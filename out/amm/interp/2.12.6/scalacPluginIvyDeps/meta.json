@@ -1,0 +1,31 @@
+{
+    "value": [
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "acyclic",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.1.7",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        }
+    ],
+    "valueHash": -2064762285,
+    "inputsHash": -763751121
+}

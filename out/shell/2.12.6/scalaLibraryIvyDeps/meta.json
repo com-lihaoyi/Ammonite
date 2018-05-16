@@ -1,0 +1,31 @@
+{
+    "value": [
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-library",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.6",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": true
+        }
+    ],
+    "valueHash": -736088112,
+    "inputsHash": -145541835
+}

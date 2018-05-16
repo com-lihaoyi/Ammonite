@@ -1,0 +1,406 @@
+{
+    "value": [
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "geny",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.1.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.github.scopt",
+                    "name": "scopt",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.5.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "sourcecode",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.1.3",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "fansi",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.2.4",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "upickle",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.6.6",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "pprint",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.5.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "io.get-coursier",
+                    "name": "coursier",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.0.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "io.get-coursier",
+                    "name": "coursier-cache",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.0.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "org.scalaj",
+                    "name": "scalaj-http",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.3.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-compiler",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.6",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-reflect",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.6",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "scalaparse",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.0.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.javassist",
+                    "name": "javassist",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.21.0-GA",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.jline",
+                    "name": "jline",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.6.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.jline",
+                    "name": "jline-terminal-jna",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.6.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "com.github.javaparser",
+                    "name": "javaparser-core",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.2.5",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        }
+    ],
+    "valueHash": -1232287689,
+    "inputsHash": 1974879213
+}

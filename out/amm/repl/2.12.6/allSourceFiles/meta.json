@@ -1,0 +1,101 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/Stubs.scala",
+            "quick": false,
+            "sig": 1769276158
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/main/Defaults.scala",
+            "quick": false,
+            "sig": -2060087322
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/AmmoniteFrontEnd.scala",
+            "quick": false,
+            "sig": 1700613353
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/ApiImpls.scala",
+            "quick": false,
+            "sig": -1069525736
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEnd.scala",
+            "quick": false,
+            "sig": 760330069
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEndUtils.scala",
+            "quick": false,
+            "sig": 953555352
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FullReplAPI.scala",
+            "quick": false,
+            "sig": -1055075481
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Highlighter.scala",
+            "quick": false,
+            "sig": -1501463525
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/PPrints.scala",
+            "quick": false,
+            "sig": 1096989651
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/RemoteLogger.scala",
+            "quick": false,
+            "sig": 891609138
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Repl.scala",
+            "quick": false,
+            "sig": 986358380
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/ReplAPI.scala",
+            "quick": false,
+            "sig": 259001632
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Signaller.scala",
+            "quick": false,
+            "sig": -736554419
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/package.scala",
+            "quick": false,
+            "sig": -1156325701
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/Compat.scala",
+            "quick": false,
+            "sig": -275956604
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/SourceRuntime.scala",
+            "quick": false,
+            "sig": -1596183226
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/desugar.scala",
+            "quick": false,
+            "sig": 723773943
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/source.scala",
+            "quick": false,
+            "sig": -1398559784
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala-2.12/ammonite/repl/tools/HighlightJava.scala",
+            "quick": false,
+            "sig": -552937464
+        }
+    ],
+    "valueHash": 1422771631,
+    "inputsHash": 682355758
+}

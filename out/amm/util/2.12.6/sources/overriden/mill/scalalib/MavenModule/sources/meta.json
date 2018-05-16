@@ -1,0 +1,16 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala",
+            "quick": false,
+            "sig": -721566117
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/java",
+            "quick": false,
+            "sig": -914035544
+        }
+    ],
+    "valueHash": -1477477182,
+    "inputsHash": -350302061
+}

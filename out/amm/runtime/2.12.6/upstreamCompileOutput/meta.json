@@ -1,0 +1,22 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": -1386438222
+            }
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": -1168708702
+            }
+        }
+    ],
+    "valueHash": -2136438871,
+    "inputsHash": 1512939805
+}

@@ -1,0 +1,196 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": 1013927385
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": -1386438222
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": -1168708702
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": 1045580684
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": -701272589
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": 1895334102
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.6/scala-compiler-2.12.6.jar",
+            "quick": true,
+            "sig": -362916390
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.16/scalaz-core_2.12-7.2.16.jar",
+            "quick": true,
+            "sig": -1651670221
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.6/scala-library-2.12.6.jar",
+            "quick": true,
+            "sig": -1273478942
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.6/scala-reflect-2.12.6.jar",
+            "quick": true,
+            "sig": -1504949327
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/scopt/scopt_2.12/3.5.0/scopt_2.12-3.5.0.jar",
+            "quick": true,
+            "sig": 70732459
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar",
+            "quick": true,
+            "sig": 376299498
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/1.0.0/fastparse_2.12-1.0.0.jar",
+            "quick": true,
+            "sig": -951901014
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.12/0.6.6/ujson_2.12-0.6.6.jar",
+            "quick": true,
+            "sig": 737923459
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier_2.12/1.0.0/coursier_2.12-1.0.0.jar",
+            "quick": true,
+            "sig": -1276154102
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.12/1.0.0/scalaparse_2.12-1.0.0.jar",
+            "quick": true,
+            "sig": 280819898
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar",
+            "quick": true,
+            "sig": -1421882323
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/4.2.2/jna-4.2.2.jar",
+            "quick": true,
+            "sig": -68256996
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/javaparser/javaparser-core/3.2.5/javaparser-core-3.2.5.jar",
+            "quick": true,
+            "sig": -561098624
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-terminal/3.6.2/jline-terminal-3.6.2.jar",
+            "quick": true,
+            "sig": 1868486025
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.6.2/jline-3.6.2.jar",
+            "quick": true,
+            "sig": -141666258
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.4/sourcecode_2.12-0.1.4.jar",
+            "quick": true,
+            "sig": 775579628
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.4/fansi_2.12-0.2.4.jar",
+            "quick": true,
+            "sig": 943390685
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-concurrent_2.12/7.2.16/scalaz-concurrent_2.12-7.2.16.jar",
+            "quick": true,
+            "sig": -1096625080
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-effect_2.12/7.2.16/scalaz-effect_2.12-7.2.16.jar",
+            "quick": true,
+            "sig": 661734884
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.12/0.5.2/pprint_2.12-0.5.2.jar",
+            "quick": true,
+            "sig": 598782990
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.12/0.1.2/geny_2.12-0.1.2.jar",
+            "quick": true,
+            "sig": -130393247
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-terminal-jna/3.6.2/jline-terminal-jna-3.6.2.jar",
+            "quick": true,
+            "sig": 1468312214
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse-utils_2.12/1.0.0/fastparse-utils_2.12-1.0.0.jar",
+            "quick": true,
+            "sig": 507110950
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.12/0.6.6/upickle_2.12-0.6.6.jar",
+            "quick": true,
+            "sig": -988116431
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalaj/scalaj-http_2.12/2.3.0/scalaj-http_2.12-2.3.0.jar",
+            "quick": true,
+            "sig": 1954145525
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-cache_2.12/1.0.0/coursier-cache_2.12-1.0.0.jar",
+            "quick": true,
+            "sig": -554670707
+        }
+    ],
+    "valueHash": 2063682539,
+    "inputsHash": 2106413914
+}

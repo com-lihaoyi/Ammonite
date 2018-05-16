@@ -1,0 +1,66 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Filter.scala",
+            "quick": false,
+            "sig": 1878413160
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/FilterTools.scala",
+            "quick": false,
+            "sig": 1010065306
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/LineReader.scala",
+            "quick": false,
+            "sig": -2091913384
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Protocol.scala",
+            "quick": false,
+            "sig": 827611602
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/SpecialKeys.scala",
+            "quick": false,
+            "sig": 363712609
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Terminal.scala",
+            "quick": false,
+            "sig": 2037248692
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Utils.scala",
+            "quick": false,
+            "sig": 355755156
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala",
+            "quick": false,
+            "sig": 1712848956
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/GUILikeFilters.scala",
+            "quick": false,
+            "sig": -212108171
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/HistoryFilter.scala",
+            "quick": false,
+            "sig": -2072574534
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/ReadlineFilters.scala",
+            "quick": false,
+            "sig": -1584322189
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala",
+            "quick": false,
+            "sig": -1717029448
+        }
+    ],
+    "valueHash": 2094757288,
+    "inputsHash": 855699554
+}

@@ -1,0 +1,106 @@
+{
+    "value": [
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.jline",
+                    "name": "jline",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.6.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.jline",
+                    "name": "jline-terminal-jna",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.6.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "com.github.javaparser",
+                    "name": "javaparser-core",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.2.5",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        },
+        {
+            "$type": "mill.scalalib.Dep.Scala",
+            "dep": {
+                "module": {
+                    "organization": "com.github.scopt",
+                    "name": "scopt",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.5.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        }
+    ],
+    "valueHash": -1845071761,
+    "inputsHash": -763751121
+}

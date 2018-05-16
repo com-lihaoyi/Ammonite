@@ -1,0 +1,31 @@
+{
+    "value": [
+        {
+            "$type": "mill.scalalib.Dep.Java",
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-reflect",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.6",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": false,
+            "force": false
+        }
+    ],
+    "valueHash": -830750831,
+    "inputsHash": -763751121
+}

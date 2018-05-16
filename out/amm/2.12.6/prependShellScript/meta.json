@@ -1,0 +1,5 @@
+{
+    "value": "@ 2>/dev/null # 2>nul & echo off & goto BOF\r\n:\nexec java -jar -Xmx500m -XX:+UseG1GC $JAVA_OPTS \"$0\" \"$@\"\nexit\n\r\n:BOF\r\n@echo off\r\njava -jar -Xmx500m -XX:+UseG1GC %JAVA_OPTS% \"%~dpnx0\" %*\r\nexit /B %errorlevel%\r\n",
+    "valueHash": -354415535,
+    "inputsHash": -763751121
+}

@@ -1,0 +1,16 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.12/0.1.7/acyclic_2.12-0.1.7.jar",
+            "quick": true,
+            "sig": -927605976
+        },
+        {
+            "path": "/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.0/scala-library-2.12.0.jar",
+            "quick": true,
+            "sig": 280272068
+        }
+    ],
+    "valueHash": -647333908,
+    "inputsHash": 151915671
+}

@@ -1,0 +1,8 @@
+[0m[[0m[0minfo[0m] [0m[0mCompiling 4 Scala sources to /home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.6/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:31:35: abstract type pattern T is unchecked since it is eliminated by erasure[0m
+[0m[[0m[33mwarn[0m] [0m[0m      case (Res.Success(prev), x: T) => f(prev, x)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere was one deprecation warning; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were four feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthree warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m

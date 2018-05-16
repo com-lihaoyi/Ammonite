@@ -1,0 +1,31 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala",
+            "quick": false,
+            "sig": 2097702082
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/java",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala-2.12.6",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala-2.12",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala-2",
+            "quick": false,
+            "sig": -914035544
+        }
+    ],
+    "valueHash": 1016881169,
+    "inputsHash": 1113783950
+}

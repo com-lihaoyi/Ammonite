@@ -1,0 +1,54 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": 1013927385
+            }
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": -1386438222
+            }
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": -1168708702
+            }
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": 1045580684
+            }
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": -701272589
+            }
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.12.6/compile/dest/zinc",
+            "classes": {
+                "path": "/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.12.6/compile/dest/classes",
+                "quick": false,
+                "sig": 1895334102
+            }
+        }
+    ],
+    "valueHash": -1785328470,
+    "inputsHash": 1484999170
+}

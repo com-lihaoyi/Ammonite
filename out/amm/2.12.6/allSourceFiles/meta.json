@@ -1,0 +1,41 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/Main.scala",
+            "quick": false,
+            "sig": 1444729841
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/main/Cli.scala",
+            "quick": false,
+            "sig": 1060843995
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/main/Compat.scala",
+            "quick": false,
+            "sig": -1539033895
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/main/ProxyFromEnv.scala",
+            "quick": false,
+            "sig": -1738952998
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/main/Router.scala",
+            "quick": false,
+            "sig": -5717754
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/main/Scripts.scala",
+            "quick": false,
+            "sig": -583722051
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala/ammonite/main/package.scala",
+            "quick": false,
+            "sig": -1173435908
+        }
+    ],
+    "valueHash": 374157833,
+    "inputsHash": -693431396
+}

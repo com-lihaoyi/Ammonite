@@ -1,0 +1,26 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Imports.scala",
+            "quick": false,
+            "sig": 832956249
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Model.scala",
+            "quick": false,
+            "sig": -1555504283
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala",
+            "quick": false,
+            "sig": 2025409157
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Util.scala",
+            "quick": false,
+            "sig": -1563838687
+        }
+    ],
+    "valueHash": -257357908,
+    "inputsHash": -1384739092
+}

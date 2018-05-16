@@ -1,0 +1,16 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/terminal/src/main/resources",
+            "quick": false,
+            "sig": -914035544
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.6/compile/dest/classes",
+            "quick": false,
+            "sig": 1013927385
+        }
+    ],
+    "valueHash": -517055510,
+    "inputsHash": 308506187
+}

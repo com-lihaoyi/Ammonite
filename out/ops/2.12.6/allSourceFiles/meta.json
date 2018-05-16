@@ -1,0 +1,41 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/Extensions.scala",
+            "quick": false,
+            "sig": 1384841166
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/FileOps.scala",
+            "quick": false,
+            "sig": 1512963306
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/Model.scala",
+            "quick": false,
+            "sig": 497318570
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/Path.scala",
+            "quick": false,
+            "sig": -1102675766
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/PathUtils.scala",
+            "quick": false,
+            "sig": 1175612807
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/Shellout.scala",
+            "quick": false,
+            "sig": -753854599
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala/ammonite/ops/package.scala",
+            "quick": false,
+            "sig": 17797577
+        }
+    ],
+    "valueHash": 452396458,
+    "inputsHash": 2111016666
+}

@@ -1,0 +1,61 @@
+{
+    "value": [
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/AmmonitePlugin.scala",
+            "quick": false,
+            "sig": -1723784906
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Compiler.scala",
+            "quick": false,
+            "sig": 594172636
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CompilerLifecycleManager.scala",
+            "quick": false,
+            "sig": -930050987
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/InterpAPI.scala",
+            "quick": false,
+            "sig": 1686911231
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Interpreter.scala",
+            "quick": false,
+            "sig": 1481804454
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Parsers.scala",
+            "quick": false,
+            "sig": 1345235629
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/PredefInitialization.scala",
+            "quick": false,
+            "sig": 971069209
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Preprocessor.scala",
+            "quick": false,
+            "sig": -1584907093
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Pressy.scala",
+            "quick": false,
+            "sig": -1976979877
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.12/ammonite/interp/CompilerCompatibility.scala",
+            "quick": false,
+            "sig": -192512595
+        },
+        {
+            "path": "/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.12/ammonite/interp/GlobalInitCompat.scala",
+            "quick": false,
+            "sig": -346523132
+        }
+    ],
+    "valueHash": 87827991,
+    "inputsHash": -975008943
+}
