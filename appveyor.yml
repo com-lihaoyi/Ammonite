@@ -2,31 +2,26 @@
 version: '{build}'
 os: Windows Server 2012
 
-#  To make the extended ascii characters work on Windows
-#  we need to set string encoding for jvm to utf-8 on windows
 environment:
-  SBT_OPTS: -Dfile.encoding=UTF8
-  JAVA_OPTS: -Dfile.encoding=UTF8
+  matrix:
+  - JAVA_OPTS: -Dfile.encoding=UTF8
+    JAVA_HOME: C:\Program Files\Java\jdk9
+    TEST_TASKS: ops[2.11.12].test terminal[2.12.6].test amm.repl[2.12.6].test
+
+  - JAVA_OPTS: -Dfile.encoding=UTF8
+    JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+    TEST_TASKS: amm[2.11.12].test integration[2.12.6].test
+
 install:
-  - cmd: choco install sbt -ia "INSTALLDIR=""C:\sbt""" --version 0.13.15
-  - cmd: SET PATH=C:\sbt\bin;%JAVA_HOME%\bin;%PATH%
-  - cmd: SET SBT_OPTS=-XX:MaxPermSize=2g -Xmx4g
+  - SET MILL_URL=https://github.com/lihaoyi/mill/releases/download/0.1.7/0.1.7-97-00b10e
 
 build_script:
-  - sbt ++2.11.12 ops/compile
-  - sbt ++2.11.12 amm/compile
-  - sbt ++2.11.12 integration/compile
+  - SET "PATH=%JAVA_HOME%\bin;%PATH%"
+  - MD C:\bin
+  - curl -Lo C:\bin\mill.bat %MILL_URL%
 
 test_script:
-  - sbt ++2.11.12 ops/test
-  - sbt ++2.11.12 amm/test
-  - sbt ++2.11.12 integration/test
+  - cmd /C C:\bin\mill.bat -i all %TEST_TASKS%
 
 cache:
-  - C:\sbt\
-  - '%USERPROFILE%\.ivy2\cache'
-  - '%USERPROFILE%\.m2'
-  - '%USERPROFILE%\.sbt'
   - '%LOCALAPPDATA%\Coursier\cache'
-  - C:\ProgramData\chocolatey\lib -> appveyor.yml
-  - C:\ProgramData\chocolatey\bin -> appveyor.yml

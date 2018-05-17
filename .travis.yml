@@ -7,56 +7,61 @@ install:
 
 matrix:
   include:
-  # Each `test` call is manually sharded out into `published/test` and
-  # `integration/test`; for some reason, running them on the same box is
-  # flaky and `integration/test` ends up hanging, even if they are run in
-  # separate, sequential processes.
-  #
-  # published tests tend to run slower than integration tests, so start
-  # them first
-  - stage: build
-    env: CI_SCRIPT="mill unitTest"
-    jdk: oraclejdk9
-    scala: 2.12.4
 
   - stage: build
-    env: CI_SCRIPT="mill unitTest"
-    jdk: oraclejdk8
-    scala: 2.12.6
-
-  - stage: build
-    env: CI_SCRIPT="mill unitTest"
+    env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk7
     scala: 2.11.12
 
   - stage: build
-    env: CI_SCRIPT="mill integrationTest"
+    env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk9
     scala: 2.12.6
 
   - stage: build
-    env: CI_SCRIPT="mill integrationTest"
+    env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk8
-    scala: 2.12.4
+    scala: 2.12.6
 
   - stage: build
-    env: CI_SCRIPT="mill integrationTest"
+    env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk7
     scala: 2.11.12
+
+  - stage: build
+    env: CI_SCRIPT="mill -i integrationTest"
+    jdk: oraclejdk9
+    scala: 2.12.6
+
+  - stage: build
+    env: CI_SCRIPT="mill -i integrationTest"
+    jdk: oraclejdk8
+    scala: 2.12.6
+
 
   # Everything worked, *then* kick off a release
   - stage: release
-    env: CI_SCRIPT="ci/build.sc sonatypeReleaseAll"
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 1 3"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="ci/build.sc docs"
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 2 3"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="ci/build.sc publishExecutable"
+    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 3 3"
+    jdk: oraclejdk8
+    scala: 2.11.12
+
+  - stage: release
+    env: CI_SCRIPT="mill -i publishDocs"
+    jdk: oraclejdk8
+    scala: 2.11.12
+
+  - stage: release
+    env: CI_SCRIPT="mill -i publishExecutable"
     jdk: oraclejdk8
     scala: 2.11.12
 
@@ -67,10 +72,8 @@ script:
 - export PATH=~/bin/amm:~/bin/mill:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- rm ~/bin/amm
-- if [ ! -f ~/bin/amm ]; then curl -L -o ~/bin/amm https://github.com/lihaoyi/Ammonite/releases/download/1.1.0/2.11-1.1.0-7-33b728c && chmod +x ~/bin/amm; fi
-- sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.0/0.2.0) > ~/bin/mill && chmod +x ~/bin/mill'
-- JAVAOPTS="-Xmx2048m" amm $CI_SCRIPT
+- if [ ! -f ~/bin/mill ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.0/0.2.0) > ~/bin/mill && chmod +x ~/bin/mill'; fi
+- JAVAOPTS="-Xmx2048m" $CI_SCRIPT
 
 notifications:
   email:
@@ -82,12 +85,7 @@ sudo: true
 # Stolen from https://github.com/typelevel/cats/blob/master/.travis.yml
 cache:
   directories:
-  - $HOME/.sbt/0.13/dependency
-  - $HOME/.sbt/boot/scala*
-  - $HOME/.sbt/launchers
-  - $HOME/.ivy2/cache
   - $HOME/.coursier
-  - $HOME/.nvm
   - $HOME/bin
 
 before_cache:
