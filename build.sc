@@ -16,6 +16,7 @@ val fullCrossScalaVersions = Seq(
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6"
 )
 trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
+  def artifactName = "ammonite-" + millOuterCtx.segments.parts.last
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
@@ -132,6 +133,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 }
 class MainModule(val crossScalaVersion: String) extends AmmModule{
+
+  def artifactName = "ammonite"
 
   def mainClass = Some("ammonite.Main")
 
