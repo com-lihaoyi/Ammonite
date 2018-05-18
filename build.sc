@@ -340,7 +340,7 @@ def publishDocs() = {
       "readme/run",
       AMMONITE_SHELL=shell("2.12.6").jar().path,
       AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path,
-      CONSTANTS_FILE=constantsFile
+      CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
@@ -381,7 +381,6 @@ def publishDocs() = {
         yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k")
     )
 
-    %sbt "readme/compile"
     %sbt(
       "readme/run",
       AMMONITE_SHELL=shell("2.12.6").jar().path,
