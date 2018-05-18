@@ -13,7 +13,7 @@ environment:
     TEST_TASKS: amm[2.11.12].test integration[2.12.6].test
 
 install:
-  - SET MILL_URL=https://github.com/lihaoyi/mill/releases/download/0.1.7/0.1.7-97-00b10e
+  - SET MILL_URL=https://github.com/lihaoyi/mill/releases/download/0.2.0/0.2.0-30-699802
 
 build_script:
   - SET "PATH=%JAVA_HOME%\bin;%PATH%"
