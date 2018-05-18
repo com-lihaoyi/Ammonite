@@ -14,5 +14,5 @@ lazy val readme = ScalatexReadme(
   ),
   fork := true,
   baseDirectory in (Compile, run) := (baseDirectory in (Compile, run)).value / "..",
-  (unmanagedSources in Compile) += baseDirectory.value/".."/"project"/"Constants.scala"
+  (unmanagedSources in Compile) += file(sys.env("CONSTANTS_FILE"))
 )
