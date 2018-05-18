@@ -339,7 +339,8 @@ def publishDocs() = {
     %sbt(
       "readme/run",
       AMMONITE_SHELL=shell("2.12.6").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path
+      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path,
+      CONSTANTS_FILE=constantsFile
     )
   }else T.command{
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
