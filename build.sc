@@ -294,12 +294,12 @@ def updateConstants(version: String = buildVersion,
 
 
 def publishExecutable() = {
+  updateConstants(buildVersion)
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: generating executable but not publishing")
     mill.define.Task.sequence(latestAssemblies)()
   }else T.command{
     val latestAssemblyJars = mill.define.Task.sequence(latestAssemblies)()
-    updateConstants(buildVersion)
 
     println("MASTER COMMIT: Creating a release")
     import ujson.Js
