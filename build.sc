@@ -106,9 +106,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
 
     def generatedSources = T{
-      import ammonite.ops._
-      cp(build.millSourcePath/'project/"Constants.scala", T.ctx().dest/"Constants.scala")
-      Seq(PathRef(T.ctx().dest))
+      Seq(PathRef(generateConstantsFile(buildVersion)))
     }
   }
 
@@ -264,13 +262,13 @@ def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.
   integration(scalaVersion).test.test()()
 }
 
-
-def updateConstants(version: String = buildVersion,
-                    unstableVersion: String = "<fill-me-in-in-Constants.scala>",
-                    curlUrl: String = "<fill-me-in-in-Constants.scala>",
-                    unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
-                    oldCurlUrls: Seq[(String, String)] = Nil,
-                    oldUnstableCurlUrls: Seq[(String, String)] = Nil) = {
+def generateConstantsFile(version: String = buildVersion,
+                          unstableVersion: String = "<fill-me-in-in-Constants.scala>",
+                          curlUrl: String = "<fill-me-in-in-Constants.scala>",
+                          unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
+                          oldCurlUrls: Seq[(String, String)] = Nil,
+                          oldUnstableCurlUrls: Seq[(String, String)] = Nil)
+                         (implicit ctx: mill.util.Ctx.Dest)= {
   val versionTxt = s"""
     package ammonite
     object Constants{
@@ -287,14 +285,13 @@ def updateConstants(version: String = buildVersion,
     }
   """
   println("Writing Constants.scala")
-  rm! pwd/'project/"Constants.scala"
-  write(pwd/'project/"Constants.scala", versionTxt)
-  println(read! pwd/'project/"Constants.scala")
+
+  write(ctx.dest/"Constants.scala", versionTxt)
+  ctx.dest/"Constants.scala"
 }
 
 
 def publishExecutable() = {
-  updateConstants(buildVersion)
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: generating executable but not publishing")
     mill.define.Task.sequence(latestAssemblies)()
@@ -372,7 +369,7 @@ def publishDocs() = {
       }
     println("(stableKey, unstableKey)")
     println((stableKey, unstableKey))
-    updateConstants(
+    val constantsFile = generateConstantsFile(
       latestTaggedVersion,
       buildVersion,
       s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey",
@@ -387,7 +384,8 @@ def publishDocs() = {
     %sbt(
       "readme/run",
       AMMONITE_SHELL=shell("2.12.6").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path
+      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path,
+      CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")
   }

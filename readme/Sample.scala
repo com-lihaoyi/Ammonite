@@ -14,15 +14,11 @@ object Sample{
 
 
   def curlCommand(curlUrl: String) =
-    s"$$ sudo curl -L -o /usr/local/bin/amm " +
-    curlUrl +
-    " && sudo chmod +x /usr/local/bin/amm && amm"
-  def unstableCurlCommand(curlUrl: String) =
     s"""$$ sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L """ +
     curlUrl +
     ") > /usr/local/bin/amm && chmod +x /usr/local/bin/amm' && amm"
   val replCurl = curlCommand(ammonite.Constants.curlUrl)
-  val unstableCurl = unstableCurlCommand(ammonite.Constants.unstableCurlUrl)
+  val unstableCurl = curlCommand(ammonite.Constants.unstableCurlUrl)
   val cygwinSed = """$ sed -i '0,/"\$0"/{s/"\$0"/`cygpath -w "\$0"`/}' /usr/local/bin/amm"""
   val filesystemCurl =
     "$ mkdir -p ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/vHaKQ"
