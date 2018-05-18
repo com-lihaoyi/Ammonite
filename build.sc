@@ -335,7 +335,6 @@ def publishDocs() = {
   // need to make significant changes to the readme and that'll time.
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: Building readme for verification")
-    %sbt("readme/compile")
     %sbt(
       "readme/run",
       AMMONITE_SHELL=shell("2.12.6").jar().path,
