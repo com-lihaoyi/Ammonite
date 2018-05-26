@@ -120,7 +120,7 @@ object SpecialClassLoader{
     val allClassloaders = {
       val all = mutable.Buffer.empty[ClassLoader]
       var current = classloader
-      while(current != null){
+      while(current != null && current != ClassLoader.getSystemClassLoader){
         all.append(current)
         current = current.getParent
       }
@@ -143,18 +143,17 @@ object SpecialClassLoader{
         .collect{case cl: java.net.URLClassLoader => cl.getURLs}
         .flatten
         .filter(_.getProtocol == "file")
+        .map(p => java.nio.file.Paths.get(p.toURI))
 
-    val mtimes = classpathRoots.flatMap{ rawP =>
-      val p = java.nio.file.Paths.get(rawP.toURI)
-      if (!java.nio.file.Files.exists(p)) {
-        None
-      }
-      else if (java.nio.file.Files.isDirectory(p)){
-        Some(findMtimes(p))
-      } else  {
-        Some(Seq(Right(Path(p)) -> Path(p).mtime.toMillis))
-      }
-    }.flatten
+    val bootClasspathRoots = sys.props("java.class.path")
+      .split(":|;")
+      .map(java.nio.file.Paths.get(_))
+
+    val mtimes = (bootClasspathRoots ++ classpathRoots).flatMap{ p =>
+      if (!java.nio.file.Files.exists(p)) Nil
+      else if (java.nio.file.Files.isDirectory(p)) findMtimes(p)
+      else Seq(Right(Path(p)) -> Path(p).mtime.toMillis)
+    }
 
     mtimes
   }
