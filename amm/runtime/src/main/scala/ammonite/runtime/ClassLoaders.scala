@@ -146,7 +146,7 @@ object SpecialClassLoader{
         .map(p => java.nio.file.Paths.get(p.toURI))
 
     val bootClasspathRoots = sys.props("java.class.path")
-      .split(":|;")
+      .split(java.io.File.pathSeparator)
       .map(java.nio.file.Paths.get(_))
 
     val mtimes = (bootClasspathRoots ++ classpathRoots).flatMap{ p =>
