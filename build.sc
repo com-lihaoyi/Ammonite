@@ -100,8 +100,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util())
     def ivyDeps = Agg(
-      ivy"io.get-coursier::coursier:1.0.0",
-      ivy"io.get-coursier::coursier-cache:1.0.0",
+      ivy"io.get-coursier::coursier:1.0.3",
+      ivy"io.get-coursier::coursier-cache:1.0.3",
       ivy"org.scalaj::scalaj-http:2.3.0"
     )
 
