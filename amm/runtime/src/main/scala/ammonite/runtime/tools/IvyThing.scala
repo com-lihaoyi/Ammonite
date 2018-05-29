@@ -4,6 +4,7 @@ import java.io.{PrintStream, PrintWriter}
 
 import ammonite.util.Util
 
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object IvyConstructor extends IvyConstructor
 trait IvyConstructor{
@@ -20,6 +21,7 @@ trait IvyConstructor{
 }
 
 object IvyThing{
+
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
                       verbose: Boolean,
@@ -37,9 +39,9 @@ object IvyThing{
 
     val start = coursier.Resolution(dependencies.toSet)
 
-    val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch(logger = logger))
+    val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch[coursier.util.Task](logger = logger))
 
-    val resolution = start.process.run(fetch).run
+    val resolution = start.process.run(fetch).unsafeRun()
 
 
     val res =
@@ -58,18 +60,18 @@ object IvyThing{
         )
       }else {
         def load(artifacts: Seq[coursier.Artifact]) = {
-
-          val loadedArtifacts = scalaz.concurrent.Task.gatherUnordered(
+          val loadedArtifacts = coursier.util.Task.gather.gather(
             for (a <- artifacts)
-              yield coursier.Cache.file(a, logger = logger).run
+              yield coursier.Cache.file[coursier.util.Task](a, logger = logger)
+                .run
                 .map(a.isOptional -> _)
-          ).run
+            ).unsafeRun()
 
           val errors = loadedArtifacts.collect {
-            case (false, scalaz.-\/(x)) => x
-            case (true, scalaz.-\/(x)) if !x.notFound => x
+            case (false, Left(err)) => err
+            case (true, Left(err)) if !err.notFound => err
           }
-          val successes = loadedArtifacts.collect { case (_, scalaz.\/-(x)) => x }
+          val successes = loadedArtifacts.collect { case (_, Right(x)) => x }
           (errors, successes)
         }
 
