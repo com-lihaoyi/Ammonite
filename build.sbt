@@ -6,7 +6,7 @@ lazy val readme = ScalatexReadme(
   url = "https://github.com/lihaoyi/ammonite/tree/master",
   source = "Index"
 ).settings(
-  scalaVersion := "2.12.3",
+  scalaVersion := "2.12.6",
   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.3",
   envVars in Test := Map(
     "AMMONITE_ASSEMBLY" -> sys.env("AMMONITE_ASSEMBLY"),
