@@ -223,33 +223,6 @@ object SourceTests extends TestSuite{
           "def productIterator"
         )
       }
-      'scalaz{
-
-        'base - check212(load(scalaz.==>>), "Map.scala", "object ==>>")
-        // Some aliases the make our code shorter
-        import scalaz.==>>
-        implicit val scalazOrder: scalaz.Order[Int] = scalaz.Order.fromScalaOrdering(Ordering[Int])
-        implicit val scalazShow: scalaz.Show[Int] = scalaz.Show.show[Int](_.toString)
-        type I = Int
-        'empty     - check212(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
-        'singleton - check212(load(==>>.singleton[I, I] _), "Map.scala", "final def singleton")
-        'unions    - check212(load(==>>.unions[I, I] _), "Map.scala", "final def unions")
-        // inherited
-        'mapShow   - check212(load(==>>.mapShow[I, I]), "Map.scala", "implicit def mapShow")
-        'mapOrder  - check212(load(==>>.mapOrder[I, I]), "Map.scala", "implicit def mapOrder")
-        'mapBifoldable - check212(
-          load(==>>.mapBifoldable),
-          "Map.scala",
-          "implicit val mapBifoldable"
-        )
-
-        val instance = ==>>.empty[I, I]
-        'instance  - check212(load(instance), "Map.scala", "case object Tip")
-        'adjust    - check212(load(instance.adjust _), "Map.scala", "def adjust")
-        'values    - check212(load(instance.values _), "Map.scala", "def values")
-        'mapAccumL - check212(load(instance.mapAccumL _), "Map.scala", "def mapAccumL")
-        'split     - check212(load(instance.split _), "Map.scala", "def split")
-      }
       'fastparse{
         import fastparse.all._
         'all - check212(load(fastparse.all), "StringApi.scala", "object all extends StringApi")
