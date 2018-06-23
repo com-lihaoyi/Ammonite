@@ -143,6 +143,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ReplModule.this.sources() ++
         ReplModule.this.externalSources()
       }
+      def ivyDeps = super.ivyDeps() ++ Agg(
+        ivy"org.scalaz::scalaz-core:7.2.24"
+      )
     }
   }
 }
