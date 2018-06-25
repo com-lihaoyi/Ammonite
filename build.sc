@@ -141,7 +141,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def resources = T.sources {
         super.resources() ++
         ReplModule.this.sources() ++
-        ReplModule.this.externalSources()
+        ReplModule.this.externalSources() ++
+        resolveDeps(ivyDeps, sources = true)()
       }
       def ivyDeps = super.ivyDeps() ++ Agg(
         ivy"org.scalaz::scalaz-core:7.2.24"
