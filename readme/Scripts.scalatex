@@ -319,7 +319,7 @@
         given to the script:
 
       @hl.sh
-        $ amm --predef 'println("welcome!")' Args.sc 3 Moo
+        $ amm --predef-code 'println("welcome!")' Args.sc 3 Moo
         welcome!
         "Hello! MooMooMoo Ammonite."
 
@@ -755,3 +755,7 @@
       @p
         If you have already started an SBT repl, then you can run the above without the quotes:
         @code{test:run /path/to/script.sc arg1 arg2 arg3}
+        
+      @p
+        Running a script from your SBT project can be achieved with
+        @code{ammonite.Main.main(Array("--predef-code", """println("welcome!")""", "file.sc"))}
