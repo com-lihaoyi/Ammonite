@@ -431,11 +431,13 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
       }
     }
+
     new SonatypePublisher(
       "https://oss.sonatype.org/service/local",
       "https://oss.sonatype.org/content/repositories/snapshots",
       sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
-      sys.env("SONATYPE_PGP_PASSWORD"),
+      Option(sys.env("SONATYPE_PGP_PASSWORD")),
+      true,
       T.ctx().log
     ).publishAll(
       true,
