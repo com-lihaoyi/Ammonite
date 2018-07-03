@@ -72,7 +72,7 @@ script:
 - export PATH=~/bin/amm:~/bin/mill:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- if [ ! -f ~/bin/mill ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.3/0.2.3) > ~/bin/mill && chmod +x ~/bin/mill'; fi
+- if [ ! -f ~/bin/mill-0.2.3 ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.3/0.2.3) > ~/bin/mill-0.2.3 && chmod +x ~/bin/mill-0.2.3 && ( cd ~/bin && rm -f mill && ln -s mill-0.2.3 mill)'; fi
 - JAVAOPTS="-Xmx2048m" $CI_SCRIPT
 
 notifications:
