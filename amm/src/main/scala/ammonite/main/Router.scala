@@ -91,7 +91,7 @@ object Router{
 
         group match{
           case (value, None) =>
-            if (value(0) == '-' && !varargs){
+            if (value.startsWith("-") && !varargs){
               lookupArgSig.get(stripDashes(value)) match{
                 case None => leftoverArgs.append(value)
                 case Some(sig) => incomplete = Some(sig)
