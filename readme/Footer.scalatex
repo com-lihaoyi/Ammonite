@@ -1445,12 +1445,6 @@
       @readme.Sample.unstableCurl
 
     @p
-      On Cygwin, run the following after the above:
-
-    @hl.sh
-      @readme.Sample.cygwinSed
-
-    @p
       The latest build can also be run as Windows batch; just save the following as amm.bat:
 
     @p
