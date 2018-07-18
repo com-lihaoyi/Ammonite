@@ -129,6 +129,10 @@ object MainTests extends TestSuite{
           )
           assert(out.contains(expected.trim))
         }
+        'emptyArg {
+          val evaled = exec("ArgList.sc", "")
+          assert(evaled.success)
+        }
       }
     }
 
