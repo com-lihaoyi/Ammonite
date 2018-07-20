@@ -67,7 +67,9 @@ case class Main(predefCode: String = "",
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default,
                 replCodeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper,
-                scriptCodeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper){
+                scriptCodeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper,
+                alreadyLoadedDependencies: Seq[coursier.Dependency] =
+                  Defaults.alreadyLoadedDependencies()){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -119,7 +121,8 @@ case class Main(predefCode: String = "",
         remoteLogger = remoteLogger,
         initialColors = colors,
         replCodeWrapper = replCodeWrapper,
-        scriptCodeWrapper = scriptCodeWrapper
+        scriptCodeWrapper = scriptCodeWrapper,
+        alreadyLoadedDependencies = alreadyLoadedDependencies
       )
     }
 
@@ -156,7 +159,8 @@ case class Main(predefCode: String = "",
         () => frame,
         () => throw new Exception("session loading / saving not possible here"),
         replCodeWrapper,
-        scriptCodeWrapper
+        scriptCodeWrapper,
+        alreadyLoadedDependencies = alreadyLoadedDependencies
       )
       interp.initializePredef() match{
         case None => Right(interp)

@@ -39,7 +39,8 @@ class Interpreter(val printer: Printer,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
                   replCodeWrapper: Preprocessor.CodeWrapper,
-                  scriptCodeWrapper: Preprocessor.CodeWrapper)
+                  scriptCodeWrapper: Preprocessor.CodeWrapper,
+                  alreadyLoadedDependencies: Seq[coursier.Dependency])
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -583,6 +584,10 @@ class Interpreter(val printer: Printer,
   }
 
 
+  private val alwaysExclude = alreadyLoadedDependencies
+    .map(dep => (dep.module.organization, dep.module.name))
+    .toSet
+
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
     val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
 
@@ -591,7 +596,13 @@ class Interpreter(val printer: Printer,
       case None =>
         ammonite.runtime.tools.IvyThing.resolveArtifact(
           interpApi.repositories(),
-          coordinates,
+          coordinates
+            .filter(dep => !alwaysExclude((dep.module.organization, dep.module.name)))
+            .map { dep =>
+              dep.copy(
+                exclusions = dep.exclusions ++ alwaysExclude
+              )
+            },
           verbose = verboseOutput,
           output = printer.errStream
         )match{

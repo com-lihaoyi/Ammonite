@@ -59,6 +59,27 @@ trait AmmModule extends AmmInternalModule with PublishModule{
 
 
 }
+trait AmmDependenciesResourceFileModule extends JavaModule{
+  def crossScalaVersion: String
+  def dependencyResourceFileName: String
+  def resources = T.sources {
+
+    val deps0 = T.task{compileIvyDeps() ++ transitiveIvyDeps()}()
+    val (_, res) = mill.modules.Jvm.resolveDependenciesMetadata(
+      repositories,
+      deps0.map(resolveCoursierDependency().apply(_)),
+      deps0.filter(_.force).map(resolveCoursierDependency().apply(_)),
+      mapDependencies = Some(mapDependencies)
+    )
+
+    super.resources() ++
+    Seq(PathRef(generateDependenciesFile(
+      crossScalaVersion,
+      dependencyResourceFileName,
+      res.minDependencies.toSeq
+    )))
+  }
+}
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
@@ -137,7 +158,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"com.github.scopt::scopt:3.5.0"
     )
 
-    object test extends Tests{
+    object test extends Tests with AmmDependenciesResourceFileModule{
+      def crossScalaVersion = ReplModule.this.crossScalaVersion
+      def dependencyResourceFileName = "amm-test-dependencies.txt"
       def resources = T.sources {
         super.resources() ++
         ReplModule.this.sources() ++
@@ -150,7 +173,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
 }
-class MainModule(val crossScalaVersion: String) extends AmmModule{
+class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
 
   def artifactName = "ammonite"
 
@@ -190,6 +213,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule{
     )
   }
 
+  def dependencyResourceFileName = "amm-dependencies.txt"
 
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
@@ -292,6 +316,31 @@ def generateConstantsFile(version: String = buildVersion,
 
   write(ctx.dest/"Constants.scala", versionTxt)
   ctx.dest/"Constants.scala"
+}
+
+def generateDependenciesFile(scalaVersion: String,
+                             fileName: String,
+                             deps: Seq[coursier.Dependency])
+                            (implicit ctx: mill.util.Ctx.Dest) = {
+
+  val dir = ctx.dest / "extra-resources"
+  val dest = dir / fileName
+
+  val content = deps
+    .map { dep =>
+      (dep.module.organization, dep.module.name, dep.version)
+    }
+    .sorted
+    .map {
+      case (org, name, ver) =>
+        s"$org:$name:$ver"
+    }
+    .mkString("\n")
+
+  println(s"Writing $dest")
+  write(dest, content.getBytes("UTF-8"))
+
+  dir
 }
 
 
@@ -435,11 +484,13 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
       }
     }
+
     new SonatypePublisher(
       "https://oss.sonatype.org/service/local",
       "https://oss.sonatype.org/content/repositories/snapshots",
       sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
-      sys.env("SONATYPE_PGP_PASSWORD"),
+      Option(sys.env("SONATYPE_PGP_PASSWORD")),
+      true,
       T.ctx().log
     ).publishAll(
       true,

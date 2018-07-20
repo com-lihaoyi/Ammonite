@@ -306,6 +306,40 @@ object ProjectTests extends TestSuite{
       )
     }
 
+    "no duplicate Ammonite JARs" - {
+      check.session(
+        """
+        @ def scalaLibJarCount() = {
+        @   import scala.collection.JavaConverters._
+        @   Thread.currentThread
+        @     .getContextClassLoader
+        @     .getResources("library.properties")
+        @     .asScala
+        @     .length
+        @ }
+        defined function scalaLibJarCount
+
+        @ val initCount = scalaLibJarCount()
+
+        @ // should only add the shapeless-specific JARs
+
+        @ import $ivy.`com.chuusai::shapeless:2.3.2`
+        import $ivy.$
+
+        @ val addedAfterShapeless = scalaLibJarCount() - initCount
+        addedAfterShapeless: Int = 0
+
+        @ // shouldn't add any JAR (scala-library already pulled by Ammonite)
+
+        @ import $ivy.`org.scala-lang:scala-library:2.11.12`
+        import $ivy.$
+
+        @ val addedAfterScalaLib = scalaLibJarCount() - initCount
+        addedAfterScalaLib: Int = 0
+        """
+      )
+    }
+
   }
 }
 

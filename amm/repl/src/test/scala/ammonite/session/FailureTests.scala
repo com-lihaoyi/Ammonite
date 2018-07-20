@@ -45,7 +45,7 @@ object FailureTests extends TestSuite{
     }
     'ivyFail{
       check.session("""
-        @ import $ivy.`com.lihaoyi::upickle:0.1.12312-DOESNT-EXIST`
+        @ import $ivy.`com.lihaoyi::upickle-doest-exist:0.1.0`
         error: Failed to resolve ivy dependencies
       """)
     }
