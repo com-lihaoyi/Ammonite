@@ -29,7 +29,8 @@ object Cli{
                     home: Path = Defaults.ammoniteHome,
                     predefFile: Option[Path] = None,
                     help: Boolean = false,
-                    colored: Option[Boolean] = None)
+                    colored: Option[Boolean] = None,
+                    classBased: Boolean = false)
 
 
   import ammonite.main.Scripts.pathScoptRead
@@ -109,6 +110,13 @@ object Cli{
         |commands
         |""".stripMargin,
       (c, v) => c.copy(remoteLogging= false)
+    ),
+    Arg[Config, Unit](
+      "class-based", None,
+      """Wrap user code in classes rather than singletons, typically for Java serialization
+        |friendliness.
+        |""".stripMargin,
+      (c, v) => c.copy(classBased=true)
     )
 
   )

@@ -412,6 +412,12 @@ class MainRunner(cliConfig: Cli.Config,
       new Storage.Folder(cliConfig.home, isRepl)
     }
 
+    val codeWrapper =
+      if (cliConfig.classBased)
+        Preprocessor.CodeClassWrapper
+      else
+        Preprocessor.CodeWrapper
+
     Main(
       cliConfig.predefCode,
       cliConfig.predefFile,
@@ -424,7 +430,9 @@ class MainRunner(cliConfig: Cli.Config,
       welcomeBanner = cliConfig.welcomeBanner,
       verboseOutput = cliConfig.verboseOutput,
       remoteLogging = cliConfig.remoteLogging,
-      colors = colors
+      colors = colors,
+      replCodeWrapper = codeWrapper,
+      scriptCodeWrapper = codeWrapper
     )
 
   }
