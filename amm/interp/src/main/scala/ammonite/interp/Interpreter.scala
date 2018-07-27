@@ -40,12 +40,14 @@ class Interpreter(val printer: Printer,
                   val createFrame: () => Frame,
                   replCodeWrapper: Preprocessor.CodeWrapper,
                   scriptCodeWrapper: Preprocessor.CodeWrapper,
-                  alreadyLoadedDependencies: Seq[coursier.Dependency])
+                  alreadyLoadedDependencies: Seq[coursier.Dependency],
+                  initialProfiles: Seq[String] = Nil)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
+  val profiles = Ref(initialProfiles.toList)
 
   val mainThread = Thread.currentThread()
 
@@ -589,7 +591,7 @@ class Interpreter(val printer: Printer,
     .toSet
 
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
-    val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
+    val cacheKey = (interpApi.repositories().hashCode.toString, interpApi.profiles().sorted, coordinates)
 
     storage.ivyCache().get(cacheKey) match{
       case Some(res) => Right(res.map(new java.io.File(_)))
@@ -603,6 +605,7 @@ class Interpreter(val printer: Printer,
                 exclusions = dep.exclusions ++ alwaysExclude
               )
             },
+          interpApi.profiles(),
           verbose = verboseOutput,
           output = printer.errStream
         )match{
@@ -658,6 +661,8 @@ class Interpreter(val printer: Printer,
     val beforeExitHooks = interp.beforeExitHooks
 
     val repositories = interp.repositories
+
+    val profiles = interp.profiles
 
     object load extends DefaultLoadJar with InterpLoad {
 

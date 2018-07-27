@@ -35,6 +35,11 @@ trait InterpAPI {
   def repositories: Ref[List[coursier.Repository]]
 
   /**
+    * profiles to use when loading jars
+    */
+  def profiles: Ref[List[String]]
+
+  /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit
     */
   def exit = throw AmmoniteExit(())

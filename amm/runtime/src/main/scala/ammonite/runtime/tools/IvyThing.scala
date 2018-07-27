@@ -23,6 +23,7 @@ trait IvyConstructor{
 object IvyThing{
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
+                      profiles: Seq[String],
                       verbose: Boolean,
                       output: PrintStream) = synchronized {
     val writer = new PrintWriter(output)
@@ -36,7 +37,14 @@ object IvyThing{
       Some(logger)
     }
 
-    val start = coursier.Resolution(dependencies.toSet)
+    val start = coursier.Resolution(
+      dependencies.toSet,
+      userActivations =
+        if (profiles.isEmpty)
+          None
+        else
+          Some(profiles.map(p => if (p.startsWith("!")) p.drop(1) -> false else p -> true).toMap)
+    )
 
     val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch[Task](logger = logger))
 

@@ -41,7 +41,7 @@ trait Storage{
 
 object Storage{
   case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
-  type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
+  type IvyMap = Map[(String, Seq[String], Seq[coursier.Dependency]), Set[String]]
   implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
   implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
   implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
