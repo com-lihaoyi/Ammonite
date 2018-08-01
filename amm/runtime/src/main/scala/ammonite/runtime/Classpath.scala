@@ -24,7 +24,7 @@ object Classpath {
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-  def classpath(storage: Storage): Vector[File] = {
+  def classpath(classLoader: ClassLoader, storage: Storage): Vector[File] = {
     val cache = storage.classpathCache()
     if (cache.isDefined) return cache.get
     def rtCacheDir(storage: Storage): Option[Path] = storage match {
@@ -38,7 +38,7 @@ object Classpath {
       case _ => None
     }
 
-    var current = Thread.currentThread().getContextClassLoader
+    var current = classLoader
     val files = collection.mutable.Buffer.empty[java.io.File]
     while(current != null){
       current match{
