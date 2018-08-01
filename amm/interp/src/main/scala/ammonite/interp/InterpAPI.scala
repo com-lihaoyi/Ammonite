@@ -35,6 +35,12 @@ trait InterpAPI {
   def repositories: Ref[List[coursier.Repository]]
 
   /**
+    * Functions that will be chained and called on coursier
+    * Resolutions right before they are run
+    */
+  val resolutionHooks: mutable.Buffer[coursier.Resolution => coursier.Resolution]
+
+  /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit
     */
   def exit = throw AmmoniteExit(())

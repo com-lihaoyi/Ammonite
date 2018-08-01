@@ -24,7 +24,8 @@ object IvyThing{
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
                       verbose: Boolean,
-                      output: PrintStream) = synchronized {
+                      output: PrintStream,
+                      hooks: Seq[coursier.Resolution => coursier.Resolution]) = synchronized {
     val writer = new PrintWriter(output)
     // Print directly to stderr, since Ammonite's own internal logging
     // doesn't allow us to print weird ASCII control codes to stdout,
@@ -36,7 +37,7 @@ object IvyThing{
       Some(logger)
     }
 
-    val start = coursier.Resolution(dependencies.toSet)
+    val start = Function.chain(hooks)(coursier.Resolution(dependencies.toSet))
 
     val fetch = coursier.Fetch.from(repositories, coursier.Cache.fetch[Task](logger = logger))
 
