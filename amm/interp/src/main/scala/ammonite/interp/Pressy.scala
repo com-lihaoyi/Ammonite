@@ -15,6 +15,15 @@ import ammonite.util.Util.newLine
  * Nice wrapper for the presentation compiler.
  */
 trait Pressy{
+  /**
+    * Ask for autocompletion at a particular spot in the code, returning
+    * possible things that can be completed at that location. May try various
+    * different completions depending on where the `index` is placed, but
+    * the outside caller probably doesn't care.
+    *
+    * The returned index gives the position from which the possible replacements
+    * should be inserted.
+    */
   def complete(snippetIndex: Int,
                previousImports: String,
                snippet: String): (Int, Seq[String], Seq[String])
@@ -135,7 +144,12 @@ object Pressy {
               // If the expr is badly typed, try to scope complete it
               if (expr.isInstanceOf[pressy.Ident]) {
                 val exprName =  expr.asInstanceOf[pressy.Ident].name.decoded
-                expr.pos.point -> handleCompletion(
+                val pos =
+                  // Without the first case, things like `import <caret>` are
+                  // returned a wrong position.
+                  if (exprName == "<error>") expr.pos.point - 1
+                  else expr.pos.point
+                pos -> handleCompletion(
                   ask(expr.pos.point, pressy.askScopeCompletion),
                   // if it doesn't have a name at all, accept anything
                   if (exprName == "<error>") "" else exprName
@@ -156,9 +170,12 @@ object Pressy {
         )
         lazy val deep = deepCompletion(name.decoded).distinct
 
-        if (shallow.length > 0) (t.pos.start, shallow)
-        else if (deep.length == 1) (t.pos.start, deep)
-        else (t.pos.end, deep :+ ("" -> None))
+        val res =
+          if (shallow.length > 0) shallow
+          else if (deep.length == 1) deep
+          else deep :+ ("" -> None)
+
+        (t.pos.start, res)
 
       case t =>
         val comps = ask(index, pressy.askScopeCompletion)
@@ -197,12 +214,6 @@ object Pressy {
       GlobalInitCompat.initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
     }
 
-    /**
-     * Ask for autocompletion at a particular spot in the code, returning
-     * possible things that can be completed at that location. May try various
-     * different completions depending on where the `index` is placed, but
-     * the outside caller probably doesn't care.
-     */
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
       val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
       val suffix = newLine + "}"

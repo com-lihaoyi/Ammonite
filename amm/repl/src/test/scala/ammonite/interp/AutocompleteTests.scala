@@ -11,8 +11,12 @@ object AutocompleteTests extends TestSuite{
     def apply(caretCode: String,
                  cmp: (Set[String]) => Set[String],
                  sigs: (Set[String]) => Set[String] = _ => Set()) = {
-      val cursor = caretCode.indexOf("<caret>")
-      val buf = caretCode.replace("<caret>", "")
+      val from = caretCode.indexOf("<from>")
+      val caretCode0 =
+        if (from < 0) caretCode
+        else caretCode.replace("<from>", "")
+      val cursor = caretCode0.indexOf("<caret>")
+      val buf = caretCode0.replace("<caret>", "")
 
       for (interp <- check.interps) {
         val (index, completions, signatures) = interp.compilerManager.complete(
@@ -24,6 +28,7 @@ object AutocompleteTests extends TestSuite{
         assert(left == Set())
         val sigLeft = sigs(signatures.toSet)
         assert(sigLeft == Set())
+        assert(from < 0 || index == from)
       }
     }
   }
@@ -50,23 +55,26 @@ object AutocompleteTests extends TestSuite{
 
       'import - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
-          complete("""import <caret>""", Set("java", "javax", "scala", "javassist") -- _)
-          complete("""import j<caret>""", Set("java", "javax", "javassist") -- _)
+          complete("""import <from><caret>""", Set("java", "javax", "scala", "javassist") -- _)
+          complete("""import <from>j<caret>""", Set("java", "javax", "javassist") -- _)
           complete(
-            """import ja<caret>""",
+            """import <from>ja<caret>""",
             x => Set("java", "javax", "javassist") ^ (x - "javafx")
           )
         }
-        complete("""import java.<caret>""", Set("lang", "util") -- _)
-        complete("""import java.u<caret>""", Set("util") ^ _)
-        complete("""import java.util.<caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
-        complete("""import java.util.LinkedHa<caret>""", Set("LinkedHashMap", "LinkedHashSet") ^ _)
+        complete("""import java.<from><caret>""", Set("lang", "util") -- _)
+        complete("""import java.<from>u<caret>""", Set("util") ^ _)
+        complete("""import java.util.<from><caret>""", Set("LinkedHashMap", "LinkedHashSet") -- _)
         complete(
-          """import java.util.{LinkedHa<caret>""",
+          """import java.util.<from>LinkedHa<caret>""",
           Set("LinkedHashMap", "LinkedHashSet") ^ _
         )
         complete(
-          """import java.util.{LinkedHashMap, Linke<caret>""",
+          """import java.util.{<from>LinkedHa<caret>""",
+          Set("LinkedHashMap", "LinkedHashSet") ^ _
+        )
+        complete(
+          """import java.util.{LinkedHashMap, <from>Linke<caret>""",
           Set("LinkedHashMap", "LinkedHashSet", "LinkedList") ^ _
         )
         complete(
@@ -81,10 +89,10 @@ object AutocompleteTests extends TestSuite{
       'scope - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete( """<caret>""", Set("scala") -- _)
-          complete( """Seq(1, 2, 3).map(argNameLol => <caret>)""", Set("argNameLol") -- _)
-          complete( """object Zomg{ <caret> }""", Set("Zomg") -- _)
+          complete( """Seq(1, 2, 3).map(argNameLol => <from><caret>)""", Set("argNameLol") -- _)
+          complete( """object Zomg{ <from><caret> }""", Set("Zomg") -- _)
           complete(
-            "printl<caret>",
+            "<from>printl<caret>",
             Set("println") ^,
             Set[String]() ^
           )
@@ -98,14 +106,14 @@ object AutocompleteTests extends TestSuite{
       }
       'scopePrefix - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
-          complete( """ammon<caret>""", Set("ammonite") ^ _)
+          complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
 
-          complete( """Seq(1, 2, 3).map(argNameLol => argNam<caret>)""", Set("argNameLol") ^)
+          complete( """Seq(1, 2, 3).map(argNameLol => <from>argNam<caret>)""", Set("argNameLol") ^)
 
-          complete( """object Zomg{ Zom<caret> }""", Set("Zomg") ^)
-          complete( """object Zomg{ Zo<caret>m }""", Set("Zomg") ^)
-          complete( """object Zomg{ Z<caret>om }""", Set("Zomg") ^)
-          complete( """object Zomg{ <caret>Zom }""", Set("Zomg") ^)
+          complete( """object Zomg{ <from>Zom<caret> }""", Set("Zomg") ^)
+          complete( """object Zomg{ <from>Zo<caret>m }""", Set("Zomg") ^)
+          complete( """object Zomg{ <from>Z<caret>om }""", Set("Zomg") ^)
+          complete( """object Zomg{ <from><caret>Zom }""", Set("Zomg") ^)
         }
       }
       'dot - checking{ complete =>
@@ -129,10 +137,10 @@ object AutocompleteTests extends TestSuite{
       }
 
       'deep - checking{ complete =>
-        complete( """fromN<caret>""",
+        complete( """<from>fromN<caret>""",
           Set("scala.concurrent.duration.fromNow") ^
         )
-        complete( """Fut<caret>""",
+        complete( """<from>Fut<caret>""",
           Set("scala.concurrent.Future", "java.util.concurrent.Future") -- _
         )
         complete( """SECO<caret>""",
@@ -140,13 +148,13 @@ object AutocompleteTests extends TestSuite{
         )
       }
       'dotPrefix - checking{ complete =>
-        complete( """java.math.Big<caret>""",
+        complete( """java.math.<from>Big<caret>""",
           Set("BigDecimal", "BigInteger") ^
         )
         complete( """scala.Option.option2<caret>""",
           Set() ^
         )
-        complete( """val x = 1; x + x.><caret>""",
+        complete( """val x = 1; x + x.<from>><caret>""",
           Set(">>", ">>>") -- _,
           Set(
             "def >(x: Double): Boolean",
