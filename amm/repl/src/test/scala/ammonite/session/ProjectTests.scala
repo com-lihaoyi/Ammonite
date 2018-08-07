@@ -340,6 +340,61 @@ object ProjectTests extends TestSuite{
       )
     }
 
+    'profiles {
+      val testCore =
+        """
+            @ import $ivy.`org.apache.spark::spark-sql:1.6.2`
+
+            @ import scala.collection.JavaConverters._
+
+            @ val p = new java.util.Properties
+            p: java.util.Properties = {}
+
+            @ p.load(
+            @   Thread.currentThread()
+            @     .getContextClassLoader
+            @     .getResources("common-version-info.properties")
+            @     .asScala
+            @     .toVector
+            @     .find(!_.toString.contains("-sources.jar"))
+            @     .getOrElse(sys.error("common-version-info.properties not found in classpath"))
+            @     .openStream()
+            @ )
+        """
+      'default {
+        // should load hadoop 2.2 stuff by default
+        if (scala2_11)
+          check.session(
+            s"""
+            $testCore
+
+            @ val hadoopVersion = p.getProperty("version")
+            hadoopVersion: String = "2.2.0"
+            """
+          )
+      }
+      'withProfile {
+        // with the right profile, should load hadoop 2.6 stuff
+        if (scala2_11)
+          check.session(
+            s"""
+            @ interp.resolutionHooks += { res =>
+            @   res.copy(
+            @     userActivations = Some(
+            @       res.userActivations.getOrElse(Map()) + ("hadoop-2.6" -> true)
+            @     )
+            @   )
+            @ }
+
+            $testCore
+
+            @ val hadoopVersion = p.getProperty("version")
+            hadoopVersion: String = "2.6.0"
+            """
+          )
+      }
+    }
+
   }
 }
 

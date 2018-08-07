@@ -46,6 +46,7 @@ class Interpreter(val printer: Printer,
 
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
+  val resolutionHooks = mutable.Buffer.empty[coursier.Resolution => coursier.Resolution]
 
   headFrame.classloader.specialLocalClasses ++= Seq(
     "ammonite.interp.InterpBridge",
@@ -613,7 +614,8 @@ class Interpreter(val printer: Printer,
               )
             },
           verbose = verboseOutput,
-          output = printer.errStream
+          output = printer.errStream,
+          hooks = resolutionHooks
         )match{
           case (srcWarnings, Right(loaded)) =>
             srcWarnings.foreach(printer.info)
@@ -667,6 +669,7 @@ class Interpreter(val printer: Printer,
     val beforeExitHooks = interp.beforeExitHooks
 
     val repositories = interp.repositories
+    val resolutionHooks = interp.resolutionHooks
 
     object load extends DefaultLoadJar with InterpLoad {
 
