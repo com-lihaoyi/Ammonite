@@ -64,17 +64,16 @@ class Frame(val classloader: SpecialClassLoader,
     usedEarlierDefinitions0 = usedEarlierDefinitions
 }
 object Frame{
-  def createInitial() = {
+  def createInitial(baseClassLoader: ClassLoader = Thread.currentThread().getContextClassLoader) = {
 
     // *Try* to load the JVM source files and make them available as resources,
     // so that the `source` helper can navigate to the sources within the
     // Java standard library
 
     val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
-    val mainThread = Thread.currentThread()
-    val hash = SpecialClassLoader.initialClasspathSignature(mainThread.getContextClassLoader)
+    val hash = SpecialClassLoader.initialClasspathSignature(baseClassLoader)
     def special = new SpecialClassLoader(
-      new ForkClassLoader(mainThread.getContextClassLoader, getClass.getClassLoader),
+      new ForkClassLoader(baseClassLoader, getClass.getClassLoader),
       hash,
       Set.empty,
       likelyJdkSourceLocation.toNIO.toUri.toURL

@@ -76,7 +76,7 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       onSettingsInit.foreach(_(settings))
       Internal.compiler = Compiler(
-        Classpath.classpath(storage) ++ headFrame.classpath,
+        Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
         headFrame.pluginClassloader,
@@ -89,7 +89,7 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath(storage) ++ headFrame.classpath,
+        Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
 
