@@ -67,45 +67,54 @@ class TestRepl {
         PredefInfo(Name("testPredef"), predef._1, false, predef._2)
       ),
       customPredefs = Seq(),
-      extraBridges = Seq((
-        "ammonite.repl.ReplBridge",
-        "repl",
-        new ReplApiImpl {
-          def replArgs0 = Vector.empty[Bind[_]]
-          def printer = printer0
+      extraBridges = Seq(
+        (
+          "ammonite.TestReplBridge",
+          "test",
+          new TestReplApi {
+            def message = "ba"
+          }
+        ),
+        (
+          "ammonite.repl.ReplBridge",
+          "repl",
+          new ReplApiImpl {
+            def replArgs0 = Vector.empty[Bind[_]]
+            def printer = printer0
 
-          def sess = sess0
-          val prompt = Ref("@")
-          val frontEnd = Ref[FrontEnd](null)
-          def lastException: Throwable = null
-          def fullHistory = storage.fullHistory()
-          def history = new History(Vector())
-          val colors = Ref(Colors.BlackWhite)
-          def newCompiler() = interp.compilerManager.init(force = true)
-          def compiler = interp.compilerManager.compiler.compiler
-          def fullImports = interp.predefImports ++ imports
-          def imports = interp.frameImports
-          def usedEarlierDefinitions = interp.frameUsedEarlierDefinitions
-          def width = 80
-          def height = 80
+            def sess = sess0
+            val prompt = Ref("@")
+            val frontEnd = Ref[FrontEnd](null)
+            def lastException: Throwable = null
+            def fullHistory = storage.fullHistory()
+            def history = new History(Vector())
+            val colors = Ref(Colors.BlackWhite)
+            def newCompiler() = interp.compilerManager.init(force = true)
+            def compiler = interp.compilerManager.compiler.compiler
+            def fullImports = interp.predefImports ++ imports
+            def imports = interp.frameImports
+            def usedEarlierDefinitions = interp.frameUsedEarlierDefinitions
+            def width = 80
+            def height = 80
 
-          object load extends ReplLoad with (String => Unit){
+            object load extends ReplLoad with (String => Unit){
 
-            def apply(line: String) = {
-              interp.processExec(line, currentLine, () => currentLine += 1) match{
-                case Res.Failure(s) => throw new CompilationError(s)
-                case Res.Exception(t, s) => throw t
-                case _ =>
+              def apply(line: String) = {
+                interp.processExec(line, currentLine, () => currentLine += 1) match{
+                  case Res.Failure(s) => throw new CompilationError(s)
+                  case Res.Exception(t, s) => throw t
+                  case _ =>
+                }
+              }
+
+              def exec(file: Path): Unit = {
+                interp.watch(file)
+                apply(normalizeNewlines(read(file)))
               }
             }
-
-            def exec(file: Path): Unit = {
-              interp.watch(file)
-              apply(normalizeNewlines(read(file)))
-            }
           }
-        }
-      )),
+        )
+      ),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },

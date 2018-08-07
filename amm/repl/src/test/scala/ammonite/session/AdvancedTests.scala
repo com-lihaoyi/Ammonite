@@ -383,5 +383,11 @@ object AdvancedTests extends TestSuite{
         res4: Boolean = true
       """)
     }
+    'customBridge{
+      check.session("""
+        @ val s = test.message
+        s: String = "ba"
+      """)
+    }
   }
 }

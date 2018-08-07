@@ -14,11 +14,13 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
   def childFrame(parent: Frame) = new Frame(
     new SpecialClassLoader(
       parent.classloader,
-      parent.classloader.classpathSignature
+      parent.classloader.classpathSignature,
+      parent.classloader.specialLocalClasses
     ),
     new SpecialClassLoader(
       parent.pluginClassloader,
-      parent.pluginClassloader.classpathSignature
+      parent.pluginClassloader.classpathSignature,
+      parent.pluginClassloader.specialLocalClasses
     ),
     parent.imports,
     parent.classpath,

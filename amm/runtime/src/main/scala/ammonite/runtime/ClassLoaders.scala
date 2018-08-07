@@ -76,6 +76,7 @@ object Frame{
     def special = new SpecialClassLoader(
       new ForkClassLoader(mainThread.getContextClassLoader, getClass.getClassLoader),
       hash,
+      Set.empty,
       likelyJdkSourceLocation.toNIO.toUri.toURL
     )
 
@@ -178,6 +179,7 @@ class ForkClassLoader(realParent: ClassLoader, fakeParent: ClassLoader)
   */
 class SpecialClassLoader(parent: ClassLoader,
                          parentSignature: Seq[(Either[String, Path], Long)],
+                         var specialLocalClasses: Set[String],
                          urls: URL*)
   extends URLClassLoader(urls.toArray, parent){
 
@@ -192,12 +194,6 @@ class SpecialClassLoader(parent: ClassLoader,
     newFileDict(name) = bytes
   }
   def findClassPublic(name: String) = findClass(name)
-  val specialLocalClasses = Set(
-    "ammonite.repl.ReplBridge",
-    "ammonite.repl.ReplBridge$",
-    "ammonite.interp.InterpBridge",
-    "ammonite.interp.InterpBridge$"
-  )
   override def findClass(name: String): Class[_] = {
     val loadedClass = this.findLoadedClass(name)
     if (loadedClass != null) loadedClass
@@ -291,7 +287,10 @@ class SpecialClassLoader(parent: ClassLoader,
        else
          parent
 
-     val clone = new SpecialClassLoader(newParent, parentSignature, getURLs.toSeq: _*)
+     val clone = new SpecialClassLoader(newParent,
+                                        parentSignature,
+                                        specialLocalClasses,
+                                        getURLs.toSeq: _*)
      clone.newFileDict ++= newFileDict
      clone.classpathSignature0 = classpathSignature0
 

@@ -47,6 +47,15 @@ class Interpreter(val printer: Printer,
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
 
+  headFrame.classloader.specialLocalClasses ++= Seq(
+    "ammonite.interp.InterpBridge",
+    "ammonite.interp.InterpBridge$"
+  )
+
+  headFrame.classloader.specialLocalClasses ++= extraBridges
+    .map(_._1)
+    .flatMap(c => Seq(c, c + "$"))
+
   val mainThread = Thread.currentThread()
 
   def evalClassloader = headFrame.classloader
