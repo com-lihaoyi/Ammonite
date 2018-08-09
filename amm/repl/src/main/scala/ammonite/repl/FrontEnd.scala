@@ -12,10 +12,8 @@ import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.interp.Parsers
 
-/**
- * All the mucky JLine interfacing code
- */
-trait FrontEnd{
+/** JLine interface */
+trait FrontEnd {
   def width: Int
   def height: Int
   def action(input: InputStream,
@@ -28,12 +26,13 @@ trait FrontEnd{
              addHistory: String => Unit): Res[(String, Seq[String])]
 }
 
-object FrontEnd{
+object FrontEnd {
   object JLineUnix extends JLineTerm
   object JLineWindows extends JLineTerm
-  class JLineTerm() extends FrontEnd{
+  class JLineTerm() extends FrontEnd {
 
     private val term = TerminalBuilder.builder().build()
+    
     private val readerBuilder = LineReaderBuilder.builder().terminal(term)
     private val ammHighlighter = new AmmHighlighter()
     private val ammCompleter = new AmmCompleter(ammHighlighter)
@@ -43,7 +42,8 @@ object FrontEnd{
     readerBuilder.parser(ammParser)
     readerBuilder.history(new DefaultHistory())
     readerBuilder.option(LineReader.Option.DISABLE_EVENT_EXPANSION, true)
-    readerBuilder.option(LineReader.Option.INSERT_TAB, true)
+    readerBuilder.option(LineReader.Option.INSERT_TAB, true) // TAB on blank line
+    readerBuilder.option(LineReader.Option.AUTO_FRESH_LINE, true) // if not at start of line
     private val reader = readerBuilder.build()
 
     def width = term.getWidth
@@ -66,8 +66,8 @@ object FrontEnd{
       def readCode(): Res[(String, Seq[String])] = {
         Option(reader.readLine(prompt)) match {
           case Some(code) =>
-            val pl = reader.getParser.parse(code, 0)
-            Res.Success(code -> pl.words().asScala)
+            val pl = reader.getParser.parse(code, 0).asInstanceOf[AmmoniteParsedLine]
+            Res.Success(code -> pl.stmts)
           case None => Res.Exit(())
         }
       }
@@ -95,6 +95,10 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
   // completion varies from action to action
   var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
     (x, y) => (0, Seq.empty, Seq.empty)
+  
+  // used when making a candidate
+  private val leftDelimiters  = Set('.')
+  private val rightDelimiters = Set('.', '(', '{', '[')
 
   override def complete(reader: LineReader,
                         line: ParsedLine,
@@ -116,16 +120,18 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
     }
     // add suggestions
     completions.sorted.foreach { c =>
-      // if member selection, concatenate compiler suggestion to variable name
-      val candidate = if (line.word().contains(".")) {
-        val lastDotIndex = line.word().lastIndexOf(".")
-        val prefix = line.word().substring(0, lastDotIndex + 1)
-        prefix + c
-      } else {
-        c
-      }
+      val candidate = makeCandidate(line.word, line.wordCursor, c)
       candidates.add(new Candidate(candidate, c, null, null, null, null, false))
     }
+  }
+
+  /** Makes a full-word candidate based on autocomplete candidate */
+  private def makeCandidate(word: String, wordCursor: Int, candidate: String): String = {
+    val leftFromCursor  = word.substring(0, wordCursor)
+    val rightFromCursor = word.substring(wordCursor)
+    val left = leftFromCursor.reverse.dropWhile(c => !leftDelimiters.contains(c)).reverse
+    val right = rightFromCursor.dropWhile(c => !rightDelimiters.contains(c))
+    left + candidate + right
   }
 }
 
@@ -133,19 +139,24 @@ class AmmParser extends Parser {
 
   var addHistory: String => Unit = x => ()
 
+  private val defaultParser = new org.jline.reader.impl.DefaultParser
+
   override def parse(line: String, cursor: Int, context: Parser.ParseContext): ParsedLine = {
-    val words = new java.util.ArrayList[String]()
-    var wordCursor = -1
-    var wordIndex = -1
+    // let JLine's default parser to handle JLine words and indices
+    val defParLine = defaultParser.parse(line, cursor, context)
+    val words = defParLine.words
+    val wordIndex = defParLine.wordIndex // index of the current word in the list of words
+    val wordCursor = defParLine.wordCursor // cursor position within the current word
+    
     Parsers.split(line) match {
-      case Some(Parsed.Success(value, idx)) =>
+      case Some(Parsed.Success(stmts, idx)) =>
         addHistory(line)
-        words.addAll(value.asJava)
-        if (cursor == line.length && words.size > 0) {
-          wordIndex = words.size - 1
-          wordCursor = words.get(words.size - 1).length
+        // if ENTER and not at the end of input -> newline
+        if (context == Parser.ParseContext.ACCEPT_LINE && cursor != line.length) {
+          throw new EOFError(-1, -1, "Newline entered")
+        } else {
+          new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor, stmts)
         }
-        new ArgumentList(line, words, wordIndex, wordCursor, cursor)
       case Some(Parsed.Failure(p, idx, extra)) =>
         // we "accept the failure" only when ENTER is pressed, loops forever otherwise...
         // https://groups.google.com/d/msg/jline-users/84fPur0oHKQ/bRnjOJM4BAAJ
@@ -155,19 +166,25 @@ class AmmParser extends Parser {
             fastparse.core.ParseError.msg(extra.input, extra.traced.expected, idx)
           )
         } else {
-          new ArgumentList(line, words, wordIndex, wordCursor, cursor)
+          new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)
         }
       case None =>
-        // when TAB is pressed (COMEPLETE context) return a line so that it can show suggestions
+        // when TAB is pressed (COMPLETE context) return a line so that it can show suggestions
         // else throw EOFError to signal that input isn't finished
         if (context == Parser.ParseContext.COMPLETE) {
-          new ArgumentList(line, words, wordIndex, wordCursor, cursor)
+          new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)
         } else {
           throw new EOFError(-1, -1, "Missing closing paren/quote/expression")
         }
     }
   }
 }
+
+class AmmoniteParsedLine(
+  line: String, words: java.util.List[String],
+  wordIndex: Int, wordCursor: Int, cursor: Int,
+  val stmts: Seq[String] = Seq.empty // needed for interpreter
+) extends ArgumentList(line, words, wordIndex, wordCursor, cursor)
 
 class SyntaxError(val msg: String) extends RuntimeException
 
