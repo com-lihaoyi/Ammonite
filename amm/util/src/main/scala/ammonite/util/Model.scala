@@ -47,7 +47,7 @@ object Tag{
   * Holds the value "raw", with all special characters intact, e.g.
   * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
   * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
-  * useful for accessing names as-seen-from the Java/JVM side of thigns
+  * useful for accessing names as-seen-from the Java/JVM side of things
   */
 case class Name(raw: String){
   assert(
@@ -194,7 +194,7 @@ trait CodeColors{
 }
 
 /**
- * A set of colors used to highlight the miscellanious bits of the REPL.
+ * A set of colors used to highlight the miscellaneous bits of the REPL.
  * Re-used all over the place in PPrint, TPrint, syntax highlighting,
  * command-echoes, etc. in order to keep things consistent
  *

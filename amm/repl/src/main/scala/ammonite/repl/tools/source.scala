@@ -101,7 +101,7 @@ object source{
     // in an infinite recursion. No such problem matching on the `Block` AST node.
     //
     // We keep the block wrapper to re-apply to the final expression later, because
-    // somtimes (e.g. in the case of `new javassist.ClassPool().find _`) the LHS of
+    // sometimes (e.g. in the case of `new javassist.ClassPool().find _`) the LHS of
     // the last expr in the block ends up depending on the earlier statements
     @tailrec def rec(wrapper: Tree => Tree, x: Tree)
                     : Option[(Tree, Symbol, Tree => Tree)] = {
