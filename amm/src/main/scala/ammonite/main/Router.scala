@@ -16,7 +16,7 @@ import scala.reflect.macros.blackbox.Context
   */
 object Router{
   /**
-    * Allows you to query how many things are overriden by the enclosing owner.
+    * Allows you to query how many things are overridden by the enclosing owner.
     */
   case class Overrides(value: Int)
   object Overrides{

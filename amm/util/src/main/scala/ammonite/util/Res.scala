@@ -75,7 +75,7 @@ object Res{
   }
 
   /**
-    * A known failure occured, maybe caused by an exception
+    * A known failure occurred, maybe caused by an exception
     * (e.g. `ThreadDeath`) and maybe not (e.g. compile error)
     *
     * @param msg the message we want to display on screen due to this failure

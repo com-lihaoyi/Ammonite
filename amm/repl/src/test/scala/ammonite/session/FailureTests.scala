@@ -30,7 +30,7 @@ object FailureTests extends TestSuite{
       """)
     }
     'compilerCrash{
-      // Make sure compiler crashes provide the appropiate error
+      // Make sure compiler crashes provide the appropriate error
       // messaging, and the REPL continues functioning after
       if (!TestUtils.scala2_12) check.session("""
         @ val x = 1

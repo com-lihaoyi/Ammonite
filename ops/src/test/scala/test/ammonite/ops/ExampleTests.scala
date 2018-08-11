@@ -65,7 +65,7 @@ object ExampleTests extends TestSuite{
       // `mkdir -p` in Bash, and creates and parents necessary
       val deep = wd/'this/'is/'very/'deep
       mkdir! deep
-      // Writing to a file also creates neccessary parents
+      // Writing to a file also creates necessary parents
       write(deep/'deeeep/"file.txt", "I am cow")
 
       // `ls` provides a listing of every direct child of the given folder.
