@@ -59,10 +59,10 @@ object IvyThing{
           )
         )
       }else {
-        def load(artifacts: Seq[coursier.Artifact]) = {
+        def load(artifacts: Seq[coursier.Artifact], artifactTypes: Set[String]) = {
 
           val loadedArtifacts = Task.gather.gather(
-            for (a <- artifacts)
+            for (a <- artifacts if artifactTypes(a.`type`))
               yield coursier.Cache.file[Task](a, logger = logger).run
                 .map(a.isOptional -> _)
           ).unsafeRun()
@@ -75,8 +75,14 @@ object IvyThing{
           (errors, successes)
         }
 
-        val (jarErrors, jarSuccesses) = load(resolution.artifacts(withOptional = true))
-        val (sourceErrors, sourceSuccesses) = load(resolution.classifiersArtifacts(Seq("sources")))
+        val (jarErrors, jarSuccesses) = load(
+          resolution.dependencyArtifacts(withOptional = true).map(_._2),
+          jarTypes
+        )
+        val (sourceErrors, sourceSuccesses) = load(
+          resolution.dependencyClassifiersArtifacts(Seq("sources")).map(_._2),
+          srcTypes
+        )
         val srcWarnings =
           if (sourceErrors.isEmpty) None
           else Some(
@@ -99,6 +105,10 @@ object IvyThing{
 
     res
   }
+
+  // FIXME Allow users to tweak those?
+  val jarTypes = Set("jar", "bundle")
+  val srcTypes = Set("src")
 
   val defaultRepositories = List(
     coursier.Cache.ivy2Local,

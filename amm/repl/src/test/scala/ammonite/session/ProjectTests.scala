@@ -394,6 +394,26 @@ object ProjectTests extends TestSuite{
           )
       }
     }
+    'onlyJarLikeArtifactTypes {
+      check.session(
+        """
+           @ import $ivy.`log4j:log4j:1.2.17`
+
+           @ val log4jStuff = {
+           @   repl
+           @     .sess
+           @     .frames
+           @     .flatMap(_.classpath)
+           @     .filter(_.getName.contains("log4j"))
+           @ }
+
+           @ assert(
+           @   // no zip or tar.gz stuff in particular
+           @   log4jStuff.forall(_.getName.endsWith(".jar"))
+           @ )
+           """
+      )
+    }
 
   }
 }
