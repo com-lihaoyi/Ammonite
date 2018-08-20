@@ -206,7 +206,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
   def prependShellScript = T{
     mill.modules.Jvm.launcherUniversalScript(
       mainClass().get,
-      Agg("$0"),
+      Agg("""$(type cygpath >/dev/null 2>&1 && cygpath -w "$0" || echo $(cd $(dirname $(which "$0")); pwd)/$(basename $(which "$0")))"""),
       Agg("%~dpnx0"),
       // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
       Seq("-Xmx500m", "-XX:+UseG1GC")
