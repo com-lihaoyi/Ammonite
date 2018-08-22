@@ -9,7 +9,6 @@
 [patreon-badge]: https://img.shields.io/badge/patreon-sponsor-ff69b4.svg
 [patreon-link]: https://www.patreon.com/lihaoyi
 
-
 This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) 
 project lives:
 
