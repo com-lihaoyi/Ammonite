@@ -232,11 +232,11 @@ class SpecialClassLoader(parent: ClassLoader,
 
   private var classpathSignature0 = parentSignature
   def classpathSignature = classpathSignature0
-  def classpathHash(wd: Path) = {
+  def classpathHash(wd: Option[Path]) = {
     Util.md5Hash(
       // Include the current working directory in the classpath hash, to make
       // sure different scripts cached
-      Iterator(wd.toString.getBytes) ++
+      wd.map(_.toString.getBytes).iterator ++
       classpathSignature0.iterator.map { case (path, long) =>
         val buffer = ByteBuffer.allocate(8)
         buffer.putLong(long)

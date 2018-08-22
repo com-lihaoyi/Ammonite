@@ -299,7 +299,7 @@ class Interpreter(val printer: Printer,
 
     val tag = Tag(
       Interpreter.cacheTag(processed.code.getBytes),
-      Interpreter.cacheTag(evalClassloader.classpathHash(wd))
+      Interpreter.cacheTag(evalClassloader.classpathHash(codeSource0.path))
     )
 
     for {
@@ -345,7 +345,7 @@ class Interpreter(val printer: Printer,
           Interpreter.cacheTag(code.getBytes),
           Interpreter.cacheTag(
             if (hardcoded) Array.empty[Byte]
-            else evalClassloader.classpathHash(wd)
+            else evalClassloader.classpathHash(codeSource.path)
           )
         )
 
@@ -531,7 +531,7 @@ class Interpreter(val printer: Printer,
             scriptCodeWrapper.wrapperPath
           ).isInstanceOf[Res.Success[_]]
         } yield {
-          val envHash = Interpreter.cacheTag(evalClassloader.classpathHash(wd))
+          val envHash = Interpreter.cacheTag(evalClassloader.classpathHash(codeSource.path))
           if (envHash != blockMetadata.id.tag.env) {
             compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
           } else{
