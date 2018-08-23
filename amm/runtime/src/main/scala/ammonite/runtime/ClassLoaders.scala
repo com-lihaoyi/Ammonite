@@ -42,10 +42,8 @@ class Frame(val classloader: SpecialClassLoader,
   def classpath = classpath0
   def usedEarlierDefinitions = usedEarlierDefinitions0
   def addImports(additional: Imports) = {
-    if (!frozen0) {
-      version0 += 1
+    if (!frozen0)
       imports0 = imports0 ++ additional
-    }
   }
   def addClasspath(additional: Seq[java.io.File]) = {
     if (!frozen0) {
