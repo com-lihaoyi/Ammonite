@@ -96,17 +96,13 @@ object TTY{
   def init() = {
     stty("-a")
 
-    val width = consoleDim("cols")
-    val height = consoleDim("lines")
-//    Debug("Initializing, Width " + width)
-//    Debug("Initializing, Height " + height)
     val initialConfig = stty("-g").trim
     stty("-icanon min 1 -icrnl -inlcr -ixon")
     sttyFailTolerant("dsusp undef")
     stty("-echo")
     stty("intr undef")
-//    Debug("")
-    (width, height, initialConfig)
+
+    initialConfig
   }
 
   private def sttyCmd(s: String) = {
