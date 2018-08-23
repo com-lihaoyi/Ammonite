@@ -27,7 +27,6 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
   private[this] object Internal{
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
     var compiler: Compiler = null
-    var dynamicClasspathChanged: Boolean = true
     var pressyStale: Boolean = true
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
     val onSettingsInit = mutable.Buffer.empty[scala.tools.nsc.Settings => Unit]
@@ -48,7 +47,7 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
   def compilationCount = Internal.compilationCount
 
   def preprocess(fileName: String) = synchronized{
-    if (compiler == null) init()
+    if (compiler == null) init(force = true)
     Preprocessor(compiler.parse(fileName, _))
   }
 
@@ -63,7 +62,6 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
   def init(force: Boolean = false) = synchronized{
     if ((headFrame ne lastFrame) ||
         headFrame.version != lastFrameVersion ||
-        Internal.dynamicClasspathChanged ||
         Internal.preConfiguredSettingsChanged ||
         force) {
 
@@ -95,14 +93,6 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
 
         settings.copy()
       )
-
-      // Do this last; that way, if someone `Ctrl C`s in the middle of the
-      // operation, we end up with `compilerStale = true` and a `compiler != null`,
-      // which is better than `compilerStale = false` and `compiler == null`
-      // because the first case means we redundantly re-initialize the compiler,
-      // while the second means we're stuck without a compiler when we need one
-      // and everything blows up
-      Internal.dynamicClasspathChanged = false
     }
   }
 
@@ -157,7 +147,6 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
 
   def addToClasspath(classFiles: ClassFiles) = synchronized {
     Compiler.addToClasspath(classFiles, dynamicClasspath)
-    dynamicClasspathChanged = true
   }
   // Not synchronized, since it's part of the exit sequence that needs to run
   // if the repl exits while the warmup code is compiling
