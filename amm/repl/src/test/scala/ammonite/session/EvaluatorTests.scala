@@ -155,12 +155,21 @@ object EvaluatorTests extends TestSuite{
         @ case class CO()
         defined class CO
 
-        @ CO
-        res8: CO.type = CO
+        @ CO // res8: CO.type = CO
 
         @ CO()
         res9: CO = CO()
+
+        @ CO == res3
+        res10: Boolean = false
       """)
+
+      // there used to be a
+      //     @ CO
+      //     res8: CO.type = CO
+      // that fails with class wrapping in 2.12 since #853, giving instead
+      //     res8: CO = CO
+      // CO != res3 should test roughly the same thing
     }
 
     'packageImport{
