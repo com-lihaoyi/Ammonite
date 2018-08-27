@@ -28,8 +28,10 @@ object AmmoniteRepl extends AmmoniteBlogPage {
           people coming from IDEs or other REPLs such as
           [IPython](https://ipython.org/) or [Zsh](http://www.zsh.org/).
 
-        It can be combined with [Ammonite-Ops](${AmmoniteOps.ref}) to replace Bash as your systems shell,
-          but also can be used alone as a [superior](${featuresSection.ref}) version of the default Scala REPL,
+        It can be combined with [Ammonite-Ops](${AmmoniteOps.ref}) 
+          to replace Bash as your systems shell,
+          but also can be used alone as a 
+          [superior](${featuresSection.ref}) version of the default Scala REPL,
           or as a @sect.ref("Debugging", "debugging tool"), or for many other
           @sect.ref("Ammonite Cookbook", "fun and interesting things")!
 
