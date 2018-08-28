@@ -389,5 +389,27 @@ object AdvancedTests extends TestSuite{
         s: String = "ba"
       """)
     }
+
+    'dontRefreshCompiler {
+      * - {
+        check.session("""
+          @ val c1 = repl.compiler
+
+          @ val n = 2
+          n: Int = 2
+
+          @ val c2 = repl.compiler
+
+          @ import scala.collection.mutable.ListBuffer
+          import scala.collection.mutable.ListBuffer
+
+          @ val c3 = repl.compiler
+
+          @ assert(c1 eq c2)
+
+          @ assert(c1 eq c3)
+        """)
+      }
+    }
   }
 }
