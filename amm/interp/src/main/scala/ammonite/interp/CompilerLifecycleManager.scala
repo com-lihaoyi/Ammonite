@@ -93,6 +93,8 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
 
         settings.copy()
       )
+
+      Internal.preConfiguredSettingsChanged = false
     }
   }
 
