@@ -183,7 +183,13 @@ class Repl(input: InputStream,
 
 
   def run(): Any = {
-    welcomeBanner.foreach(printer.outStream.println)
+
+    val initialConfigOpt =
+      if (scala.util.Properties.isWin)
+        None
+      else
+        Some(ammonite.terminal.TTY.init())
+
     @tailrec def loop(): Any = {
       val actionResult = action()
       remoteLogger.foreach(_.apply("Action"))
@@ -201,8 +207,15 @@ class Repl(input: InputStream,
         case Some(value) => value
       }
     }
-    loop()
-  }
+
+    try {
+      welcomeBanner.foreach(printer.outStream.println)
+      loop()
+    } finally {
+      for (config <- initialConfigOpt)
+        ammonite.terminal.TTY.stty(config)
+    }
+}
 
   def beforeExit(exitValue: Any): Any = {
     Function.chain(interp.beforeExitHooks)(exitValue)

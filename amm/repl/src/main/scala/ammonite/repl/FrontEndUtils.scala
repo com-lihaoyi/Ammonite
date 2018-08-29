@@ -8,10 +8,10 @@ import ammonite.util.Util.newLine
 object FrontEndUtils {
   def width = 
     if (scala.util.Properties.isWin) ammonite.repl.FrontEnd.JLineWindows.width
-    else ammonite.terminal.TTY.consoleDim("cols")
+    else ammonite.terminal.ConsoleDim.width()
   def height =
     if (scala.util.Properties.isWin) ammonite.repl.FrontEnd.JLineWindows.width
-    else ammonite.terminal.TTY.consoleDim("lines")
+    else ammonite.terminal.ConsoleDim.height()
   def tabulate(snippetsRaw: Seq[fansi.Str], width: Int): Iterator[String] = {
     val gap = 2
     val snippets = if (snippetsRaw.isEmpty) Seq(fansi.Str("")) else snippetsRaw
