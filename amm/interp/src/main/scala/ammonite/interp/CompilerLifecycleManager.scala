@@ -121,7 +121,7 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
     for {
       compiled <- Res.Success{
         compiler.compile(
-          processed.code.getBytes,
+          processed.code.getBytes(scala.util.Properties.sourceEncoding),
           printer,
           processed.prefixCharLength,
           processed.userCodeNestingLevel,
