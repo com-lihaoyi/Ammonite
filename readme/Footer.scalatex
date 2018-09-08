@@ -114,6 +114,23 @@
 
 
   @sect{Changelog}
+    @sect{1.2.0}
+      @ul
+        @li
+          Removed Scalaz dependency (@issue(830))
+        @li
+          Fix FrontEndUtils width and height on Windows (@issue(820))
+        @li
+          Fix passing empty parameters to scripts (@issue(747))
+        @li
+          Avoid unnecessarily re-compiling synthetic predef files when changing
+          working directory
+        @li
+          Improve REPL performance by preserving compiler & TTY metadata across
+          commands (@issue(853))
+        @li
+          Improvements to JLine REPL autocomplete (@issue(846))
+
     @sect{1.1.2}
       @ul
         @li
