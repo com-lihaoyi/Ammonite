@@ -2,16 +2,34 @@ package site
 
 import scalatags.Text.all._
 import ba.sake.hepek.html.structure.blog.Section
-import templates.AmmoniteBlogPage
-import utils.Imports._
 
-object Reference extends AmmoniteBlogPage {
+object Reference extends templates.AmmoniteBlogPage {
 
-  override def pageTitle = "Reference"
+  override def pageSettings = super.pageSettings.withTitle("Reference")
 
-  def inTheWildSection = Section(
-    "inTheWildSection",
-    div("inTheWildSection")
+  override def blogSettings =
+    super.blogSettings.withSections(referenceSection)
+
+  def referenceSection = Section(
+    "Reference",
+    div("Reference"),
+    List(communitySection,
+         olderScalaVersionsSection,
+         talksSection,
+         inTheWildSection,
+         scaladocSection,
+         changelogSection,
+         unstableVersionsSection)
+  )
+
+  def communitySection = Section(
+    "Community",
+    div("Community")
+  )
+
+  def olderScalaVersionsSection = Section(
+    "Older Scala Versions",
+    div("Older Scala Versions")
   )
 
   def talksSection = Section(
@@ -19,9 +37,30 @@ object Reference extends AmmoniteBlogPage {
     div("talksSection")
   )
 
+  def inTheWildSection = Section(
+    "inTheWildSection",
+    div("inTheWildSection")
+  )
+
+  def scaladocSection = Section(
+    "Scaladoc",
+    div("Scaladoc")
+  )
+
+  def changelogSection = Section(
+    "Changelog",
+    div("Changelog")
+  )
+
   def unstableVersionsSection = Section(
     "unstableVersionsSection",
-    div("unstableVersionsSection")
+    div("unstableVersionsSection"),
+    List(unstableChangelogSection)
+  )
+
+  def unstableChangelogSection = Section(
+    "unstableChangelogSection",
+    div("unstableChangelogSection")
   )
 
 }

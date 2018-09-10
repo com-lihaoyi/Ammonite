@@ -8,10 +8,11 @@ lazy val root = (project in file("."))
     organization := "ba.sake",
     version := "0.0.0-SNAPSHOT",
     libraryDependencies ++= Seq(
-      "ba.sake" %% "hepek" % "0.1.3-SNAPSHOT",
+      "ba.sake" %% "hepek" % "0.2.0-SNAPSHOT",
       "com.lihaoyi" %% "fansi" % "0.2.3",
       "com.lihaoyi" %% "ammonite-ops" % "1.1.2"
     ),
+    resolvers += Resolver.sonatypeRepo("snapshots"),
     (hepek in Compile) := {
       WebKeys.assets.value // run 'assets' after compiling...
       (hepek in Compile).value

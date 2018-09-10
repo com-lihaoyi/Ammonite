@@ -1,14 +1,56 @@
 package utils
 
 import ammonite.ops._
-import ba.sake.hepek.prismjs.PrismCodeHighlightComponents
+import scalatags.Text.all._
+import ba.sake.hepek.prismjs.{PrismCmdHighlighter, PrismCodeHighlightComponents}
 import ba.sake.hepek.Resources
+import ba.sake.hepek.bootstrap3.component.BootstrapImageComponents
+import ba.sake.hepek.html.component.BasicComponents
 
-object Imports {
+object Imports extends BasicComponents with BootstrapImageComponents {
 
   object chl extends PrismCodeHighlightComponents
 
   object resources extends Resources
+
+  /* AMM-specific */
+  private def scalaCmdHighlighter = PrismCmdHighlighter("scala")
+
+  def ammSnippet(
+      filePath: ammonite.ops.BasePath,
+      startQueries: List[String] = Nil,
+      endQueries: List[String] = Nil
+  ): Frag = {
+    val (startIndex, endIndex, textSnippet) =
+      extractFileSnippet(filePath, startQueries, endQueries)
+
+    // ^\s*$ - split by blank line
+    // (?m) - multiline so that ^ and $ refer to each line and not whole string
+    val steps =
+      textSnippet.split("(?m)^\\s*$").toList.filterNot(_.trim.isEmpty)
+    steps
+      .map { step =>
+        val margin = step.lines.map(_.takeWhile(_ == ' ').length).min
+        val (cmdLinesRaw, resultLinesRaw) =
+          step.lines.toList.map(_.drop(margin)).partition(_.startsWith("@"))
+        val cmdLines =
+          cmdLinesRaw.map(_.stripPrefix("@ ")).filterNot(_.trim.isEmpty)
+        val resultLines = resultLinesRaw.filterNot(_.trim.isEmpty)
+
+        div(cls := "amm-snippet")(
+          if (cmdLines.isEmpty) frag()
+          else
+            scalaCmdHighlighter
+              .withPrompt("@")(cmdLines.mkString("\n")),
+          if (resultLines.isEmpty) frag()
+          else
+            scalaCmdHighlighter
+              .withPrompt(" ")(resultLines.mkString("\n"))
+        )
+      }
+      .flatMap(List(hr, _)) // insert hr between each
+      .tail
+  }
 
   // TODO move to Hepek...
   def extractFileSnippet(filePath: ammonite.ops.BasePath,

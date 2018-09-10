@@ -1,13 +1,13 @@
 package site
 
+import ammonite.Constants
 import scalatags.Text.all._
-import ba.sake.hepek.html.structure.blog.Section
+import ba.sake.hepek.implicits._
 import ba.sake.hepek.html.component.GridComponents
 import ba.sake.hepek.bootstrap3.component.BootstrapGridComponents
-import templates.AmmoniteStaticPage
 import utils.Imports._
 
-object Index extends AmmoniteStaticPage {
+object Index extends templates.AmmoniteStaticPage {
   import grid._
 
   private val replLink =
@@ -17,7 +17,7 @@ object Index extends AmmoniteStaticPage {
   private val shellLink =
     s"[systems shell](${AmmoniteShell.ammoniteShellSection.ref})"
 
-  override def pageTitle = "Home"
+  override def pageSettings = super.pageSettings.withTitle("Home")
 
   override def pageContent = row(
     third1(),
@@ -38,9 +38,7 @@ object Index extends AmmoniteStaticPage {
             tr(
               td(
                 div(cls := "text-center")(
-                  i(cls := s"fa $faIcon",
-                    fontSize := "48px",
-                    aria.hidden := "true"),
+                  i(cls := s"fa $faIcon", fontSize := "48px", aria.hidden := "true"),
                   div(
                     h3(hyperlink(section.ref)(section.name))
                   )
@@ -95,7 +93,7 @@ object Index extends AmmoniteStaticPage {
           [in the wild](${Reference.inTheWildSection.ref}), to see what people are doing with it. 
         And there are more talks available [here](${Reference.talksSection}).
 
-        The bulk of this page describes the latest stable release of Ammonite, `1.1.2` //TODO.  
+        The bulk of this page describes the latest stable release of Ammonite, `${Constants.version}`.  
         If you're willing to live on the edge,
           we also publish [Unstable Versions](${Reference.unstableVersionsSection.ref})
           from any commits that get pushed

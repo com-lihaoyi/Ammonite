@@ -1,13 +1,11 @@
 package site
 
 import scalatags.Text.all._
-import ba.sake.hepek.html.structure.blog.Section
-import templates.AmmoniteBlogPage
-import utils.Imports._
+import ba.sake.hepek.implicits._
 
-object AmmoniteShell extends AmmoniteBlogPage {
+object AmmoniteShell extends templates.AmmoniteBlogPage {
 
-  override def pageTitle = "Shell"
+  override def pageSettings = super.pageSettings.withTitle("Shell")
 
   def ammoniteShellSection = Section(
     "Ammonite Shell",
