@@ -1,6 +1,6 @@
 package ammonite.interp
 
-
+import java.io.{OutputStream, PrintWriter}
 
 import ammonite.interp.Compiler.makeReporter
 
@@ -73,6 +73,34 @@ object Pressy {
       s.decodedName == "<init>" ||
       s.decodedName.contains('$')
     }
+
+    private val memberToString = new {
+      // Some hackery here to get at the protected CodePrinter.printedName which was the only
+      // mildly reusable prior art I could locate. Other related bits:
+      // - When constructing Trees, Scala captures the back-quoted nature into the AST as
+      //   Ident.isBackquoted. Code-completion is inherently "pre-Tree", at least for the
+      //   symbols being considered for use as completions, so not clear how this would be
+      //   leveragable without big changes inside nsc.
+      // - There's a public-but-incomplete implementation of rule-based backquoting in
+      //   Printers.quotedName
+      private val nullOutputStream = new OutputStream() { def write(b: Int): Unit = {} }
+      private object backQuoter extends pressy.CodePrinter(
+        new PrintWriter(nullOutputStream),
+        printRootPkg = false
+      ) {
+        def apply(decodedName: pressy.Name): String = printedName(decodedName, decoded = true)
+      }
+
+      def apply(member: pressy.Member): String = {
+        // nsc returns certain members w/ a suffix (LOCAL_SUFFIX_STRING, " ").
+        // See usages of symNameDropLocal in nsc's PresentationCompilerCompleter.
+        // Several people have asked that Scala mask this implementation detail:
+        // https://github.com/scala/bug/issues/5736
+        val decodedName = member.symNameDropLocal.decodedName
+        backQuoter(decodedName)
+      }
+    }
+
     val r = new Response[pressy.Tree]
     pressy.askTypeAt(new OffsetPosition(currentFile, index), r)
     val tree = r.get.fold(x => x, e => throw e)
@@ -95,6 +123,7 @@ object Pressy {
         member <- pressy.RootClass.typeSignature.members.toList
         sym <- rec(member)
         // sketchy name munging because I don't know how to do this properly
+        // Note lack of back-quoting support.
         strippedName = sym.nameString.stripPrefix("package$").stripSuffix("$")
         if strippedName.startsWith(name)
         (pref, _) = sym.fullNameString.splitAt(sym.fullNameString.lastIndexOf('.') + 1)
@@ -114,7 +143,7 @@ object Pressy {
         .filter(m => !blacklisted(m.sym))
         .map{ x  =>
           (
-            x.sym.name.decoded,
+            memberToString(x),
             if (x.sym.name.decoded != prefix) None
             else Some(x.sym.defString)
           )
@@ -182,7 +211,7 @@ object Pressy {
 
         index -> pressy.ask(() =>
           comps.filter(m => !blacklisted(m.sym))
-               .map { s => (s.sym.name.decoded, None) }
+               .map { s => (memberToString(s), None) }
         )
     }
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
