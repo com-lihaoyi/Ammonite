@@ -69,7 +69,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
       repositories,
       deps0.map(resolveCoursierDependency().apply(_)),
       deps0.filter(_.force).map(resolveCoursierDependency().apply(_)),
-      mapDependencies = Some(mapDependencies)
+      mapDependencies = Some(mapDependencies())
     )
 
     super.resources() ++
