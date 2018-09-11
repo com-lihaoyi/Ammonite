@@ -1,0 +1,18 @@
+
+body {
+  font-size: 19px;
+  margin-bottom: 55px;
+}
+
+h1 {
+  padding-bottom: 33px;
+}
+
+.amm-snippet .code-toolbar:nth-of-type(1) {
+  margin-bottom: -7px;
+}
+
+/* specific to cosmo theme */
+table a:not(.btn), .table a:not(.btn) {
+    text-decoration: none; 
+}
