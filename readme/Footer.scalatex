@@ -114,7 +114,7 @@
 
 
   @sect{Changelog}
-    @sect{1.2.0}
+    @sect{1.2.1}
       @ul
         @li
           Removed Scalaz dependency (@issue(830))
