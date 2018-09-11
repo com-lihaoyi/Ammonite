@@ -1,0 +1,8 @@
+{
+    "value": [
+        "qref:6db7cdaa:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-sbt/util-interface/1.2.0/util-interface-1.2.0.jar",
+        "qref:905b7d76:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-sbt/compiler-interface/1.2.1/compiler-interface-1.2.1.jar"
+    ],
+    "valueHash": -32290016,
+    "inputsHash": 849532835
+}
