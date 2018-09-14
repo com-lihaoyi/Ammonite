@@ -191,6 +191,31 @@ object AutocompleteTests extends TestSuite{
         //Test around https://github.com/lihaoyi/Ammonite/issues/252
         complete("""new Array<caret>""", Set() ^)
       }
+
+      'LOCAL_SUFFIX_STRING - checking { complete =>
+        complete(
+          // The following object creation pattern triggers nsc to return
+          // symbols w/ trailing whitespace, which we strip.
+          """object x { val foo = 1 }; x.<caret>""",
+          Set("foo") -- _
+        )
+      }
+    }
+
+    'backquotes {
+      'spaces - checking { complete =>
+        complete(
+          """object x { val `Backquoted Bar` = 1 }; x.<caret>""",
+          Set("`Backquoted Bar`") -- _
+        )
+      }
+
+      'keywords - checking { complete =>
+        complete(
+          """object x { val `new` = 1; }; x.<caret>""",
+          Set("`new`") -- _
+        )
+      }
     }
   }
 }
