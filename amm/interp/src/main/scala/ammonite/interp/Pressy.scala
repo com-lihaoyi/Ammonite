@@ -74,7 +74,7 @@ object Pressy {
       s.decodedName.contains('$')
     }
 
-    private val memberToString = new {
+    private val memberToString = {
       // Some hackery here to get at the protected CodePrinter.printedName which was the only
       // mildly reusable prior art I could locate. Other related bits:
       // - When constructing Trees, Scala captures the back-quoted nature into the AST as
@@ -83,15 +83,15 @@ object Pressy {
       //   leveragable without big changes inside nsc.
       // - There's a public-but-incomplete implementation of rule-based backquoting in
       //   Printers.quotedName
-      private val nullOutputStream = new OutputStream() { def write(b: Int): Unit = {} }
-      private object backQuoter extends pressy.CodePrinter(
+      val nullOutputStream = new OutputStream() { def write(b: Int): Unit = {} }
+      object backQuoter extends pressy.CodePrinter(
         new PrintWriter(nullOutputStream),
         printRootPkg = false
       ) {
         def apply(decodedName: pressy.Name): String = printedName(decodedName, decoded = true)
       }
 
-      def apply(member: pressy.Member): String = {
+      (member: pressy.Member) => {
         // nsc returns certain members w/ a suffix (LOCAL_SUFFIX_STRING, " ").
         // See usages of symNameDropLocal in nsc's PresentationCompilerCompleter.
         // Several people have asked that Scala mask this implementation detail:
