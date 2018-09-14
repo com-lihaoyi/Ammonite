@@ -84,7 +84,7 @@ object Pressy {
       // - There's a public-but-incomplete implementation of rule-based backquoting in
       //   Printers.quotedName
       val nullOutputStream = new OutputStream() { def write(b: Int): Unit = {} }
-      object backQuoter extends pressy.CodePrinter(
+      val backQuoter = new pressy.CodePrinter(
         new PrintWriter(nullOutputStream),
         printRootPkg = false
       ) {
