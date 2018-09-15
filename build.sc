@@ -163,10 +163,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
       def resources = T.sources {
-        super.resources() ++
+        (super.resources() ++
         ReplModule.this.sources() ++
         ReplModule.this.externalSources() ++
-        resolveDeps(ivyDeps, sources = true)()
+        resolveDeps(ivyDeps, sources = true)()).distinct
       }
       def ivyDeps = super.ivyDeps() ++ Agg(
         ivy"org.scalaz::scalaz-core:7.2.24"
