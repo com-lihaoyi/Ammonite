@@ -13,10 +13,11 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.11.12", "2.12.6")
+val binCrossScalaVersions = Seq("2.11.12", "2.12.6", "2.13.0-M5")
 val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6"
+  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6",
+  "2.13.0-M5"
 )
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
@@ -32,10 +33,10 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.last
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
-  def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
-  def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
+  def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.8")
+  def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.8")
   trait Tests extends super.Tests{
-    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.0")
+    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.6")
     def testFrameworks = Seq("utest.runner.Framework")
     def forkArgs = Seq("-XX:MaxPermSize=2g", "-Xmx4g", "-Dfile.encoding=UTF8")
   }
@@ -91,7 +92,7 @@ class OpsModule(val crossScalaVersion: String) extends AmmModule{
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::sourcecode:0.1.3",
+    ivy"com.lihaoyi::sourcecode:0.1.5",
     ivy"com.lihaoyi::fansi:0.2.4"
   )
   def compileIvyDeps = Agg(
@@ -169,7 +170,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         resolveDeps(ivyDeps, sources = true)()).distinct
       }
       def ivyDeps = super.ivyDeps() ++ Agg(
-        ivy"org.scalaz::scalaz-core:7.2.24"
+        ivy"org.scalaz::scalaz-core:7.2.26"
       )
     }
   }
@@ -219,7 +220,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.chuusai::shapeless:2.3.2"
+      ivy"com.chuusai::shapeless:2.3.3"
     )
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
