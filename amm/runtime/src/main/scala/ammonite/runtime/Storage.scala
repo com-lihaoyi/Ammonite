@@ -21,7 +21,6 @@ import scala.reflect.NameTransformer.encode
 trait Storage{
   def loadPredef: Option[(String, Path)]
   val fullHistory: StableRef[History]
-  val ivyCache: StableRef[Storage.IvyMap]
 
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
   def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
@@ -41,10 +40,6 @@ trait Storage{
 
 object Storage{
   case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
-  type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
-  implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
-  implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
-  implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
   private def loadIfTagMatches(loadedTag: Tag,
                                cacheTag: Tag,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],
@@ -69,12 +64,6 @@ object Storage{
     val fullHistory = new StableRef[History]{
       def apply() = _history
       def update(h: History): Unit = _history = h
-    }
-
-    var _ivyCache: IvyMap = Map.empty
-    val ivyCache = new StableRef[IvyMap]{
-      def apply() = _ivyCache
-      def update(value: IvyMap): Unit = _ivyCache = value
     }
 
     var compileCache: mutable.Map[String, (Tag, CompileCache)] = mutable.Map.empty
@@ -120,7 +109,6 @@ object Storage{
     val cacheDir = dir/'cache/ammonite.Constants.version
     val compileCacheDir = cacheDir/'compile
     val classFilesOrder = "classFilesOrder.json"
-    val ivyCacheFile = cacheDir/"ivycache.json"
     val metadataFile = "metadata.json"
     val sessionFile  = dir/"session"
 
@@ -234,20 +222,6 @@ object Storage{
       }.toOption
     }
 
-
-    val ivyCache = new StableRef[IvyMap]{
-      def apply() = {
-        val json =
-          try read(ivyCacheFile)
-          catch{ case e: java.nio.file.NoSuchFileException => "[]" }
-
-        try upickle.default.read[IvyMap](json)
-        catch{ case e: Exception => Map.empty }
-      }
-      def update(map: IvyMap) = {
-        write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
-      }
-    }
 
     def loadPredef = {
       try Some((read(predef), predef))

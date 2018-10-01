@@ -599,35 +599,26 @@ class Interpreter(val printer: Printer,
     .toSet
 
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
-    val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
-
-    storage.ivyCache().get(cacheKey) match{
-      case Some(res) => Right(res.map(new java.io.File(_)))
-      case None =>
-        ammonite.runtime.tools.IvyThing.resolveArtifact(
-          interpApi.repositories(),
-          coordinates
-            .filter(dep => !alwaysExclude((dep.module.organization, dep.module.name)))
-            .map { dep =>
-              dep.copy(
-                exclusions = dep.exclusions ++ alwaysExclude
-              )
-            },
-          verbose = verboseOutput,
-          output = printer.errStream,
-          hooks = resolutionHooks
-        )match{
-          case (srcWarnings, Right(loaded)) =>
-            srcWarnings.foreach(printer.info)
-            val loadedSet = loaded.toSet
-            storage.ivyCache() = storage.ivyCache().updated(
-              cacheKey, loadedSet.map(_.getAbsolutePath)
-            )
-            Right(loadedSet)
-          case (srcWarnings, Left(l)) =>
-            srcWarnings.foreach(printer.info)
-            Left(l)
-        }
+    ammonite.runtime.tools.IvyThing.resolveArtifact(
+      interpApi.repositories(),
+      coordinates
+        .filter(dep => !alwaysExclude((dep.module.organization, dep.module.name)))
+        .map { dep =>
+          dep.copy(
+            exclusions = dep.exclusions ++ alwaysExclude
+          )
+        },
+      verbose = verboseOutput,
+      output = printer.errStream,
+      hooks = resolutionHooks
+    )match{
+      case (srcWarnings, Right(loaded)) =>
+        srcWarnings.foreach(printer.info)
+        val loadedSet = loaded.toSet
+        Right(loadedSet)
+      case (srcWarnings, Left(l)) =>
+        srcWarnings.foreach(printer.info)
+        Left(l)
     }
   }
 
