@@ -16,10 +16,10 @@ val commitsSinceTaggedVersion = {
 
 val allVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.12",
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6"
+  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7"
 )
 
-val latestMajorVersions = Set("2.11.12", "2.12.6")
+val latestMajorVersions = Set("2.11.12", "2.12.7")
 
 val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
   case Some(v) if v != "" => (v, false)
