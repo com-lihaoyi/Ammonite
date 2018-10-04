@@ -7,6 +7,7 @@ import ammonite.util._
 import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
+import scala.util.Try
 
 
 /**
@@ -101,6 +102,11 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
   def complete(offset: Int, previousImports: String, snippet: String) = synchronized{
     init()
     pressy.complete(offset, previousImports, snippet)
+  }
+
+  def info(offset: Int, previousImports: String, snippet: String): Try[String] = synchronized{
+    init()
+    pressy.info(offset, previousImports, snippet)
   }
 
   def search(target: scala.reflect.runtime.universe.Type) = synchronized{

@@ -27,6 +27,11 @@ trait Pressy{
   def complete(snippetIndex: Int,
                previousImports: String,
                snippet: String): (Int, Seq[String], Seq[String])
+
+  /**
+    * Basic type info at the provided index.
+    */
+  def info(snippetIndex: Int, previousImports: String, snippet: String): Try[String]
   def shutdownPressy(): Unit
 }
 object Pressy {
@@ -244,7 +249,7 @@ object Pressy {
       GlobalInitCompat.initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
     }
 
-    def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
+    def run(snippetIndex: Int, previousImports: String, snippet: String) = {
       val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
       val suffix = newLine + "}"
       val allCode = prefix + snippet + suffix
@@ -260,9 +265,14 @@ object Pressy {
       pressy.askReload(List(currentFile), r)
       r.get.fold(x => x, e => throw e)
 
-      val run = Try(new Run(pressy, currentFile, allCode, index))
+      (prefix, Try(new Run(pressy, currentFile, allCode, index)))
+    }
 
-      val (i, all): (Int, Seq[(String, Option[String])]) = run.map(_.prefixed) match {
+    def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
+
+      val (prefix, run0) = run(snippetIndex, previousImports, snippet)
+
+      val (i, all): (Int, Seq[(String, Option[String])]) = run0.map(_.prefixed) match {
         case Success(prefixed) => prefixed
         case Failure(throwable) => (0, Seq.empty)
       }
@@ -272,6 +282,11 @@ object Pressy {
       val signatures = all.collect { case (name, Some(defn)) => defn }.sorted.distinct
 
       (i - prefix.length, allNames, signatures)
+    }
+
+    def info(snippetIndex: Int, previousImports: String, snippet: String): Try[String] = {
+      val (_, run0) = run(snippetIndex, previousImports, snippet)
+      run0.map(_.tree.symbol.info.toString)
     }
 
     def shutdownPressy() = {
