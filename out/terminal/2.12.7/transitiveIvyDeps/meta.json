@@ -1,0 +1,60 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "sourcecode",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.1.3",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "fansi",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.2.4",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 93844487,
+    "inputsHash": 606022620
+}

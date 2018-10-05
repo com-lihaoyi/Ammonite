@@ -1,0 +1,19 @@
+{
+    "value": [
+        "ref:d3fc01ff:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/ConsoleDim.scala",
+        "ref:6ff64f68:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Filter.scala",
+        "ref:3c345f9a:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/FilterTools.scala",
+        "ref:834fef58:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/LineReader.scala",
+        "ref:315459d2:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Protocol.scala",
+        "ref:15add061:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/SpecialKeys.scala",
+        "ref:c7e70663:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Terminal.scala",
+        "ref:bb8b4659:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/Utils.scala",
+        "ref:6618003c:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala",
+        "ref:f35b7c75:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/GUILikeFilters.scala",
+        "ref:847705ba:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/HistoryFilter.scala",
+        "ref:a1912973:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/ReadlineFilters.scala",
+        "ref:99a835b8:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala"
+    ],
+    "valueHash": 1701664545,
+    "inputsHash": -120280663
+}

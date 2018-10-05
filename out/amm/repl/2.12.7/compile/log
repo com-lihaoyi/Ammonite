@@ -1,0 +1,8 @@
+[0m[[0m[0minfo[0m] [0m[0mCompiling 19 Scala sources to /home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.12.7/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two deprecation warnings[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two deprecation warnings (since 2.11.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere was one deprecation warning (since 2.12.2)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 5 deprecation warnings in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m5 warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m

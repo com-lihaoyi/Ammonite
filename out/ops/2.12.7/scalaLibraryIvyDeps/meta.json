@@ -1,0 +1,34 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-library",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.7",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "",
+                "platformed": false
+            },
+            "force": true
+        }
+    ],
+    "valueHash": 1626560162,
+    "inputsHash": -560071983
+}

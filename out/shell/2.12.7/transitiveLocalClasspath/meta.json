@@ -1,0 +1,21 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "ref:4dcc45cc:/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/resources",
+        "ref:bc8e1500:/home/travis/build/lihaoyi/Ammonite/out/amm/2.12.7/resources/dest/extra-resources",
+        "ref:5eba5a13:/home/travis/build/lihaoyi/Ammonite/out/amm/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/resources",
+        "ref:06323eb2:/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+        "ref:d15d36a9:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/resources",
+        "ref:0f2e54e4:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/resources",
+        "ref:84dd9f8e:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/resources",
+        "ref:736f4151:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.12.7/compile/dest/classes"
+    ],
+    "valueHash": -893265771,
+    "inputsHash": -604186018
+}

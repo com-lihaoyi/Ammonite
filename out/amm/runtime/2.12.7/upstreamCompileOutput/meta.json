@@ -1,0 +1,14 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.7/compile/dest/zinc",
+            "classes": "ref:4dcc45cc:/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.7/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.7/compile/dest/zinc",
+            "classes": "ref:d15d36a9:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.7/compile/dest/classes"
+        }
+    ],
+    "valueHash": 922024184,
+    "inputsHash": 309455297
+}

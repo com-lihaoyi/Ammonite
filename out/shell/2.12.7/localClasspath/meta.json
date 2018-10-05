@@ -1,0 +1,8 @@
+{
+    "value": [
+        "ref:5cda3a15:/home/travis/build/lihaoyi/Ammonite/shell/src/main/resources",
+        "ref:80dd234b:/home/travis/build/lihaoyi/Ammonite/out/shell/2.12.7/compile/dest/classes"
+    ],
+    "valueHash": 1935736833,
+    "inputsHash": -1914423851
+}

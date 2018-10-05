@@ -1,0 +1,25 @@
+{
+    "value": [
+        "ref:697502fe:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/Stubs.scala",
+        "ref:041efbd2:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/main/Defaults.scala",
+        "ref:655d4ce9:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/AmmoniteFrontEnd.scala",
+        "ref:88d4deba:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/ApiImpls.scala",
+        "ref:1e0f3c2a:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEnd.scala",
+        "ref:6a5c5539:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEndUtils.scala",
+        "ref:c11cd367:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FullReplAPI.scala",
+        "ref:a6817c1b:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Highlighter.scala",
+        "ref:4162bbd3:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/PPrints.scala",
+        "ref:3524e032:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/RemoteLogger.scala",
+        "ref:b6edc70a:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Repl.scala",
+        "ref:0f700d20:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/ReplAPI.scala",
+        "ref:d419124d:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Signaller.scala",
+        "ref:bb13debb:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/package.scala",
+        "ref:ef8d3c84:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/Compat.scala",
+        "ref:a0dc2d46:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/SourceRuntime.scala",
+        "ref:2b23e9f7:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/desugar.scala",
+        "ref:d23a3a1c:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/source.scala",
+        "ref:df0ad808:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala-2.12/ammonite/repl/tools/HighlightJava.scala"
+    ],
+    "valueHash": 1049482313,
+    "inputsHash": 657259609
+}

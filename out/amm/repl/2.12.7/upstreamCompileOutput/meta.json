@@ -1,0 +1,26 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.7/compile/dest/zinc",
+            "classes": "ref:4dcc45cc:/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.7/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.7/compile/dest/zinc",
+            "classes": "ref:d15d36a9:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.7/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.7/compile/dest/zinc",
+            "classes": "ref:0f2e54e4:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.7/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.12.7/compile/dest/zinc",
+            "classes": "ref:84dd9f8e:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.12.7/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.7/compile/dest/zinc",
+            "classes": "ref:06323eb2:/home/travis/build/lihaoyi/Ammonite/out/terminal/2.12.7/compile/dest/classes"
+        }
+    ],
+    "valueHash": 359440438,
+    "inputsHash": 652720610
+}

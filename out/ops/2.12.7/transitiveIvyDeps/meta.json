@@ -1,0 +1,33 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "geny",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.1.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 1340642585,
+    "inputsHash": -897980131
+}

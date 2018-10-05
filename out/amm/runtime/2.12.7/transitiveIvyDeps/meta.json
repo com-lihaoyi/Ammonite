@@ -1,0 +1,195 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "io.get-coursier",
+                    "name": "coursier",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.1.0-M7",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "io.get-coursier",
+                    "name": "coursier-cache",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.1.0-M7",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "org.scalaj",
+                    "name": "scalaj-http",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.4.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "geny",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.1.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "upickle",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.6.6",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "pprint",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.5.2",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "fansi",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.2.4",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 1504600097,
+    "inputsHash": 796542916
+}

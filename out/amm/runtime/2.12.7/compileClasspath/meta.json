@@ -1,0 +1,23 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "ref:4dcc45cc:/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+        "ref:d15d36a9:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.7/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/resources",
+        "qref:cdbcd3b6:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.3/sourcecode_2.12-0.1.3.jar",
+        "qref:8f40682d:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaj/scalaj-http_2.12/2.4.0/scalaj-http_2.12-2.4.0.jar",
+        "qref:ae9a7be2:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.12/0.6.6/upickle_2.12-0.6.6.jar",
+        "qref:c03177d0:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-cache_2.12/1.1.0-M7/coursier-cache_2.12-1.1.0-M7.jar",
+        "qref:687405dd:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.12/0.1.2/geny_2.12-0.1.2.jar",
+        "qref:7220b09f:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.7/scala-library-2.12.7.jar",
+        "qref:a8d078f5:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier_2.12/1.1.0-M7/coursier_2.12-1.1.0-M7.jar",
+        "qref:47e42443:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.12/0.5.2/pprint_2.12-0.5.2.jar",
+        "qref:67a2e910:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.4/fansi_2.12-0.2.4.jar",
+        "qref:6745809c:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.12/0.1.7/acyclic_2.12-0.1.7.jar",
+        "qref:8c3b873c:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.12/0.6.6/ujson_2.12-0.6.6.jar",
+        "qref:221c708b:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.1.0/scala-xml_2.12-1.1.0.jar"
+    ],
+    "valueHash": -1878317271,
+    "inputsHash": -366927440
+}

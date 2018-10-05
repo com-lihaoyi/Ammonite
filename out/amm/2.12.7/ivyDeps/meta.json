@@ -1,0 +1,33 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.github.scopt",
+                    "name": "scopt",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.5.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": -530863302,
+    "inputsHash": -999971332
+}
