@@ -106,7 +106,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.6.6",
+      ivy"com.lihaoyi::upickle:0.6.7",
       ivy"com.lihaoyi::pprint:0.5.2",
       ivy"com.lihaoyi::fansi:0.2.4"
     )
