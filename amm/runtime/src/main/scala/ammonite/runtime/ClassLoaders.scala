@@ -141,11 +141,11 @@ object SpecialClassLoader{
         .collect{case cl: java.net.URLClassLoader => cl.getURLs}
         .flatten
         .filter(_.getProtocol == "file")
-        .map(p => java.nio.file.Paths.get(p.toURI))
+        .map(p => java.nio.file.Paths.get(p.toURI).toAbsolutePath)
 
     val bootClasspathRoots = sys.props("java.class.path")
       .split(java.io.File.pathSeparator)
-      .map(java.nio.file.Paths.get(_))
+      .map(java.nio.file.Paths.get(_).toAbsolutePath)
 
     val mtimes = (bootClasspathRoots ++ classpathRoots).flatMap{ p =>
       if (!java.nio.file.Files.exists(p)) Nil
