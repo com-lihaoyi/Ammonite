@@ -139,7 +139,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .print($ident, "$ident", $customCode)
+            .print($ident, ${fastparse.utils.Utils.literalize(ident)}, $customCode)
       """
     }
     def definedStr(definitionLabel: String, name: String) =
@@ -149,7 +149,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .printDef("$definitionLabel", "$name")
+            .printDef("$definitionLabel", ${fastparse.utils.Utils.literalize(name)})
       """
 
     def pprint(ident: String) = pprintSignature(ident, None)
@@ -198,7 +198,7 @@ object Preprocessor{
                 .ReplBridge
                 .value
                 .Internal
-                .printImport($tq$body$tq)
+                .printImport(${fastparse.utils.Utils.literalize(body)})
           """
         ))
     }
