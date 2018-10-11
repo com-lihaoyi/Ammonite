@@ -158,17 +158,22 @@ object rm extends Function1[Path, Unit]{
       s"Cannot rm a root directory: $target"
     )
     // Emulate `rm -rf` functionality by ignoring non-existent files
-    val files =
-      try ls.rec(target)
-      catch {
-        case e: NoSuchFileException => Nil
-        case e: NotDirectoryException => Nil
-      }
+    def recursiveDelete(path: Path): Unit = {
+        ls(path) foreach {x:Path=>
+          if (!x.isSymLink && x.isDir) recursiveDelete(x)
+          new File(x.toString).delete
+        }
+    }
 
-    files.toArray
-         .reverseIterator
-         .foreach(p => new File(p.toString).delete())
-    new File(target.toString).delete
+    try
+        if (target.isSymLink)
+          new File(target.toString).delete
+        else
+          recursiveDelete(target)
+    catch {
+      case e: java.nio.file.NoSuchFileException => Nil
+      case e: java.nio.file.NotDirectoryException => Nil
+    }
   }
 }
 
