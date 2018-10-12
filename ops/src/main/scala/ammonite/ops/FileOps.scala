@@ -157,22 +157,20 @@ object rm extends Function1[Path, Unit]{
       target.segments.nonEmpty,
       s"Cannot rm a root directory: $target"
     )
-    // Emulate `rm -rf` functionality by ignoring non-existent files
-    def recursiveDelete(path: Path): Unit = {
-        ls(path) foreach {x:Path=>
-          if (!x.isSymLink && x.isDir) recursiveDelete(x)
-          new File(x.toString).delete
-        }
+
+    def recursiveDelete(path: Path) : Unit = ls(path) foreach delete
+
+    def delete(path: Path): Unit = {
+      if (path.isDir) recursiveDelete(path)
+      new File(path.toString).delete
     }
 
-    try
-        if (target.isSymLink)
-          new File(target.toString).delete
-        else
-          recursiveDelete(target)
-    catch {
-      case e: java.nio.file.NoSuchFileException => Nil
-      case e: java.nio.file.NotDirectoryException => Nil
+    // Emulate `rm -rf` functionality by ignoring non-existent files
+    try {
+      delete(target)
+    } catch {
+      case e: NoSuchFileException => Nil
+      case e: NotDirectoryException => Nil
     }
   }
 }
