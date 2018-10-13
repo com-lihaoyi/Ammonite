@@ -8,7 +8,7 @@ import ammonite.runtime.Evaluator.AmmoniteExit
 import ammonite.util.Name.backtickWrap
 import ammonite.util.Util.CodeSource
 import ammonite.util.{Name, Res, Util}
-import fastparse.utils.Utils._
+import fastparse.Util._
 
 /**
   * Logic around using Ammonite as a script-runner; invoking scripts via the

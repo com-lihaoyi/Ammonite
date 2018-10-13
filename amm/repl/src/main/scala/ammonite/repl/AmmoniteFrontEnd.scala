@@ -5,7 +5,7 @@ import java.io.{InputStream, OutputStream, OutputStreamWriter}
 import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
 import ammonite.terminal._
-import fastparse.core.Parsed
+import fastparse.Parsed
 
 import ammonite.util.{Colors, Res}
 import ammonite.interp.Parsers
@@ -26,13 +26,11 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
-        Parsers.Splitter.parse(code) match{
+        fastparse.parse(code, Parsers.Splitter(_)) match{
           case Parsed.Success(value, idx) =>
             Res.Success((code, value))
-          case Parsed.Failure(_, index, extra) =>
-            Res.Failure(
-              fastparse.core.ParseError.msg(extra.input, extra.traced.expected, index)
-            )
+          case f @ Parsed.Failure(_, index, extra) =>
+            Res.Failure(f.trace)
         }
     }
   }

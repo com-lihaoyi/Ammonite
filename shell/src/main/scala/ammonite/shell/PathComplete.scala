@@ -57,9 +57,9 @@ object PathComplete {
       Parsers.Splitter,
       snippet.toVector,
       {
-        case scalaparse.Scala.Id => Interval.Id
-        case scalaparse.Scala.Literals.Expr.String => Interval.String
-        case scalaparse.Scala.Literals.Symbol => Interval.Symbol
+        case "Id" => Interval.Id
+        case "String" => Interval.String
+        case "Symbol" => Interval.Symbol
       },
       Interval.End
     )

@@ -3,7 +3,7 @@ package ammonite.repl
 
 import ammonite.interp.Parsers
 
-import fastparse.all._
+import fastparse._
 
 import scalaparse.Scala._
 import scalaparse.syntax.Identifiers._
@@ -11,8 +11,8 @@ object Highlighter {
 
   object BackTicked{
     private[this] val regex = "`([^`]+)`".r
-    def unapplySeq(s: Any): Option[List[String]] = {
-      regex.unapplySeq(s.toString)
+    def unapplySeq(s: String): Option[List[String]] = {
+      regex.unapplySeq(s)
     }
   }
 
@@ -34,10 +34,10 @@ object Highlighter {
                        literal: fansi.Attrs,
                        keyword: fansi.Attrs,
                        reset: fansi.Attrs) = {
-    defaultHighlight0(Parsers.Splitter, buffer, comment, `type`, literal, keyword, reset)
+    defaultHighlight0(Parsers.Splitter(_), buffer, comment, `type`, literal, keyword, reset)
   }
 
-  def defaultHighlight0(parser: P[_],
+  def defaultHighlight0(parser: P[_] => P[Any],
                         buffer: Vector[Char],
                         comment: fansi.Attrs,
                         `type`: fansi.Attrs,
@@ -55,9 +55,9 @@ object Highlighter {
                               literal: fansi.Attrs,
                               keyword: fansi.Attrs,
                               reset: fansi.Attrs) = Highlighter.defaultHighlightIndices0(
-    Parsers.Splitter, buffer, comment, `type`, literal, keyword, reset
+    Parsers.Splitter(_), buffer, comment, `type`, literal, keyword, reset
   )
-  def defaultHighlightIndices0(parser: P[_],
+  def defaultHighlightIndices0(parser: P[_] => P[Any],
                                buffer: Vector[Char],
                                comment: fansi.Attrs,
                                `type`: fansi.Attrs,
@@ -67,24 +67,27 @@ object Highlighter {
     parser,
     buffer,
     {
-      case Literals.Expr.Interp | Literals.Pat.Interp => reset
-      case Literals.Comment => comment
-      case ExprLiteral => literal
-      case TypeId => `type`
+      case "Interp" => reset
+      case "Comment" => comment
+      case "ExprLiteral" => literal
+      case "TypeId" => `type`
       case BackTicked(body)
-        if alphaKeywords.contains(body) => keyword
+        if parse(body, scalaparse.syntax.Identifiers.AlphabetKeywords(_)).isSuccess => keyword
     },
     reset
   )
-  def highlightIndices[T](parser: Parser[_],
+  def highlightIndices[T](parser: P[_] => P[Any],
                           buffer: Vector[Char],
-                          ruleColors: PartialFunction[Parser[_], T],
+                          ruleColors: PartialFunction[String, T],
                           endColor: T): Seq[(Int, T)] = {
     val indices = {
       var indices = collection.mutable.Buffer((0, endColor))
       var done = false
       val input = buffer.mkString
-      parser.parse(input, instrument = (rule, idx, res) => {
+      parse(input, parser, instrument = new ParsingRun.Instrument {
+        def beforeParse(parser: String, index: Int): Unit = ()
+        def afterParse(parser: String, index: Int, success: Boolean): Unit = ()
+      }/*(rule, idx, res) => {
         for(color <- ruleColors.lift(rule)){
           val closeColor = indices.last._2
           val startIndex = indices.length
@@ -112,19 +115,12 @@ object Highlighter {
               indices.remove(startIndex, indices.length - startIndex)
           }
         }
-      })
+      }*/)
       indices
     }
     // Make sure there's an index right at the start and right at the end! This
     // resets the colors at the snippet's end so they don't bleed into later output
     indices ++ Seq((999999999, endColor))
-  }
-  def highlight(parser: Parser[_],
-                buffer: Vector[Char],
-                ruleColors: PartialFunction[Parser[_], fansi.Attrs],
-                endColor: fansi.Attrs) = {
-    val boundedIndices = highlightIndices(parser, buffer, ruleColors, endColor)
-    flattenIndices(boundedIndices, buffer)
   }
 
 }

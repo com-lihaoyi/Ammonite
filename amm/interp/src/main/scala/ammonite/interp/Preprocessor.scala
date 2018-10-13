@@ -3,7 +3,7 @@ package ammonite.interp
 import ammonite._
 import ammonite.util._
 import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines, windowsPlatform}
-import fastparse.all._
+import fastparse.{Util => _, _}
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
@@ -47,8 +47,8 @@ object Preprocessor{
 
 
   def formatFastparseError(fileName: String, rawCode: String, f: Parsed.Failure) = {
-    val lineColIndex = f.extra.input.repr.prettyIndex(f.extra.input, f.index)
-    val expected = f.extra.traced.expected
+    val lineColIndex = f.extra.input.prettyIndex(f.index)
+    val expected = f.extra.traced.stack.head._1
       val locationString = {
         val (first, last) = rawCode.splitAt(f.index)
         val lastSnippet = last.split(newLine).headOption.getOrElse("")
@@ -139,7 +139,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .print($ident, ${fastparse.utils.Utils.literalize(ident)}, $customCode)
+            .print($ident, ${fastparse.Util.literalize(ident)}, $customCode)
       """
     }
     def definedStr(definitionLabel: String, name: String) =
@@ -149,7 +149,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .printDef("$definitionLabel", ${fastparse.utils.Utils.literalize(name)})
+            .printDef("$definitionLabel", ${fastparse.Util.literalize(name)})
       """
 
     def pprint(ident: String) = pprintSignature(ident, None)
@@ -198,7 +198,7 @@ object Preprocessor{
                 .ReplBridge
                 .value
                 .Internal
-                .printImport(${fastparse.utils.Utils.literalize(body)})
+                .printImport(${fastparse.Util.literalize(body)})
           """
         ))
     }

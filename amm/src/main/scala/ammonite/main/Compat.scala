@@ -1,6 +1,6 @@
 package ammonite.main
 
-import fastparse.utils.Compat.Context
+import scala.reflect.macros.blackbox.Context
 
 object Compat{
   def copyAnnotatedType(c: Context)

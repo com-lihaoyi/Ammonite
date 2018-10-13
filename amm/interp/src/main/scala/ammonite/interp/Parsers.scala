@@ -2,27 +2,27 @@ package ammonite.interp
 
 object Parsers {
 
-  import fastparse.noApi._
+  import fastparse._
 
+  import ScalaWhitespace._
   import scalaparse.Scala._
-  import WhitespaceApi._
 
   // For some reason Scala doesn't import this by default
-  val `_` = scalaparse.Scala.`_`
+  def `_`[_: P] = scalaparse.Scala.`_`
 
 
-  val ImportSplitter: P[Seq[ammonite.util.ImportTree]] = {
+  def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
     val IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
-    val Selector = P( IdParser ~ (`=>` ~/ IdParser).? )
-    val Selectors = P( "{" ~/ Selector.rep(sep = ",".~/) ~ "}" )
-    val BulkImport = P( `_`).map(
+    def Selector = P( IdParser ~ (`=>` ~/ IdParser).? )
+    def Selectors = P( "{" ~/ Selector.rep(sep = ","./) ~ "}" )
+    def BulkImport = P( `_`).map(
       _ => Seq("_" -> None)
     )
-    val Prefix = P( IdParser.rep(1, sep = ".") )
-    val Suffix = P( "." ~/ (BulkImport | Selectors) )
-    val ImportExpr: P[ammonite.util.ImportTree] = {
+    def Prefix = P( IdParser.rep(1, sep = ".") )
+    def Suffix = P( "." ~/ (BulkImport | Selectors) )
+    def ImportExpr: P[ammonite.util.ImportTree] = {
       // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
       // we do not want the whitespace to be consumed even if the WL0 parser parses
       // to the end of the input (which is the default behavior for WhitespaceApi)
@@ -31,22 +31,22 @@ object Parsers {
           ammonite.util.ImportTree(idSeq, selectors, start, end)
       }
     }
-    P( `import` ~/ ImportExpr.rep(1, sep = ",".~/) )
+    P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
   }
 
-  val PatVarSplitter = {
+  def PatVarSplitter[_: P] = {
     val Prefixes = P(Prelude ~ (`var` | `val`))
     val Lhs = P( Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).? )
     P( Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End )
   }
   def patVarSplit(code: String) = {
-    val Parsed.Success((lhs, rhs), _) = PatVarSplitter.parse(code)
+    val Parsed.Success((lhs, rhs), _) = parse(code, PatVarSplitter(_))
     (lhs, rhs)
   }
 
-  val Prelude = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
+  def Prelude[_: P] = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
 
-  val TmplStat = P( Import | Prelude ~ BlockDef | StatCtx.Expr )
+  def TmplStat[_: P] = P( Import | Prelude ~ BlockDef | StatCtx.Expr )
 
 
   // Do this funny ~~WS thing to make sure we capture the whitespace
@@ -54,13 +54,13 @@ object Parsers {
   //
   // After each statement, there must either be `Semis`, a "}" marking the
   // end of the block, or the `End` of the input
-  def StatementBlock(blockSep: P0) =
+  def StatementBlock[_: P](blockSep: P0) =
     P( Semis.? ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!.repX)
 
-  val Splitter0 = P( StatementBlock(Fail) )
-  val Splitter = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
+  def Splitter0[_: P] = P( StatementBlock(Fail) )
+  def Splitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
 
-  val ObjParser = P( ObjDef )
+  def ObjParser[_: P] = P( ObjDef )
 
   /**
    * Attempts to break a code blob into multiple statements. Returns `None` if
@@ -71,30 +71,34 @@ object Parsers {
     // input, any time during the parse. If it has done so, and failed, we
     // consider the input incomplete.
     var furthest = 0
-    def instrument(p: fastparse.all.Parser[_], index: Int, parse: () => fastparse.all.Parsed[_]) = {
-      if (index > furthest) furthest = index
+    val instrument = new ParsingRun.Instrument {
+      def beforeParse(parser: String, index: Int): Unit = ()
+      def afterParse(parser: String, index: Int, success: Boolean): Unit = {
+        if (index > furthest) furthest = index
+      }
     }
 
-    Splitter.parse(code, instrument = instrument) match{
+    parse(code, Splitter(_), instrument = instrument) match{
       case Parsed.Failure(_, index, extra) if furthest == code.length => None
       case x => Some(x)
     }
   }
 
   def isObjDef(code: String): Boolean = {
-    ObjParser.parse(code)
-      .fold((_, _, _) => false, (_, _) => true)
+    parse(code, ObjParser(_))
+      .fold((_, _) => false, (_, _) => true)
   }
 
-  val Separator = P( WL ~ "@" ~~ CharIn(" " + System.lineSeparator).rep(1) )
-  val CompilationUnit = P( WL.! ~ StatementBlock(Separator) ~ WL )
-  val ScriptSplitter = P( CompilationUnit.repX(1, Separator) ~ End)
-  def splitScript(code: String) = ScriptSplitter.parse(code)
+  def Separator[_: P] = P( WL ~ "@" ~~ CharIn(" \n\r").rep(1) )
+  def CompilationUnit[_: P] = P( WL.! ~ StatementBlock(Separator) ~ WL )
+  def ScriptSplitter[_: P] = P( CompilationUnit.repX(1, Separator) ~ End)
+  def splitScript(code: String) = parse(code, ScriptSplitter(_))
 
   def stringWrap(s: String) = "\"" + pprint.Util.literalize(s) + "\""
   def stringSymWrap(s: String) = {
+    def idToEnd[_: P] = P( scalaparse.syntax.Identifiers.Id ~ End )
     if (s == "") "'"
-    else (scalaparse.syntax.Identifiers.Id ~ End).parse(s, 0)  match{
+    else parse(s, idToEnd(_), 0)  match{
       case Parsed.Success(v, _) =>  "'" + s
       case f: Parsed.Failure => stringWrap(s)
     }

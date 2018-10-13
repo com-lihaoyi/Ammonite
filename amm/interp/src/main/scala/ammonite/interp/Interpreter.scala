@@ -8,7 +8,7 @@ import ammonite.interp.Preprocessor.CodeWrapper
 import scala.collection.mutable
 import ammonite.ops._
 import ammonite.runtime._
-import fastparse.all._
+import fastparse._
 
 import annotation.tailrec
 import ammonite.util.ImportTree
@@ -182,7 +182,7 @@ class Interpreter(val printer: Printer,
     val hookedStmts = mutable.Buffer.empty[String]
     val importTrees = mutable.Buffer.empty[ImportTree]
     for(stmt <- stmts) {
-      Parsers.ImportSplitter.parse(stmt) match{
+      parse(stmt, Parsers.ImportSplitter(_)) match{
         case f: Parsed.Failure => hookedStmts.append(stmt)
         case Parsed.Success(parsedTrees, _) =>
           var currentStmt = stmt
@@ -678,7 +678,7 @@ class Interpreter(val printer: Printer,
 
       def module(file: Path) = {
         watch(file)
-        val (pkg, wrapper) = Util.pathToPackageWrapper(
+        val (pkg, wrapper) = ammonite.util.Util.pathToPackageWrapper(
           Seq(Name("dummy")),
           file relativeTo wd
         )
@@ -742,7 +742,7 @@ object Interpreter{
     * in imports, so we don't need to pass them explicitly.
     */
   def cacheTag(classpathHash: Array[Byte]): String = {
-    val bytes = Util.md5Hash(Iterator(
+    val bytes = ammonite.util.Util.md5Hash(Iterator(
       classpathHash
     ))
     bytes.map("%02x".format(_)).mkString

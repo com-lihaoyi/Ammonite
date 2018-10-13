@@ -217,7 +217,7 @@ object SourceRuntime{
           if (loc.fileName.endsWith(".scala")){
             fansi.Str(
               Highlighter.defaultHighlight0(
-                scalaparse.Scala.CompilationUnit,
+                scalaparse.Scala.CompilationUnit(_),
                 loc.fileContent.toVector,
                 colors.comment,
                 colors.`type`,
