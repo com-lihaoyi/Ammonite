@@ -12,7 +12,7 @@ object Parsers {
 
 
   def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
-    val IdParser = P( (Id | `_` ).! ).map(
+    def IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
     def Selector = P( IdParser ~ (`=>` ~/ IdParser).? )
@@ -35,8 +35,8 @@ object Parsers {
   }
 
   def PatVarSplitter[_: P] = {
-    val Prefixes = P(Prelude ~ (`var` | `val`))
-    val Lhs = P( Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).? )
+    def Prefixes = P(Prelude ~ (`var` | `val`))
+    def Lhs = P( Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).? )
     P( Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End )
   }
   def patVarSplit(code: String) = {
@@ -54,7 +54,7 @@ object Parsers {
   //
   // After each statement, there must either be `Semis`, a "}" marking the
   // end of the block, or the `End` of the input
-  def StatementBlock[_: P](blockSep: P0) =
+  def StatementBlock[_: P](blockSep: => P0) =
     P( Semis.? ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!.repX)
 
   def Splitter0[_: P] = P( StatementBlock(Fail) )
