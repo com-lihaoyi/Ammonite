@@ -158,11 +158,11 @@ object rm extends Function1[Path, Unit]{
       s"Cannot rm a root directory: $target"
     )
 
-    def recursiveDelete(path: Path) : Unit = ls(path) foreach delete
+    def recursiveDelete(p: Path) : Unit = ls(p) foreach delete
 
-    def delete(path: Path): Unit = {
-      if (path.isDir) recursiveDelete(path)
-      new File(path.toString).delete
+    def delete(p: Path): Unit = {
+      if (stat(p).isDir) recursiveDelete(p)
+      new File(p.toString).delete
     }
 
     // Emulate `rm -rf` functionality by ignoring non-existent files
