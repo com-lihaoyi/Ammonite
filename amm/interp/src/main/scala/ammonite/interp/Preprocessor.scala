@@ -3,7 +3,7 @@ package ammonite.interp
 import ammonite._
 import ammonite.util._
 import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines, windowsPlatform}
-import fastparse.{Util => _, _}
+import fastparse._
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
@@ -139,7 +139,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .print($ident, ${fastparse.Util.literalize(ident)}, $customCode)
+            .print($ident, ${fastparse.internal.Util.literalize(ident)}, $customCode)
       """
     }
     def definedStr(definitionLabel: String, name: String) =
@@ -149,7 +149,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .printDef("$definitionLabel", ${fastparse.Util.literalize(name)})
+            .printDef("$definitionLabel", ${fastparse.internal.Util.literalize(name)})
       """
 
     def pprint(ident: String) = pprintSignature(ident, None)
@@ -198,7 +198,7 @@ object Preprocessor{
                 .ReplBridge
                 .value
                 .Internal
-                .printImport(${fastparse.Util.literalize(body)})
+                .printImport(${fastparse.internal.Util.literalize(body)})
           """
         ))
     }

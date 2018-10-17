@@ -71,7 +71,7 @@ object Parsers {
     // input, any time during the parse. If it has done so, and failed, we
     // consider the input incomplete.
     var furthest = 0
-    val instrument = new ParsingRun.Instrument {
+    val instrument = new fastparse.internal.Instrument {
       def beforeParse(parser: String, index: Int): Unit = ()
       def afterParse(parser: String, index: Int, success: Boolean): Unit = {
         if (index > furthest) furthest = index
@@ -86,7 +86,7 @@ object Parsers {
 
   def isObjDef(code: String): Boolean = {
     parse(code, ObjParser(_))
-      .fold((_, _) => false, (_, _) => true)
+      .fold((_, _, _) => false, (_, _) => true)
   }
 
   def Separator[_: P] = P( WL ~ "@" ~~ CharIn(" \n\r").rep(1) )
@@ -98,7 +98,7 @@ object Parsers {
   def stringSymWrap(s: String) = {
     def idToEnd[_: P] = P( scalaparse.syntax.Identifiers.Id ~ End )
     if (s == "") "'"
-    else parse(s, idToEnd(_), 0)  match{
+    else parse(s, idToEnd(_))  match{
       case Parsed.Success(v, _) =>  "'" + s
       case f: Parsed.Failure => stringWrap(s)
     }

@@ -85,7 +85,7 @@ object Highlighter {
       var done = false
       val input = buffer.mkString
       val stack = collection.mutable.ArrayBuffer.empty[(T, Int, Int)]
-      parse(input, parser, instrument = new ParsingRun.Instrument {
+      parse(input, parser, instrument = new fastparse.internal.Instrument {
         def beforeParse(parser: String, index: Int): Unit = {
           for(color <- ruleColors.lift(parser)) {
             val closeColor = indices.last._2
@@ -113,7 +113,7 @@ object Highlighter {
               }
               indices += ((index, closeColor))
               if (index == buffer.length) done = true
-            } else if (index == buffer.length && !parse(input, endCheckParser(_), index).isSuccess) {
+            } else if (index == buffer.length && !parse(input, endCheckParser(_), startIndex = index).isSuccess) {
               done = true
             } else {
               indices.remove(startIndex, indices.length - startIndex)
