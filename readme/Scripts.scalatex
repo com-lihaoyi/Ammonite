@@ -419,8 +419,8 @@
         via the @sect.ref{import $ivy} syntax, it also comes bundled with some
         basic libraries, e.g. @lnk("Scalaj-HTTP", "https://github.com/scalaj/scalaj-http")
         for making HTTP calls, or the
-        @lnk("uPickle", "http://www.lihaoyi.com/upickle-pprint/upickle/")
-        library with it's @lnk("JSON Api", "http://www.lihaoyi.com/upickle-pprint/upickle/#JSONAPI")
+        @lnk("uPickle", "https://github.com/lihaoyi/upickle")
+        library with its @lnk("JSON Api", "http://www.lihaoyi.com/upickle/#uJson")
         for dealing with the common JSON format.
 
       @p

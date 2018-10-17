@@ -117,12 +117,14 @@ object EvaluatorTests extends TestSuite{
       """)
     }
     'library{
+      // x and y pprinted value is 'non-empty iterator' up to 2.12.6,
+      // '<iterator>' since 2.12.7, hence the '?' (don't check the value)
       check.session("""
         @ val x = Iterator.continually(1)
-        x: Iterator[Int] = non-empty iterator
+        x: Iterator[Int] = ?
 
         @ val y = x.take(15)
-        y: Iterator[Int] = non-empty iterator
+        y: Iterator[Int] = ?
 
         @ val z = y.foldLeft(0)(_ + _)
         z: Int = 15

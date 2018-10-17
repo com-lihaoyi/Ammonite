@@ -92,11 +92,12 @@ object Pressy {
       }
 
       (member: pressy.Member) => {
+        import pressy._
         // nsc returns certain members w/ a suffix (LOCAL_SUFFIX_STRING, " ").
         // See usages of symNameDropLocal in nsc's PresentationCompilerCompleter.
         // Several people have asked that Scala mask this implementation detail:
         // https://github.com/scala/bug/issues/5736
-        val decodedName = member.symNameDropLocal.decodedName
+        val decodedName = member.sym.name.dropLocal.decodedName
         backQuoter(decodedName)
       }
     }

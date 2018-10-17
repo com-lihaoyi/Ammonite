@@ -227,14 +227,28 @@ class TestRepl {
                 .map(_.replaceAll(" *$", ""))
                 .mkString(Util.newLine)
                 .trim()
-            failLoudly(
-              assert{
-                identity(error)
-                identity(warning)
-                identity(info)
-                normalize(allOut) == normalize(expected)
-              }
-            )
+
+            val expected0 = normalize(expected)
+
+            if (expected0.endsWith(" = ?")) {
+              val expectedStart = expected0.stripSuffix("?")
+              failLoudly(
+                assert{
+                  identity(error)
+                  identity(warning)
+                  identity(info)
+                  normalize(allOut).take(expectedStart.length) == expectedStart
+                }
+              )
+            } else
+              failLoudly(
+                assert{
+                  identity(error)
+                  identity(warning)
+                  identity(info)
+                  normalize(allOut) == expected0
+                }
+              )
 
           case Res.Failure(failureMsg) =>
             assert{
