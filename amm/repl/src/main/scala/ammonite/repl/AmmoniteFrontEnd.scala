@@ -30,7 +30,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
             Res.Success((code, value))
           case f @ Parsed.Failure(_, index, extra) =>
             Res.Failure(
-              Preprocessor.formatFastparseError("(console)", line, f)
+              Preprocessor.formatFastparseError("(console)", code, f)
             )
         }
     }
