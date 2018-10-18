@@ -114,10 +114,10 @@
 
 
   @sect{Changelog}
-    @sect{1.3.0}
+    @sect{1.3.1}
       @ul
         @li
-          Upgrade to Fastparse 2.0.0, uPickle 0.6.7
+          Upgrade to Fastparse 2.0.4, uPickle 0.6.7
         @li
           Support for Scala 2.12.7
 
