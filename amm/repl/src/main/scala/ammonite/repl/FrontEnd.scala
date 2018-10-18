@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import java.io.{InputStream, OutputStream}
+
 import scala.collection.JavaConverters._
 import fastparse.Parsed
 import fastparse.ParserInput
@@ -10,7 +11,7 @@ import org.jline.reader.impl.DefaultParser.ArgumentList
 import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
-import ammonite.interp.Parsers
+import ammonite.interp.{Parsers, Preprocessor}
 
 /** JLine interface */
 trait FrontEnd {
@@ -163,7 +164,7 @@ class AmmParser extends Parser {
         if (context == Parser.ParseContext.ACCEPT_LINE) {
           addHistory(line)
           throw new SyntaxError(
-            f.trace().msg
+            Preprocessor.formatFastparseError("(console)", line, f)
           )
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)
