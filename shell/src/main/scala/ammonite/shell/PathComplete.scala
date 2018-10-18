@@ -54,7 +54,7 @@ object PathComplete {
    */
   def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = {
     val indices = Highlighter.highlightIndices(
-      Parsers.Splitter,
+      Parsers.Splitter(_),
       snippet.toVector,
       {
         case "Id" => Interval.Id
