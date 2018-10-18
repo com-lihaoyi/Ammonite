@@ -76,6 +76,7 @@ object Highlighter {
     },
     reset
   )
+
   def highlightIndices[T](parser: P[_] => P[Any],
                           buffer: Vector[Char],
                           ruleColors: PartialFunction[String, T],
@@ -84,41 +85,54 @@ object Highlighter {
       var indices = collection.mutable.Buffer((0, endColor))
       var done = false
       val input = buffer.mkString
-      val stack = collection.mutable.ArrayBuffer.empty[(T, Int, Int)]
-      parse(input, parser, instrument = new fastparse.internal.Instrument {
+      val stack = collection.mutable.ArrayBuffer.empty[(T, Int, Int, Boolean)]
+      val res = parse(input, parser, instrument = new fastparse.internal.Instrument {
         def beforeParse(parser: String, index: Int): Unit = {
           for(color <- ruleColors.lift(parser)) {
             val closeColor = indices.last._2
             val startIndex = indices.length
-            indices += ((index, color))
+            val newIndex =
+              index > indices.lastOption.fold(0)(_._1) ||
+              indices.lastOption.map(_._2).contains(endColor)
 
-            stack.append((closeColor, startIndex, index))
+            if (newIndex) indices += ((index, color))
+            stack.append((closeColor, startIndex, index, newIndex))
           }
+
         }
         def afterParse(parser: String, index: Int, success: Boolean): Unit = {
+
           for(color <- ruleColors.lift(parser)) {
-            val (closeColor, startIndex, idx) = stack.remove(stack.length - 1)
+            val (closeColor, startIndex, idx, newIndex) = stack.remove(stack.length - 1)
 
             def endCheckParser[_: P] = P(WL ~ End)
 
-            if (success) {
-              val prev = indices(startIndex - 1)._1
 
-              if (idx < prev && index <= prev) {
+            if (newIndex) {
+              if (success) {
+                val prev = indices(startIndex - 1)._1
+
+                if (idx < prev && index <= prev) {
+                  indices.remove(startIndex, indices.length - startIndex)
+
+                }
+                while (idx < indices.last._1 && index <= indices.last._1) {
+                  indices.remove(indices.length - 1)
+                }
+                indices += ((index, closeColor))
+                if (index == buffer.length) done = true
+              } else if (
+                  index == buffer.length &&
+                  !parse(input, endCheckParser(_), startIndex = startIndex).isSuccess &&
+                  index > idx) {
+                done = true
+              } else {
                 indices.remove(startIndex, indices.length - startIndex)
-
               }
-              while (idx < indices.last._1 && index <= indices.last._1) {
-                indices.remove(indices.length - 1)
-              }
-              indices += ((index, closeColor))
-              if (index == buffer.length) done = true
-            } else if (index == buffer.length && !parse(input, endCheckParser(_), startIndex = startIndex).isSuccess) {
-              done = true
-            } else {
-              indices.remove(startIndex, indices.length - startIndex)
             }
+
           }
+
         }
       })
 
