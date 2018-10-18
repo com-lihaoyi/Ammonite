@@ -27,7 +27,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers / "ErrorLineNumberTest.sc",
           expected = Util.normalizeNewlines(
-            """ErrorLineNumberTest.sc:5:24 expected ";" | Newline.rep(1) | "}"
+            """ErrorLineNumberTest.sc:5:24 expected "}"
               |    printlnqs(unsorted))
               |                       ^""".stripMargin
           )
@@ -40,7 +40,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
           expected = Util.normalizeNewlines(
-            """MultipleCompilationUnitErrorMsgTest1.sc:5:1 expected "@" | End
+            """MultipleCompilationUnitErrorMsgTest1.sc:5:1 expected end-of-input
               |}
               |^""".stripMargin
           )
@@ -54,7 +54,7 @@ object LineNumberTests extends TestSuite{
         checkErrorMessage(
           file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
           expected = Util.normalizeNewlines(
-            """MultipleCompilationUnitErrorMsgTest2.sc:3:1 expected "@" | End
+            """MultipleCompilationUnitErrorMsgTest2.sc:3:1 expected end-of-input
               |}
               |^""".stripMargin
           )

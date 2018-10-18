@@ -113,7 +113,7 @@ object Highlighter {
               }
               indices += ((index, closeColor))
               if (index == buffer.length) done = true
-            } else if (index == buffer.length && !parse(input, endCheckParser(_), startIndex = index).isSuccess) {
+            } else if (index == buffer.length && !parse(input, endCheckParser(_), startIndex = startIndex).isSuccess) {
               done = true
             } else {
               indices.remove(startIndex, indices.length - startIndex)

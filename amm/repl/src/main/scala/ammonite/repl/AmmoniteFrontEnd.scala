@@ -30,7 +30,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
           case Parsed.Success(value, idx) =>
             Res.Success((code, value))
           case f @ Parsed.Failure(_, index, extra) =>
-            Res.Failure(f.trace)
+            Res.Failure(f.traceVerbose().msg)
         }
     }
   }

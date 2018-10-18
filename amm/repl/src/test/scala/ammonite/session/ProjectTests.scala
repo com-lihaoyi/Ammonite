@@ -161,15 +161,11 @@ object ProjectTests extends TestSuite{
         @ 1
         res1: Int = 1
 
-        @ ExprCtx.Parened.parse("1 + 1") // for some reason the tuple isn't pprinted
-        res2: fastparse.core.Parsed[Unit, Char, String] = Failure(
-          ElemLiteral('('),
-          0,
-          Extra(1 + 1, [traced - not evaluated])
-        )
+        @ fastparse.parse("1 + 1", ExprCtx.Parened(_)).toString
+        res2: String = "Parsed.Failure(Position 1:1, found \\"1 + 1\\")"
 
-        @ ExprCtx.Parened.parse("(1 + 1)")
-        res3: fastparse.core.Parsed[Unit, Char, String] = Success((), 7)
+        @ fastparse.parse("(1 + 1)", ExprCtx.Parened(_)).toString
+        res3: String = "Parsed.Success((), 7)"
       """)
     }
 
