@@ -163,7 +163,7 @@ class AmmParser extends Parser {
         if (context == Parser.ParseContext.ACCEPT_LINE) {
           addHistory(line)
           throw new SyntaxError(
-            f.traceVerbose().msg
+            f.trace().msg
           )
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)

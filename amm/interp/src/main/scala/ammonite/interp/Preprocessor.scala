@@ -49,7 +49,7 @@ object Preprocessor{
   def formatFastparseError(fileName: String, rawCode: String, f: Parsed.Failure) = {
 
     val lineColIndex = f.extra.input.prettyIndex(f.index)
-    val expected = f.traceVerbose().parseFailureString
+    val expected = f.trace().failure.failureLabel
       val locationString = {
         val (first, last) = rawCode.splitAt(f.index)
         val lastSnippet = last.split(newLine).headOption.getOrElse("")
