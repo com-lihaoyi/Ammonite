@@ -86,11 +86,11 @@ Although most features should be unit tested, it's still useful to fire up a REP
 
 - `mill -i amm[2.12.6].launcher` creates a launcher script at
   `out/amm/2.12.6/launcher/dest/run` that can also be used to run Ammonite
-  outsid of the Mill build tool.
+  outside of the Mill build tool.
 
 ### Automated Testing
 
-While working on a arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `amm/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `amm/test-only -- ammonite.TestObject.path.to.test`.
+While working on an arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `amm/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `amm/test-only -- ammonite.TestObject.path.to.test`.
 
 - `ops/test` tests the filesystem operations, without any REPL present
 - `amm/test` tests the Ammonite-REPL/Script-runner, without filesystem-shell integration.
@@ -147,5 +147,5 @@ And possibly:
 - **Be prepared to discuss/argue-for your changes if you want them merged**! You will probably need to refactor so your changes fit into the larger codebase
 - **If your code is hard to unit test, and you don't want to unit test it, that's ok**. But be prepared to argue why that's the case!
 - **It's entirely possible your changes won't be merged**, or will get ripped out later. This is also the case for my changes, as the Author!
-- **Even a rejected/reverted PR is valuable**! It helps explore the solution space, and know what works and what doesn't. For every line in the repo, at least three lines were tried, committed, and reverted/refactored, and more than 10 were tried without committing.
+- **Even a rejected/reverted PR is valuable**! It helps to explore the solution space, and know what works and what doesn't. For every line in the repo, at least three lines were tried, committed, and reverted/refactored, and more than 10 were tried without committing.
 - **Feel free to send Proof-Of-Concept PRs** that you don't intend to get merged.
