@@ -457,5 +457,31 @@ object AdvancedTests extends TestSuite{
         json: String = "{\\"a\\":false}"
       """)
     }
+
+    'accessPressy - {
+      check.session("""
+        @ def typeAt(code: String, pos: Int) = {
+        @   import scala.tools.nsc.interactive.Response
+        @   import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
+        @   val c = repl.interactiveCompiler
+        @   val f = new BatchSourceFile("<virtual>", code)
+        @   val r = new Response[Unit]
+        @   c.askReload(List(f), r)
+        @   r.get.fold(x => x, e => throw e)
+        @   val r0 = new Response[c.Tree]
+        @   c.askTypeAt(new OffsetPosition(f, pos), r0)
+        @   r0.get.fold(x => x, e => throw e)
+        @ }
+        defined function typeAt
+
+        @ val code = "object A { val l = List }"
+        code: String = "object A { val l = List }"
+
+        @ val t = typeAt(code, code.length - 2).toString
+        t: String = ?
+
+        @ assert(t.endsWith(".List"))
+      """)
+    }
   }
 }

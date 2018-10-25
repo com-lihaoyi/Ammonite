@@ -86,6 +86,7 @@ class Repl(input: InputStream,
         def history = repl.history
         def newCompiler() = interp.compilerManager.init(force = true)
         def compiler = interp.compilerManager.compiler.compiler
+        def interactiveCompiler = interp.compilerManager.pressy.compiler
         def fullImports = repl.fullImports
         def imports = repl.imports
         def usedEarlierDefinitions = repl.usedEarlierDefinitions

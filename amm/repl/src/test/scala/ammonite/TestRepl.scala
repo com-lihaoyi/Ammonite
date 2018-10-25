@@ -92,6 +92,7 @@ class TestRepl {
             val colors = Ref(Colors.BlackWhite)
             def newCompiler() = interp.compilerManager.init(force = true)
             def compiler = interp.compilerManager.compiler.compiler
+            def interactiveCompiler = interp.compilerManager.pressy.compiler
             def fullImports = interp.predefImports ++ imports
             def imports = interp.frameImports
             def usedEarlierDefinitions = interp.frameUsedEarlierDefinitions
