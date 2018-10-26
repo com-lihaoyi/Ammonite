@@ -27,6 +27,7 @@ trait Pressy{
   def complete(snippetIndex: Int,
                previousImports: String,
                snippet: String): (Int, Seq[String], Seq[String])
+  def compiler: nsc.interactive.Global
   def shutdownPressy(): Unit
 }
 object Pressy {
@@ -231,7 +232,12 @@ object Pressy {
             evalClassloader: => ClassLoader,
             settings: Settings): Pressy = new Pressy {
 
-    var cachedPressy: nsc.interactive.Global = null
+    @volatile var cachedPressy: nsc.interactive.Global = null
+
+    def compiler = {
+      if (cachedPressy == null) cachedPressy = initPressy
+      cachedPressy
+    }
 
     def initPressy = {
       val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
@@ -249,9 +255,8 @@ object Pressy {
       val suffix = newLine + "}"
       val allCode = prefix + snippet + suffix
       val index = snippetIndex + prefix.length
-      if (cachedPressy == null) cachedPressy = initPressy
 
-      val pressy = cachedPressy
+      val pressy = compiler
       val currentFile = new BatchSourceFile(
         Compiler.makeFile(allCode.getBytes, name = "Current.sc"),
         allCode)

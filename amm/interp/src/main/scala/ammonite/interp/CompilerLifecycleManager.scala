@@ -46,6 +46,8 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
   def compiler = Internal.compiler
   def compilationCount = Internal.compilationCount
 
+  def pressy: Pressy = Internal.pressy
+
   def preprocess(fileName: String) = synchronized{
     if (compiler == null) init(force = true)
     Preprocessor(compiler.parse(fileName, _))
