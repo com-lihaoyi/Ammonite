@@ -21,7 +21,7 @@ object SourceTests extends TestSuite{
       // The line number from first bytecode of earliest concrete method
       // may be inexact, but it should put you *somewhere* near what you
       // are looking for
-      val nearby = loaded.fileContent.lines.slice(
+      val nearby = Predef.augmentString(loaded.fileContent).lines.slice(
         loaded.lineNum - slop,
         loaded.lineNum + slop
       ).mkString(Util.newLine)

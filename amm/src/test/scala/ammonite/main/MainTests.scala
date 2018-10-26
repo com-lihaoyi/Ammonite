@@ -13,7 +13,7 @@ object MainTests extends TestSuite{
   def exec(p: RelPath, args: String*) = new InProcessMainMethodRunner('mains/p, Nil, args)
 
   def stripInvisibleMargin(s: String): String = {
-    val lines = s.lines.toArray
+    val lines = Predef.augmentString(s).lines.toArray
     val leftMargin = lines.filter(_.trim.nonEmpty).map(_.takeWhile(_ == ' ').length).min
     lines.map(_.drop(leftMargin)).mkString(Util.newLine)
   }
@@ -31,7 +31,7 @@ object MainTests extends TestSuite{
         val evaled = exec("CompilerCrash.sc")
         // Make sure we do not accidentally lose the stack trace in the case
         // where the script fails during compilation before entering the evaluator
-        assert(evaled.err.lines.length > 50)
+        assert(Predef.augmentString(evaled.err).lines.length > 50)
       }
     }
 
@@ -289,7 +289,7 @@ object MainTests extends TestSuite{
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish
-        assert(evaled.err.lines.length < 20)
+        assert(Predef.augmentString(evaled.err).lines.length < 20)
 
       }
     }

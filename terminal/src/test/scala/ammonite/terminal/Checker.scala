@@ -7,7 +7,7 @@ object Checker{
     // Only do line/margin mangling for multi-line strings
     if (s.indexOf('\n') == -1) s
     else{
-      val lines = s.lines.toVector
+      val lines = Predef.augmentString(s).lines.toVector
       val min = lines.map(_.indexWhere(_ != ' '))
         .filter(_ != -1)
         .min

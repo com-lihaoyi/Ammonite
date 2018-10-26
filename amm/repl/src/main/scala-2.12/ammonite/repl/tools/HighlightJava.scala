@@ -17,7 +17,7 @@ object HighlightJava{
       new StringProvider(sourceCode)
     ).getTokens
 
-    val lineCounts = sourceCode.lines.map(_.length).toArray
+    val lineCounts = Predef.augmentString(sourceCode).lines.map(_.length).toArray
 
     def positionToOffset(p: com.github.javaparser.Position) = {
       lineCounts.iterator.take(p.line - 1).sum + (p.line-1) + (p.column - 1)

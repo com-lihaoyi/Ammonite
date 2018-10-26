@@ -143,7 +143,7 @@ object BasicTests extends TestSuite{
           executable,
           "-c",
           """val loc = source.load(new String().substring(_: Int))
-            |val snip = loc.fileContent
+            |val snip = Predef.augmentString(loc.fileContent)
             |  .lines
             |  .slice(loc.lineNum-15, loc.lineNum+15)
             |  .mkString("\n")

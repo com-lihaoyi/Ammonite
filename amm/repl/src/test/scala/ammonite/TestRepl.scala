@@ -156,7 +156,11 @@ class TestRepl {
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
-    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+    val margin = Predef.augmentString(sess)
+      .lines
+      .filter(_.trim != "")
+      .map(_.takeWhile(_ == ' ').length)
+      .min
     // Strip margin & whitespace
 
     val steps = sess.replace(
@@ -167,7 +171,7 @@ class TestRepl {
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
-        step.lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
+        Predef.augmentString(step).lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
@@ -223,7 +227,8 @@ class TestRepl {
           case Res.Success(str) =>
             // Strip trailing whitespace
             def normalize(s: String) =
-              s.lines
+              Predef.augmentString(s)
+                .lines
                 .map(_.replaceAll(" *$", ""))
                 .mkString(Util.newLine)
                 .trim()
