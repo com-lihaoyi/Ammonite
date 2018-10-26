@@ -130,7 +130,7 @@ object Cli{
 
     for(arg <- args) yield {
       showArg(arg).padTo(leftMargin, ' ').mkString +
-      arg.doc.lines.mkString(Util.newLine + " " * leftMargin)
+      Predef.augmentString(arg.doc).lines.mkString(Util.newLine + " " * leftMargin)
     }
   }
   def ammoniteHelp = {

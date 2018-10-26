@@ -133,7 +133,7 @@ object ParserTests extends TestSuite{
                  b <- List(2)
               } yield (1, 2)"""
           )
-          val lines = input.lines.toVector
+          val lines = Predef.augmentString(input).lines.toVector
           for(i <- 1 until lines.length) {
             val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
@@ -151,7 +151,7 @@ object ParserTests extends TestSuite{
                     lengths(m - 1)
                 } """
           )
-          val lines = input.lines.toVector
+          val lines = Predef.augmentString(input).lines.toVector
           for(i <- 1 until lines.length) {
             val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
@@ -189,7 +189,7 @@ object ParserTests extends TestSuite{
                  server.stop()                                                    // 24
                }                                                                  // 25"""
           )
-          val lines = input.lines.toVector
+          val lines = Predef.augmentString(input).lines.toVector
           // Every line n where the prefix formed by lines 0 to n (inclusive)
           // is a valid, complete input. Every other line *should* be incomplete,
           // and no prefix in this example should be invalid

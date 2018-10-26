@@ -169,7 +169,7 @@ object Scripts {
       for((lhs, rhs) <- args)
         yield {
           val lhsPadded = lhs.padTo(leftColWidth, ' ')
-          val rhsPadded = rhs.lines.mkString(Util.newLine)
+          val rhsPadded = Predef.augmentString(rhs).lines.mkString(Util.newLine)
            s"$leftIndentStr  $lhsPadded  $rhsPadded"
         }
     val mainDocSuffix = main.doc match{
@@ -273,7 +273,7 @@ object Scripts {
   }
 
   def softWrap(s: String, leftOffset: Int, maxWidth: Int) = {
-    val oneLine = s.lines.mkString(" ").split(' ')
+    val oneLine = Predef.augmentString(s).lines.mkString(" ").split(' ')
 
     lazy val indent = " " * leftOffset
 
