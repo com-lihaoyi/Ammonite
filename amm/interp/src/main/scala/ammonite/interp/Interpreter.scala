@@ -6,7 +6,7 @@ import java.util.regex.Pattern
 import ammonite.interp.Preprocessor.CodeWrapper
 
 import scala.collection.mutable
-import ammonite.ops._
+
 import ammonite.runtime._
 import fastparse._
 
@@ -33,7 +33,7 @@ class Interpreter(val printer: Printer,
                   // running, so you can use them predef to e.g. configure
                   // the REPL before it starts
                   extraBridges: Seq[(String, String, AnyRef)],
-                  val wd: Path,
+                  val wd: os.Path,
                   colors: Ref[Colors],
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
@@ -71,7 +71,7 @@ class Interpreter(val printer: Printer,
 
   private var scriptImportCallback: Imports => Unit = handleImports
 
-  val watchedFiles = mutable.Buffer.empty[(Path, Long)]
+  val watchedFiles = mutable.Buffer.empty[(os.Path, Long)]
 
   // We keep an *in-memory* cache of scripts, in additional to the global
   // filesystem cache shared between processes. This is because the global
@@ -106,7 +106,7 @@ class Interpreter(val printer: Printer,
 
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
-  def initializePredef(): Option[(Res.Failing, Seq[(Path, Long)])] = {
+  def initializePredef(): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
     PredefInitialization.apply(
       ("ammonite.interp.InterpBridge", "interp", interpApi) +: extraBridges,
       interpApi,
@@ -132,7 +132,7 @@ class Interpreter(val printer: Printer,
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  def watch(p: Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
+  def watch(p: os.Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
 
   def resolveSingleImportHook(
     source: CodeSource,
@@ -634,10 +634,10 @@ class Interpreter(val printer: Printer,
   abstract class DefaultLoadJar extends LoadJar {
     def handleClasspath(jar: File): Unit
 
-    def cp(jar: Path): Unit = {
+    def cp(jar: os.Path): Unit = {
       handleClasspath(new java.io.File(jar.toString))
     }
-    def cp(jars: Seq[Path]): Unit = {
+    def cp(jars: Seq[os.Path]): Unit = {
       jars.map(_.toString).map(new java.io.File(_)).foreach(handleClasspath)
     }
     def ivy(coordinates: coursier.Dependency*): Unit = {
@@ -656,7 +656,7 @@ class Interpreter(val printer: Printer,
 
     val colors = interp.colors
 
-    def watch(p: Path) = interp.watch(p)
+    def watch(p: os.Path) = interp.watch(p)
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
       compilerManager.configureCompiler(callback)
@@ -676,14 +676,14 @@ class Interpreter(val printer: Printer,
       def handleClasspath(jar: File) = headFrame.addClasspath(Seq(jar))
 
 
-      def module(file: Path) = {
+      def module(file: os.Path) = {
         watch(file)
         val (pkg, wrapper) = ammonite.util.Util.pathToPackageWrapper(
           Seq(Name("dummy")),
           file relativeTo wd
         )
         processModule(
-          normalizeNewlines(read(file)),
+          normalizeNewlines(os.read(file)),
           CodeSource(
             wrapper,
             pkg,
@@ -711,7 +711,7 @@ class Interpreter(val printer: Printer,
 
 object Interpreter{
 
-  def mtimeIfExists(p: Path) = if (exists(p)) p.mtime.toMillis else 0L
+  def mtimeIfExists(p: os.Path) = if (os.exists(p)) os.mtime(p) else 0L
 
   /**
     * Recursively mtimes things, with the sole purpose of providing a number
@@ -721,11 +721,11 @@ object Interpreter{
     * signature, as file moves often do not update the mtime but we want to
     * trigger a "something changed" event anyway
     */
-  def pathSignature(p: Path) =
-    if (!exists(p)) 0L
+  def pathSignature(p: os.Path) =
+    if (!os.exists(p)) 0L
     else try {
-      if (p.isDir) ls.rec(p).map(x => x.hashCode + mtimeIfExists(x)).sum
-      else p.mtime.toMillis
+      if (os.isDir(p)) os.walk(p).map(x => x.hashCode + mtimeIfExists(x)).sum
+      else os.mtime(p)
     } catch { case e: java.nio.file.NoSuchFileException =>
       0L
     }

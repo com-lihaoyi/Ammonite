@@ -1,6 +1,5 @@
 package ammonite.sshd
 
-import ammonite.ops.Path
 import com.jcraft.jsch.{JSchException, Session}
 import org.scalacheck.Prop.forAll
 import utest._
@@ -75,7 +74,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
   )
 
   private def cantConnectToChannel(client: Session, channel: String)
-                                  (implicit dir: Path): Unit = {
+                                  (implicit dir: os.Path): Unit = {
     assert(client.isConnected)
     Option(client.openChannel(channel)) match {
       case Some(shell) =>

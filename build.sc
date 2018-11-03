@@ -83,7 +83,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(ivy"com.lihaoyi::geny:0.1.2")
+  def ivyDeps = Agg(ivy"com.lihaoyi::os-lib:0.1.0")
 
   object test extends Tests
 }

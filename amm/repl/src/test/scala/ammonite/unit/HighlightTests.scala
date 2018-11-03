@@ -28,11 +28,11 @@ object HighlightTests extends TestSuite{
     println("HighlightTests")
     'highlighting {
       'fuzz - {
-        import ammonite.ops._
 
-        val paths = ls.rec! pwd |? (_.ext == "scala")
+
+        val paths = os.walk(os.pwd).filter(_.ext == "scala")
         for(path <- paths){
-          val code = read! path
+          val code = os.read(path)
           val out = Highlighter.defaultHighlight(
             code.toVector,
             fansi.Underlined.On,

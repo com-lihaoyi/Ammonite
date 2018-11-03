@@ -53,7 +53,7 @@ object Defaults{
     |  typeOf
     |}
   """.stripMargin
-  def ammoniteHome = ammonite.ops.Path(System.getProperty("user.home"))/".ammonite"
+  def ammoniteHome = os.Path(System.getProperty("user.home"))/".ammonite"
 
   def alreadyLoadedDependencies(
     resourceName: String = "amm-dependencies.txt"

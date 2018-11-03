@@ -3,7 +3,6 @@ package ammonite.runtime
 import java.lang.reflect.InvocationTargetException
 
 import ammonite._
-import ammonite.ops.Path
 import util.Util.{ClassFiles, newLine}
 import ammonite.util._
 

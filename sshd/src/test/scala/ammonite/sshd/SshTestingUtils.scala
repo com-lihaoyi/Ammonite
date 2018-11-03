@@ -3,7 +3,6 @@ package ammonite.sshd
 import java.io._
 import java.util.concurrent.TimeoutException
 
-import ammonite.ops._
 import com.jcraft.jsch.{Channel, JSch, Session, UserInfo}
 import org.apache.sshd.server.auth.password.PasswordAuthenticator
 import org.apache.sshd.server.session.ServerSession
@@ -40,17 +39,14 @@ object SshTestingUtils {
   def genNonMatchingCredsPair = genCredsPair.suchThat(pair => pair._1 != pair._2)
 
 
-  def withTmpDirectory[T](block: Path => T):T = {
-    lazy val tmpDir = tmp.dir()
-    try {
-      block(tmpDir)
-    } finally {
-      rm! tmpDir
-    }
+  def withTmpDirectory[T](block: os.Path => T):T = {
+    lazy val tmpDir = os.temp.dir()
+    try block(tmpDir)
+    finally   os.remove(tmpDir)
   }
 
   def testSshServer(user: (String, String), shell: ShellSession.Server)
-                   (implicit dir: Path) = {
+                   (implicit dir: os.Path) = {
     def config = SshServerConfig(
       "localhost",
       port = 0,
@@ -66,7 +62,7 @@ object SshTestingUtils {
 
   def withTestSshServer[T](user: (String, String), testShell: () => Any = () => ???)
                           (test: SshServerImpl => T)
-                          (implicit dir: Path): T = {
+                          (implicit dir: os.Path): T = {
     val server = testSshServer(user, (_, _) => testShell.apply())
     server.start()
     try {

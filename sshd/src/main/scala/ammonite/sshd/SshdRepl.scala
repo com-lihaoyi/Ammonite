@@ -4,7 +4,6 @@ package ammonite.sshd
 import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.Main
-import ammonite.ops.Path
 import ammonite.runtime.Storage
 import ammonite.sshd.util.Environment
 import ammonite.util.{Bind, Colors}
@@ -24,7 +23,7 @@ import ammonite.util.{Bind, Colors}
 class SshdRepl(sshConfig: SshServerConfig,
                predef: String = "",
                defaultPredef: Boolean = true,
-               wd: Path = ammonite.ops.pwd,
+               wd: os.Path = os.pwd,
                replArgs: Seq[Bind[_]] = Nil,
                classLoader: ClassLoader = SshdRepl.getClass.getClassLoader) {
   private lazy val sshd = SshServer(
@@ -48,10 +47,10 @@ class SshdRepl(sshConfig: SshServerConfig,
 
 object SshdRepl {
   // Actually runs a repl inside of session serving a remote user shell.
-  private def runRepl(homePath: Path,
+  private def runRepl(homePath: os.Path,
                       predefCode: String,
                       defaultPredef: Boolean,
-                      wd: Path,
+                      wd: os.Path,
                       replArgs: Seq[Bind[_]],
                       replServerClassLoader: ClassLoader)
                      (in: InputStream, out: OutputStream): Unit = {

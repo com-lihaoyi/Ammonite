@@ -1,6 +1,5 @@
 // MultiMain.sc
 
-import ammonite.ops._
 val x = 1
 
 @main
@@ -9,6 +8,6 @@ def mainA() = {
 }
 
 @main
-def functionB(i: Int, s: String, path: Path = pwd) = {
-  println(s"Hello! ${s * i} ${path.relativeTo(pwd)}.")
+def functionB(i: Int, s: String, path: os.Path = os.pwd) = {
+  println(s"Hello! ${s * i} ${path.relativeTo(os.pwd)}.")
 }

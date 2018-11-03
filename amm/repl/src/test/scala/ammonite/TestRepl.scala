@@ -4,7 +4,6 @@ import java.io.PrintStream
 
 import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.main.Defaults
-import ammonite.ops.{Path, read}
 import ammonite.repl._
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
@@ -19,10 +18,10 @@ import scala.collection.mutable
  */
 class TestRepl {
   var allOutput = ""
-  def predef: (String, Option[ammonite.ops.Path]) = ("", None)
+  def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper
 
-  val tempDir = ammonite.ops.Path(
+  val tempDir = os.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
@@ -56,7 +55,7 @@ class TestRepl {
     new Interpreter(
       printer0,
       storage = storage,
-      wd = ammonite.ops.pwd,
+      wd = os.pwd,
       basePredefs = Seq(
         PredefInfo(
           Name("defaultPredef"),
@@ -107,9 +106,9 @@ class TestRepl {
                 }
               }
 
-              def exec(file: Path): Unit = {
+              def exec(file: os.Path): Unit = {
                 interp.watch(file)
-                apply(normalizeNewlines(read(file)))
+                apply(normalizeNewlines(os.read(file)))
               }
             }
           }

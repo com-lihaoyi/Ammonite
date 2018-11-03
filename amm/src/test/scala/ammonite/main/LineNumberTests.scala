@@ -1,6 +1,6 @@
 package ammonite.main
 
-import ammonite.ops._
+
 import ammonite.util.Util
 import utest._
 
@@ -13,7 +13,7 @@ import utest._
 object LineNumberTests extends TestSuite{
   val tests = this{
 
-    def checkErrorMessage(file: RelPath, expected: String): Unit = {
+    def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
       val e = new InProcessMainMethodRunner(file, Nil, Nil)
 
       assert(e.err.contains(expected))
@@ -25,7 +25,7 @@ object LineNumberTests extends TestSuite{
     'errorTest - {
       if(!Util.windowsPlatform) {
         checkErrorMessage(
-          file = 'lineNumbers / "ErrorLineNumberTest.sc",
+          file = os.rel / 'lineNumbers / "ErrorLineNumberTest.sc",
           expected = Util.normalizeNewlines(
             """ErrorLineNumberTest.sc:5:24 expected "}"
               |    printlnqs(unsorted))
@@ -38,7 +38,7 @@ object LineNumberTests extends TestSuite{
     'multipleCompilationUnitErrorTest1 - {
       if(!Util.windowsPlatform) {
         checkErrorMessage(
-          file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
+          file = os.rel / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
           expected = Util.normalizeNewlines(
             """MultipleCompilationUnitErrorMsgTest1.sc:5:1 expected end-of-input
               |}
@@ -52,7 +52,7 @@ object LineNumberTests extends TestSuite{
     'multipleCompilationUnitErrorTest2 - {
       if(!Util.windowsPlatform) {
         checkErrorMessage(
-          file = 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
+          file = os.rel / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
           expected = Util.normalizeNewlines(
             """MultipleCompilationUnitErrorMsgTest2.sc:3:1 expected end-of-input
               |}
@@ -63,7 +63,7 @@ object LineNumberTests extends TestSuite{
     }
 
     'compilationErrorWithCommentsAtTop - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
+      file = os.rel / 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorWithCommentsAtTop.sc:11: not found: value quicort
           |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
@@ -72,7 +72,7 @@ object LineNumberTests extends TestSuite{
     )
 
     'compilationErrorInSecondBlock - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInSecondBlock.sc",
+      file = os.rel / 'lineNumbers/"compilationErrorInSecondBlock.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorInSecondBlock.sc:14: not found: value printnl
           |val res_0 = printnl("OK")
@@ -81,7 +81,7 @@ object LineNumberTests extends TestSuite{
     )
 
     'compilationErrorInFourthBlock - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInFourthBlock.sc",
+      file = os.rel / 'lineNumbers/"compilationErrorInFourthBlock.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorInFourthBlock.sc:30: not found: value prinntl
           |val res = prinntl("Ammonite")
@@ -90,12 +90,12 @@ object LineNumberTests extends TestSuite{
     )
 
     'compilationErrorInClass - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInClass.sc",
+      file = os.rel / 'lineNumbers/"compilationErrorInClass.sc",
       expected = "compilationErrorInClass.sc:17: value a is not a member of"
     )
 
     'CompilationErrorLineNumberTest - checkErrorMessage(
-      file = 'lineNumbers/"CompilationErrorLineNumberTest.sc",
+      file = os.rel / 'lineNumbers/"CompilationErrorLineNumberTest.sc",
       expected = Util.normalizeNewlines(
         """CompilationErrorLineNumberTest.sc:7: not found: value noSuchObject
           |  val x = noSuchObject.badFunction
@@ -104,7 +104,7 @@ object LineNumberTests extends TestSuite{
     )
 
     'RuntimeCompilationErrorLineNumberTest - checkErrorMessage(
-      file = 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
+      file = os.rel / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
       expected = {
         val p = InProcessMainMethodRunner.base/'lineNumbers
         s"(RuntimeCompilationErrorLineNumberTest.sc:6)"

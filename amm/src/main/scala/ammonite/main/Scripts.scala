@@ -3,7 +3,7 @@ import java.nio.file.NoSuchFileException
 
 
 import ammonite.main.Router.{ArgSig, EntryPoint}
-import ammonite.ops._
+
 import ammonite.runtime.Evaluator.AmmoniteExit
 import ammonite.util.Name.backtickWrap
 import ammonite.util.Util.CodeSource
@@ -31,15 +31,15 @@ object Scripts {
     scriptArgs
   }
 
-  def runScript(wd: Path,
-                path: Path,
+  def runScript(wd: os.Path,
+                path: os.Path,
                 interp: ammonite.interp.Interpreter,
                 scriptArgs: Seq[(String, Option[String])] = Nil) = {
     interp.watch(path)
     val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
 
     for{
-      scriptTxt <- try Res.Success(Util.normalizeNewlines(read(path))) catch{
+      scriptTxt <- try Res.Success(Util.normalizeNewlines(os.read(path))) catch{
         case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
       }
 
@@ -325,6 +325,7 @@ object Scripts {
   /**
     * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
     */
-  implicit def pathScoptRead: scopt.Read[Path] = scopt.Read.stringRead.map(Path(_, pwd))
+  implicit def pathScoptRead: scopt.Read[os.Path] = scopt.Read.stringRead.map(os.Path(_, os.pwd))
+  implicit def ammPathScoptRead: scopt.Read[ammonite.ops.Path] = scopt.Read.stringRead.map(ammonite.ops.Path(_, ammonite.ops.pwd))
 
 }

@@ -326,12 +326,12 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'loadingModulesInPredef{
-      import ammonite.ops._
-      val dir = pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
+
+      val dir = os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
       'loadExec {
         val c1 = new DualTestRepl() {
           override def predef = (
-            read! dir/"PredefLoadExec.sc",
+            os.read(dir/"PredefLoadExec.sc"),
             Some(dir/"PredefLoadExec.sc")
           )
         }
@@ -343,7 +343,7 @@ object AdvancedTests extends TestSuite{
       'loadModule{
         val c2 = new DualTestRepl(){
           override def predef = (
-            read! dir/"PredefLoadModule.sc",
+            os.read(dir/"PredefLoadModule.sc"),
             Some(dir/"PredefLoadModule.sc")
           )
         }
@@ -355,7 +355,7 @@ object AdvancedTests extends TestSuite{
       'importIvy{
         val c2 = new DualTestRepl(){
           override def predef = (
-            read! dir/"PredefMagicImport.sc",
+            os.read(dir/"PredefMagicImport.sc"),
             Some(dir/"PredefMagicImport.sc")
           )
         }

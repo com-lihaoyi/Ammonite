@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.File
 import java.util.zip.ZipFile
 
-import ammonite.ops._
+
 import io.github.retronym.java9rtexport.Export
 
 import scala.util.control.NonFatal
@@ -27,11 +27,11 @@ object Classpath {
   def classpath(classLoader: ClassLoader, storage: Storage): Vector[File] = {
     val cache = storage.classpathCache()
     if (cache.isDefined) return cache.get
-    def rtCacheDir(storage: Storage): Option[Path] = storage match {
+    def rtCacheDir(storage: Storage): Option[os.Path] = storage match {
       case storage: Storage.Folder =>
         // no need to cache if the storage is in tmpdir
         // because it is temporary
-        if (storage.dir.toNIO.startsWith(
+        if (storage.dir.wrapped.startsWith(
           java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"))))
           None
         else Some(storage.dir)

@@ -8,7 +8,7 @@ import ammonite.util.{Evaluated, Res}
   */
 class DualTestRepl { dual =>
 
-  def predef: (String, Option[ammonite.ops.Path]) = ("", None)
+  def predef: (String, Option[os.Path]) = ("", None)
 
   val repls = Seq(
     new TestRepl {
