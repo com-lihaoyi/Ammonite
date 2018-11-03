@@ -1,6 +1,7 @@
 package ammonite.runtime
 
 import java.nio.file.FileAlreadyExistsException
+import java.nio.file.{Files, Paths}
 
 import ammonite.ops._
 import ammonite.util._
@@ -241,8 +242,11 @@ object Storage{
           try read(ivyCacheFile)
           catch{ case e: java.nio.file.NoSuchFileException => "[]" }
 
-        try upickle.default.read[IvyMap](json)
-        catch{ case e: Exception => Map.empty }
+        val map =
+          try upickle.default.read[IvyMap](json)
+          catch{ case e: Exception => Map.empty }
+        // Check that cached files exist
+        map.filter(_._2.forall(str => Files.exists(Paths.get(str)))).asInstanceOf[IvyMap]
       }
       def update(map: IvyMap) = {
         write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
