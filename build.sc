@@ -83,8 +83,8 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(ivy"com.lihaoyi::os-lib:0.1.0")
-
+  def ivyDeps = Agg(ivy"com.lihaoyi::os-lib:0.1.5")
+  def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
 }
 

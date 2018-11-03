@@ -1,69 +1,88 @@
 package ammonite
 
 
-package object ops extends Extensions with RelPathStuff{
+package object ops extends Extensions {
   implicit val postfixOps = scala.language.postfixOps
+  type ResourceNotFoundException = os.ResourceNotFoundException
+  val ResourceNotFoundException = os.ResourceNotFoundException
 
+  val PathError = os.PathError
+
+  type Path = os.Path
+  val Path = os.Path
+
+  type RelPath = os.RelPath
+  val RelPath = os.RelPath
+
+  type FilePath = os.FilePath
+  val FilePath = os.FilePath
+
+  type BasePath = os.BasePath
+  val BasePath = os.BasePath
+
+  type ResourceRoot = os.ResourceRoot
+  val ResourceRoot = os.ResourceRoot
+
+  type FileType = os.FileType
+  val FileType = os.FileType
+
+  type PermSet = os.PermSet
+  val PermSet = os.PermSet
+
+  object stat extends Function1[Path, os.StatInfo]{
+    def apply(s: Path, followLinks: Boolean = true) = os.stat(s, followLinks)
+    def apply(s: Path) = os.stat(s)
+    val full = os.stat.full
+  }
+  implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
+  implicit def StringPath(s: String): RelPath = {
+    BasePath.checkSegment(s)
+    RelPath(s)
+  }
+
+  val exists = os.exists
+  val read = os.read
+  val write = os.write
+  val rm = os.remove.all
+  val mkdir = os.makeDir.all
+  object ls extends Function1[Path, LsSeq]{
+    def !(implicit arg: Path) = apply(arg)
+    def apply(src: Path) = {
+      LsSeq(src, os.list(src).map(_ relativeTo src).toArray.sorted:_*)
+    }
+    def iter(p: Path) = os.list.stream(p)
+    object rec extends Function1[Path, LsSeq]{
+      def apply(src: Path) =
+        LsSeq(src, os.walk(src).map(_ relativeTo src).toArray.sorted:_*)
+    }
+  }
+
+
+  object ln extends Function2[Path, Path, Unit]{
+    def apply(src: Path, dest: Path) = os.hardlink(src, dest)
+    val s = os.symlink
+  }
   /**
    * The root of the filesystem
    */
-  val root = ops.Path.root
+  val root = os.root
+  val empty = os.rel
 
-  def resource(implicit resRoot: ResourceRoot = Thread.currentThread().getContextClassLoader) ={
-    ops.ResourcePath.resource(resRoot)
-  }
+  def resource(implicit resRoot: ResourceRoot = Thread.currentThread().getContextClassLoader) =
+    os.resource
 
   /**
    * The user's home directory
    */
-  val home = Path(System.getProperty("user.home"))
+  val home = os.home
 
-  /**
-    * Alias for `java.nio.file.Files.createTempFile` and
-    * `java.io.File.deleteOnExit`. Pass in `deleteOnExit = false` if you want
-    * the temp file to stick around.
-    */
-  object tmp{
-    /**
-      * Creates a temporary directory
-      */
-    def dir(dir: Path = null,
-            prefix: String = null,
-            deleteOnExit: Boolean = true): Path = {
-      val nioPath = dir match{
-        case null => java.nio.file.Files.createTempDirectory(prefix)
-        case _ => java.nio.file.Files.createTempDirectory(dir.toNIO, prefix)
-      }
-      if (deleteOnExit) nioPath.toFile.deleteOnExit()
-      Path(nioPath)
-    }
-
-    /**
-      * Creates a temporary file with the provided contents
-      */
-    def apply(contents: Internals.Writable = null,
-              dir: Path = null,
-              prefix: String = null,
-              suffix: String = null,
-              deleteOnExit: Boolean = true): Path = {
-
-      val nioPath = dir match{
-        case null => java.nio.file.Files.createTempFile(prefix, suffix)
-        case _ => java.nio.file.Files.createTempFile(dir.toNIO, prefix, suffix)
-      }
-
-      if (contents != null) write.over(Path(nioPath), contents)
-      if (deleteOnExit) nioPath.toFile.deleteOnExit()
-      Path(nioPath)
-    }
-  }
-
+  val tmp = os.temp
   /**
    * The current working directory for this process.
    */
-  lazy val pwd = ops.Path(new java.io.File("").getCanonicalPath)
-  @deprecated("replaced by pwd","0.7.5")
-  lazy val cwd = pwd
+  val pwd = os.pwd
+
+  val up = os.up
 
   /**
     * If you want to call subprocesses using [[%]] or [[%%]] and don't care
@@ -89,20 +108,14 @@ package object ops extends Extensions with RelPathStuff{
     *
     * To break apart a path and extract various pieces of it.
     */
-  object /{
-    def unapply[T <: BasePath](p: T): Option[(p.ThisType, String)] = {
-      if (p.segments.nonEmpty)
-        Some((p / up, p.last))
-      else None
-    }
-  }
+  val / = os./
 
   /**
     * Lets you treat any path as a file, letting you access any property you'd
     * normally access through [[stat]]-ing it by [[stat]]-ing the file for you
     * when necessary.
     */
-  implicit def fileData(p: Path): stat.full = stat.full(p)
+  implicit def fileData(p: Path): os.FullStatInfo = stat.full(p)
 
   /**
     * Used to spawn a subprocess interactively; any output gets printed to the

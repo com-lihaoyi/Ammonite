@@ -161,7 +161,7 @@ object PathComplete {
       val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
         PathComplete.findPathLiteral(b.mkString, c)
 
-      val path = rootMap(base)(wd) / seq.map { case None => up; case Some(s) => s: RelPath }
+      val path = rootMap(base)(wd) / seq.map { case None => os.up; case Some(s) => s: RelPath }
 
       if (!exists(path)) TermState(rest, b, c)
       else {

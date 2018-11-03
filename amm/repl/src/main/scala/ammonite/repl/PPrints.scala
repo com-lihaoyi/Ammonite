@@ -23,7 +23,11 @@ object PPrints{
       ctx.width, ctx.applyPrefixColor, ctx.literalColor, ctx.indentStep
     )
     val snippets = for (p <- t) yield {
-      fansi.Str.join(renderer.rec(relPathRepr(os.RelPath(p relativeTo t.base toString)), 0, 0).iter.toStream:_*)
+      fansi.Str.join(
+        renderer.rec(relPathRepr(os.RelPath(p relativeTo t.base toString)), 0, 0)
+                .iter
+                .toStream:_*
+      )
     }
     Iterator(Util.newLine) ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
   }

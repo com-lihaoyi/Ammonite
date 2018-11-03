@@ -46,12 +46,6 @@ object ExampleTests extends TestSuite{
       read.bytes(relResourcePath).length  ==> 18
       read.lines(relResourcePath).length  ==> 1
 
-      // You can also read `InputStream`s
-      val inputStream = new java.io.ByteArrayInputStream(
-        Array[Byte](104, 101, 108, 108, 111)
-      )
-      read(inputStream)           ==> "hello"
-
       // By default, `write` fails if there is already a file in place. Use
       // `write.append` or `write.over` if you want to append-to/overwrite
       // any existing files
@@ -308,7 +302,7 @@ object ExampleTests extends TestSuite{
             |? (_.ext == "scala")
             | longLines
             |? (_._2.length > 0)
-            |? (!_._1.segments.contains("src_managed"))
+            |? (!_._1.getSegments.contains("src_managed"))
       )
 
       assert(filesWithTooLongLines.length == 0)

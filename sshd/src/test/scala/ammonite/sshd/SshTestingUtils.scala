@@ -42,7 +42,7 @@ object SshTestingUtils {
   def withTmpDirectory[T](block: os.Path => T):T = {
     lazy val tmpDir = os.temp.dir()
     try block(tmpDir)
-    finally   os.remove(tmpDir)
+    finally os.remove.all(tmpDir)
   }
 
   def testSshServer(user: (String, String), shell: ShellSession.Server)

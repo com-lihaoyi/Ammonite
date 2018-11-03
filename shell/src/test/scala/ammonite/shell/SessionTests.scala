@@ -50,10 +50,10 @@ object SessionTests extends TestSuite{
 
         @ import ammonite.ops.ImplicitWd
 
-        @ %%ls 'ops
+        @ %%ls "ops/src/test"
         res3: CommandResult =
-        src
-        target
+        resources
+        scala
       """)
     }
 
@@ -76,7 +76,7 @@ object SessionTests extends TestSuite{
 
         @ cd! 'destSymLink
 
-        @ assert("srcDir0" == wd.tryFollowLinks.get.name)
+        @ assert("srcDir0" == os.followLink(wd).get.name)
 
         @ assert("destSymLink" == wd.name)
 
@@ -111,7 +111,7 @@ object SessionTests extends TestSuite{
 
         @ cd! 'test126
 
-        @ assert(wd.tryFollowLinks.get == (tmpdir/'test123).tryFollowLinks.get)
+        @ assert(os.followLink(wd).get == os.followLink(tmpdir/'test123).get)
 
         @ assert(wd == tmpdir/'test126)
 
@@ -121,7 +121,7 @@ object SessionTests extends TestSuite{
 
         @ rm! 'test123
 
-        @ assert( (wd/'test126).tryFollowLinks == None)
+        @ assert(os.followLink(wd/'test126) == None)
 
         @ names.foreach(p => rm! wd/p)
 
@@ -219,9 +219,9 @@ object SessionTests extends TestSuite{
 
         @ assert(!stat.full(t/'test132).isDir && !stat.full(t/'test132).isSymLink)
 
-        @ assert(stat(t/'test130).isDir && stat(t).isSymLink)
+        @ assert(stat(t/'test130).isDir && stat(t, followLinks = false).isSymLink)
 
-        @ assert(stat.full(t/'test130).isDir && stat.full(t).isSymLink)
+        @ assert(stat.full(t/'test130).isDir && stat.full(t, followLinks = false).isSymLink)
 
         @ rm! tmpdir
       """)

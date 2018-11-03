@@ -175,7 +175,7 @@ object grep {
 
 case class tail(interval: Int, prefix: Int) extends Function[os.Path, Iterator[String]]{
   def apply(arg: os.Path): Iterator[String] = {
-    val is = os.read.getInputStream(arg)
+    val is = arg.toSource.getInputStream
     val br = new BufferedReader(new InputStreamReader(is))
     Iterator.continually{
       val line = br.readLine()

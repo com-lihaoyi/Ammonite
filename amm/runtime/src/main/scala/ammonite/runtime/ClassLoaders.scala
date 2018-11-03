@@ -199,13 +199,17 @@ class SpecialClassLoader(parent: ClassLoader,
       defineClass(name, bytes, 0, bytes.length)
     }else if (specialLocalClasses(name)) {
 
-      val resource = this.getResourceAsStream(name.replace('.', '/') + ".class")
-      if (resource != null){
-        val bytes = os.read.bytes(resource)
 
-        defineClass(name, bytes, 0, bytes.length)
-      }else{
-        super.findClass(name)
+      val parts = name.split('.')
+      val resource = os.resource / parts.dropRight(1) / (parts.last + ".class")
+
+      val bytes =
+        try Some(os.read.bytes(resource))
+        catch{case e: os.ResourceNotFoundException => None}
+
+      bytes match{
+        case Some(b) => defineClass(name, b, 0, b.length)
+        case None => super.findClass(name)
       }
 
     } else super.findClass(name)

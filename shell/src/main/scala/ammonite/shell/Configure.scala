@@ -21,7 +21,7 @@ object Configure {
     repl.prompt.bind(
       sys.props("user.name") +
       "-" +
-      wd.segments.lastOption.getOrElse("") +
+      wd.getSegments().toSeq.lastOption.getOrElse("") +
       "@ "
     )
   }

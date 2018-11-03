@@ -1,6 +1,6 @@
 package ammonite.runtime
 
-import java.io.File
+import java.io.{ByteArrayOutputStream, File}
 import java.net.URI
 
 import ammonite.runtime.tools.IvyThing
@@ -244,7 +244,9 @@ object ImportHook{
             case (uri, rename) =>
               val inputStream = uri.toURL.openStream()
               val code = try {
-                os.read(inputStream)
+                val baos = new ByteArrayOutputStream()
+                os.Internals.transfer(inputStream, baos)
+                new String(baos.toByteArray)
               } finally{
                 inputStream.close()
               }

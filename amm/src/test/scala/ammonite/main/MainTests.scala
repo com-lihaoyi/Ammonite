@@ -10,7 +10,8 @@ import utest._
   * and the associated error behavior if the caller messes up.
  */
 object MainTests extends TestSuite{
-  def exec(p: os.RelPath, args: String*) = new InProcessMainMethodRunner(os.rel / 'mains/p, Nil, args)
+  def exec(p: os.RelPath, args: String*) =
+    new InProcessMainMethodRunner(os.rel / 'mains/p, Nil, args)
 
   def stripInvisibleMargin(s: String): String = {
     val lines = Predef.augmentString(s).lines.toArray
@@ -38,7 +39,11 @@ object MainTests extends TestSuite{
     // Not really related to main methods, but related since most of the main
     // logic revolves around handling arguments. Make sure this fails properly
     'badAmmoniteFlag{
-      val evaled = new InProcessMainMethodRunner(os.rel / 'mains/"Hello.sc", List("--doesnt-exist"), Nil)
+      val evaled = new InProcessMainMethodRunner(
+        os.rel / 'mains/"Hello.sc",
+        List("--doesnt-exist"),
+        Nil
+      )
       assert(!evaled.success)
       val expected = "Unknown Ammonite option: --doesnt-exist"
       assert(evaled.err.toString.contains(expected))

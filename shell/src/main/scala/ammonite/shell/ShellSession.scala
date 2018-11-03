@@ -28,7 +28,7 @@ case class ShellSession() extends OpsAPI {
      */
     val realPath = Option(arg)
       .filter(_.isDir)
-      .orElse(arg.tryFollowLinks.filter(_.isDir))
+      .orElse(os.followLink(arg).filter(_.isDir))
 
     realPath match {
       case None => throw new NotDirectoryException(arg.toString)
@@ -50,7 +50,7 @@ trait OpsAPI{
     * gets appended on to the current `wd`, if it's absolute it replaces. It
     * returns the resultant absolute path.
     */
-  val cd: ammonite.ops.Path => ammonite.ops.Path
+  val cd: os.Path => os.Path
 
   /**
     * Allows you to use relative paths (and anything convertible to a relative
