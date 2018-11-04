@@ -1,0 +1,8 @@
+{
+    "value": [
+        "-P:acyclic:force",
+        "-target:jvm-1.7"
+    ],
+    "valueHash": 415471615,
+    "inputsHash": 946492373
+}
