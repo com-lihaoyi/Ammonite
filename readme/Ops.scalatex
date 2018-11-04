@@ -17,7 +17,7 @@
 
   @val opsTests = 'ops/'src/'test/'scala/'test/'ammonite/'ops
   @val opsExamples = opsTests/"ExampleTests.scala"
-  @val pathsScala = 'ops/'src/'main/'scala/'ammonite/'ops/"Path.scala"
+
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
   @p
@@ -50,12 +50,7 @@
         @code{RelPath}: a relative path, not rooted anywhere
 
     @p
-      Generally, almost all commands take absolute @code{Path}s. These are basically defined as:
-
-    @hl.ref(pathsScala, "class Path", "")
-
-    @p
-      With a number of useful operations that can be performed on them. Absolute paths can be created in a few ways:
+      Generally, almost all commands take absolute @code{Path}s. These have a number of useful operations that can be performed on them. Absolute paths can be created in a few ways:
 
     @hl.ref(opsExamples, Seq("constructingPaths", "//"), "}")
 
@@ -82,12 +77,7 @@
 
     @sect{RelPaths}
       @p
-        @hl.scala{RelPath}s represent relative paths. These are basically defined as:
-
-      @hl.ref(pathsScala, "class RelPath", "")
-
-      @p
-        The same data structure as @hl.scala{Path}s, except that they can represent a number of @hl.scala{up}s before the relative path is applied. They can be created in the following ways:
+        @hl.scala{RelPath}s represent relative paths. These are basically the same data structure as @hl.scala{Path}s, except that they can represent a number of @hl.scala{up}s before the relative path is applied. They can be created in the following ways:
 
       @hl.ref(opsExamples, Seq("relPaths", "//"), ":")
 
@@ -112,9 +102,7 @@
     @sect{Path Operations}
 
       @p
-        Ammonite's paths are transparent data-structures, and you can always access the @hl.scala{segments} and @hl.scala{ups} directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths:
-
-      @hl.ref(pathsScala, "trait BasePath", "trait")
+        Ammonite's paths are transparent data-structures, and you can always access the @hl.scala{segments} and @hl.scala{ups} directly. Nevertheless, Ammonite defines a number of useful operations that handle the common cases of dealing with these paths.
 
       @p
         In this definition, @hl.scala{ThisType} represents the same type as the current path; e.g. a @hl.scala{Path}'s @hl.scala{/} returns a @hl.scala{Path} while a @hl.scala{RelPath}'s @hl.scala{/} returns a @hl.scala{RelPath}. Similarly, you can only compare or subtract paths of the same type.
