@@ -40,7 +40,9 @@ object Classpath {
 
     var current = classLoader
     val files = collection.mutable.Buffer.empty[java.io.File]
+    val seenClassLoaders = collection.mutable.Buffer.empty[ClassLoader]
     while(current != null){
+      seenClassLoaders.append(current)
       current match{
         case t: java.net.URLClassLoader =>
           files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
@@ -49,15 +51,16 @@ object Classpath {
       current = current.getParent
     }
 
-    {
-      val sunBoot = System.getProperty("sun.boot.class.path")
-      if (sunBoot != null) {
-        files.appendAll(
-          sunBoot
-            .split(java.io.File.pathSeparator)
-            .map(new java.io.File(_))
-        )
-      } else {
+
+    val sunBoot = System.getProperty("sun.boot.class.path")
+    if (sunBoot != null) {
+      files.appendAll(
+        sunBoot
+          .split(java.io.File.pathSeparator)
+          .map(new java.io.File(_))
+      )
+    } else {
+      if (seenClassLoaders.contains(ClassLoader.getSystemClassLoader)) {
         for (p <- System.getProperty("java.class.path")
           .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
           files.append(new File(p))

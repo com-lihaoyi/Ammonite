@@ -1,6 +1,5 @@
 package ammonite
 
-
 package object ops extends Extensions {
   implicit val postfixOps = scala.language.postfixOps
   type ResourceNotFoundException = os.ResourceNotFoundException
