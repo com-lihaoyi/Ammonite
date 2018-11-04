@@ -114,6 +114,14 @@
 
 
   @sect{Changelog}
+    @sect{1.4.0}
+      @ul
+        @li
+          The core of Ammonite-Ops has been extracted into a standalone project
+          @lnk("OS-Lib", "https://github.com/lihaoyi/os-lib"). The @code{ammonite.ops}
+          namespace remains for backwards compatibility, and continues to contain
+          all the extension methods & shorthand syntax that OS-Lib does not, but
+          for general-purpose scripting and programming you should now use OS-Lib
     @sect{1.3.3}
       @ul
         @li

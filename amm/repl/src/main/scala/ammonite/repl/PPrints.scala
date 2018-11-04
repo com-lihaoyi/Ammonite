@@ -50,7 +50,7 @@ object PPrints{
   )
 
   def pathRepr(p: os.Path) = pprint.Tree.Lazy(ctx =>
-    Iterator("root") ++ p.getSegments().map("/" + reprSection(_, ctx))
+    Iterator("root") ++ p.segments.map("/" + reprSection(_, ctx))
   )
 
   def commandResultRepr(x: CommandResult) = pprint.Tree.Lazy(ctx =>

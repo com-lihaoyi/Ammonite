@@ -302,7 +302,7 @@ object ExampleTests extends TestSuite{
             |? (_.ext == "scala")
             | longLines
             |? (_._2.length > 0)
-            |? (!_._1.getSegments.contains("src_managed"))
+            |? (!_._1.segments.contains("src_managed"))
       )
 
       assert(filesWithTooLongLines.length == 0)
