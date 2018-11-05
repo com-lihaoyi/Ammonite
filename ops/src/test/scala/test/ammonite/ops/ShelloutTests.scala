@@ -6,16 +6,22 @@ import utest._
 object ShelloutTests extends TestSuite{
   val scriptFolder = pwd/'ops/'src/'test/'resources/'scripts
 
+  val listCmd = if(scala.util.Properties.isWin) "dir" else "ls"
+
   val tests = Tests {
     'implicitWd{
       import ammonite.ops.ImplicitWd._
       'lines{
-        val res = %%('ls, "ops/src/test/resources/testdata")
-        assert(res.out.lines == Seq("File.txt", "folder1", "folder2"))
+        val res = %%(listCmd, pwd/'ops/'src/'test/'resources/'testdata)
+        Seq("File.txt", "folder1", "folder2").foreach(f =>
+          assert(res.out.lines.exists(_.contains(f)))
+        )
       }
       'string{
-        val res = %%('ls, "ops/src/test/resources/testdata")
-        assert(res.out.string == "File.txt\nfolder1\nfolder2\n")
+        val res = %%(listCmd, pwd/'ops/'src/'test/'resources/'testdata)
+        "File.txt,folder1,folder2,".split(",").foreach(f =>
+          assert(res.out.string.contains(f))
+        )
       }
       'bytes{
         if(Unix()){
@@ -28,11 +34,11 @@ object ShelloutTests extends TestSuite{
       'chained{
         assert(%%('git, 'init).out.string.contains("Reinitialized existing Git repository"))
         assert(%%('git, "init").out.string.contains("Reinitialized existing Git repository"))
-        assert(%%('ls, pwd).out.string.contains("readme.md"))
+        assert(%%(listCmd, pwd).out.string.contains("readme.md"))
       }
       'basicList{
         val files = List("readme.md", "build.sbt")
-        val output = %%('ls, files).out.string
+        val output = %%(listCmd, files).out.string
         assert(files.forall(output.contains))
       }
       'listMixAndMatch{
@@ -41,11 +47,12 @@ object ShelloutTests extends TestSuite{
         assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
       }
       'failures{
-        val ex = intercept[ShelloutException]{ %%('ls, "does-not-exist") }
+        val ex = intercept[ShelloutException]{ %%(listCmd, "does-not-exist") }
         val res: CommandResult = ex.result
         assert(
           res.exitCode != 0,
-          res.err.string.contains("No such file or directory")
+          res.err.string.contains("No such file or directory") || // unix
+          res.err.string.contains("File Not Found") // win
         )
       }
 
@@ -70,35 +77,39 @@ object ShelloutTests extends TestSuite{
       }
 
       'envArgs{
-        val res0 = %%('bash, "-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
-        assert(res0.out.lines == Seq("Hello12"))
+        if(Unix()){
+          val res0 = %%('bash, "-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
+          assert(res0.out.lines == Seq("Hello12"))
 
-        val res1 = %%('bash, "-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
-        assert(res1.out.lines == Seq("Hello12"))
+          val res1 = %%('bash, "-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
+          assert(res1.out.lines == Seq("Hello12"))
 
-        val res2 = %%('bash, "-c", "echo 'Hello$ENV_ARG'", ENV_ARG=12)
-        assert(res2.out.lines == Seq("Hello$ENV_ARG"))
+          val res2 = %%('bash, "-c", "echo 'Hello$ENV_ARG'", ENV_ARG=12)
+          assert(res2.out.lines == Seq("Hello$ENV_ARG"))
 
-        val res3 = %%('bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
-        assert(res3.out.lines == Seq("Hello123"))
+          val res3 = %%('bash, "-c", "echo 'Hello'$ENV_ARG", ENV_ARG=123)
+          assert(res3.out.lines == Seq("Hello123"))
+        }
       }
 
     }
     'workingDirectory{
       implicit var wd = pwd
-      val listed1 = %%('ls)
+      val listed1 = %%(listCmd)
 
       wd /= up
 
-      val listed2 = %%('ls)
+      val listed2 = %%(listCmd)
 
       assert(listed2 != listed1)
     }
     'customWorkingDir{
-      val res1 = %.ls()(pwd) // explicitly
-      // or implicitly
-      import ammonite.ops.ImplicitWd._
-      val res2 = %ls
+      if(Unix()){
+        val res1 = %.ls()(pwd) // explicitly
+        // or implicitly
+        import ammonite.ops.ImplicitWd._
+        val res2 = %ls
+      }
     }
     'fileCustomWorkingDir - {
       if(Unix()){

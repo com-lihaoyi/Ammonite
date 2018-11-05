@@ -6,7 +6,6 @@
  */
 package ammonite.ops
 
-import java.io.File
 import java.nio.file._
 
 import scala.io.Codec
@@ -20,14 +19,14 @@ object Internals{
     def apply(t: PartialFunction[String, String])(from: Path) = {
       if (check || t.isDefinedAt(from.last)){
         val dest = from/RelPath.up/t(from.last)
-        new File(from.toString).renameTo(new File(dest.toString))
+        Files.move(from.toNIO, dest.toNIO);
       }
     }
     def *(t: PartialFunction[Path, Path])(from: Path) = {
       if (check || t.isDefinedAt(from)) {
         val dest = t(from)
         mkdir(dest/RelPath.up)
-        new File(from.toString).renameTo(new File(t(from).toString))
+        Files.move(from.toNIO, dest.toNIO)
       }
     }
   }

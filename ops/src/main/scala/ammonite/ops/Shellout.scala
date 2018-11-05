@@ -24,7 +24,7 @@ object Shellout{
 
     val proc =
       builder
-        .command(cmd.cmd:_*)
+        .command(getCmd(cmd): _*)
         .inheritIO()
         .start()
 
@@ -67,7 +67,7 @@ object Shellout{
     builder.directory(new java.io.File(wd.toString))
     val process =
       builder
-        .command(cmd.cmd:_*)
+        .command(getCmd(cmd): _*)
         .start()
     val stdout = process.getInputStream
     val stderr = process.getErrorStream
@@ -99,6 +99,16 @@ object Shellout{
     val res = CommandResult(process.exitValue(), chunks)
     if (res.exitCode == 0) res
     else throw ShelloutException(res)
+  }
+
+  private def getCmd(cmd: Command[_]): Vector[String] = {
+    if(scala.util.Properties.isWin) {
+      val cmdCommand = cmd.cmd.head
+      val cmdParams = cmd.cmd.tail.mkString(" ")
+      Vector("cmd.exe", "/C", s"$cmdCommand $cmdParams")
+    } else {
+      cmd.cmd
+    }
   }
 }
 

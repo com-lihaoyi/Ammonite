@@ -199,7 +199,7 @@ object ExampleTests extends TestSuite{
           if (!f.delete())
             throw new RuntimeException("Failed to delete " + f.getAbsolutePath)
         }
-        new java.io.File(path).delete
+        java.nio.file.Files.delete(java.nio.file.Paths.get(path))
       }
       removeAll("target/folder/thing")
 

@@ -34,22 +34,18 @@ object PathTests extends TestSuite{
       'RelPath{
         'Constructors {
           'Symbol {
-            if (Unix()){
               val rel1 = rel / 'ammonite
               assert(
                 rel1.segments == Seq("src", "main", "scala", "ammonite"),
                 rel1.toString == "src/main/scala/ammonite"
               )
-            }
           }
           'String {
-            if (Unix()){
               val rel1 = rel / "Path.scala"
               assert(
                 rel1.segments == Seq("src", "main", "scala", "Path.scala"),
                 rel1.toString == "src/main/scala/Path.scala"
               )
-            }
           }
           'Combos{
             def check(rel1: RelPath) = assert(
@@ -57,29 +53,23 @@ object PathTests extends TestSuite{
               rel1.toString == "src/main/scala/sub1/sub2"
             )
             'ArrayString - {
-              if (Unix()){
                 val arr = Array("sub1", "sub2")
                 check(rel / arr)
-              }
             }
             'ArraySymbol - {
-              if (Unix()){
                 val arr = Array('sub1, 'sub2)
                 check(rel / arr)
-              }
             }
             'SeqString - {
-              if (Unix()) check(rel / Seq("sub1", "sub2"))
+              check(rel / Seq("sub1", "sub2"))
             }
             'SeqSymbol - {
-              if (Unix()) check(rel / Seq('sub1, 'sub2))
+              check(rel / Seq('sub1, 'sub2))
             }
             'SeqSeqSeqSymbol - {
-              if (Unix()){
                 check(
                   rel / Seq(Seq(Seq('sub1), Seq()), Seq(Seq('sub2)), Seq())
                 )
-              }
             }
           }
         }
@@ -97,8 +87,8 @@ object PathTests extends TestSuite{
         val d = pwd
         val abs = d / rel
         'Constructor {
-          if (Unix()) assert(
-            abs.toString.drop(d.toString.length) == "/src/main/scala",
+          assert(
+            abs.toString.drop(d.toString.length).replace("\\", "/") == "/src/main/scala",
             abs.toString.length > d.toString.length
           )
         }
@@ -168,7 +158,6 @@ object PathTests extends TestSuite{
         }
       }
     }
-
     'Errors{
       'InvalidChars {
         val ex = intercept[PathError.InvalidSegment]('src/"Main/.scala")
@@ -197,9 +186,11 @@ object PathTests extends TestSuite{
       'CannotRelativizeAbsAndRel{
         val abs = pwd
         val rel = 'omg/'wtf
-        compileError("""
+        compileError(
+          """
           abs relativeTo rel
-        """).check(
+          """
+        ).check(
           """
           abs relativeTo rel
                          ^
@@ -263,19 +254,19 @@ object PathTests extends TestSuite{
         if(Unix()){
           val relStr = "hello/cow/world/.."
           val absStr = "/hello/world"
-
+  
           assert(
             RelPath(relStr) == 'hello/'cow,
             // Path(...) also allows paths starting with ~,
             // which is expanded to become your home directory
             Path(absStr) == root/'hello/'world
           )
-
+  
           // You can also pass in java.io.File and java.nio.file.Path
           // objects instead of Strings when constructing paths
           val relIoFile = new java.io.File(relStr)
           val absNioFile = java.nio.file.Paths.get(absStr)
-
+  
           assert(
             RelPath(relIoFile) == 'hello/'cow,
             Path(absNioFile) == root/'hello/'world,
@@ -312,12 +303,12 @@ object PathTests extends TestSuite{
           intercept[java.lang.IllegalArgumentException]{
             Path(relStr)
           }
-
+  
           val absStr = "/hello"
           intercept[java.lang.IllegalArgumentException]{
             RelPath(absStr)
           }
-
+  
           val tooManyUpsStr = "/hello/../.."
           intercept[PathError.AbsolutePathOutsideRoot.type]{
             Path(tooManyUpsStr)
@@ -330,7 +321,6 @@ object PathTests extends TestSuite{
         val twd = tmp.dir()
 
         'nestedSymlinks{
-          if(Unix()) {
             names.foreach(p => rm ! twd/p)
             mkdir ! twd/'test123
             ln.s(twd/'test123, twd/'test124)
@@ -339,11 +329,9 @@ object PathTests extends TestSuite{
             assert(os.followLink(twd/'test126).get == os.followLink(twd/'test123).get)
             names.foreach(p => rm ! twd/p)
             names.foreach(p => assert(!exists(twd/p)))
-          }
         }
 
         'danglingSymlink{
-          if(Unix()) {
             names.foreach(p => rm ! twd/p)
             mkdir ! twd/'test123
             ln.s(twd/'test123, twd/'test124)
@@ -355,7 +343,6 @@ object PathTests extends TestSuite{
             names.foreach(p => assert(!exists(twd / p)))
             names.foreach(p => rm ! twd/p)
             names.foreach(p => assert(!exists(twd/p)))
-          }
         }
       }
     }
