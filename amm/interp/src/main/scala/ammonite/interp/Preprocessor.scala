@@ -234,7 +234,7 @@ object Preprocessor{
       if (errors.length != 0) Res.Failure(errors.mkString(newLine))
       else {
         val allDecls = for {
-          ((Right(trees), code), i) <- reParsed.zipWithIndex if (trees.nonEmpty)
+          ((Right(trees), code), i) <- reParsed.zipWithIndex if trees.nonEmpty
         } yield {
           // Suffix the name of the result variable with the index of
           // the tree if there is more than one statement in this command
