@@ -114,7 +114,7 @@
 
 
   @sect{Changelog}
-    @sect{1.4.1}
+    @sect{1.4.2}
       @ul
         @li
           The core of Ammonite-Ops has been extracted into a standalone project
