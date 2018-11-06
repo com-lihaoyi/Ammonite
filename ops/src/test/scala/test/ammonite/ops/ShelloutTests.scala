@@ -44,7 +44,10 @@ object ShelloutTests extends TestSuite{
       'listMixAndMatch{
         val stuff = List("I", "am", "bovine")
         val result = %%('echo, "Hello,", stuff, "hear me roar")
-        assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
+        if(Unix())
+          assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
+        else // win quotes multiword args
+          assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " \"hear me roar\""))
       }
       'failures{
         val ex = intercept[ShelloutException]{ %%(listCmd, "does-not-exist") }

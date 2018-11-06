@@ -103,9 +103,7 @@ object Shellout{
 
   private def getCmd(cmd: Command[_]): Vector[String] = {
     if(scala.util.Properties.isWin) {
-      val cmdCommand = cmd.cmd.head
-      val cmdParams = cmd.cmd.tail.mkString(" ")
-      Vector("cmd.exe", "/C", s"$cmdCommand $cmdParams")
+      Vector("cmd.exe", "/C") ++ cmd.cmd
     } else {
       cmd.cmd
     }
