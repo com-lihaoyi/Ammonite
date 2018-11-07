@@ -164,7 +164,7 @@ class TestRepl {
 
     val steps = sess.replace(
       Util.newLineRegex + margin, Util.newLine
-    ).replaceAll(" *" + Util.newLineRegex, "\n").split("\n\n")
+    ).replaceAll(s" *(${Util.newLineRegex})", "\n").split("\n\n")
 
     for((step, index) <- steps.zipWithIndex){
       // Break the step into the command lines, starting with @,
