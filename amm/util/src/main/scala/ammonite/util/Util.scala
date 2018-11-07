@@ -59,6 +59,7 @@ object Util{
   val windowsPlatform = System.getProperty("os.name").startsWith("Windows")
   val java9OrAbove = !System.getProperty("java.specification.version").startsWith("1.")
   val newLine = System.lineSeparator()
+  val newLineRegex = "\r\n|\r|\n"
   // Type aliases for common things
 
   /**

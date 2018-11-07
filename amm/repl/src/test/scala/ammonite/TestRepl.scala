@@ -163,8 +163,8 @@ class TestRepl {
     // Strip margin & whitespace
 
     val steps = sess.replace(
-      Util.newLine + margin, Util.newLine
-    ).replaceAll(" *\n", "\n").split("\n\n")
+      Util.newLineRegex + margin, Util.newLine
+    ).replaceAll(" *" + Util.newLineRegex, "\n").split("\n\n")
 
     for((step, index) <- steps.zipWithIndex){
       // Break the step into the command lines, starting with @,
