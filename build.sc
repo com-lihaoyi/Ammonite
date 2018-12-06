@@ -13,10 +13,10 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.11.12", "2.12.7")
+val binCrossScalaVersions = Seq("2.11.12", "2.12.8")
 val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7"
+  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8"
 )
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
@@ -391,7 +391,8 @@ def publishDocs() = {
     println("MISC COMMIT: Building readme for verification")
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.12.7").jar().path,
+      AMMONITE_SHELL=shell("
+      ").jar().path,
       AMMONITE_ASSEMBLY=amm("2.12.7").assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
