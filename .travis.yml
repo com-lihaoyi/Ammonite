@@ -16,12 +16,12 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
     jdk: openjdk11
-    scala: 2.12.7
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk8
-    scala: 2.12.7
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
