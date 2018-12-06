@@ -1,0 +1,117 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-compiler",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.8",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "org.scala-lang",
+                    "name": "scala-reflect",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.12.8",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "com.lihaoyi",
+                    "name": "scalaparse",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.0.5",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "org.javassist",
+                    "name": "javassist",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "3.21.0-GA",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": -568488461,
+    "inputsHash": -1159687572
+}

@@ -1,0 +1,11 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "qref:d4662209:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.8/scala-library-2.12.8.jar",
+        "qref:28f97987:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.12/0.2.2/os-lib_2.12-0.2.2.jar",
+        "qref:6745809c:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.12/0.1.7/acyclic_2.12-0.1.7.jar",
+        "qref:532286e1:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.12/0.1.4/geny_2.12-0.1.4.jar"
+    ],
+    "valueHash": -2125688907,
+    "inputsHash": -1202157647
+}

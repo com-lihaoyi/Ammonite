@@ -1,0 +1,87 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": "io.get-coursier",
+                    "name": "coursier",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.1.0-M7",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "io.get-coursier",
+                    "name": "coursier-cache",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "1.1.0-M7",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": "org.scalaj",
+                    "name": "scalaj-http",
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.4.0",
+                "configuration": "default(compile)",
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": "",
+                    "classifier": ""
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 2076701680,
+    "inputsHash": -1159687572
+}

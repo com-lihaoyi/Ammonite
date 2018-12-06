@@ -1,0 +1,12 @@
+{
+    "value": [
+        "ref:c59e7871:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala",
+        "ref:c39e4c95:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/java",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala-2.12.8",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala-2.12",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala-2",
+        "ref:b9f87910:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.8/generatedSources/dest/Constants.scala"
+    ],
+    "valueHash": -1576544560,
+    "inputsHash": 305932393
+}

@@ -1,0 +1,12 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "ref:d3b8bb02:/home/travis/build/lihaoyi/Ammonite/out/ops/2.12.8/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+        "ref:9c228e98:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.12.8/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/resources",
+        "ref:dd164e89:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.12.8/compile/dest/classes"
+    ],
+    "valueHash": -1451205093,
+    "inputsHash": -227758681
+}
