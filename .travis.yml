@@ -31,12 +31,12 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: openjdk11
-    scala: 2.12.7
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk8
-    scala: 2.12.7
+    scala: 2.12.8
 
 
   # Everything worked, *then* kick off a release
