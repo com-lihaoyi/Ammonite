@@ -391,9 +391,8 @@ def publishDocs() = {
     println("MISC COMMIT: Building readme for verification")
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("
-      ").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.7").assembly().path,
+      AMMONITE_SHELL=shell("2.12.8").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.12.8").assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
@@ -437,8 +436,8 @@ def publishDocs() = {
 
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.12.7").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.7").assembly().path,
+      AMMONITE_SHELL=shell("2.12.8").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.12.8").assembly().path,
       CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")
