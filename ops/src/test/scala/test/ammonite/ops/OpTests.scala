@@ -118,7 +118,7 @@ object OpTests extends TestSuite{
           )
         }
         'deep{
-          write(d/'folderA/'folderB/'file, "Cow")
+          write(d/'folderA/'folderB/'file, "Cow", createFolders = true)
           cp(d/'folderA, d/'folderC)
           assert(read(d/'folderC/'folderB/'file) == "Cow")
         }
@@ -133,6 +133,7 @@ object OpTests extends TestSuite{
         }
         'shallow{
           val d = test/'moving2
+          mkdir(d)
           write(d/"A.scala", "AScala")
           write(d/"B.scala", "BScala")
           write(d/"A.py", "APy")
@@ -154,6 +155,9 @@ object OpTests extends TestSuite{
         }
         'deep{
           val d = test/'moving2
+          mkdir(d)
+          mkdir(d/'scala)
+          mkdir(d/'py)
           write(d/'scala/'A, "AScala")
           write(d/'scala/'B, "BScala")
           write(d/'py/'A, "APy")
@@ -225,7 +229,7 @@ object OpTests extends TestSuite{
           assert(read(d/'file) == "i am a cow")
         }
         'autoMkdir{
-          write(d/'folder/'folder/'file, "i am a cow")
+          write(d/'folder/'folder/'file, "i am a cow", createFolders = true)
           assert(read(d/'folder/'folder/'file) == "i am a cow")
         }
         'binary{

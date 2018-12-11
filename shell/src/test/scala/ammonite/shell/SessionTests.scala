@@ -76,9 +76,9 @@ object SessionTests extends TestSuite{
 
         @ cd! 'destSymLink
 
-        @ assert("srcDir0" == os.followLink(wd).get.name)
+        @ assert("srcDir0" == os.followLink(wd).get.last)
 
-        @ assert("destSymLink" == wd.name)
+        @ assert("destSymLink" == wd.last)
 
         @ cd! originalWd
 

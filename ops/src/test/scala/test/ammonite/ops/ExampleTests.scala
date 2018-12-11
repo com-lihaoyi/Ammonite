@@ -60,7 +60,7 @@ object ExampleTests extends TestSuite{
       val deep = wd/'this/'is/'very/'deep
       mkdir! deep
       // Writing to a file also creates necessary parents
-      write(deep/'deeeep/"file.txt", "I am cow")
+      write(deep/'deeeep/"file.txt", "I am cow", createFolders = true)
 
       // `ls` provides a listing of every direct child of the given folder.
       // Both files and folders are included
@@ -136,8 +136,8 @@ object ExampleTests extends TestSuite{
 
       // Write to a file without pain! Necessary
       // enclosing directories are created automatically
-      write(wd/'dir2/"file1.scala", "package example\nclass Foo{}\n")
-      write(wd/'dir2/"file2.scala", "package example\nclass Bar{}\n")
+      write(wd/'dir2/"file1.scala", "package example\nclass Foo{}\n", createFolders = true)
+      write(wd/'dir2/"file2.scala", "package example\nclass Bar{}\n", createFolders = true)
 
       // Rename all .scala files inside the folder d into .java files
       ls! wd/'dir2 | mv{case r"$x.scala" => s"$x.java"}
@@ -149,6 +149,7 @@ object ExampleTests extends TestSuite{
       val lineCount = ls.rec! wd |? (_.ext == "java") | read.lines | (_.size) sum
 
       // Find and concatenate all .java files directly in the working directory
+      mkdir(wd / 'target)
       ls! wd/'dir2 |? (_.ext == "java") | read |> (write(wd/'target/"bundled.java", _))
 
       assert(
@@ -161,7 +162,7 @@ object ExampleTests extends TestSuite{
       )
 
 
-      write(wd/'py/"cow.scala", "Hello World")
+      write(wd/'py/"cow.scala", "Hello World", createFolders = true)
       write(wd/".file", "Hello")
       // Chains
 
@@ -187,7 +188,7 @@ object ExampleTests extends TestSuite{
     }
     'comparison{
       rm! pwd/'target/'folder/'thing/'file
-      write(pwd/'target/'folder/'thing/'file, "Hello!")
+      write(pwd/'target/'folder/'thing/'file, "Hello!", createFolders = true)
 
       def removeAll(path: String) = {
         def getRecursively(f: java.io.File): Seq[java.io.File] = {
@@ -204,7 +205,7 @@ object ExampleTests extends TestSuite{
 
       assert(ls(pwd/'target/'folder).toSeq == Nil)
 
-      write(pwd/'target/'folder/'thing/'file, "Hello!")
+      write(pwd/'target/'folder/'thing/'file, "Hello!", createFolders = true)
 
       rm! pwd/'target/'folder/'thing
       assert(ls(pwd/'target/'folder).toSeq == Nil)
