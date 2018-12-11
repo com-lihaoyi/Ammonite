@@ -114,6 +114,22 @@
 
 
   @sect{Changelog}
+    @sect{1.5.0}
+      @ul
+        @li
+          Bump OS-Lib version to 0.2.6; note that this has some backwards-incompatible
+          changes:
+        @li
+          @code{ammonite.ops.write} now no longer creates enclosing folders by default;
+          pass in the @code{createFolders = true} flag to make it do so
+        @li
+          The order of arguments in @code{ammonite.ops.ln.s} is swapped, for
+          consistency with the underlying Java APIs
+
+    @sect{1.4.4}
+      @ul
+        @li
+          Upgrade uPickle to 0.7.1
     @sect{1.4.3}
       @ul
         @li
