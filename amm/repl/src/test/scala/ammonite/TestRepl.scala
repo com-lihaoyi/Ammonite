@@ -8,9 +8,11 @@ import ammonite.repl._
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
+import pprint.{TPrint, TPrintColors}
 import utest._
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /**
  * A test REPL which does not read from stdin or stdout files, but instead lets
@@ -77,7 +79,7 @@ class TestRepl {
         (
           "ammonite.repl.ReplBridge",
           "repl",
-          new ReplApiImpl {
+          new ReplApiImpl { replApi =>
             def replArgs0 = Vector.empty[Bind[_]]
             def printer = printer0
 
@@ -111,6 +113,26 @@ class TestRepl {
                 apply(normalizeNewlines(os.read(file)))
               }
             }
+
+            override protected[this] def internal0: FullReplAPI.Internal =
+              new FullReplAPI.Internal {
+                def pprinter = replApi.pprinter
+                def colors = replApi.colors
+                def replArgs: IndexedSeq[Bind[_]] = replArgs0
+
+                override def print[T: TPrint](
+                  value: => T,
+                  ident: String,
+                  custom: Option[String]
+                )(implicit
+                  tcolors: TPrintColors,
+                  classTagT: ClassTag[T]
+                ): Iterator[String] =
+                  if (classTagT == scala.reflect.classTag[TestRepl.Nope])
+                    Iterator()
+                  else
+                    super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
+              }
           }
         )
       ),
@@ -343,5 +365,11 @@ class TestRepl {
       println("FAILURE TRACE" + Util.newLine + allOutput)
       throw e
     }
+
+}
+
+object TestRepl {
+
+  case class Nope(n: Int)
 
 }

@@ -151,6 +151,12 @@ object AdvancedTests extends TestSuite{
         res3: Int Array = Array(1)
       """)
     }
+    'trappedType{
+      check.session("""
+        @ val nope = ammonite.TestRepl.Nope(2); val n = 2
+        n: Int = 2
+      """)
+    }
     'unwrapping{
       check.session("""
         @ {
