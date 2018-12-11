@@ -98,7 +98,6 @@ object ExampleTests extends TestSuite{
       info.isDir  ==> false
       info.isFile ==> true
       info.size   ==> 20
-      info.name   ==> "file1.txt"
 
       // Ammonite provides an implicit conversion from `Path` to
       // `stat`, so you can use these attributes directly

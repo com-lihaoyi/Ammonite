@@ -72,7 +72,7 @@ object SessionTests extends TestSuite{
 
         @ mkdir! 'srcDir0
 
-        @ ln.s('srcDir0, 'destSymLink)
+        @ ln.s('destSymLink, 'srcDir0)
 
         @ cd! 'destSymLink
 
@@ -103,11 +103,11 @@ object SessionTests extends TestSuite{
 
         @ mkdir! wd/'test123
 
-        @ ln.s(wd/'test124, wd/'test123`)
+        @ ln.s(wd/'test124, wd/'test123)
 
-        @ ln.s(wd/'test125, wd/'test124`)
+        @ ln.s(wd/'test125, wd/'test124)
 
-        @ ln.s(wd/'test126, wd/'test125`)
+        @ ln.s(wd/'test126, wd/'test125)
 
         @ cd! 'test126
 

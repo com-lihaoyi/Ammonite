@@ -198,10 +198,13 @@ object BasicTests extends TestSuite{
 
         def publishJarAndRunScript(theThing: String): Unit = {
           // 1. edit code
-          write.over(dummyScala,
+          write.over(
+            dummyScala,
             s"""package dummy
               object Dummy{def thing="$theThing"}
-           """.stripMargin)
+           """.stripMargin,
+            createFolders = true
+          )
 
           // 2. build & publish code locally
           %%("sbt", "+package", "+publishLocal")(buildRoot)
