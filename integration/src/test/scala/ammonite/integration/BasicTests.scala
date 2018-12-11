@@ -42,7 +42,7 @@ object BasicTests extends TestSuite{
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         rm(scriptAddr)
-        write(scriptAddr, """println("Script Worked!!")""")
+        write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
         val evaled = %%bash(
           executable,
           "-s",

@@ -103,11 +103,11 @@ object SessionTests extends TestSuite{
 
         @ mkdir! wd/'test123
 
-        @ ln.s(wd/'test123, wd/'test124)
+        @ ln.s(wd/'test124, wd/'test123`)
 
-        @ ln.s(wd/'test124, wd/'test125)
+        @ ln.s(wd/'test125, wd/'test124`)
 
-        @ ln.s(wd/'test125, wd/'test126)
+        @ ln.s(wd/'test126, wd/'test125`)
 
         @ cd! 'test126
 
@@ -149,11 +149,11 @@ object SessionTests extends TestSuite{
 
         @ mkdir! wd/'test123
 
-        @ ln.s(wd/'test123, wd/'test124)
+        @ ln.s(wd/'test124, wd/'test123)
 
-        @ ln.s(wd/'test124, wd/'test125)
+        @ ln.s(wd/'test125, wd/'test124)
 
-        @ ln.s(wd/'test125, wd/'test126)
+        @ ln.s(wd/'test126, wd/'test125)
 
         @ cd! 'test126
 

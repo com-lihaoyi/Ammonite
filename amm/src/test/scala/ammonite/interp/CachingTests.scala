@@ -87,7 +87,7 @@ object CachingTests extends TestSuite{
       val storage = new Storage.Folder(tempDir)
       val numFile = os.pwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
       os.remove.all(numFile)
-      os.write(numFile, "1")
+      os.write(numFile, "1", createFolders = true)
       val interp1 = createTestInterp(
         storage,
         Defaults.predefString

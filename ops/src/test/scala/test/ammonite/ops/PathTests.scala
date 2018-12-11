@@ -333,9 +333,9 @@ object PathTests extends TestSuite{
           if(Unix()) {
             names.foreach(p => rm ! twd/p)
             mkdir ! twd/'test123
-            ln.s(twd/'test123, twd/'test124)
-            ln.s(twd/'test124, twd/'test125)
-            ln.s(twd/'test125, twd/'test126)
+            ln.s(twd/'test124, twd/'test123)
+            ln.s(twd/'test125, twd/'test124)
+            ln.s(twd/'test126, twd/'test125)
             assert(os.followLink(twd/'test126).get == os.followLink(twd/'test123).get)
             names.foreach(p => rm ! twd/p)
             names.foreach(p => assert(!exists(twd/p)))
@@ -346,9 +346,9 @@ object PathTests extends TestSuite{
           if(Unix()) {
             names.foreach(p => rm ! twd/p)
             mkdir ! twd/'test123
-            ln.s(twd/'test123, twd/'test124)
-            ln.s(twd/'test124, twd/'test125)
-            ln.s(twd/'test125, twd/'test126)
+            ln.s(twd/'test124, twd/'test123)
+            ln.s(twd/'test125, twd/'test124)
+            ln.s(twd/'test126, twd/'test125)
             rm ! twd / 'test123
             assert( os.followLink(twd / 'test126).isEmpty)
             names.foreach(p => rm ! twd / p)

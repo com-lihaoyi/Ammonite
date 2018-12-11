@@ -72,7 +72,7 @@ object SshServer {
   def touch(file: os.Path): os.Path = {
     import ammonite.ops._
     if (!os.exists(file)) {
-      os.write(file, Array.empty[Byte])
+      os.write(file, Array.empty[Byte], createFolders = true)
     }
     file
   }

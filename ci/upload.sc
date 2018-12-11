@@ -16,7 +16,7 @@ def apply(uploadedFile: Path,
     .header("Authorization", "token " + authKey)
     .asString.body
 
-  val parsed = upickle.json.read(body)
+  val parsed = ujson.read(body)
 
   println(body)
 
@@ -35,7 +35,7 @@ def apply(uploadedFile: Path,
     .asString
 
   println(res.body)
-  val longUrl = upickle.json.read(res.body)("browser_download_url").toString
+  val longUrl = ujson.read(res.body)("browser_download_url").toString
 
   longUrl
 }
