@@ -285,7 +285,7 @@ object ExampleTests extends TestSuite{
       ls.rec! pwd |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
     'concatAll{if (Unix()){
-      ls.rec! pwd |? (_.ext == "scala") | read |> (write(pwd/'target/'test/"omg.txt", _))
+      ls.rec! pwd |? (_.ext == "scala") | read |> (write(pwd/'target/'test/"omg.txt", _, createFolders = true))
     }}
 
     'noLongLines{
