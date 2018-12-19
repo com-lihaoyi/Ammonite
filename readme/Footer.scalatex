@@ -89,6 +89,10 @@
         Seems Twitter @lnk("now uses Ammonite",
         "https://twitter.com/bd/status/724297737525596160") within their
         monorepo (monorepi?) codebase
+      @li
+        Yang Bo from ThoughtWorks created
+        @link("an sbt plug-in", "https://github.com/ThoughtWorksInc/sbt-ammonite-classpath")
+        to export the classpath of an sbt project to Ammonite Script.
 
   @sect{Scaladoc}
     @p
