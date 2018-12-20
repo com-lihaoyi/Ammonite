@@ -170,8 +170,8 @@ class Interpreter(val printer: Printer,
           }
         case res: ImportHook.Result.ClassPath =>
 
-          if (res.plugin) headFrame.addPluginClasspath(Seq(res.file.toIO))
-          else headFrame.addClasspath(Seq(res.file.toIO))
+          if (res.plugin) headFrame.addPluginClasspath(Seq(res.file.toNIO.toUri.toURL))
+          else headFrame.addClasspath(Seq(res.file.toNIO.toUri.toURL))
 
           Res.Success(Imports())
       }
@@ -632,20 +632,22 @@ class Interpreter(val printer: Printer,
   }
 
   abstract class DefaultLoadJar extends LoadJar {
-    def handleClasspath(jar: File): Unit
+    def handleClasspath(jar: java.net.URL): Unit
 
     def cp(jar: os.Path): Unit = {
-      handleClasspath(new java.io.File(jar.toString))
+      handleClasspath(jar.toNIO.toUri.toURL)
     }
     def cp(jars: Seq[os.Path]): Unit = {
-      jars.map(_.toString).map(new java.io.File(_)).foreach(handleClasspath)
+      jars.map(_.toNIO.toUri.toURL).foreach(handleClasspath)
     }
     def ivy(coordinates: coursier.Dependency*): Unit = {
       loadIvy(coordinates:_*) match{
         case Left(failureMsg) =>
           throw new Exception(failureMsg)
         case Right(loaded) =>
-          loaded.foreach(handleClasspath)
+          loaded
+            .map(_.toURI.toURL)
+            .foreach(handleClasspath)
 
       }
     }
@@ -673,7 +675,7 @@ class Interpreter(val printer: Printer,
 
     object load extends DefaultLoadJar with InterpLoad {
 
-      def handleClasspath(jar: File) = headFrame.addClasspath(Seq(jar))
+      def handleClasspath(jar: java.net.URL) = headFrame.addClasspath(Seq(jar))
 
 
       def module(file: os.Path) = {
@@ -701,7 +703,7 @@ class Interpreter(val printer: Printer,
       }
 
       object plugin extends DefaultLoadJar {
-        def handleClasspath(jar: File) = headFrame.addPluginClasspath(Seq(jar))
+        def handleClasspath(jar: java.net.URL) = headFrame.addPluginClasspath(Seq(jar))
       }
 
     }
