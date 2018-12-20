@@ -45,7 +45,10 @@ object Classpath {
       seenClassLoaders.append(current)
       current match{
         case t: java.net.URLClassLoader =>
-          files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
+          files.appendAll(
+            t.getURLs
+              .filter(u => "file".equals(u.getProtocol))
+              .map(u => new java.io.File(u.toURI)))
         case _ =>
       }
       current = current.getParent
