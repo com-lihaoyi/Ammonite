@@ -62,7 +62,11 @@ object GlobalInitCompat {
     val jarCP =
       jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
         .map { x =>
-          val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
+          val arc =
+            if (x.getProtocol == "file")
+              new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
+            else
+              new internal.CustomURLZipArchive(x)
           new DirectoryClassPath(arc, jCtx)
         }
         .toVector

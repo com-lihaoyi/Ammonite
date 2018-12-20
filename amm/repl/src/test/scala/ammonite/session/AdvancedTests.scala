@@ -443,5 +443,19 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
+
+    'loadURL - {
+      val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+      val url = "https://repo1.maven.org/maven2/" +
+        s"io/argonaut/argonaut_$sbv/6.2.2/argonaut_$sbv-6.2.2.jar"
+      check.session(s"""
+        @ interp.load.cp(new java.net.URL("$url"))
+
+        @ import argonaut._, Argonaut._
+
+        @ val json = Json.obj("a" -> Json.jBool(false)).nospaces
+        json: String = "{\\"a\\":false}"
+      """)
+    }
   }
 }

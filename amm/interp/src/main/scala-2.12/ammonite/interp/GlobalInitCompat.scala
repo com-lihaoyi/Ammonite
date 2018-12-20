@@ -4,7 +4,7 @@ import ammonite.runtime.Classpath
 import scala.reflect.io.{AbstractFile, FileZipArchive, VirtualDirectory}
 import scala.tools.nsc
 import scala.tools.nsc.classpath._
-import scala.tools.nsc.{Global, Settings}
+import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
@@ -64,8 +64,13 @@ object GlobalInitCompat{
     val jarCP =
       jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
         .map { x =>
-          val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
-          ZipAndJarClassPathFactory.create(arc, settings)
+          if (x.getProtocol == "file") {
+            val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
+            ZipAndJarClassPathFactory.create(arc, settings)
+          } else {
+            val arc = new internal.CustomURLZipArchive(x)
+            CustomZipAndJarFileLookupFactory.create(arc, settings)
+          }
         }
         .toVector
 

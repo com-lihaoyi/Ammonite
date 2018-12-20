@@ -400,12 +400,12 @@ object ProjectTests extends TestSuite{
            @     .sess
            @     .frames
            @     .flatMap(_.classpath)
-           @     .filter(_.getName.contains("log4j"))
+           @     .filter(_.getPath.split('/').last.contains("log4j"))
            @ }
 
            @ assert(
            @   // no zip or tar.gz stuff in particular
-           @   log4jStuff.forall(_.getName.endsWith(".jar"))
+           @   log4jStuff.forall(_.getPath.split('/').last.endsWith(".jar"))
            @ )
            """
       )

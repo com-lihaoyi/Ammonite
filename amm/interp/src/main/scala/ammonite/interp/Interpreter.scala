@@ -640,6 +640,9 @@ class Interpreter(val printer: Printer,
     def cp(jars: Seq[os.Path]): Unit = {
       jars.map(_.toNIO.toUri.toURL).foreach(handleClasspath)
     }
+    def cp(jar: java.net.URL): Unit = {
+      handleClasspath(jar)
+    }
     def ivy(coordinates: coursier.Dependency*): Unit = {
       loadIvy(coordinates:_*) match{
         case Left(failureMsg) =>
