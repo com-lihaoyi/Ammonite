@@ -100,19 +100,19 @@ object CustomZipAndJarFileLookupFactory {
 
   def create(zipFile: AbstractFile, settings: Settings): ClassPath = {
     if (settings.YdisableFlatCpCaching || zipFile.file == null)
-      createForZipFile(zipFile, settings.releaseValue)
+      createForZipFile(zipFile)
     else
       createUsingCache(zipFile, settings)
   }
 
-  def createForZipFile(zipFile: AbstractFile, release: Option[String]): ClassPath = {
+  def createForZipFile(zipFile: AbstractFile): ClassPath = {
     new ZipArchiveClassPath(zipFile.toURL)
   }
 
   private def createUsingCache(zipFile: AbstractFile, settings: Settings): ClassPath = {
     cache.getOrCreate(
       List(zipFile.file.toPath),
-      () => createForZipFile(zipFile, settings.releaseValue)
+      () => createForZipFile(zipFile)
     )
   }
 }
