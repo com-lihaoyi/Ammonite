@@ -9,8 +9,10 @@ import pprint.Renderer
 object PPrints{
   val replPPrintHandlers: PartialFunction[Any, pprint.Tree] = {
     case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x)
-    case x: ammonite.ops.Path => PPrints.pathRepr(x)
-    case x: ammonite.ops.RelPath => PPrints.relPathRepr(x)
+    case x: os.Path => PPrints.pathRepr(x)
+    case x: os.RelPath => PPrints.relPathRepr(x)
+    case x: ammonite.ops.Path => PPrints.pathRepr(os.Path(x.toString))
+    case x: ammonite.ops.RelPath => PPrints.relPathRepr(os.RelPath(x.toString))
     case x: ammonite.ops.CommandResult => PPrints.commandResultRepr(x)
     case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString(Util.newLine)))
     case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
@@ -21,7 +23,11 @@ object PPrints{
       ctx.width, ctx.applyPrefixColor, ctx.literalColor, ctx.indentStep
     )
     val snippets = for (p <- t) yield {
-      fansi.Str.join(renderer.rec(relPathRepr(p relativeTo t.base), 0, 0).iter.toStream:_*)
+      fansi.Str.join(
+        renderer.rec(relPathRepr(os.RelPath(p relativeTo t.base toString)), 0, 0)
+                .iter
+                .toStream:_*
+      )
     }
     Iterator(Util.newLine) ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
   }
@@ -37,14 +43,14 @@ object PPrints{
     }
   }
 
-  def relPathRepr(p: ammonite.ops.RelPath) = pprint.Tree.Lazy(ctx =>
+  def relPathRepr(p: os.RelPath) = pprint.Tree.Lazy(ctx =>
     Iterator(
       (Seq.fill(p.ups)("up") ++ p.segments.map(reprSection(_, ctx))).mkString("/")
     )
   )
 
-  def pathRepr(p: ammonite.ops.Path) = pprint.Tree.Lazy(ctx =>
-    Iterator("root") ++ p.segments.iterator.map("/" + reprSection(_, ctx))
+  def pathRepr(p: os.Path) = pprint.Tree.Lazy(ctx =>
+    Iterator("root") ++ p.segments.map("/" + reprSection(_, ctx))
   )
 
   def commandResultRepr(x: CommandResult) = pprint.Tree.Lazy(ctx =>

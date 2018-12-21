@@ -4,14 +4,15 @@ import java.io.PrintStream
 
 import ammonite.interp.{Interpreter, Preprocessor}
 import ammonite.main.Defaults
-import ammonite.ops.{Path, read}
 import ammonite.repl._
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
+import pprint.{TPrint, TPrintColors}
 import utest._
 
 import scala.collection.mutable
+import scala.reflect.ClassTag
 
 /**
  * A test REPL which does not read from stdin or stdout files, but instead lets
@@ -19,10 +20,10 @@ import scala.collection.mutable
  */
 class TestRepl {
   var allOutput = ""
-  def predef: (String, Option[ammonite.ops.Path]) = ("", None)
+  def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: Preprocessor.CodeWrapper = Preprocessor.CodeWrapper
 
-  val tempDir = ammonite.ops.Path(
+  val tempDir = os.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
@@ -56,7 +57,7 @@ class TestRepl {
     new Interpreter(
       printer0,
       storage = storage,
-      wd = ammonite.ops.pwd,
+      wd = os.pwd,
       basePredefs = Seq(
         PredefInfo(
           Name("defaultPredef"),
@@ -78,7 +79,7 @@ class TestRepl {
         (
           "ammonite.repl.ReplBridge",
           "repl",
-          new ReplApiImpl {
+          new ReplApiImpl { replApi =>
             def replArgs0 = Vector.empty[Bind[_]]
             def printer = printer0
 
@@ -91,6 +92,7 @@ class TestRepl {
             val colors = Ref(Colors.BlackWhite)
             def newCompiler() = interp.compilerManager.init(force = true)
             def compiler = interp.compilerManager.compiler.compiler
+            def interactiveCompiler = interp.compilerManager.pressy.compiler
             def fullImports = interp.predefImports ++ imports
             def imports = interp.frameImports
             def usedEarlierDefinitions = interp.frameUsedEarlierDefinitions
@@ -107,11 +109,31 @@ class TestRepl {
                 }
               }
 
-              def exec(file: Path): Unit = {
+              def exec(file: os.Path): Unit = {
                 interp.watch(file)
-                apply(normalizeNewlines(read(file)))
+                apply(normalizeNewlines(os.read(file)))
               }
             }
+
+            override protected[this] def internal0: FullReplAPI.Internal =
+              new FullReplAPI.Internal {
+                def pprinter = replApi.pprinter
+                def colors = replApi.colors
+                def replArgs: IndexedSeq[Bind[_]] = replArgs0
+
+                override def print[T: TPrint](
+                  value: => T,
+                  ident: String,
+                  custom: Option[String]
+                )(implicit
+                  tcolors: TPrintColors,
+                  classTagT: ClassTag[T]
+                ): Iterator[String] =
+                  if (classTagT == scala.reflect.classTag[TestRepl.Nope])
+                    Iterator()
+                  else
+                    super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
+              }
           }
         )
       ),
@@ -156,7 +178,11 @@ class TestRepl {
   def session(sess: String): Unit = {
     // Remove the margin from the block and break
     // it into blank-line-delimited steps
-    val margin = sess.lines.filter(_.trim != "").map(_.takeWhile(_ == ' ').length).min
+    val margin = Predef.augmentString(sess)
+      .lines
+      .filter(_.trim != "")
+      .map(_.takeWhile(_ == ' ').length)
+      .min
     // Strip margin & whitespace
 
     val steps = sess.replace(
@@ -167,7 +193,7 @@ class TestRepl {
       // Break the step into the command lines, starting with @,
       // and the result lines
       val (cmdLines, resultLines) =
-        step.lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
+        Predef.augmentString(step).lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
 
       val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
 
@@ -223,18 +249,33 @@ class TestRepl {
           case Res.Success(str) =>
             // Strip trailing whitespace
             def normalize(s: String) =
-              s.lines
+              Predef.augmentString(s)
+                .lines
                 .map(_.replaceAll(" *$", ""))
                 .mkString(Util.newLine)
                 .trim()
-            failLoudly(
-              assert{
-                identity(error)
-                identity(warning)
-                identity(info)
-                normalize(allOut) == normalize(expected)
-              }
-            )
+
+            val expected0 = normalize(expected)
+
+            if (expected0.endsWith(" = ?")) {
+              val expectedStart = expected0.stripSuffix("?")
+              failLoudly(
+                assert{
+                  identity(error)
+                  identity(warning)
+                  identity(info)
+                  normalize(allOut).take(expectedStart.length) == expectedStart
+                }
+              )
+            } else
+              failLoudly(
+                assert{
+                  identity(error)
+                  identity(warning)
+                  identity(info)
+                  normalize(allOut) == expected0
+                }
+              )
 
           case Res.Failure(failureMsg) =>
             assert{
@@ -325,5 +366,11 @@ class TestRepl {
       println("FAILURE TRACE" + Util.newLine + allOutput)
       throw e
     }
+
+}
+
+object TestRepl {
+
+  case class Nope(n: Int)
 
 }

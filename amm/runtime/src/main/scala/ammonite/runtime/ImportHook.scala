@@ -1,9 +1,8 @@
 package ammonite.runtime
 
-import java.io.File
+import java.io.{ByteArrayOutputStream, File}
 import java.net.URI
 
-import ammonite.ops.{read, _}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.Util.CodeSource
 import ammonite.util._
@@ -42,7 +41,7 @@ object ImportHook{
     */
   trait InterpreterInterface{
     def loadIvy(coordinates: coursier.Dependency*): Either[String, Set[File]]
-    def watch(p: Path): Unit
+    def watch(p: os.Path): Unit
   }
 
   /**
@@ -55,17 +54,17 @@ object ImportHook{
                       codeSource: CodeSource,
                       hookImports: Imports,
                       exec: Boolean) extends Result
-    case class ClassPath(file: Path, plugin: Boolean) extends Result
+    case class ClassPath(file: os.Path, plugin: Boolean) extends Result
   }
 
   object File extends SourceHook(false)
   object Exec extends SourceHook(true)
 
-  def resolveFiles(tree: ImportTree, currentScriptPath: Path, extensions: Seq[String])
-                  : (Seq[(RelPath, Option[String])], Seq[Path], Seq[Path]) = {
+  def resolveFiles(tree: ImportTree, currentScriptPath: os.Path, extensions: Seq[String])
+                  : (Seq[(os.RelPath, Option[String])], Seq[os.Path], Seq[os.Path]) = {
     val relative =
       tree.prefix
-        .map{case ammonite.util.Util.upPathSegment => up; case x => ammonite.ops.empty/x}
+        .map{case ammonite.util.Util.upPathSegment => os.up; case x => os.rel/x}
         .reduce(_/_)
 
     val relativeModules = tree.mappings match{
@@ -73,10 +72,10 @@ object ImportHook{
       case Some(mappings) => for((k, v) <- mappings) yield relative/k -> v
     }
 
-    def relToFile(relative: RelPath) = {
-      val base = currentScriptPath/up/relative
-      extensions.find(ext => exists! base/up/(relative.last + ext)) match{
-        case Some(p) => Right(base/up/(relative.last + p): Path)
+    def relToFile(relative: os.RelPath) = {
+      val base = currentScriptPath/os.up/relative
+      extensions.find(ext => os.exists(base/os.up/(relative.last + ext))) match{
+        case Some(p) => Right(base/os.up/(relative.last + p): os.Path)
         case None => Left(base)
       }
     }
@@ -103,7 +102,7 @@ object ImportHook{
           )
 
           files.foreach(interp.watch)
-          missing.foreach(x => interp.watch(x/up/(x.last + ".sc")))
+          missing.foreach(x => interp.watch(x/os.up/(x.last + ".sc")))
           if (missing.nonEmpty) {
             Left("Cannot resolve $file import: " + missing.map(_ + ".sc").mkString(", "))
           } else {
@@ -111,7 +110,7 @@ object ImportHook{
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
 
                 val (flexiblePkg, wrapper) = Util.pathToPackageWrapper(
-                  source.flexiblePkgName, filePath relativeTo currentScriptPath/up
+                  source.flexiblePkgName, filePath relativeTo currentScriptPath/os.up
                 )
 
                 val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper) ++ wrapperPath
@@ -129,7 +128,7 @@ object ImportHook{
                 )
 
                 Result.Source(
-                  Util.normalizeNewlines(read(filePath)),
+                  Util.normalizeNewlines(os.read(filePath)),
                   codeSrc,
                   Imports(importData),
                   exec
@@ -186,7 +185,7 @@ object ImportHook{
                wrapperPath: Seq[Name]) = for{
       signatures <- splitImportTree(tree).right
       resolved <- resolve(interp, signatures).right
-    } yield resolved.map(Path(_)).map(Result.ClassPath(_, plugin)).toSeq
+    } yield resolved.map(os.Path(_)).map(Result.ClassPath(_, plugin)).toSeq
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
@@ -245,7 +244,9 @@ object ImportHook{
             case (uri, rename) =>
               val inputStream = uri.toURL.openStream()
               val code = try {
-                read(inputStream)
+                val baos = new ByteArrayOutputStream()
+                os.Internals.transfer(inputStream, baos)
+                new String(baos.toByteArray)
               } finally{
                 inputStream.close()
               }

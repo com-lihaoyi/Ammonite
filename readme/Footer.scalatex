@@ -89,6 +89,10 @@
         Seems Twitter @lnk("now uses Ammonite",
         "https://twitter.com/bd/status/724297737525596160") within their
         monorepo (monorepi?) codebase
+      @li
+        Yang Bo from ThoughtWorks created
+        @link("an sbt plug-in", "https://github.com/ThoughtWorksInc/sbt-ammonite-classpath")
+        to export the classpath of an sbt project to Ammonite Script.
 
   @sect{Scaladoc}
     @p
@@ -114,6 +118,49 @@
 
 
   @sect{Changelog}
+    @sect{1.6.0}
+      @ul
+        @li
+          Bump FastParse to 2.1.0.
+    @sect{1.5.0}
+      @ul
+        @li
+          Bump OS-Lib version to 0.2.6; note that this has some backwards-incompatible
+          changes:
+        @li
+          @code{ammonite.ops.write} now no longer creates enclosing folders by default;
+          pass in the @code{createFolders = true} flag to make it do so
+        @li
+          The order of arguments in @code{ammonite.ops.ln.s} is swapped, for
+          consistency with the underlying Java APIs
+
+    @sect{1.4.4}
+      @ul
+        @li
+          Upgrade uPickle to 0.7.1
+    @sect{1.4.3}
+      @ul
+        @li
+          Upgrade uPickle to 0.7.0
+    @sect{1.4.2}
+      @ul
+        @li
+          The core of Ammonite-Ops has been extracted into a standalone project
+          @lnk("OS-Lib", "https://github.com/lihaoyi/os-lib"). The @code{ammonite.ops}
+          namespace remains for backwards compatibility, and continues to contain
+          all the extension methods & shorthand syntax that OS-Lib does not, but
+          for general-purpose scripting and programming you should now use OS-Lib
+    @sect{1.3.3}
+      @ul
+        @li
+          Bump Fastparse to 2.0.5
+    @sect{1.3.2}
+      @ul
+        @li
+          Upgrade to Fastparse 2.0.4, uPickle 0.6.7
+        @li
+          Support for Scala 2.12.7
+
     @sect{1.2.1}
       @ul
         @li

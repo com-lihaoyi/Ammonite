@@ -1,0 +1,9 @@
+amm.repl
+
+ammonite.unit.HighlightTests.highlighting.runOff
+ammonite.session.ProjectTests.scalaparse
+
+amm
+
+ammonite.main.LineNumberTests.errorTest
+ammonite.main.LineNumberTests.multipleCompilationUnitErrorTest1

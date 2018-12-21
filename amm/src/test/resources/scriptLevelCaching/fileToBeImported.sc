@@ -1,2 +1,1 @@
-import ammonite.ops._
-def listScalaFiles = ls(pwd) |? (_.last.endsWith(".sc"))
+def listScalaFiles = os.list(os.pwd).filter(_.last.endsWith(".sc"))

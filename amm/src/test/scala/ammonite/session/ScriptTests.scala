@@ -3,7 +3,7 @@ package ammonite.session
 import ammonite.{TestRepl, Main, main}
 import ammonite.TestUtils._
 import ammonite.main.{Defaults, Scripts}
-import ammonite.ops._
+
 import ammonite.runtime.Storage
 import ammonite.util.Res
 import utest._
@@ -19,7 +19,7 @@ object ScriptTests extends TestSuite{
       'compilationBlocks{
         'loadIvy - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"LoadIvy.sc")
 
@@ -30,7 +30,7 @@ object ScriptTests extends TestSuite{
           }
         'preserveImports{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"PreserveImports.sc")
 
@@ -40,7 +40,7 @@ object ScriptTests extends TestSuite{
         }
         'annotation{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"Annotation.sc")
 
@@ -50,7 +50,7 @@ object ScriptTests extends TestSuite{
         }
         'syntax{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"BlockSepSyntax.sc")
 
@@ -60,7 +60,7 @@ object ScriptTests extends TestSuite{
         }
         'limitImports{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"LimitImports.sc")
 
@@ -72,7 +72,7 @@ object ScriptTests extends TestSuite{
       'failures{
         'syntaxError{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
@@ -86,7 +86,7 @@ object ScriptTests extends TestSuite{
         }
         'compilationError{
           check.session(s"""
-            @  import ammonite.ops._
+            @  import os._
 
             @ repl.load.exec($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
@@ -100,7 +100,7 @@ object ScriptTests extends TestSuite{
         }
         'nofile{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
@@ -109,7 +109,7 @@ object ScriptTests extends TestSuite{
         }
         'multiBlockError{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
@@ -124,7 +124,7 @@ object ScriptTests extends TestSuite{
       }
       'nestedScripts{
         check.session(s"""
-          @ import ammonite.ops._
+          @ import os._
 
           @ repl.load.exec($printedScriptPath/"NestedScripts.sc")
 
@@ -138,7 +138,7 @@ object ScriptTests extends TestSuite{
       'sheBang{
         'singleLine{
           check.session(s"""
-            @  import ammonite.ops._
+            @  import os._
 
             @ repl.load.exec($printedScriptPath/"SheBang.sc")
 
@@ -149,7 +149,7 @@ object ScriptTests extends TestSuite{
         'multiLine {
           check.session(
             s"""
-            @  import ammonite.ops._
+            @  import os._
 
             @ repl.load.exec($printedScriptPath/"MultilineSheBang.sc")
 
@@ -165,7 +165,7 @@ object ScriptTests extends TestSuite{
       'compilationBlocks{
         'loadIvy{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"LoadIvy.sc")
 
@@ -175,7 +175,7 @@ object ScriptTests extends TestSuite{
         }
         'preserveImports{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"PreserveImports.sc")
 
@@ -187,7 +187,7 @@ object ScriptTests extends TestSuite{
         'annotation{
 
           check.session(s"""
-          @ import ammonite.ops._
+          @ import os._
 
           @ interp.load.module($printedScriptPath/"Annotation.sc")
 
@@ -197,7 +197,7 @@ object ScriptTests extends TestSuite{
         }
         'syntax{
             check.session(s"""
-              @ import ammonite.ops._
+              @ import os._
 
               @ interp.load.module($printedScriptPath/"BlockSepSyntax.sc")
 
@@ -207,7 +207,7 @@ object ScriptTests extends TestSuite{
         }
         'limitImports{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"LimitImports.sc")
 
@@ -219,7 +219,7 @@ object ScriptTests extends TestSuite{
       'failures{
         'syntaxError{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
@@ -233,7 +233,7 @@ object ScriptTests extends TestSuite{
         }
         'compilationError{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
@@ -246,7 +246,7 @@ object ScriptTests extends TestSuite{
         }
         'nofile{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ repl.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
@@ -254,20 +254,20 @@ object ScriptTests extends TestSuite{
           )
         }
         'scriptWithoutExtension{
-          val storage = new Storage.Folder(tmp.dir(prefix = "ammonite-tester"))
+          val storage = new Storage.Folder(os.temp.dir(prefix = "ammonite-tester"))
           val interp2 = createTestInterp(
             storage,
             Defaults.predefString + Main.extraPredefString
           )
 
           val Res.Failure(msg) =
-            Scripts.runScript(pwd, pwd/"scriptWithoutExtension", interp2)
+            Scripts.runScript(os.pwd, os.pwd/"scriptWithoutExtension", interp2)
 
           assert(msg.contains("Script file not found"))
         }
         'multiBlockError{
           check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
@@ -282,7 +282,7 @@ object ScriptTests extends TestSuite{
       }
       'encapsulation{
         check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ val asd = "asd"
 
@@ -293,7 +293,7 @@ object ScriptTests extends TestSuite{
       }
       'nestedScripts{
         check.session(s"""
-          @ import ammonite.ops._
+          @ import os._
 
           @ interp.load.module($printedScriptPath/"NestedScripts.sc")
 
@@ -306,7 +306,7 @@ object ScriptTests extends TestSuite{
       }
       'noUnWrapping{
         check.session(s"""
-          @ import ammonite.ops._
+          @ import os._
 
           @ interp.load.module($printedScriptPath/"ScriptDontUnwrap.sc")
 
@@ -320,7 +320,7 @@ object ScriptTests extends TestSuite{
       'resolverWithinScript{
         'pass - {
           if (!scala2_12) check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"Resolvers.sc")
 
@@ -329,7 +329,7 @@ object ScriptTests extends TestSuite{
         }
         'fail - {
           if (!scala2_12) check.session(s"""
-            @ import ammonite.ops._
+            @ import os._
 
             @ interp.load.module($printedScriptPath/"ResolversFail.sc")
             error: Failed to resolve ivy dependencies
@@ -338,7 +338,7 @@ object ScriptTests extends TestSuite{
       }
       'loadIvyAdvanced{
         check.session(s"""
-        @ import ammonite.ops._
+        @ import os._
 
         @ interp.load.module($printedScriptPath/"loadIvyAdvanced.sc")
 

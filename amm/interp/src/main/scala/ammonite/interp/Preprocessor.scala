@@ -3,7 +3,7 @@ package ammonite.interp
 import ammonite._
 import ammonite.util._
 import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines, windowsPlatform}
-import fastparse.all._
+import fastparse._
 
 import scala.reflect.internal.Flags
 import scala.tools.nsc.{Global => G}
@@ -47,8 +47,9 @@ object Preprocessor{
 
 
   def formatFastparseError(fileName: String, rawCode: String, f: Parsed.Failure) = {
-    val lineColIndex = f.extra.input.repr.prettyIndex(f.extra.input, f.index)
-    val expected = f.extra.traced.expected
+
+    val lineColIndex = f.extra.input.prettyIndex(f.index)
+    val expected = f.trace().failure.label
       val locationString = {
         val (first, last) = rawCode.splitAt(f.index)
         val lastSnippet = last.split(newLine).headOption.getOrElse("")
@@ -139,7 +140,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .print($ident, "$ident", $customCode)
+            .print($ident, ${fastparse.internal.Util.literalize(ident)}, $customCode)
       """
     }
     def definedStr(definitionLabel: String, name: String) =
@@ -149,7 +150,7 @@ object Preprocessor{
             .ReplBridge
             .value
             .Internal
-            .printDef("$definitionLabel", "$name")
+            .printDef("$definitionLabel", ${fastparse.internal.Util.literalize(name)})
       """
 
     def pprint(ident: String) = pprintSignature(ident, None)
@@ -198,7 +199,7 @@ object Preprocessor{
                 .ReplBridge
                 .value
                 .Internal
-                .printImport($tq$body$tq)
+                .printImport(${fastparse.internal.Util.literalize(body)})
           """
         ))
     }
@@ -234,7 +235,7 @@ object Preprocessor{
       if (errors.length != 0) Res.Failure(errors.mkString(newLine))
       else {
         val allDecls = for {
-          ((Right(trees), code), i) <- reParsed.zipWithIndex if (trees.nonEmpty)
+          ((Right(trees), code), i) <- reParsed.zipWithIndex if trees.nonEmpty
         } yield {
           // Suffix the name of the result variable with the index of
           // the tree if there is more than one statement in this command

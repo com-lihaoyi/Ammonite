@@ -127,11 +127,11 @@ object PathTests extends TestSuite{
           // Keep applying `up` and verify that the path gets
           // shorter and shorter and eventually errors.
           var abs = pwd
-          var i = abs.segments.length
+          var i = abs.segmentCount
           while(i > 0){
             abs/=up
             i-=1
-            assert(abs.segments.length == i)
+            assert(abs.segmentCount == i)
           }
           intercept[PathError.AbsolutePathOutsideRoot.type]{ abs/up }
         }
@@ -168,6 +168,7 @@ object PathTests extends TestSuite{
         }
       }
     }
+
     'Errors{
       'InvalidChars {
         val ex = intercept[PathError.InvalidSegment]('src/"Main/.scala")
@@ -180,7 +181,7 @@ object PathTests extends TestSuite{
 
         val PathError.InvalidSegment("..", msg2) = ex2
 
-        assert(msg2.contains("use the `up` segment from `ammonite.ops.up`"))
+        assert(msg2.contains("use the `up` segment from `os.up`"))
       }
       'InvalidSegments{
         intercept[PathError.InvalidSegment]{root/ "core/src/test"}
@@ -221,11 +222,6 @@ object PathTests extends TestSuite{
           intercept[IllegalArgumentException](RelPath("/omg/cow"))
         }
       }
-      'Pollution{
-        // Make sure we're not polluting too much
-        compileError("""'omg.ext""")
-        compileError(""" "omg".ext """)
-      }
     }
     'Extractors{
       'regex{
@@ -247,27 +243,12 @@ object PathTests extends TestSuite{
           d == "D"
         )
 
-
-        val relative = 'omg/'wtf/'bbq
-        val a2/b2/c2 = relative
-        assert(
-          a2 == empty/'omg,
-          b2 == "wtf",
-          c2 == "bbq"
-        )
-
         // If the paths aren't deep enough, it
         // just doesn't match but doesn't blow up
         root/'omg match {
           case a3/b3/c3/d3/e3 => assert(false)
           case _ =>
         }
-
-        relative match {
-          case a3/b3/c3/d3/e3 => assert(false)
-          case _ =>
-        }
-
       }
     }
     'sorting{
@@ -352,10 +333,10 @@ object PathTests extends TestSuite{
           if(Unix()) {
             names.foreach(p => rm ! twd/p)
             mkdir ! twd/'test123
-            ln.s(twd/'test123, twd/'test124)
-            ln.s(twd/'test124, twd/'test125)
-            ln.s(twd/'test125, twd/'test126)
-            assert((twd/'test126).tryFollowLinks.get == (twd/'test123).tryFollowLinks.get)
+            ln.s(twd/'test124, twd/'test123)
+            ln.s(twd/'test125, twd/'test124)
+            ln.s(twd/'test126, twd/'test125)
+            assert(os.followLink(twd/'test126).get == os.followLink(twd/'test123).get)
             names.foreach(p => rm ! twd/p)
             names.foreach(p => assert(!exists(twd/p)))
           }
@@ -365,11 +346,11 @@ object PathTests extends TestSuite{
           if(Unix()) {
             names.foreach(p => rm ! twd/p)
             mkdir ! twd/'test123
-            ln.s(twd/'test123, twd/'test124)
-            ln.s(twd/'test124, twd/'test125)
-            ln.s(twd/'test125, twd/'test126)
+            ln.s(twd/'test124, twd/'test123)
+            ln.s(twd/'test125, twd/'test124)
+            ln.s(twd/'test126, twd/'test125)
             rm ! twd / 'test123
-            assert( (twd / 'test126).tryFollowLinks.isEmpty)
+            assert( os.followLink(twd / 'test126).isEmpty)
             names.foreach(p => rm ! twd / p)
             names.foreach(p => assert(!exists(twd / p)))
             names.foreach(p => rm ! twd/p)

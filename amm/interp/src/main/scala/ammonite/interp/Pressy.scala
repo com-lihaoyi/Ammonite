@@ -27,6 +27,7 @@ trait Pressy{
   def complete(snippetIndex: Int,
                previousImports: String,
                snippet: String): (Int, Seq[String], Seq[String])
+  def compiler: nsc.interactive.Global
   def shutdownPressy(): Unit
 }
 object Pressy {
@@ -226,17 +227,26 @@ object Pressy {
     }
 
   }
-  def apply(classpath: Seq[java.io.File],
+  def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             settings: Settings): Pressy = new Pressy {
 
-    var cachedPressy: nsc.interactive.Global = null
+    @volatile var cachedPressy: nsc.interactive.Global = null
+
+    def compiler = {
+      if (cachedPressy == null) cachedPressy = initPressy
+      cachedPressy
+    }
 
     def initPressy = {
-      val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+      val (dirDeps, jarDeps) = classpath.partition { u =>
+        u.getProtocol == "file" &&
+          java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+      }
       val jcp = GlobalInitCompat.initGlobalClasspath(
-        dirDeps, jarDeps,
+        dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
+        jarDeps,
         dynamicClasspath,
         settings
       )
@@ -249,9 +259,8 @@ object Pressy {
       val suffix = newLine + "}"
       val allCode = prefix + snippet + suffix
       val index = snippetIndex + prefix.length
-      if (cachedPressy == null) cachedPressy = initPressy
 
-      val pressy = cachedPressy
+      val pressy = compiler
       val currentFile = new BatchSourceFile(
         Compiler.makeFile(allCode.getBytes, name = "Current.sc"),
         allCode)

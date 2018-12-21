@@ -15,13 +15,13 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
-    jdk: oraclejdk9
-    scala: 2.12.6
+    jdk: openjdk11
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk8
-    scala: 2.12.6
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
@@ -35,13 +35,13 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
-    jdk: oraclejdk9
-    scala: 2.12.6
+    jdk: openjdk11
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk8
-    scala: 2.12.6
+    scala: 2.12.8
 
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
@@ -82,7 +82,7 @@ script:
 - export PATH=~/bin/amm:~/bin/mill:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- if [ ! -f ~/bin/mill-0.2.7 ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.2.7/0.2.7) > ~/bin/mill-0.2.7 && chmod +x ~/bin/mill-0.2.7 && ( cd ~/bin && rm -f mill && ln -s mill-0.2.7 mill)'; fi
+- if [ ! -f ~/bin/mill-0.3.3 ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.3.3/0.3.3) > ~/bin/mill-0.3.3 && chmod +x ~/bin/mill-0.3.3 && ( cd ~/bin && rm -f mill && ln -s mill-0.3.3 mill)'; fi
 - JAVAOPTS="-Xmx2048m" $CI_SCRIPT
 
 notifications:

@@ -2,7 +2,6 @@ package ammonite.sshd
 
 
 import ammonite.main.Defaults
-import ammonite.ops.Path
 import org.apache.sshd.server.auth.password.PasswordAuthenticator
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
 
@@ -14,8 +13,8 @@ import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
  */
 case class SshServerConfig(address: String,
                            port: Int,
-                           ammoniteHome: Path = Defaults.ammoniteHome,
-                           hostKeyFile: Option[Path] = None,
+                           ammoniteHome: os.Path = Defaults.ammoniteHome,
+                           hostKeyFile: Option[os.Path] = None,
                            passwordAuthenticator: Option[PasswordAuthenticator] = None,
                            publicKeyAuthenticator: Option[PublickeyAuthenticator] = None
 ) {

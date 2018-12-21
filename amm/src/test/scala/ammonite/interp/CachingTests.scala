@@ -3,7 +3,7 @@ package ammonite.interp
 import ammonite.TestUtils._
 import ammonite.main
 import ammonite.main.{Defaults, Scripts}
-import ammonite.ops._
+
 import ammonite.runtime.Storage
 import ammonite.runtime.tools.IvyConstructor._
 import ammonite.util.{Res, Util}
@@ -13,16 +13,16 @@ object CachingTests extends TestSuite{
   val tests = Tests{
     println("ScriptTests")
 
-    val scriptPath = pwd/'amm/'src/'test/'resources/'scripts
+    val scriptPath = os.pwd/'amm/'src/'test/'resources/'scripts
 
-    val resourcesPath = pwd/'amm/'src/'test/'resources
+    val resourcesPath = os.pwd/'amm/'src/'test/'resources
 
 
-    val tempDir = tmp.dir(prefix="ammonite-tester")
+    val tempDir = os.temp.dir(prefix="ammonite-tester")
     'noAutoIncrementWrapper{
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      Scripts.runScript(pwd, scriptPath/"ThreeBlocks.sc", interp)
+      Scripts.runScript(os.pwd, scriptPath/"ThreeBlocks.sc", interp)
       try{
         Class.forName("cmd0")
         assert(false)
@@ -38,7 +38,7 @@ object CachingTests extends TestSuite{
         val n0 = storage.compileCache.size
 
         assert(n0 == 1) // customLolz predef
-        Scripts.runScript(pwd, scriptPath/fileName, interp)
+        Scripts.runScript(os.pwd, scriptPath/fileName, interp)
 
         val n = storage.compileCache.size
         assert(n == expected)
@@ -50,7 +50,7 @@ object CachingTests extends TestSuite{
     }
 
     'processModuleCaching{
-      def check(script: RelPath){
+      def check(script: os.RelPath){
         val storage = new Storage.Folder(tempDir)
 
         val interp1 = createTestInterp(
@@ -58,7 +58,7 @@ object CachingTests extends TestSuite{
           Defaults.predefString
         )
 
-        Scripts.runScript(pwd, resourcesPath/script, interp1)
+        Scripts.runScript(os.pwd, resourcesPath/script, interp1)
 
         assert(interp1.compilerManager.compiler != null)
         val interp2 = createTestInterp(
@@ -67,34 +67,34 @@ object CachingTests extends TestSuite{
         )
         assert(interp2.compilerManager.compiler == null)
 
-        Scripts.runScript(pwd, resourcesPath/script, interp2)
+        Scripts.runScript(os.pwd, resourcesPath/script, interp2)
         assert(interp2.compilerManager.compiler == null)
       }
 
-      'testOne - check('scriptLevelCaching/"scriptTwo.sc")
-      'testTwo - check('scriptLevelCaching/"scriptOne.sc")
-      'testThree - check('scriptLevelCaching/"QuickSort.sc")
-      'testLoadModule - check('scriptLevelCaching/"testLoadModule.sc")
-      'testFileImport - check('scriptLevelCaching/"testFileImport.sc")
-      'testIvyImport - check('scriptLevelCaching/"ivyCacheTest.sc")
+      'testOne - check(os.rel/'scriptLevelCaching/"scriptTwo.sc")
+      'testTwo - check(os.rel/'scriptLevelCaching/"scriptOne.sc")
+      'testThree - check(os.rel/'scriptLevelCaching/"QuickSort.sc")
+      'testLoadModule - check(os.rel/'scriptLevelCaching/"testLoadModule.sc")
+      'testFileImport - check(os.rel/'scriptLevelCaching/"testFileImport.sc")
+      'testIvyImport - check(os.rel/'scriptLevelCaching/"ivyCacheTest.sc")
       'testIvyResource- {
-        if (!scala2_12) check('scriptLevelCaching/"ivyCachedResourceTest.sc")
+        if (!scala2_12) check(os.rel/'scriptLevelCaching/"ivyCachedResourceTest.sc")
       }
 
     }
 
     'testRunTimeExceptionForCachedScripts{
       val storage = new Storage.Folder(tempDir)
-      val numFile = pwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
-      rm(numFile)
-      write(numFile, "1")
+      val numFile = os.pwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
+      os.remove.all(numFile)
+      os.write(numFile, "1", createFolders = true)
       val interp1 = createTestInterp(
         storage,
         Defaults.predefString
       )
 
       Scripts.runScript(
-        pwd,
+        os.pwd,
         resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc",
         interp1
       )
@@ -104,7 +104,7 @@ object CachingTests extends TestSuite{
         Defaults.predefString
       )
       val Res.Exception(ex, _) = Scripts.runScript(
-        pwd,
+        os.pwd,
         resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc",
         interp2
       )
@@ -117,14 +117,14 @@ object CachingTests extends TestSuite{
 
     'persistence{
 
-      val tempDir = ammonite.ops.Path(
+      val tempDir = os.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
       )
 
       val interp1 = createTestInterp(new Storage.Folder(tempDir))
       val interp2 = createTestInterp(new Storage.Folder(tempDir))
-      Scripts.runScript(pwd, scriptPath/"OneBlock.sc", interp1)
-      Scripts.runScript(pwd, scriptPath/"OneBlock.sc", interp2)
+      Scripts.runScript(os.pwd, scriptPath/"OneBlock.sc", interp1)
+      Scripts.runScript(os.pwd, scriptPath/"OneBlock.sc", interp2)
       val n1 = interp1.compilationCount
       val n2 = interp2.compilationCount
       assert(n1 == 2) // customLolz predef + OneBlock.sc
@@ -133,25 +133,25 @@ object CachingTests extends TestSuite{
     'tags{
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      Scripts.runScript(pwd, scriptPath/"TagBase.sc", interp)
-      Scripts.runScript(pwd, scriptPath/"TagPrevCommand.sc", interp)
+      Scripts.runScript(os.pwd, scriptPath/"TagBase.sc", interp)
+      Scripts.runScript(os.pwd, scriptPath/"TagPrevCommand.sc", interp)
 
       interp.loadIvy("com.lihaoyi" %% "scalatags" % "0.6.2")
-      Scripts.runScript(pwd, scriptPath/"TagBase.sc", interp)
+      Scripts.runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       val n = storage.compileCache.size
       assert(n == 5) // customLolz predef + two blocks for each loaded file
     }
 
     'compilerInit{
-      val tempDir = ammonite.ops.Path(
+      val tempDir = os.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
       )
 
       val interp1 = createTestInterp(new Storage.Folder(tempDir))
       val interp2 = createTestInterp(new Storage.Folder(tempDir))
 
-      Scripts.runScript(pwd, scriptPath/"cachedCompilerInit.sc", interp1)
-      Scripts.runScript(pwd, scriptPath/"cachedCompilerInit.sc", interp2)
+      Scripts.runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp1)
+      Scripts.runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp2)
       assert(interp2.compilationCount == 0)
     }
 
@@ -162,13 +162,13 @@ object CachingTests extends TestSuite{
       // to the script being run. For each change, the caches should be
       // invalidated, and subsequently a single compile should be enough
       // to re-fill the caches
-      val predefFile = tmp("""
+      val predefFile = os.temp("""
         val x = 1337
         @
         val y = x
         import $ivy.`com.lihaoyi::scalatags:0.6.2`, scalatags.Text.all._
         """)
-      val scriptFile = tmp("""div("<('.'<)", y).render""")
+      val scriptFile = os.temp("""div("<('.'<)", y).render""")
 
       def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) ={
         val interp = createTestInterp(
@@ -177,15 +177,15 @@ object CachingTests extends TestSuite{
           },
           Defaults.predefString
         )
-        Scripts.runScript(pwd, scriptFile, interp)
+        Scripts.runScript(os.pwd, scriptFile, interp)
         assert(f(interp.compilerManager.compiler))
       }
 
       processAndCheckCompiler(_ != null)
       processAndCheckCompiler(_ == null)
 
-      rm! predefFile
-      write(
+      os.remove.all(predefFile)
+      os.write(
         predefFile,
         """
         import $ivy.`com.lihaoyi::scalatags:0.6.2`; import scalatags.Text.all._
@@ -196,8 +196,8 @@ object CachingTests extends TestSuite{
       processAndCheckCompiler(_ != null)
       processAndCheckCompiler(_ == null)
 
-      rm! scriptFile
-      write(
+      os.remove.all(scriptFile)
+      os.write(
         scriptFile,
         """div("(>'.')>", y).render"""
       )
@@ -207,19 +207,19 @@ object CachingTests extends TestSuite{
     }
     'changeImportedScriptInvalidation{
 
-      val storageFolder = tmp.dir()
+      val storageFolder = os.temp.dir()
 
       val storage = new Storage.Folder(storageFolder)
-      def runScript(script: Path, expectedCount: Int) = {
+      def runScript(script: os.Path, expectedCount: Int) = {
         val interp = createTestInterp(storage)
-        val res = Scripts.runScript(script / up, script, interp, Nil)
+        val res = Scripts.runScript(script / os.up, script, interp, Nil)
 
         val count = interp.compilationCount
         assert(count == expectedCount)
         res
       }
-      def createScript(s: String, dir: Path = null, name: String) = {
-        val tmpFile = tmp(s, dir = dir, suffix = name + ".sc", prefix = "script")
+      def createScript(s: String, dir: os.Path = null, name: String) = {
+        val tmpFile = os.temp(s, dir = dir, suffix = name + ".sc", prefix = "script")
         val ident = tmpFile.last.stripSuffix(".sc")
         (tmpFile, ident)
       }
@@ -240,7 +240,7 @@ object CachingTests extends TestSuite{
             |
             |println($upstreamIdent.x)
           """.stripMargin,
-          dir = upstream/up,
+          dir = upstream/os.up,
           name = "downstream"
         )
 
@@ -252,7 +252,7 @@ object CachingTests extends TestSuite{
 
         // Make sure when we change the upstream code, the downstream script
         // recompiles too
-        ammonite.ops.write.over(
+        os.write.over(
           upstream,
           """println("barr")
             |val x = 2
@@ -265,7 +265,7 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
 
         // But if we change the downstream code, the upstream does *not* recompile
-        ammonite.ops.write.over(
+        os.write.over(
           downstream,
           s"""import $$file.$upstreamIdent
              |println("hello")
@@ -280,7 +280,7 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
 
         // If upstream gets deleted, make sure the $file import fails to resolve
-        rm(upstream)
+        os.remove.all(upstream)
 
         val Res.Failure(msg1) = runScript(downstream, 0)
 
@@ -290,7 +290,7 @@ object CachingTests extends TestSuite{
 
         // And make sure that if the upstream re-appears with the exact same code,
         // the file import starts working again without needing compilation
-        ammonite.ops.write.over(
+        os.write.over(
           upstream,
           """println("barr")
             |val x = 2
@@ -303,13 +303,13 @@ object CachingTests extends TestSuite{
 
         // But if it gets deleted and re-appears with different contents, both
         // upstream and downstream need to be recompiled
-        rm(upstream)
+        os.remove.all(upstream)
 
         val Res.Failure(msg3) = runScript(downstream, 0)
 
         assert(msg3.startsWith("Cannot resolve $file import"))
 
-        ammonite.ops.write.over(
+        os.write.over(
           upstream,
           """println("Hohohoho")
             |val x = 2
@@ -336,7 +336,7 @@ object CachingTests extends TestSuite{
              |val a = $upstreamIdent.x + 1
              |
            """.stripMargin,
-          dir = upstream/up,
+          dir = upstream/os.up,
           name = "middleA"
         )
 
@@ -346,7 +346,7 @@ object CachingTests extends TestSuite{
              |val b = $upstreamIdent.x + 2
              |
            """.stripMargin,
-          dir = upstream/up,
+          dir = upstream/os.up,
           name = "middleB"
         )
 
@@ -356,7 +356,7 @@ object CachingTests extends TestSuite{
              |println("downstreammm")
              |println($middleAIdent.a + $middleBIdent.b)
           """.stripMargin,
-          dir = upstream/up,
+          dir = upstream/os.up,
           name = "downstream"
         )
 
@@ -367,14 +367,14 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        write.append(downstream, Util.newLine + "val dummy = 1")
+        os.write.append(downstream, Util.newLine + "val dummy = 1")
 
         runScript(downstream, 1)
         runScript(downstream, 0)
         runScript(downstream, 0)
 
 
-        write.append(middleA, Util.newLine + "val dummy = 1")
+        os.write.append(middleA, Util.newLine + "val dummy = 1")
 
         // Unfortunately, this currently causes `middleB` to get re-processed
         // too, as it is only evaluated "after" middleA and thus it's
@@ -383,13 +383,13 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        write.append(middleB, Util.newLine + "val dummy = 1")
+        os.write.append(middleB, Util.newLine + "val dummy = 1")
 
         runScript(downstream, 2)
         runScript(downstream, 0)
         runScript(downstream, 0)
 
-        write.append(upstream, Util.newLine + "val dummy = 1")
+        os.write.append(upstream, Util.newLine + "val dummy = 1")
 
         runScript(downstream, 4)
         runScript(downstream, 0)

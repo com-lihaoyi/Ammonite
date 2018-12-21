@@ -1,16 +1,17 @@
 package ammonite.repl
 
 import java.io.{InputStream, OutputStream}
+
 import scala.collection.JavaConverters._
-import fastparse.core.Parsed
-import fastparse.utils.ParserInput
+import fastparse.Parsed
+import fastparse.ParserInput
 import org.jline.reader._
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.reader.impl.DefaultParser.ArgumentList
 import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
-import ammonite.interp.Parsers
+import ammonite.interp.{Parsers, Preprocessor}
 
 /** JLine interface */
 trait FrontEnd {
@@ -157,13 +158,13 @@ class AmmParser extends Parser {
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor, stmts)
         }
-      case Some(Parsed.Failure(p, idx, extra)) =>
+      case Some(f @ Parsed.Failure(p, idx, extra)) =>
         // we "accept the failure" only when ENTER is pressed, loops forever otherwise...
         // https://groups.google.com/d/msg/jline-users/84fPur0oHKQ/bRnjOJM4BAAJ
         if (context == Parser.ParseContext.ACCEPT_LINE) {
           addHistory(line)
           throw new SyntaxError(
-            fastparse.core.ParseError.msg(extra.input, extra.traced.expected, idx)
+            Preprocessor.formatFastparseError("(console)", line, f)
           )
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)

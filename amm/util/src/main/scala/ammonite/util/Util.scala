@@ -5,7 +5,7 @@ package ammonite.util
 
 import java.security.MessageDigest
 
-import ammonite.ops._
+
 
 
 object Util{
@@ -20,9 +20,9 @@ object Util{
   }
   val upPathSegment = "^"
   def pathToPackageWrapper(flexiblePkgName0: Seq[Name],
-                           relPath0: RelPath): (Seq[Name], Name) = {
+                           relPath0: os.RelPath): (Seq[Name], Name) = {
     var flexiblePkgName = flexiblePkgName0
-    var relPath = relPath0/up
+    var relPath = relPath0/os.up
     val fileName = relPath0.last
     while(
       flexiblePkgName.length > 1 &&
@@ -30,7 +30,7 @@ object Util{
       relPath.ups > 0
     ){
       flexiblePkgName = flexiblePkgName.dropRight(1)
-      relPath = RelPath(relPath.segments, relPath.ups - 1)
+      relPath = os.RelPath(relPath.segments, relPath.ups - 1)
     }
     val pkg = {
       val ups = Seq.fill(relPath.ups)(upPathSegment)
@@ -89,7 +89,7 @@ object Util{
   case class CodeSource(wrapperName: Name,
                         flexiblePkgName: Seq[Name],
                         pkgRoot: Seq[Name],
-                        path: Option[Path]){
+                        path: Option[os.Path]){
     // All code Ammonite compiles must be rooted in some package within
     // the `ammonite` top-level package
     assert(pkgRoot.head == Name("ammonite"))

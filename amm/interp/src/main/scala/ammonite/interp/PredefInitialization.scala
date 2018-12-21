@@ -1,7 +1,6 @@
 package ammonite.interp
 
 
-import ammonite.ops.Path
 import ammonite.runtime.{APIHolder, SpecialClassLoader, Storage}
 import ammonite.util.ScriptOutput.Metadata
 import ammonite.util.{Imports, Name, PredefInfo, Res}
@@ -20,7 +19,7 @@ object PredefInitialization {
             customPredefs: Seq[PredefInfo],
             processModule: (String, CodeSource, Boolean) => Res[Metadata],
             addImports: Imports => Unit,
-            watch: Path => Unit): Res[_] = {
+            watch: os.Path => Unit): Res[_] = {
 
     for ((name, shortName, bridge) <- bridges ){
       APIHolder.initBridge(evalClassloader, name, bridge)

@@ -151,6 +151,12 @@ object AdvancedTests extends TestSuite{
         res3: Int Array = Array(1)
       """)
     }
+    'trappedType{
+      check.session("""
+        @ val nope = ammonite.TestRepl.Nope(2); val n = 2
+        n: Int = 2
+      """)
+    }
     'unwrapping{
       check.session("""
         @ {
@@ -326,12 +332,12 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'loadingModulesInPredef{
-      import ammonite.ops._
-      val dir = pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
+
+      val dir = os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
       'loadExec {
         val c1 = new DualTestRepl() {
           override def predef = (
-            read! dir/"PredefLoadExec.sc",
+            os.read(dir/"PredefLoadExec.sc"),
             Some(dir/"PredefLoadExec.sc")
           )
         }
@@ -343,7 +349,7 @@ object AdvancedTests extends TestSuite{
       'loadModule{
         val c2 = new DualTestRepl(){
           override def predef = (
-            read! dir/"PredefLoadModule.sc",
+            os.read(dir/"PredefLoadModule.sc"),
             Some(dir/"PredefLoadModule.sc")
           )
         }
@@ -355,7 +361,7 @@ object AdvancedTests extends TestSuite{
       'importIvy{
         val c2 = new DualTestRepl(){
           override def predef = (
-            read! dir/"PredefMagicImport.sc",
+            os.read(dir/"PredefMagicImport.sc"),
             Some(dir/"PredefMagicImport.sc")
           )
         }
@@ -436,6 +442,46 @@ object AdvancedTests extends TestSuite{
           @ assert(c1 eq c3)
         """)
       }
+    }
+
+    'loadURL - {
+      val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+      val url = "https://repo1.maven.org/maven2/" +
+        s"io/argonaut/argonaut_$sbv/6.2.2/argonaut_$sbv-6.2.2.jar"
+      check.session(s"""
+        @ interp.load.cp(new java.net.URL("$url"))
+
+        @ import argonaut._, Argonaut._
+
+        @ val json = Json.obj("a" -> Json.jBool(false)).nospaces
+        json: String = "{\\"a\\":false}"
+      """)
+    }
+
+    'accessPressy - {
+      check.session("""
+        @ def typeAt(code: String, pos: Int) = {
+        @   import scala.tools.nsc.interactive.Response
+        @   import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
+        @   val c = repl.interactiveCompiler
+        @   val f = new BatchSourceFile("<virtual>", code)
+        @   val r = new Response[Unit]
+        @   c.askReload(List(f), r)
+        @   r.get.fold(x => x, e => throw e)
+        @   val r0 = new Response[c.Tree]
+        @   c.askTypeAt(new OffsetPosition(f, pos), r0)
+        @   r0.get.fold(x => x, e => throw e)
+        @ }
+        defined function typeAt
+
+        @ val code = "object A { val l = List }"
+        code: String = "object A { val l = List }"
+
+        @ val t = typeAt(code, code.length - 2).toString
+        t: String = ?
+
+        @ assert(t.endsWith(".List"))
+      """)
     }
   }
 }

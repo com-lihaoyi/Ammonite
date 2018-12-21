@@ -7,7 +7,7 @@ package ammonite.runtime.tools
 
 import java.io.{BufferedReader, InputStreamReader}
 
-import ammonite.ops._
+
 import ammonite.util.Util.newLine
 
 import scala.collection.{GenTraversableOnce, mutable}
@@ -173,9 +173,9 @@ object grep {
   }
 }
 
-case class tail(interval: Int, prefix: Int) extends Function[Path, Iterator[String]]{
-  def apply(arg: Path): Iterator[String] = {
-    val is = java.nio.file.Files.newInputStream(arg.toNIO)
+case class tail(interval: Int, prefix: Int) extends Function[os.Path, Iterator[String]]{
+  def apply(arg: os.Path): Iterator[String] = {
+    val is = os.read.inputStream(arg)
     val br = new BufferedReader(new InputStreamReader(is))
     Iterator.continually{
       val line = br.readLine()
@@ -222,11 +222,11 @@ object browse{
             height: Integer = 9999999,
             indent: Integer = null)
            (implicit pp: pprint.PPrinter,
-            wd: Path = ammonite.ops.ImplicitWd.implicitCwd) = {
+            wd: os.Path = os.pwd) = {
 
-    %(
+    os.proc(
       viewer.values,
-      tmp(
+      os.temp(
         pp.tokenize(
           t,
           width = if (width == null) pp.defaultWidth else width,
@@ -234,6 +234,6 @@ object browse{
           indent = if (indent == null) pp.defaultIndent else indent
         ).map(_.render)
       )
-    )
+    ).call(stdin = os.Inherit, stdout = os.Inherit, stderr = os.Inherit)
   }
 }

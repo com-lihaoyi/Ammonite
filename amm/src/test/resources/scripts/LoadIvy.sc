@@ -1,4 +1,3 @@
-import ammonite.ops._
 interp.load.ivy("com.lihaoyi" %% "scalatags" % "0.6.2")
 @
 import scalatags.Text.all._

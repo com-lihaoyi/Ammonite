@@ -1,7 +1,7 @@
 package ammonite.interp
 
 import ammonite.TestUtils._
-import ammonite.ops._
+
 import ammonite.runtime.Storage
 import ammonite.main.Scripts
 import utest._
@@ -10,7 +10,7 @@ object CompilerSettingsTests extends TestSuite {
   val tests = Tests {
     println("CompilerSettingsTests")
 
-    val scriptPath = pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
+    val scriptPath = os.pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
 
     'configureYrangepos {
       // In this test, the script sets -Yrangepos to true using "configureCompiler",
@@ -19,7 +19,7 @@ object CompilerSettingsTests extends TestSuite {
       // value remains "true".
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      Scripts.runScript(pwd, scriptPath / "configureCompiler.sc", interp)
+      Scripts.runScript(os.pwd, scriptPath / "configureCompiler.sc", interp)
 
       assert(interp.compilerManager.compiler.compiler.useOffsetPositions)
     }
@@ -30,7 +30,7 @@ object CompilerSettingsTests extends TestSuite {
       // useOffsetPositions initializing as false, as expected
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      Scripts.runScript(pwd, scriptPath / "preConfigureCompiler.sc", interp)
+      Scripts.runScript(os.pwd, scriptPath / "preConfigureCompiler.sc", interp)
 
       assert(!interp.compilerManager.compiler.compiler.useOffsetPositions)
     }

@@ -1,9 +1,10 @@
 package ammonite.runtime
 
 import java.io.File
-import java.util.zip.ZipFile
+import java.net.URL
+import java.util.zip.{ZipFile, ZipInputStream}
 
-import ammonite.ops._
+
 import io.github.retronym.java9rtexport.Export
 
 import scala.util.control.NonFatal
@@ -24,14 +25,14 @@ object Classpath {
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-  def classpath(classLoader: ClassLoader, storage: Storage): Vector[File] = {
+  def classpath(classLoader: ClassLoader, storage: Storage): Vector[URL] = {
     val cache = storage.classpathCache()
     if (cache.isDefined) return cache.get
-    def rtCacheDir(storage: Storage): Option[Path] = storage match {
+    def rtCacheDir(storage: Storage): Option[os.Path] = storage match {
       case storage: Storage.Folder =>
         // no need to cache if the storage is in tmpdir
         // because it is temporary
-        if (storage.dir.toNIO.startsWith(
+        if (storage.dir.wrapped.startsWith(
           java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"))))
           None
         else Some(storage.dir)
@@ -39,28 +40,35 @@ object Classpath {
     }
 
     var current = classLoader
-    val files = collection.mutable.Buffer.empty[java.io.File]
+    val files = collection.mutable.Buffer.empty[java.net.URL]
+    val seenClassLoaders = collection.mutable.Buffer.empty[ClassLoader]
     while(current != null){
+      seenClassLoaders.append(current)
       current match{
         case t: java.net.URLClassLoader =>
-          files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
+          files.appendAll(t.getURLs)
         case _ =>
       }
       current = current.getParent
     }
 
-    {
-      val sunBoot = System.getProperty("sun.boot.class.path")
-      if (sunBoot != null) {
-        files.appendAll(
-          sunBoot
-            .split(java.io.File.pathSeparator)
-            .map(new java.io.File(_))
-        )
-      } else {
+
+    val sunBoot = System.getProperty("sun.boot.class.path")
+    if (sunBoot != null) {
+      files.appendAll(
+        sunBoot
+          .split(java.io.File.pathSeparator)
+          .map(new java.io.File(_))
+          .filter(_.exists())
+          .map(_.toURI.toURL)
+      )
+    } else {
+      if (seenClassLoaders.contains(ClassLoader.getSystemClassLoader)) {
         for (p <- System.getProperty("java.class.path")
           .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
-          files.append(new File(p))
+          val f = new File(p)
+          if (f.exists())
+            files.append(f.toURI.toURL)
         }
         try {
           new java.net.URLClassLoader(files.map(_.toURI.toURL).toArray, null)
@@ -68,30 +76,34 @@ object Classpath {
         } catch {
           case _: ClassNotFoundException =>
             rtCacheDir(storage) match {
-              case Some(path) => files.append(Export.rtAt(path.toIO))
-              case _ => files.append(Export.rt())
+              case Some(path) => files.append(Export.rtAt(path.toIO).toURI.toURL)
+              case _ => files.append(Export.rt().toURI.toURL)
             }
         }
       }
     }
-    val r = files.toVector.filter(_.exists)
+    val r = files.toVector
     storage.classpathCache.update(Some(r))
     r
   }
 
-  def canBeOpenedAsJar(file: File): Boolean =
+  def canBeOpenedAsJar(url: URL): Boolean = {
+    var zis: ZipInputStream = null
     try {
-      val zf = new ZipFile(file)
-      zf.close()
-      true
+      zis = new ZipInputStream(url.openStream())
+      zis.getNextEntry != null
     } catch {
       case NonFatal(e) =>
         traceClasspathProblem(
-          s"Classpath element '${file.getAbsolutePath}' "+
-            "could not be opened as jar file because of $e"
+          s"Classpath element '$url' "+
+            s"could not be opened as jar file because of $e"
         )
         false
+    } finally {
+      if (zis != null)
+        zis.close()
     }
+  }
   def traceClasspathProblem(msg: String): Unit =
     if (traceClasspathIssues) println(msg)
 }

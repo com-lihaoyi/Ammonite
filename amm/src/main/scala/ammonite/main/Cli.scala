@@ -1,6 +1,5 @@
 package ammonite.main
 
-import ammonite.ops.Path
 import ammonite.runtime.Storage
 import ammonite.util.Util
 
@@ -20,14 +19,14 @@ object Cli{
   case class Config(predefCode: String = "",
                     defaultPredef: Boolean = true,
                     homePredef: Boolean = true,
-                    wd: Path = ammonite.ops.pwd,
+                    wd: os.Path = os.pwd,
                     welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                     verboseOutput: Boolean = true,
                     remoteLogging: Boolean = true,
                     watch: Boolean = false,
                     code: Option[String] = None,
-                    home: Path = Defaults.ammoniteHome,
-                    predefFile: Option[Path] = None,
+                    home: os.Path = Defaults.ammoniteHome,
+                    predefFile: Option[os.Path] = None,
                     help: Boolean = false,
                     colored: Option[Boolean] = None,
                     classBased: Boolean = false)
@@ -46,12 +45,12 @@ object Cli{
       "Pass in code to be run immediately in the REPL",
       (c, v) => c.copy(code = Some(v))
     ),
-    Arg[Config, Path](
+    Arg[Config, os.Path](
       "home", Some('h'),
       "The home directory of the REPL; where it looks for config and caches",
       (c, v) => c.copy(home = v)
     ),
-    Arg[Config, Path](
+    Arg[Config, os.Path](
       "predef", Some('p'),
       """Lets you load your predef from a custom location, rather than the
         |default location in your Ammonite home""".stripMargin,
@@ -130,7 +129,7 @@ object Cli{
 
     for(arg <- args) yield {
       showArg(arg).padTo(leftMargin, ' ').mkString +
-      arg.doc.lines.mkString(Util.newLine + " " * leftMargin)
+      Predef.augmentString(arg.doc).lines.mkString(Util.newLine + " " * leftMargin)
     }
   }
   def ammoniteHelp = {

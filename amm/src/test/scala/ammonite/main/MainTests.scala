@@ -1,7 +1,7 @@
 package ammonite.main
 
 import ammonite.TestUtils
-import ammonite.ops._
+
 import ammonite.util.Util
 import utest._
 
@@ -10,10 +10,11 @@ import utest._
   * and the associated error behavior if the caller messes up.
  */
 object MainTests extends TestSuite{
-  def exec(p: RelPath, args: String*) = new InProcessMainMethodRunner('mains/p, Nil, args)
+  def exec(p: os.RelPath, args: String*) =
+    new InProcessMainMethodRunner(os.rel / 'mains/p, Nil, args)
 
   def stripInvisibleMargin(s: String): String = {
-    val lines = s.lines.toArray
+    val lines = Predef.augmentString(s).lines.toArray
     val leftMargin = lines.filter(_.trim.nonEmpty).map(_.takeWhile(_ == ' ').length).min
     lines.map(_.drop(leftMargin)).mkString(Util.newLine)
   }
@@ -31,14 +32,18 @@ object MainTests extends TestSuite{
         val evaled = exec("CompilerCrash.sc")
         // Make sure we do not accidentally lose the stack trace in the case
         // where the script fails during compilation before entering the evaluator
-        assert(evaled.err.lines.length > 50)
+        assert(Predef.augmentString(evaled.err).lines.length > 50)
       }
     }
 
     // Not really related to main methods, but related since most of the main
     // logic revolves around handling arguments. Make sure this fails properly
     'badAmmoniteFlag{
-      val evaled = new InProcessMainMethodRunner('mains/"Hello.sc", List("--doesnt-exist"), Nil)
+      val evaled = new InProcessMainMethodRunner(
+        os.rel / 'mains/"Hello.sc",
+        List("--doesnt-exist"),
+        Nil
+      )
       assert(!evaled.success)
       val expected = "Unknown Ammonite option: --doesnt-exist"
       assert(evaled.err.toString.contains(expected))
@@ -80,7 +85,7 @@ object MainTests extends TestSuite{
                 functionB
                   --i     Int
                   --s     String
-                  --path  ammonite.ops.Path (default $pwd)
+                  --path  os.Path (default ${os.pwd})
             """.stripMargin
           )
           assert(out.contains(expected.trim))
@@ -102,7 +107,7 @@ object MainTests extends TestSuite{
                   --i     Int: how many times to repeat the string to make it very very long,
                           more than it originally was
                   --s     String: the string to repeat
-                  --path  ammonite.ops.Path (default $pwd)
+                  --path  os.Path (default ${os.pwd})
             """
           )
           assert(out.contains(expected.trim))
@@ -124,7 +129,7 @@ object MainTests extends TestSuite{
                   --i     Int: how many times to repeat the string to make it very very long,
                           more than it originally was
                   --s     String: the string to repeat
-                  --path  ammonite.ops.Path (default $pwd)
+                  --path  os.Path (default ${os.pwd})
             """
           )
           assert(out.contains(expected.trim))
@@ -138,7 +143,7 @@ object MainTests extends TestSuite{
 
     'args{
       'full{
-        val evaled = exec("Args.sc", "-i", "3", "--s", "Moo", (pwd/'omg/'moo).toString)
+        val evaled = exec("Args.sc", "-i", "3", "--s", "Moo", (os.pwd/'omg/'moo).toString)
         assert(evaled.success)
         assert(evaled.out == ("\"Hello! MooMooMoo moo.\"" + Util.newLine))
       }
@@ -168,7 +173,7 @@ object MainTests extends TestSuite{
            |main
            |  --i     Int
            |  --s     String
-           |  --path  ammonite.ops.Path (default $pwd)
+           |  --path  os.Path (default ${os.pwd})
            |""".stripMargin
       'tooFew{
         val evaled = exec("Args.sc", "3")
@@ -283,13 +288,13 @@ object MainTests extends TestSuite{
                |main
                |  --i     Int
                |  --s     String
-               |  --path  ammonite.ops.Path (default $pwd)
+               |  --path  os.Path (default ${os.pwd})
                |""".stripMargin
           )
         ))
         // Ensure we're properly truncating the random stuff we don't care about
         // which means that the error stack that gets printed is short-ish
-        assert(evaled.err.lines.length < 20)
+        assert(Predef.augmentString(evaled.err).lines.length < 20)
 
       }
     }

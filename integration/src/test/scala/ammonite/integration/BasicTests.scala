@@ -42,7 +42,7 @@ object BasicTests extends TestSuite{
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         rm(scriptAddr)
-        write(scriptAddr, """println("Script Worked!!")""")
+        write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
         val evaled = %%bash(
           executable,
           "-s",
@@ -143,7 +143,7 @@ object BasicTests extends TestSuite{
           executable,
           "-c",
           """val loc = source.load(new String().substring(_: Int))
-            |val snip = loc.fileContent
+            |val snip = Predef.augmentString(loc.fileContent)
             |  .lines
             |  .slice(loc.lineNum-15, loc.lineNum+15)
             |  .mkString("\n")
@@ -198,10 +198,13 @@ object BasicTests extends TestSuite{
 
         def publishJarAndRunScript(theThing: String): Unit = {
           // 1. edit code
-          write.over(dummyScala,
+          write.over(
+            dummyScala,
             s"""package dummy
               object Dummy{def thing="$theThing"}
-           """.stripMargin)
+           """.stripMargin,
+            createFolders = true
+          )
 
           // 2. build & publish code locally
           %%("sbt", "+package", "+publishLocal")(buildRoot)

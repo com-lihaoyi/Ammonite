@@ -1,8 +1,9 @@
 package ammonite.runtime
 
 import java.nio.file.FileAlreadyExistsException
+import java.nio.file.{Files, Paths}
 
-import ammonite.ops._
+
 import ammonite.util._
 import ammonite.util.Util._
 
@@ -19,23 +20,23 @@ import scala.reflect.NameTransformer.encode
  * to be able to run multiple Ammonite processes on the same system.
  */
 trait Storage{
-  def loadPredef: Option[(String, Path)]
+  def loadPredef: Option[(String, os.Path)]
   val fullHistory: StableRef[History]
   val ivyCache: StableRef[Storage.IvyMap]
 
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
   def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
-  def classFilesListSave(filePathPrefix: RelPath,
+  def classFilesListSave(filePathPrefix: os.RelPath,
                          perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                          tag: Tag): Unit
-  def classFilesListLoad(filePathPrefix: RelPath, tag: Tag): Option[ScriptOutput]
+  def classFilesListLoad(filePathPrefix: os.RelPath, tag: Tag): Option[ScriptOutput]
   def getSessionId: Long
 
   // Store classpathCache in-memory regardless of Storage impl
-  private var _classpathCache: Option[Vector[java.io.File]] = None
-  val classpathCache = new StableRef[Option[Vector[java.io.File]]]{
+  private var _classpathCache: Option[Vector[java.net.URL]] = None
+  val classpathCache = new StableRef[Option[Vector[java.net.URL]]]{
     def apply() = _classpathCache
-    def update(value: Option[Vector[java.io.File]]): Unit = _classpathCache = value
+    def update(value: Option[Vector[java.net.URL]]): Unit = _classpathCache = value
   }
 }
 
@@ -91,14 +92,14 @@ object Storage{
       } yield data
     }
 
-    def classFilesListSave(filePathPrefix: RelPath,
+    def classFilesListSave(filePathPrefix: os.RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            tag: Tag): Unit = {
 
       classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata)
     }
 
-    def classFilesListLoad(filePathPrefix: RelPath,
+    def classFilesListLoad(filePathPrefix: os.RelPath,
                            cacheTag: Tag): Option[ScriptOutput] = {
 
       classFilesListcache.get(filePathPrefix.toString) match{
@@ -111,7 +112,7 @@ object Storage{
 
 
 
-  class Folder(val dir: Path, isRepl: Boolean = true) extends Storage{
+  class Folder(val dir: os.Path, isRepl: Boolean = true) extends Storage{
     def predef = if (isRepl) dir/"predef.sc" else dir/"predefScript.sc"
     // Each version puts its cache in a separate folder, to bust caches
     // on every version bump; otherwise binary-incompatible changes to
@@ -125,10 +126,10 @@ object Storage{
     val sessionFile  = dir/"session"
 
     def getSessionId() = {
-      try read(sessionFile).toLong
+      try os.read(sessionFile).toLong
       catch{case e: Throwable =>
         val randomId = math.abs(util.Random.nextLong)
-        write.over(sessionFile, randomId.toString)
+        os.write.over(sessionFile, randomId.toString)
         randomId
       }
     }
@@ -136,27 +137,27 @@ object Storage{
     val fullHistory = new StableRef[History]{
       def apply(): History = {
         try{
-          new History(upickle.default.read[Vector[String]](read(historyFile)))
+          new History(upickle.default.read[Vector[String]](os.read(historyFile)))
         }catch{case e: Exception =>
           new History(Vector())
         }
       }
 
       def update(t: History): Unit = {
-        write.over(historyFile, upickle.default.write(t.toVector, indent = 4))
+        os.write.over(historyFile, upickle.default.write(t.toVector, indent = 4))
       }
     }
 
 
-    def classFilesListSave(filePathPrefix: RelPath,
+    def classFilesListSave(filePathPrefix: os.RelPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            tag: Tag): Unit = {
 
       val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env
 
-      mkdir(codeCacheDir)
+      os.makeDir.all(codeCacheDir)
       try {
-        write.over(
+        os.write.over(
           codeCacheDir/classFilesOrder,
           upickle.default.write((tag, perBlockMetadata), indent = 4)
         )
@@ -166,21 +167,21 @@ object Storage{
       }
     }
 
-    def readJson[T: upickle.default.Reader](path: Path): Option[T] = {
+    def readJson[T: upickle.default.Reader](path: os.Path): Option[T] = {
       try {
-        val fileData = {ammonite.ops.read(path)}
+        val fileData = os.read(path)
         val parsed = upickle.default.read[T](fileData)
         Some(parsed)
       }
       catch{ case e: Throwable => None }
     }
 
-    def classFilesListLoad(filePathPrefix: RelPath,
+    def classFilesListLoad(filePathPrefix: os.RelPath,
                            tag: Tag): Option[ScriptOutput] = {
 
       val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env
 
-      if(!exists(codeCacheDir)) None
+      if(!os.exists(codeCacheDir)) None
       else {
         val metadataJson = readJson[(Tag, Seq[ScriptOutput.BlockMetadata])](
           codeCacheDir/classFilesOrder
@@ -201,18 +202,18 @@ object Storage{
     def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
       val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.code/tag.env
 
-      mkdir(tagCacheDir)
+      os.makeDir.all(tagCacheDir)
       val metadata = upickle.default.write((tag, data.imports), indent = 4)
-      write.over(tagCacheDir/metadataFile, metadata)
+      os.write.over(tagCacheDir/metadataFile, metadata)
       data.classFiles.foreach{ case (name, bytes) =>
-        write.over(tagCacheDir/s"$name.class", bytes)
+        os.write.over(tagCacheDir/s"$name.class", bytes)
       }
 
     }
 
     def compileCacheLoad(path: String, tag: Tag): Option[CompileCache] = {
       val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.code/tag.env
-      if(!exists(tagCacheDir)) None
+      if(!os.exists(tagCacheDir)) None
       else for{
         (loadedTag, metadata) <- readJson[(Tag, Imports)](tagCacheDir/metadataFile)
 
@@ -223,12 +224,12 @@ object Storage{
       }
     }
 
-    def loadClassFiles(cacheDir: Path): Option[ClassFiles] = {
-      val classFiles = ls(cacheDir).filter(_.ext == "class").toVector
+    def loadClassFiles(cacheDir: os.Path): Option[ClassFiles] = {
+      val classFiles = os.list(cacheDir).filter(_.ext == "class").toVector
       Try{
         val data = classFiles.map{ case file =>
           val className = (file relativeTo cacheDir).toString.stripSuffix(".class")
-          (className, read.bytes(file))
+          (className, os.read.bytes(file))
         }
         data
       }.toOption
@@ -238,19 +239,22 @@ object Storage{
     val ivyCache = new StableRef[IvyMap]{
       def apply() = {
         val json =
-          try read(ivyCacheFile)
+          try os.read(ivyCacheFile)
           catch{ case e: java.nio.file.NoSuchFileException => "[]" }
 
-        try upickle.default.read[IvyMap](json)
-        catch{ case e: Exception => Map.empty }
+        val map =
+          try upickle.default.read[IvyMap](json)
+          catch{ case e: Exception => Map.empty }
+        // Check that cached files exist
+        map.filter(_._2.forall(str => Files.exists(Paths.get(str)))).asInstanceOf[IvyMap]
       }
       def update(map: IvyMap) = {
-        write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
+        os.write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
       }
     }
 
     def loadPredef = {
-      try Some((read(predef), predef))
+      try Some((os.read(predef), predef))
       catch { case e: java.nio.file.NoSuchFileException => Some(("", predef))}
     }
   }

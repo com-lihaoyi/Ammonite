@@ -7,7 +7,6 @@ package ammonite.util
 
 import java.io.PrintStream
 
-import ammonite.ops.Path
 
 import scala.reflect.NameTransformer
 import scala.reflect.runtime.universe.TypeTag
@@ -19,7 +18,7 @@ import scala.reflect.runtime.universe.TypeTag
   * classpath, which is true for many "internal" predefs which only do
   * imports from Ammonite's own packages and don't rely on external code
   */
-case class PredefInfo(name: Name, code: String, hardcoded: Boolean, path: Option[Path])
+case class PredefInfo(name: Name, code: String, hardcoded: Boolean, path: Option[os.Path])
 
 /**
   * Exception for reporting script compilation failures
@@ -282,5 +281,5 @@ object ImportTree{
 case class PredefFailedToLoad(msg: String,
                               cause: Option[Throwable],
                               res: Res.Failing,
-                              watchedFilePaths: Seq[(Path, Long)])
+                              watchedFilePaths: Seq[(os.Path, Long)])
   extends Exception(msg, cause.orNull)

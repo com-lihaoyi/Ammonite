@@ -68,14 +68,14 @@ object ParserTests extends TestSuite{
     // Not nearly comprehensive, but hopefully if someone really borks this
     // somewhat-subtle logic around the parsers, one of these will catch it
     'endOfCommandDetection{
-      def assertResult(x: String, pred: Option[fastparse.all.Parsed[_]] => Boolean) = {
+      def assertResult(x: String, pred: Option[fastparse.Parsed[_]] => Boolean) = {
         val res = ammonite.interp.Parsers.split(x)
         assert(pred(res))
       }
       def assertIncomplete(x: String) = assertResult(x, _.isEmpty)
       def assertComplete(x: String) = assertResult(x, _.isDefined)
       def assertInvalid(x: String) =
-        assertResult(x, res => res.isDefined && res.get.isInstanceOf[fastparse.all.Parsed.Failure])
+        assertResult(x, res => res.isDefined && res.get.isInstanceOf[fastparse.Parsed.Failure])
 
       'endOfCommand{
         * - assertComplete("{}")
@@ -133,7 +133,7 @@ object ParserTests extends TestSuite{
                  b <- List(2)
               } yield (1, 2)"""
           )
-          val lines = input.lines.toVector
+          val lines = Predef.augmentString(input).lines.toVector
           for(i <- 1 until lines.length) {
             val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
@@ -151,7 +151,7 @@ object ParserTests extends TestSuite{
                     lengths(m - 1)
                 } """
           )
-          val lines = input.lines.toVector
+          val lines = Predef.augmentString(input).lines.toVector
           for(i <- 1 until lines.length) {
             val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
@@ -189,7 +189,7 @@ object ParserTests extends TestSuite{
                  server.stop()                                                    // 24
                }                                                                  // 25"""
           )
-          val lines = input.lines.toVector
+          val lines = Predef.augmentString(input).lines.toVector
           // Every line n where the prefix formed by lines 0 to n (inclusive)
           // is a valid, complete input. Every other line *should* be incomplete,
           // and no prefix in this example should be invalid

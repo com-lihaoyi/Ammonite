@@ -7,7 +7,7 @@ import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
 import ammonite.interp.{Interpreter, Parsers, Preprocessor}
-import ammonite.ops._
+
 
 import scala.annotation.tailrec
 
@@ -17,7 +17,7 @@ class Repl(input: InputStream,
            storage: Storage,
            basePredefs: Seq[PredefInfo],
            customPredefs: Seq[PredefInfo],
-           wd: ammonite.ops.Path,
+           wd: os.Path,
            welcomeBanner: Option[String],
            replArgs: IndexedSeq[Bind[_]] = Vector.empty,
            initialColors: Colors = Colors.Default,
@@ -86,6 +86,7 @@ class Repl(input: InputStream,
         def history = repl.history
         def newCompiler() = interp.compilerManager.init(force = true)
         def compiler = interp.compilerManager.compiler.compiler
+        def interactiveCompiler = interp.compilerManager.pressy.compiler
         def fullImports = repl.fullImports
         def imports = repl.imports
         def usedEarlierDefinitions = repl.usedEarlierDefinitions
@@ -102,9 +103,9 @@ class Repl(input: InputStream,
             }
           }
 
-          def exec(file: Path): Unit = {
+          def exec(file: os.Path): Unit = {
             interp.watch(file)
-            apply(normalizeNewlines(read(file)))
+            apply(normalizeNewlines(os.read(file)))
           }
         }
       }

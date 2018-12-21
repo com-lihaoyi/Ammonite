@@ -1,6 +1,6 @@
 package ammonite.unit
 
-import ammonite.ops._
+
 import utest._
 
 object PPrintTests extends TestSuite{
@@ -15,11 +15,11 @@ object PPrintTests extends TestSuite{
     'paths{
       'pprint{
 
-        check(pprinter.tokenize(root/'hello/'world).mkString, "root/'hello/'world")
-        check(pprinter.tokenize('hello/'world).mkString, "'hello/'world")
-        check(pprinter.tokenize(empty/'world).mkString, "'world")
-        check(pprinter.tokenize(empty/'hello/'world).mkString, "'hello/'world")
-        check(pprinter.tokenize(empty/"hello world").mkString, "\"hello world\"")
+        check(pprinter.tokenize(os.root/'hello/'world).mkString, "root/'hello/'world")
+        check(pprinter.tokenize(os.rel/'hello/'world).mkString, "'hello/'world")
+        check(pprinter.tokenize(os.rel/'world).mkString, "'world")
+        check(pprinter.tokenize(os.rel/'hello/'world).mkString, "'hello/'world")
+        check(pprinter.tokenize(os.rel/"hello world").mkString, "\"hello world\"")
 
       }
     }

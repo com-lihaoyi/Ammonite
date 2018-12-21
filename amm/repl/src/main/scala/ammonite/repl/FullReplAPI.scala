@@ -10,7 +10,7 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
-trait FullReplAPI extends ReplAPI{
+trait FullReplAPI extends ReplAPI{ replApi =>
 
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
@@ -29,12 +29,27 @@ trait FullReplAPI extends ReplAPI{
 
 
   protected[this] def replArgs0: IndexedSeq[Bind[_]]
+  protected[this] def internal0: FullReplAPI.Internal =
+    new FullReplAPI.Internal {
+      def pprinter = replApi.pprinter
+      def colors = replApi.colors
+      def replArgs: IndexedSeq[Bind[_]] = replArgs0
+    }
+
   /**
     * This stuff is used for the REPL-generated code that prints things;
     * shouldn't really be used by users, but needs to be public and accessible
     */
-  object Internal {
-    def replArgs: IndexedSeq[Bind[_]] = replArgs0
+  lazy val Internal: FullReplAPI.Internal = internal0
+}
+
+object FullReplAPI {
+
+  trait Internal {
+    def pprinter: Ref[pprint.PPrinter]
+    def colors: Ref[Colors]
+    def replArgs: IndexedSeq[Bind[_]]
+
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
            .filter(_.nonEmpty)

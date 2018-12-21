@@ -54,7 +54,7 @@ object ErrorTruncationTests extends TestSuite{
         checkErrorMessage(
           file = 'errorTruncation/"parseError.sc",
           expected = Util.normalizeNewlines(
-            """parseError.sc:1:1 expected "@" | End
+            """parseError.sc:1:1 expected end-of-input
               |}
               |^
               |""".stripMargin

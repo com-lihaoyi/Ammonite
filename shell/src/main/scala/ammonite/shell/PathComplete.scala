@@ -54,12 +54,12 @@ object PathComplete {
    */
   def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = {
     val indices = Highlighter.highlightIndices(
-      Parsers.Splitter,
+      Parsers.Splitter(_),
       snippet.toVector,
       {
-        case scalaparse.Scala.Id => Interval.Id
-        case scalaparse.Scala.Literals.Expr.String => Interval.String
-        case scalaparse.Scala.Literals.Symbol => Interval.Symbol
+        case "Id" => Interval.Id
+        case "String" => Interval.String
+        case "Symbol" => Interval.Symbol
       },
       Interval.End
     )
@@ -161,7 +161,7 @@ object PathComplete {
       val Some(PathComplete.PathLiteralInfo(base, seq, frag, cursorOffset)) =
         PathComplete.findPathLiteral(b.mkString, c)
 
-      val path = rootMap(base)(wd) / seq.map { case None => up; case Some(s) => s: RelPath }
+      val path = rootMap(base)(wd) / seq.map { case None => os.up; case Some(s) => s: RelPath }
 
       if (!exists(path)) TermState(rest, b, c)
       else {

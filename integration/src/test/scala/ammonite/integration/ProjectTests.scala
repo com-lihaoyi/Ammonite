@@ -55,7 +55,7 @@ object ProjectTests extends TestSuite{
     'httpApi{
       'addPost {
         val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text")
-        assert(res.out.trim.startsWith("101"))
+        assert(res.out.trim.contains("101"))
       }
       'comments{
         val res = exec('basic / "HttpApi.sc", "comments", "40")

@@ -53,15 +53,22 @@ object GlobalInitCompat {
     * normal and presentation compiler
     */
   def initGlobalClasspath(dirDeps: Seq[java.io.File],
-                          jarDeps: Seq[java.io.File],
+                          jarDeps: Seq[java.net.URL],
                           dynamicClasspath: VirtualDirectory,
                           settings: Settings) = {
 
     val jCtx = new JavaContext()
 
     val jarCP =
-      jarDeps.filter(x => x.getName.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
-        .map(x => new DirectoryClassPath(new FileZipArchive(x), jCtx))
+      jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
+        .map { x =>
+          val arc =
+            if (x.getProtocol == "file")
+              new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
+            else
+              new internal.CustomURLZipArchive(x)
+          new DirectoryClassPath(arc, jCtx)
+        }
         .toVector
 
     val dirCP =

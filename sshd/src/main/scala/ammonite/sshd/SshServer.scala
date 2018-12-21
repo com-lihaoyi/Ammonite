@@ -2,7 +2,6 @@ package ammonite.sshd
 
 import java.util.Collections
 
-import ammonite.ops.Path
 import org.apache.sshd.agent.SshAgentFactory
 import org.apache.sshd.common._
 import org.apache.sshd.common.file.FileSystemFactory
@@ -39,7 +38,7 @@ object SshServer {
     val hostKeyFile = touch(
       options.hostKeyFile.getOrElse(fallbackHostkeyFilePath(options))
     )
-    val provider = new SimpleGeneratorHostKeyProvider(hostKeyFile.toNIO)
+    val provider = new SimpleGeneratorHostKeyProvider(hostKeyFile.wrapped)
     provider.setAlgorithm("RSA")
     provider
   }
@@ -70,10 +69,10 @@ object SshServer {
   private def fallbackHostkeyFilePath(options:SshServerConfig) =
     options.ammoniteHome/'cache/'ssh/'hostkeys
 
-  def touch(file:Path):Path = {
+  def touch(file: os.Path): os.Path = {
     import ammonite.ops._
-    if (!exists(file)) {
-      write(file, Array.empty[Byte])
+    if (!os.exists(file)) {
+      os.write(file, Array.empty[Byte], createFolders = true)
     }
     file
   }

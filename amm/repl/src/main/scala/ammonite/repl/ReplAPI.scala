@@ -1,6 +1,5 @@
 package ammonite.repl
 
-import ammonite.ops.Path
 import ammonite.util._
 
 import scala.reflect.runtime.universe._
@@ -71,6 +70,11 @@ trait ReplAPI {
    * Access the compiler to do crazy things if you really want to!
    */
   def compiler: scala.tools.nsc.Global
+
+  /**
+    * Access the presentation compiler to do even crazier things if you really want to!
+    */
+  def interactiveCompiler: scala.tools.nsc.interactive.Global
 
   /**
    * Shows all imports added that bring values into scope for the commands a
@@ -169,7 +173,7 @@ trait ReplLoad{
     * Compilation units separated by `@\n` are evaluated sequentially.
     * If an error happens it prints an error message to the console.
     */
-  def exec(path: Path): Unit
+  def exec(path: os.Path): Unit
 
 }
 trait Session{

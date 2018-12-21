@@ -2,7 +2,7 @@ package ammonite.repl.tools
 
 import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
-import ammonite.ops._
+
 import ammonite.repl.Highlighter
 import ammonite.runtime.tools.browse.Strings
 import ammonite.util.{CodeColors, Util}
@@ -187,7 +187,7 @@ object SourceRuntime{
 
     for{
       bytecode <- try{
-        Right(read.bytes! resource / pkg / (clsName + ".class")).right
+        Right(os.read.bytes(os.resource / pkg / (clsName + ".class"))).right
       }catch{ case e: Throwable =>
         Left("Unable to find bytecode for class " + runtimeCls.getName).right
       }
@@ -198,7 +198,7 @@ object SourceRuntime{
       lineNumber <- getLineNumber(ctCls).right
       srcFile <- Right(ctCls.getClassFile.getSourceFile).right
       sourceCode <- try{
-        Right(read! resource/ pkg / srcFile).right
+        Right(os.read(os.resource/ pkg / srcFile)).right
       }catch{case e: Throwable =>
         Left("Unable to find sourcecode for class " + runtimeCls.getName).right
       }
@@ -212,12 +212,11 @@ object SourceRuntime{
 
     loaded match{
       case Right(loc) =>
-        import ImplicitWd._
         val colored =
           if (loc.fileName.endsWith(".scala")){
             fansi.Str(
               Highlighter.defaultHighlight0(
-                scalaparse.Scala.CompilationUnit,
+                scalaparse.Scala.CompilationUnit(_),
                 loc.fileContent.toVector,
                 colors.comment,
                 colors.`type`,
@@ -252,8 +251,8 @@ object SourceRuntime{
         })()
 
         val targetLine = math.max(0, loc.lineNum - verticalOffset)
-        val tmpFile = tmp(output.mkString("\n"), suffix = "." + loc.fileName)
-        %(command(targetLine).values, tmpFile)
+        val tmpFile = os.temp(output.mkString("\n"), suffix = "." + loc.fileName)
+        os.proc(command(targetLine).values, tmpFile).call()
       case Left(msg) => println(msg)
     }
   }

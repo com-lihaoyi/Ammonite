@@ -2,10 +2,9 @@ package ammonite.main
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
-import ammonite.ops.{RelPath, pwd}
 
 object InProcessMainMethodRunner{
-  val base = pwd/'amm/'src/'test/'resources
+  val base = os.pwd/'amm/'src/'test/'resources
 }
 
 /**
@@ -19,7 +18,7 @@ object InProcessMainMethodRunner{
   * JVM-level isolation between tests. But it works well enough for
   * our unit tests.
   */
-class InProcessMainMethodRunner(p: RelPath, preArgs: List[String], args: Seq[String]){
+class InProcessMainMethodRunner(p: os.RelPath, preArgs: List[String], args: Seq[String]){
 
   val in = new ByteArrayInputStream(Array.empty[Byte])
   val err0 = new ByteArrayOutputStream()

@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.util.Collections
 
 
-import ammonite.ops._
+
 import ammonite.util.{Imports, Util}
 
 import scala.collection.mutable
@@ -24,7 +24,7 @@ import scala.collection.mutable
 class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
-            private[this] var classpath0: Seq[java.io.File],
+            private[this] var classpath0: Seq[java.net.URL],
             private[this] var usedEarlierDefinitions0: Seq[String]){
   private var frozen0 = false
   def frozen = frozen0
@@ -39,23 +39,23 @@ class Frame(val classloader: SpecialClassLoader,
   private[this] var version0: Int = 0
   def version = version0
   def imports = imports0
-  def classpath = classpath0
+  def classpath: Seq[java.net.URL] = classpath0
   def usedEarlierDefinitions = usedEarlierDefinitions0
   def addImports(additional: Imports) = {
     if (!frozen0)
       imports0 = imports0 ++ additional
   }
-  def addClasspath(additional: Seq[java.io.File]) = {
+  def addClasspath(additional: Seq[java.net.URL]) = {
     if (!frozen0) {
       version0 += 1
-      additional.map(_.toURI.toURL).foreach(classloader.add)
+      additional.foreach(classloader.add)
       classpath0 = classpath0 ++ additional
     }
   }
-  def addPluginClasspath(additional: Seq[java.io.File]) = {
+  def addPluginClasspath(additional: Seq[java.net.URL]) = {
     if (!frozen0) {
       version0 += 1
-      additional.map(_.toURI.toURL).foreach(pluginClassloader.add)
+      additional.foreach(pluginClassloader.add)
     }
   }
   def usedEarlierDefinitions_=(usedEarlierDefinitions: Seq[String]): Unit =
@@ -68,13 +68,13 @@ object Frame{
     // so that the `source` helper can navigate to the sources within the
     // Java standard library
 
-    val likelyJdkSourceLocation = Path(System.getProperty("java.home"))/up/"src.zip"
+    val likelyJdkSourceLocation = os.Path(System.getProperty("java.home"))/os.up/"src.zip"
     val hash = SpecialClassLoader.initialClasspathSignature(baseClassLoader)
     def special = new SpecialClassLoader(
       new ForkClassLoader(baseClassLoader, getClass.getClassLoader),
       hash,
       Set.empty,
-      likelyJdkSourceLocation.toNIO.toUri.toURL
+      likelyJdkSourceLocation.wrapped.toUri.toURL
     )
 
     new Frame(special, special, Imports(), Seq(), Seq())
@@ -114,7 +114,9 @@ object SpecialClassLoader{
     * heuristic improves perf by greatly cutting down on the amount of files we
     * need to mtime in many common cases.
     */
-  def initialClasspathSignature(classloader: ClassLoader): Seq[(Either[String, Path], Long)] = {
+  def initialClasspathSignature(
+    classloader: ClassLoader
+  ): Seq[(Either[String, java.net.URL], Long)] = {
     val allClassloaders = {
       val all = mutable.Buffer.empty[ClassLoader]
       var current = classloader
@@ -125,14 +127,17 @@ object SpecialClassLoader{
       all
     }
 
-    def findMtimes(d: java.nio.file.Path): Seq[(Either[String, Path], Long)] = {
-      def skipSuspicious(path: Path) = {
+    def findMtimes(d: java.nio.file.Path): Seq[(Either[String, java.net.URL], Long)] = {
+      def skipSuspicious(path: os.Path) = {
         // Leave out sketchy files which don't look like package names or
         // class files
         (simpleNameRegex.findPrefixOf(path.last) != Some(path.last)) &&
         !path.last.endsWith(".class")
       }
-      ls.rec(skip = skipSuspicious)! Path(d) | (x => (Right(x), x.mtime.toMillis))
+      os.walk(os.Path(d), skip = skipSuspicious).map(x => (Right(x), os.mtime(x))).map {
+        case (e, lm) =>
+          (e.right.map(_.toNIO.toUri.toURL), lm)
+      }
     }
 
 
@@ -140,20 +145,41 @@ object SpecialClassLoader{
       allClassloaders
         .collect{case cl: java.net.URLClassLoader => cl.getURLs}
         .flatten
-        .filter(_.getProtocol == "file")
-        .map(p => java.nio.file.Paths.get(p.toURI))
 
     val bootClasspathRoots = sys.props("java.class.path")
       .split(java.io.File.pathSeparator)
-      .map(java.nio.file.Paths.get(_))
+      .map(java.nio.file.Paths.get(_).toAbsolutePath.toUri.toURL)
 
     val mtimes = (bootClasspathRoots ++ classpathRoots).flatMap{ p =>
-      if (!java.nio.file.Files.exists(p)) Nil
-      else if (java.nio.file.Files.isDirectory(p)) findMtimes(p)
-      else Seq(Right(Path(p)) -> Path(p).mtime.toMillis)
+      if (p.getProtocol == "file") {
+        val f = java.nio.file.Paths.get(p.toURI)
+        if (!java.nio.file.Files.exists(f)) Nil
+        else if (java.nio.file.Files.isDirectory(f)) findMtimes(f)
+        else Seq(Right(p) -> os.mtime(os.Path(f)))
+      } else
+        SpecialClassLoader.urlLastModified(p).toSeq.map((Right(p), _))
     }
 
     mtimes
+  }
+
+  def urlLastModified(url: URL): Option[Long] = {
+    if (url.getProtocol == "file") {
+      val path = os.Path(java.nio.file.Paths.get(url.toURI()).toFile(), os.root)
+      if (os.exists(path)) Some(os.mtime(path)) else None
+    } else {
+      var c: java.net.URLConnection = null
+      try {
+        c = url.openConnection()
+        Some(c.getLastModified)
+      } catch {
+        case e: java.io.FileNotFoundException =>
+          None
+      } finally {
+        if (c != null)
+          scala.util.Try(c.getInputStream.close())
+      }
+    }
   }
 }
 
@@ -175,7 +201,7 @@ class ForkClassLoader(realParent: ClassLoader, fakeParent: ClassLoader)
   * http://stackoverflow.com/questions/3544614/how-is-the-control-flow-to-findclass-of
   */
 class SpecialClassLoader(parent: ClassLoader,
-                         parentSignature: Seq[(Either[String, Path], Long)],
+                         parentSignature: Seq[(Either[String, java.net.URL], Long)],
                          var specialLocalClasses: Set[String],
                          urls: URL*)
   extends URLClassLoader(urls.toArray, parent){
@@ -198,14 +224,18 @@ class SpecialClassLoader(parent: ClassLoader,
       val bytes = newFileDict(name)
       defineClass(name, bytes, 0, bytes.length)
     }else if (specialLocalClasses(name)) {
-      import ammonite.ops._
-      val resource = this.getResourceAsStream(name.replace('.', '/') + ".class")
-      if (resource != null){
-        val bytes = read.bytes(resource)
 
-        defineClass(name, bytes, 0, bytes.length)
-      }else{
-        super.findClass(name)
+
+      val parts = name.split('.')
+      val resource = os.resource / parts.dropRight(1) / (parts.last + ".class")
+
+      val bytes =
+        try Some(os.read.bytes(resource))
+        catch{case e: os.ResourceNotFoundException => None}
+
+      bytes match{
+        case Some(b) => defineClass(name, b, 0, b.length)
+        case None => super.findClass(name)
       }
 
     } else super.findClass(name)
@@ -224,13 +254,13 @@ class SpecialClassLoader(parent: ClassLoader,
   }
 
   private def jarSignature(url: URL) = {
-    val path = Path(java.nio.file.Paths.get(url.toURI()).toFile(), root)
-    Right(path) -> (if (exists(path))path.mtime.toMillis else 0)
+    val lastModified = SpecialClassLoader.urlLastModified(url).getOrElse(0L)
+    Right(url) -> lastModified
   }
 
   private var classpathSignature0 = parentSignature
-  def classpathSignature = classpathSignature0
-  def classpathHash(wd: Option[Path]) = {
+  def classpathSignature: Seq[(Either[String, java.net.URL], Long)] = classpathSignature0
+  def classpathHash(wd: Option[os.Path]) = {
     Util.md5Hash(
       // Include the current working directory in the classpath hash, to make
       // sure different scripts cached

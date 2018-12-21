@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import ammonite.ops._
+
 import ammonite.util.{Colors, Ref}
 import ammonite.runtime.APIHolder
 import ammonite.runtime.Evaluator.AmmoniteExit
@@ -16,7 +16,7 @@ trait InterpAPI {
     * file changes. By default, this happens for all script files, but you can
     * call this to watch arbitrary files your script may depend on
     */
-  def watch(p: Path): Unit
+  def watch(p: os.Path): Unit
 
   /**
     * The colors that will be used to render the Ammonite REPL in the terminal,
@@ -73,11 +73,15 @@ trait LoadJar {
   /**
    * Load a `.jar` file or directory into your JVM classpath
    */
-  def cp(jar: Path): Unit
+  def cp(jar: os.Path): Unit
+  /**
+    * Load a `.jar` from a URL into your JVM classpath
+    */
+  def cp(jar: java.net.URL): Unit
   /**
    * Load one or more `.jar` files or directories into your JVM classpath
    */
-  def cp(jars: Seq[Path]): Unit
+  def cp(jars: Seq[os.Path]): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */
@@ -86,7 +90,7 @@ trait LoadJar {
 
 trait InterpLoad extends LoadJar{
 
-  def module(path: Path): Unit
+  def module(path: os.Path): Unit
 
   def plugin: LoadJar
 

@@ -1,6 +1,6 @@
 package ammonite.unit
 
-import ammonite.ops._
+
 import ammonite.runtime.tools._
 import ammonite.util.Util.newLine
 import utest._
@@ -9,7 +9,7 @@ import utest._
 object ToolsTests extends TestSuite{
 
   val tests = Tests {
-    var wd = pwd
+    var wd = os.pwd
     /**
       * Convert the highlighter colors into angle brackets for easy testing
       */
@@ -27,6 +27,7 @@ object ToolsTests extends TestSuite{
         }
       )
       val items = Seq(123, 456, 789)
+      import ammonite.ops._
       'filter{
         assert(
           (items |? grep! "45") == Seq(456),

@@ -13,10 +13,10 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.11.12", "2.12.6", "2.13.0-M5")
+val binCrossScalaVersions = Seq("2.11.12", "2.12.8", "2.13.0-M5")
 val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6",
+  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
   "2.13.0-M5"
 )
 
@@ -84,8 +84,8 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(ivy"com.lihaoyi::geny:0.1.2")
-
+  def ivyDeps = Agg(ivy"com.lihaoyi::os-lib:0.2.6")
+  def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
 }
 
@@ -107,7 +107,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.6.6",
+      ivy"com.lihaoyi::upickle:0.7.1",
       ivy"com.lihaoyi::pprint:0.5.2",
       ivy"com.lihaoyi::fansi:0.2.4"
     )
@@ -139,7 +139,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:1.0.0",
+      ivy"com.lihaoyi::scalaparse:2.1.0",
       ivy"org.javassist:javassist:3.21.0-GA"
     )
   }
@@ -392,8 +392,8 @@ def publishDocs() = {
     println("MISC COMMIT: Building readme for verification")
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.12.6").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path,
+      AMMONITE_SHELL=shell("2.12.8").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.12.8").assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
@@ -437,8 +437,8 @@ def publishDocs() = {
 
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.12.6").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.6").assembly().path,
+      AMMONITE_SHELL=shell("2.12.8").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.12.8").assembly().path,
       CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")

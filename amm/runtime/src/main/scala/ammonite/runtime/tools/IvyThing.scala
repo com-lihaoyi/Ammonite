@@ -62,7 +62,7 @@ object IvyThing{
         def load(artifacts: Seq[coursier.Artifact], artifactTypes: Set[String]) = {
 
           val loadedArtifacts = Task.gather.gather(
-            for (a <- artifacts if artifactTypes(a.`type`))
+            for (a <- artifacts.distinct if artifactTypes(a.`type`))
               yield coursier.Cache.file[Task](a, logger = logger).run
                 .map(a.isOptional -> _)
           ).unsafeRun()

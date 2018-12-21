@@ -4,7 +4,7 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.nio.file.NoSuchFileException
 
 import ammonite.interp.{Interpreter, Preprocessor}
-import ammonite.ops._
+
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
 import ammonite.repl.{RemoteLogger, Repl}
@@ -55,10 +55,10 @@ import scala.annotation.tailrec
   *                    part of the REPL or script's output
   */
 case class Main(predefCode: String = "",
-                predefFile: Option[Path] = None,
+                predefFile: Option[os.Path] = None,
                 defaultPredef: Boolean = true,
                 storageBackend: Storage = new Storage.Folder(Defaults.ammoniteHome),
-                wd: Path = ammonite.ops.pwd,
+                wd: os.Path = os.pwd,
                 welcomeBanner: Option[String] = Some(Defaults.welcomeBanner),
                 inputStream: InputStream = System.in,
                 outputStream: OutputStream = System.out,
@@ -73,7 +73,7 @@ case class Main(predefCode: String = "",
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
-      try Right(Some(PredefInfo(Name("FilePredef"), read(path), false, Some(path))))
+      try Right(Some(PredefInfo(Name("FilePredef"), os.read(path), false, Some(path))))
       catch{case e: NoSuchFileException =>
         Left((Res.Failure("Unable to load predef file " + path), Seq(path -> 0L)))
       }
@@ -178,7 +178,7 @@ case class Main(predefCode: String = "",
     * a sequence of paths that were watched as a result of this REPL run, in
     * case you wish to re-start the REPL when any of them change.
     */
-  def run(replArgs: Bind[_]*): (Res[Any], Seq[(Path, Long)]) = {
+  def run(replArgs: Bind[_]*): (Res[Any], Seq[(os.Path, Long)]) = {
 
     val remoteLogger =
       if (!remoteLogging) None
@@ -215,9 +215,9 @@ case class Main(predefCode: String = "",
     * Run a Scala script file! takes the path to the file as well as an array
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
-  def runScript(path: Path,
+  def runScript(path: os.Path,
                 scriptArgs: Seq[(String, Option[String])])
-                : (Res[Any], Seq[(Path, Long)]) = {
+                : (Res[Any], Seq[(os.Path, Long)]) = {
 
     instantiateInterpreter() match{
       case Right(interp) =>
@@ -301,7 +301,7 @@ object Main{
               false
 
             case (None, head :: rest) =>
-              val success = runner.runScript(Path(head, pwd), rest)
+              val success = runner.runScript(os.Path(head, os.pwd), rest)
               success
           }
         }
@@ -351,7 +351,7 @@ class MainRunner(cliConfig: Cli.Config,
 
   @tailrec final def watchLoop[T](isRepl: Boolean,
                                   printing: Boolean,
-                                  run: Main => (Res[T], Seq[(Path, Long)])): Boolean = {
+                                  run: Main => (Res[T], Seq[(os.Path, Long)])): Boolean = {
     val (result, watched) = run(initMain(isRepl))
 
     val success = handleWatchRes(result, printing)
@@ -362,7 +362,7 @@ class MainRunner(cliConfig: Cli.Config,
     }
   }
 
-  def runScript(scriptPath: Path, scriptArgs: List[String]) =
+  def runScript(scriptPath: os.Path, scriptArgs: List[String]) =
     watchLoop(
       isRepl = false,
       printing = true,
@@ -373,7 +373,7 @@ class MainRunner(cliConfig: Cli.Config,
 
   def runRepl(): Unit = watchLoop(isRepl = true, printing = false, _.run())
 
-  def watchAndWait(watched: Seq[(Path, Long)]) = {
+  def watchAndWait(watched: Seq[(os.Path, Long)]) = {
     printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
     def statAll() = watched.forall{ case (file, lastMTime) =>
       Interpreter.pathSignature(file) == lastMTime
