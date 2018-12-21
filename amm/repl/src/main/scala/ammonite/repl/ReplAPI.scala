@@ -72,6 +72,11 @@ trait ReplAPI {
   def compiler: scala.tools.nsc.Global
 
   /**
+    * Access the presentation compiler to do even crazier things if you really want to!
+    */
+  def interactiveCompiler: scala.tools.nsc.interactive.Global
+
+  /**
    * Shows all imports added that bring values into scope for the commands a
    * user runs; *includes* imports from the built-in predef and user predef files
    */
