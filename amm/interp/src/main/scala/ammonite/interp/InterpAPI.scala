@@ -75,6 +75,10 @@ trait LoadJar {
    */
   def cp(jar: os.Path): Unit
   /**
+    * Load a `.jar` from a URL into your JVM classpath
+    */
+  def cp(jar: java.net.URL): Unit
+  /**
    * Load one or more `.jar` files or directories into your JVM classpath
    */
   def cp(jars: Seq[os.Path]): Unit

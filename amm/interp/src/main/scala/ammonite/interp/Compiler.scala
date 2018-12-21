@@ -150,7 +150,7 @@ object Compiler{
   }
 
 
-  def apply(classpath: Seq[java.io.File],
+  def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
@@ -209,16 +209,22 @@ object Compiler{
 
     val (vd, reporter, compiler) = {
 
-      val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+      val (dirDeps, jarDeps) = classpath.partition { u =>
+        u.getProtocol == "file" &&
+          java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+      }
 
       val jcp = GlobalInitCompat.initGlobalClasspath(
-        dirDeps, jarDeps, dynamicClasspath, settings
+        dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
+        jarDeps,
+        dynamicClasspath,
+        settings
       )
       val vd = new io.VirtualDirectory("(memory)", None)
       if (Classpath.traceClasspathIssues) {
         settings.Ylogcp.value = true
         println("jardeps")
-        jarDeps.foreach(p => println(s"${p.getName.takeRight(4)} $p"))
+        jarDeps.foreach(p => println(s"${p.getPath.takeRight(4)} $p"))
         println("finished")
       }
 

@@ -227,7 +227,7 @@ object Pressy {
     }
 
   }
-  def apply(classpath: Seq[java.io.File],
+  def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             settings: Settings): Pressy = new Pressy {
@@ -240,9 +240,13 @@ object Pressy {
     }
 
     def initPressy = {
-      val (dirDeps, jarDeps) = classpath.partition(_.isDirectory)
+      val (dirDeps, jarDeps) = classpath.partition { u =>
+        u.getProtocol == "file" &&
+          java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+      }
       val jcp = GlobalInitCompat.initGlobalClasspath(
-        dirDeps, jarDeps,
+        dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
+        jarDeps,
         dynamicClasspath,
         settings
       )
