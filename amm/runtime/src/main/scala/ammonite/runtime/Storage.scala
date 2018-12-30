@@ -129,7 +129,7 @@ object Storage{
       try os.read(sessionFile).toLong
       catch{case e: Throwable =>
         val randomId = math.abs(util.Random.nextLong)
-        os.write.over(sessionFile, randomId.toString)
+        os.write.over(sessionFile, randomId.toString, createFolders = true)
         randomId
       }
     }
