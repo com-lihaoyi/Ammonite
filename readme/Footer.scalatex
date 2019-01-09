@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{1.6.1}
+      @ul
+        @li
+          Fix @code{NoSuchFileException} when starting Ammonite on a clean machine
     @sect{1.6.0}
       @ul
         @li
