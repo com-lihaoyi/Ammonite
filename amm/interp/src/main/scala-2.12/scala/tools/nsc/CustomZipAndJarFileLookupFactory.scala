@@ -11,10 +11,7 @@ import java.net.URL
 import ammonite.interp.internal.CustomURLZipArchive
 
 import scala.collection.Seq
-import scala.reflect.io.AbstractFile
-import scala.reflect.io.FileZipArchive
 import FileUtils.AbstractFileOps
-import scala.tools.nsc.util.{ClassPath, ClassRepresentation}
 
 // Originally based on
 // https://github.com/scala/scala/blob/329deac9ab4f39e5e766ec3ab3f3f4cddbc44aa1
@@ -54,7 +51,7 @@ object CustomZipAndJarFileLookupFactory {
         if isRequiredFileType(entry)
       } yield createFileEntry(entry)
 
-    override private[nsc] def hasPackage(pkg: String) = findDirEntry(pkg).isDefined
+    def hasPackage(pkg: String) = findDirEntry(pkg).isDefined
     override private[nsc] def list(inPackage: String): ClassPathEntries = {
       val foundDirEntry = findDirEntry(inPackage)
 
@@ -70,7 +67,7 @@ object CustomZipAndJarFileLookupFactory {
             fileBuf += createFileEntry(entry)
         }
         ClassPathEntries(pkgBuf, fileBuf)
-      } getOrElse ClassPathEntries.empty
+      } getOrElse ClassPathEntries(Nil, Nil)
     }
 
     private def findDirEntry(pkg: String): Option[archive.DirEntry] =
@@ -96,23 +93,6 @@ object CustomZipAndJarFileLookupFactory {
   }
 
 
-  private val cache = new FileBasedCache[ClassPath]
-
-  def create(zipFile: AbstractFile, settings: Settings): ClassPath = {
-    if (settings.YdisableFlatCpCaching || zipFile.file == null)
-      createForZipFile(zipFile)
-    else
-      createUsingCache(zipFile, settings)
-  }
-
-  def createForZipFile(zipFile: AbstractFile): ClassPath = {
+  def create(zipFile: AbstractFile, settings: Settings): ClassPath =
     new ZipArchiveClassPath(zipFile.toURL)
-  }
-
-  private def createUsingCache(zipFile: AbstractFile, settings: Settings): ClassPath = {
-    cache.getOrCreate(
-      List(zipFile.file.toPath),
-      () => createForZipFile(zipFile)
-    )
-  }
 }
