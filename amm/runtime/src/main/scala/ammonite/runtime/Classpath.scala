@@ -90,8 +90,15 @@ object Classpath {
   def canBeOpenedAsJar(url: URL): Boolean = {
     var zis: ZipInputStream = null
     try {
-      zis = new ZipInputStream(url.openStream())
-      zis.getNextEntry != null
+      if (url.getProtocol == "file") {
+        // this ignores any preamble in particular, unlike ZipInputStream
+        val zf = new ZipFile(new File(url.toURI))
+        zf.close()
+        true
+      } else {
+        zis = new ZipInputStream(url.openStream())
+        zis.getNextEntry != null
+      }
     } catch {
       case NonFatal(e) =>
         traceClasspathProblem(
