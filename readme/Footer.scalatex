@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{1.6.2}
+      @ul
+        @li
+          Fix @code{MissingRequirementError} when starting Ammonite
     @sect{1.6.1}
       @ul
         @li
