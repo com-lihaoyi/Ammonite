@@ -392,7 +392,7 @@ object ${indexedWrapperName.backticked}{
 """
         )
 
-        val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
+        val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode\n }
   override def toString = "${indexedWrapperName.encoded}"
   $extraCode
 }}
