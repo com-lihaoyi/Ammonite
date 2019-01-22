@@ -31,6 +31,10 @@ and the doc-site every commit; the doc-site is available at
 And contains instructions on how to download the per-commit executable or 
 depend on the per-commit maven artifact.
 
+If you use Ammonite and like it, please support us by donating to our Patreon:
+
+- [https://www.patreon.com/lihaoyi](https://www.patreon.com/lihaoyi)
+
 # Developer Docs
 
 The layout of the repository is roughly:
