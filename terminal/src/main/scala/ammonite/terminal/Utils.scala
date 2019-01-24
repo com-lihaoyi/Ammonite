@@ -100,7 +100,6 @@ object TTY{
     stty("-icanon min 1 -icrnl -inlcr -ixon")
     sttyFailTolerant("dsusp undef")
     stty("-echo")
-    stty("intr undef")
 
     initialConfig
   }
