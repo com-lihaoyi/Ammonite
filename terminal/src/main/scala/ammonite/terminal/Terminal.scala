@@ -36,7 +36,12 @@ object Terminal {
                filters: Filter,
                displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = LineReader.noTransform)
                : Option[String] = {
+    TTY.stty("intr undef")
+    try {
       new LineReader(ConsoleDim.width(), prompt, reader, writer, filters, displayTransform)
         .readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
+    } finally {
+      TTY.stty("intr '^C'")
+    }
   }
 }
