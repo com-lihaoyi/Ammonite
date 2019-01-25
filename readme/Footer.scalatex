@@ -123,6 +123,12 @@
 
 
   @sect{Changelog}
+    @sect{1.6.3}
+      @ul
+        @li
+          Fix some regressions in stty handling, preventing Ctrl-C to interrupt
+	  user code, or making running sub-commands from the Ammonite prompt
+	  seem buggy.
     @sect{1.6.2}
       @ul
         @li
