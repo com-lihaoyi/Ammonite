@@ -210,7 +210,8 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
       Agg("$0"),
       Agg("%~dpnx0"),
       // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
-      Seq("-Xmx500m", "-XX:+UseG1GC")
+      Seq("-Xmx500m", "-XX:+UseG1GC"),
+      shebang = true
     )
   }
 
