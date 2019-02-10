@@ -156,15 +156,24 @@ object Preprocessor{
     def pprint(ident: String) = pprintSignature(ident, None)
 
 
+    def isPrivate(tree: G#Tree): Boolean =
+      tree match {
+        case m: G#MemberDef => m.mods.isPrivate
+        case _ => false
+      }
+
     /**
      * Processors for declarations which all have the same shape
      */
     def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]) =
       (code: String, name: String, tree: G#Tree) =>
         cond.lift(tree).map{ name =>
+          val printer =
+            if (isPrivate(tree)) Nil
+            else Seq(definedStr(definitionLabel, Name.backtickWrap(name.decoded)))
           Preprocessor.Expanded(
             code,
-            Seq(definedStr(definitionLabel, Name.backtickWrap(name.decoded)))
+            printer
           )
         }
 
@@ -182,7 +191,7 @@ object Preprocessor{
         // Try to leave out all synthetics; we don't actually have proper
         // synthetic flags right now, because we're dumb-parsing it and not putting
         // it through a full compilation
-        if (t.name.decoded.contains("$")) Nil
+        if (isPrivate(t) || t.name.decoded.contains("$")) Nil
         else if (!t.mods.hasFlag(Flags.LAZY)) Seq(pprint(Name.backtickWrap(t.name.decoded)))
         else Seq(s"""${pprintSignature(Name.backtickWrap(t.name.decoded), Some("<lazy>"))}""")
       )
@@ -206,7 +215,11 @@ object Preprocessor{
 
     val Expr = Processor{
       //Expressions are lifted to anon function applications so they will be JITed
-      case (name, code, tree) => Expanded(s"val $name = $code", Seq(pprint(name)))
+      case (name, code, tree) =>
+        Expanded(
+          s"val $name = $code",
+          if (isPrivate(tree)) Nil else Seq(pprint(name))
+        )
     }
 
     val decls = Seq[(String, String, G#Tree) => Option[Preprocessor.Expanded]](
