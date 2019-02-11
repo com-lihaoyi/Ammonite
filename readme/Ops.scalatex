@@ -255,7 +255,7 @@
 
     @sect{Chaining}
       @p
-        The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate. to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
+        The real value of Ammonite is the fact that you can pipe things together as easily as you could in Bash. No longer do you need to write reams of boilerplate to accomplish simple tasks. Some of these chains are listed at the top of this readme, here are a few more fun examples:
 
       @hl.ref(opsExamples, Seq("longExample", "// Chains", "// Move all files"), "assert(")
 
