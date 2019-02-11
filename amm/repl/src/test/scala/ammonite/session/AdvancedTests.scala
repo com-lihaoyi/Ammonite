@@ -242,9 +242,8 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'private{
-      check.session("""
+      'vals - check.session("""
         @ private val x = 1; val y = x + 1
-        x: Int = 1
         y: Int = 2
 
         @ y
@@ -264,6 +263,32 @@ object AdvancedTests extends TestSuite{
         @ b
         
       """)
+
+      'dontPrint - {
+        check.session(
+          """
+          @ private object Foo { def get = "a" }; val s = Foo.get
+          s: String = "a"
+
+          @ private class Foo { def get = "a" }; val s = (new Foo).get
+          s: String = "a"
+
+          @ private trait Foo { def get = "a" }; val s = (new Foo {}).get
+          s: String = "a"
+
+          @ private def foo(): String = "a"; val s = foo()
+          s: String = "a"
+
+          @ private lazy val foo: String = "a"; val s = foo
+          s: String = "a"
+
+          @ private val foo: String = "a"; val s = foo
+          s: String = "a"
+
+          @ private type T = String; private def foo(): T = "a"; val s: String = foo()
+          s: String = "a"
+        """)
+      }
     }
     'compilerPlugin - retry(3){
       if (!scala2_12) check.session("""

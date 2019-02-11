@@ -3,6 +3,8 @@
 @def issue(n: Int) = {
   a("#", n, href := s"https://github.com/lihaoyi/Ammonite/issues/$n")
 }
+@val coderAbhishek = lnk("coderabhishek", "https://github.com/coderabhishek")
+
 @sect{Reference}
   @sect{Community}
     @p
@@ -118,8 +120,6 @@
     @p
       Although it's best to read the documentation on this page to learn how
       to use these projects, the Scaladoc is still useful as a reference.
-
-  @val coderAbhishek = lnk("coderabhishek", "https://github.com/coderabhishek")
 
 
   @sect{Changelog}
