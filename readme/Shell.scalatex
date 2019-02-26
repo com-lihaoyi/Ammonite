@@ -29,6 +29,9 @@
     @replCurl
 
   @p
+    If you're on @lnk("FreeBSD", "https://www.freebsd.org/") then you can simply install the package by @code{pkg install ammonite} or compile it from the @code{shells/ammonite} ports directory. Be sure to setup your @code{predef.sc} correctly though.
+
+  @p
     You can then start using Ammonite as a replacement for Bash:
 
   @img(src:="SystemShell.png", width:="100%")
