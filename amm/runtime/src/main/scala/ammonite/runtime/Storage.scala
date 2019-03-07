@@ -43,6 +43,16 @@ trait Storage{
 object Storage{
   case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
   type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
+  implicit def orgRW: upickle.default.ReadWriter[coursier.core.Organization] =
+    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Organization(_))
+  implicit def modNameRW: upickle.default.ReadWriter[coursier.core.ModuleName] =
+    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.ModuleName(_))
+  implicit def configRW: upickle.default.ReadWriter[coursier.core.Configuration] =
+    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Configuration(_))
+  implicit def typeRW: upickle.default.ReadWriter[coursier.core.Type] =
+    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Type(_))
+  implicit def classifierRW: upickle.default.ReadWriter[coursier.core.Classifier] =
+    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Classifier(_))
   implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
   implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
   implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
@@ -122,6 +132,7 @@ object Storage{
     val compileCacheDir = cacheDir/'compile
     val classFilesOrder = "classFilesOrder.json"
     val ivyCacheFile = cacheDir/"ivycache.json"
+    val coursierFetchCacheDir = cacheDir/"coursier-fetch-cache"
     val metadataFile = "metadata.json"
     val sessionFile  = dir/"session"
 
@@ -234,7 +245,6 @@ object Storage{
         data
       }.toOption
     }
-
 
     val ivyCache = new StableRef[IvyMap]{
       def apply() = {

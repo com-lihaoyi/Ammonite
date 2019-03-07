@@ -4,6 +4,7 @@ package ammonite.interp
 import ammonite.util.{Colors, Ref}
 import ammonite.runtime.APIHolder
 import ammonite.runtime.Evaluator.AmmoniteExit
+import coursier.util.Task
 
 import scala.collection.mutable
 
@@ -35,10 +36,12 @@ trait InterpAPI {
   def repositories: Ref[List[coursier.Repository]]
 
   /**
-    * Functions that will be chained and called on coursier
-    * Resolutions right before they are run
+    * Functions that will be chained and called on the coursier
+    * Fetch object right before they are run
     */
-  val resolutionHooks: mutable.Buffer[coursier.Resolution => coursier.Resolution]
+  val resolutionHooks: mutable.Buffer[
+    coursier.Fetch[Task] => coursier.Fetch[Task]
+  ]
 
   /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit

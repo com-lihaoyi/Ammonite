@@ -374,11 +374,13 @@ object ProjectTests extends TestSuite{
         if (scala2_11)
           check.session(
             s"""
-            @ interp.resolutionHooks += { res =>
-            @   res.copy(
-            @     userActivations = Some(
-            @       res.userActivations.getOrElse(Map()) + ("hadoop-2.6" -> true)
-            @     )
+            @ interp.resolutionHooks += { fetch =>
+            @   fetch.withResolutionParams(
+            @     // With coursier > 1.1.0-M13-1, replace with
+            @     //   fetch.resolutionParams
+            @     //     .addProfile("hadoop-2.6")
+            @     coursier.params.ResolutionParams()
+            @       .withProfiles(Set("hadoop-2.6"))
             @   )
             @ }
 
