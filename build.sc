@@ -123,7 +123,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"io.get-coursier::coursier:1.1.0-M7",
       ivy"io.get-coursier::coursier-cache:1.1.0-M7",
-      ivy"org.scalaj::scalaj-http:2.4.0"
+      ivy"com.lihaoyi::requests:0.1.7"
     )
 
     def generatedSources = T{

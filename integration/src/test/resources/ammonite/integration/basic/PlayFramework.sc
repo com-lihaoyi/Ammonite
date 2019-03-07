@@ -3,12 +3,10 @@
   */
 import $ivy.{
   `com.typesafe.play::play:2.5.0`,
-  `com.typesafe.play::play-netty-server:2.5.0`,
-  `org.scalaj::scalaj-http:2.2.1`
+  `com.typesafe.play::play-netty-server:2.5.0`
 }
 
 import play.core.server._, play.api.routing.sird._, play.api.mvc._
-import scalaj.http._
 val server = NettyServer.fromRouter(new ServerConfig(
   rootDir = new java.io.File("."),
   port = Some(19000), sslPort = None,
@@ -29,7 +27,7 @@ val server = NettyServer.fromRouter(new ServerConfig(
   case GET(p"/hello/$to") => Action { Results.Ok(s"Hello $to") }
 }
 try {
-  println(Http("http://localhost:19000/hello/bar").asString.body)
+  println(requests.get("http://localhost:19000/hello/bar").text())
 } finally{
   server.stop()
 }

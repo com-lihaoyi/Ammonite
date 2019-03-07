@@ -7,7 +7,7 @@ import ammonite.interp.{Interpreter, Preprocessor}
 
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.{RemoteLogger, Repl}
+import ammonite.repl.Repl
 import ammonite.util.Util.newLine
 import ammonite.util._
 
@@ -82,8 +82,7 @@ case class Main(predefCode: String = "",
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
-  def instantiateRepl(replArgs: IndexedSeq[Bind[_]] = Vector.empty,
-                      remoteLogger: Option[RemoteLogger]) = {
+  def instantiateRepl(replArgs: IndexedSeq[Bind[_]] = Vector.empty) = {
 
 
     loadedPredefFile.right.map{ predefFileInfoOpt =>
@@ -118,7 +117,6 @@ case class Main(predefCode: String = "",
         wd = wd,
         welcomeBanner = welcomeBanner,
         replArgs = replArgs,
-        remoteLogger = remoteLogger,
         initialColors = colors,
         replCodeWrapper = replCodeWrapper,
         scriptCodeWrapper = scriptCodeWrapper,
@@ -180,13 +178,8 @@ case class Main(predefCode: String = "",
     */
   def run(replArgs: Bind[_]*): (Res[Any], Seq[(os.Path, Long)]) = {
 
-    val remoteLogger =
-      if (!remoteLogging) None
-      else Some(new ammonite.repl.RemoteLogger(storageBackend.getSessionId))
 
-    remoteLogger.foreach(_.apply("Boot"))
-
-    instantiateRepl(replArgs.toIndexedSeq, remoteLogger) match{
+    instantiateRepl(replArgs.toIndexedSeq) match{
       case Left(missingPredefInfo) => missingPredefInfo
       case Right(repl) =>
         repl.initializePredef().getOrElse{
@@ -201,12 +194,8 @@ case class Main(predefCode: String = "",
           warmupThread.setDaemon(true)
           warmupThread.start()
 
-          try{
-            val exitValue = Res.Success(repl.run())
-            (exitValue.map(repl.beforeExit), repl.interp.watchedFiles)
-          }finally{
-            remoteLogger.foreach(_.close())
-          }
+          val exitValue = Res.Success(repl.run())
+          (exitValue.map(repl.beforeExit), repl.interp.watchedFiles)
         }
     }
   }

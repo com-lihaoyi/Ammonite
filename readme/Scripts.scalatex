@@ -417,7 +417,7 @@
       @p
         While Ammonite allows you to load any Java or Scala library for use
         via the @sect.ref{import $ivy} syntax, it also comes bundled with some
-        basic libraries, e.g. @lnk("Scalaj-HTTP", "https://github.com/scalaj/scalaj-http")
+        basic libraries, e.g. @lnk("Requests-scala", "https://github.com/lihaoyi/requests-scala")
         for making HTTP calls, or the
         @lnk("uPickle", "https://github.com/lihaoyi/upickle")
         library with its @lnk("JSON Api", "http://www.lihaoyi.com/upickle/#uJson")
@@ -425,9 +425,9 @@
 
       @p
         For example, here's a tiny script that offers two main methods, one
-        to shorten a github link using Scalaj-HTTP and the @code{git.io} API,
+        to shorten a github link using Requests-Scala and the @code{git.io} API,
         and one that pulls out a list of release-names from a given github
-        project using Scalaj-HTTP, uPickle's JSON package, and the Github API:
+        project using Requests-Scala, uPickle's JSON package, and the Github API:
 
       @hl.ref(wd/'integration/'src/'test/'resources/'ammonite/'integration/'basic/"HttpApi.sc")
 

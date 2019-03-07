@@ -36,29 +36,13 @@
 
     @hl.scala
       Welcome to the Ammonite Repl
-      @@ interp.load.ivy("org.scalaj" %% "scalaj-http" % "2.3.0")
-      :: loading settings ::
-      :: resolving dependencies ::
-      ...
-      [SUCCESSFUL ] org.scalaj#scalaj-http_2.11;2.2.0!scalaj-http_2.11.jar (63ms)
 
-      @@ import ammonite.ops._, scalaj.http._
-      import ammonite.ops._, scalaj.http._
+      @@ import ammonite.ops._
+      import ammonite.ops._
 
-      @@ val resp = Http("https://api.github.com/repos/scala/scala").asString
-      resp: HttpResponse[String] = HttpResponse(
-      {"id":2888818,"name":"scala","full_name":"scala/scala","owner":
-      {"login":"scala","id":57059,"avatar_url":
-      "https://avatars.githubusercontent.com/u/57059?v=3","gravatar_id":"",
-      "url":"https://api.github.com/users/scala","html_url":"https://github.com/scala",
-      "followers_url":"https://api.github.com/users/scala/followers",
-      "following_url":"https://api.github.com/users/scala/following{/other_user}",
-      "gists_url":"https://api.github.com/users/scala/gists{/gist_id}",
-      "starred_url":"https://api.github.com/users/scala/starred{/owner}{/repo}",
-      "subscriptions_url":"https://api.github.com/users/scala/subscriptions",
-      ...
+      @@ val resp = requests.get("https://api.github.com/repos/scala/scala")
 
-      @@ val parsed = upickle.json.read(resp.body).asInstanceOf[upickle.Js.Obj]
+      @@ val parsed = upickle.json.read(resp.text()).asInstanceOf[upickle.Js.Obj]
       parsed: upickle.Js.Obj = Obj(
         ArrayBuffer(
           ("id", Num(2888818.0)),
@@ -82,7 +66,7 @@
       ...
 
     @p
-      In this example, we use the @lnk("Scalaj HTTP", "https://github.com/scalaj/scalaj-http") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally, and while Scalaj HTTP isn't, we can simply load it from the public repositories via @hl.scala{load.ivy}.
+      In this example, we use the @lnk("Requests-Scala", "https://github.com/lihaoyi/requests-scala") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally.
     @p
       This is a small example, but it illustrates the potential: if you find yourself needing to scrape some website or bulk-download large quantities of data from some website's HTTP/JSON API, you can start doing so within a matter of seconds using Ammonite. The results are given to you in nicely structured data, and you can deal with them using any Java or Scala libraries or tools you are used to rather than being forced to munge around in Bash. Sometimes, you may find that you need to get data from somewhere without a nice JSON API, which means you'd need to fall back to @sect.ref{Scraping HTML}...
 
@@ -289,15 +273,7 @@
 
       @@ val tokenDataUrl = "http://opennlp.sourceforge.net/models-1.5/en-token.bin"
 
-      @@ val tokenData = scalaj.http.Http(tokenDataUrl).asBytes
-      tokenData: HttpResponse[Array[Byte]] = HttpResponse(
-        Array(
-          80,
-          75,
-          3,
-          4,
-          20,
-      ...
+      @@ val tokenData = requests.get(tokenDataUrl)
 
       @@ import opennlp.tools.tokenize._ // let's get started with OpenNLP!
 
@@ -305,7 +281,7 @@
 
       @@ import java.io.ByteArrayInputStream
 
-      @@ val tokenModel = new TokenizerModel(new ByteArrayInputStream(tokenData.body))
+      @@ val tokenModel = new TokenizerModel(new ByteArrayInputStream(tokenData.text))
 
       @@ val tokenizer = new TokenizerME(tokenModel)
 

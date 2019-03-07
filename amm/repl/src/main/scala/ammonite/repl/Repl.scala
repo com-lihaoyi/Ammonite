@@ -21,7 +21,6 @@ class Repl(input: InputStream,
            welcomeBanner: Option[String],
            replArgs: IndexedSeq[Bind[_]] = Vector.empty,
            initialColors: Colors = Colors.Default,
-           remoteLogger: Option[RemoteLogger],
            replCodeWrapper: Preprocessor.CodeWrapper,
            scriptCodeWrapper: Preprocessor.CodeWrapper,
            alreadyLoadedDependencies: Seq[coursier.Dependency]) { repl =>
@@ -187,7 +186,6 @@ class Repl(input: InputStream,
     welcomeBanner.foreach(printer.outStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
-      remoteLogger.foreach(_.apply("Action"))
       Repl.handleOutput(interp, actionResult)
       Repl.handleRes(
         actionResult,
