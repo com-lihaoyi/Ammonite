@@ -123,6 +123,12 @@
 
 
   @sect{Changelog}
+    @sect{1.6.4}
+      @ul
+        @li
+          Don't print things marked as private
+        @li
+          Replace Scalaj-HTTP with Requests-Scala as bundled HTTP library
     @sect{1.6.3}
       @ul
         @li
