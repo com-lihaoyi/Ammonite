@@ -1,7 +1,6 @@
 package ammonite.runtime
 
 import java.nio.file.FileAlreadyExistsException
-import java.nio.file.{Files, Paths}
 
 
 import ammonite.util._
@@ -22,7 +21,7 @@ import scala.reflect.NameTransformer.encode
 trait Storage{
   def loadPredef: Option[(String, os.Path)]
   val fullHistory: StableRef[History]
-  val ivyCache: StableRef[Storage.IvyMap]
+  def coursierFetchCacheOpt: Option[os.Path]
 
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
   def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
@@ -43,9 +42,6 @@ trait Storage{
 object Storage{
   case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
   type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
-  implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
-  implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
-  implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
   private def loadIfTagMatches(loadedTag: Tag,
                                cacheTag: Tag,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],
@@ -72,12 +68,7 @@ object Storage{
       def update(h: History): Unit = _history = h
     }
 
-    var _ivyCache: IvyMap = Map.empty
-    val ivyCache = new StableRef[IvyMap]{
-      def apply() = _ivyCache
-      def update(value: IvyMap): Unit = _ivyCache = value
-    }
-
+    val coursierFetchCacheOpt = None
     var compileCache: mutable.Map[String, (Tag, CompileCache)] = mutable.Map.empty
     val classFilesListcache = {
       mutable.Map.empty[String, (Tag, Seq[ScriptOutput.BlockMetadata])]
@@ -121,7 +112,7 @@ object Storage{
     val cacheDir = dir/'cache/ammonite.Constants.version
     val compileCacheDir = cacheDir/'compile
     val classFilesOrder = "classFilesOrder.json"
-    val ivyCacheFile = cacheDir/"ivycache.json"
+    val coursierFetchCacheDir = cacheDir/"coursier-fetch-cache"
     val metadataFile = "metadata.json"
     val sessionFile  = dir/"session"
 
@@ -235,23 +226,8 @@ object Storage{
       }.toOption
     }
 
-
-    val ivyCache = new StableRef[IvyMap]{
-      def apply() = {
-        val json =
-          try os.read(ivyCacheFile)
-          catch{ case e: java.nio.file.NoSuchFileException => "[]" }
-
-        val map =
-          try upickle.default.read[IvyMap](json)
-          catch{ case e: Exception => Map.empty }
-        // Check that cached files exist
-        map.filter(_._2.forall(str => Files.exists(Paths.get(str)))).asInstanceOf[IvyMap]
-      }
-      def update(map: IvyMap) = {
-        os.write.over(ivyCacheFile, upickle.default.write(map, indent = 4))
-      }
-    }
+    def coursierFetchCacheOpt: Option[os.Path] =
+      Some(coursierFetchCacheDir)
 
     def loadPredef = {
       try Some((os.read(predef), predef))

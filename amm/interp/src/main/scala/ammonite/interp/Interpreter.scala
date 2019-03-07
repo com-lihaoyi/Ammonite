@@ -14,6 +14,7 @@ import annotation.tailrec
 import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
+import coursier.util.Task
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -46,7 +47,7 @@ class Interpreter(val printer: Printer,
 
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
-  val resolutionHooks = mutable.Buffer.empty[coursier.Resolution => coursier.Resolution]
+  val resolutionHooks = mutable.Buffer.empty[coursier.Fetch[Task] => coursier.Fetch[Task]]
 
   headFrame.classloader.specialLocalClasses ++= Seq(
     "ammonite.interp.InterpBridge",
@@ -599,36 +600,21 @@ class Interpreter(val printer: Printer,
     .toSet
 
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
-    val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
-
-    storage.ivyCache().get(cacheKey) match{
-      case Some(res) => Right(res.map(new java.io.File(_)))
-      case None =>
-        ammonite.runtime.tools.IvyThing.resolveArtifact(
-          interpApi.repositories(),
-          coordinates
-            .filter(dep => !alwaysExclude((dep.module.organization, dep.module.name)))
-            .map { dep =>
-              dep.copy(
-                exclusions = dep.exclusions ++ alwaysExclude
-              )
-            },
-          verbose = verboseOutput,
-          output = printer.errStream,
-          hooks = resolutionHooks
-        )match{
-          case (srcWarnings, Right(loaded)) =>
-            srcWarnings.foreach(printer.info)
-            val loadedSet = loaded.toSet
-            storage.ivyCache() = storage.ivyCache().updated(
-              cacheKey, loadedSet.map(_.getAbsolutePath)
-            )
-            Right(loadedSet)
-          case (srcWarnings, Left(l)) =>
-            srcWarnings.foreach(printer.info)
-            Left(l)
-        }
-    }
+    storage.coursierFetchCacheOpt
+    ammonite.runtime.tools.IvyThing.resolveArtifact(
+      interpApi.repositories(),
+      coordinates
+        .filter(dep => !alwaysExclude((dep.module.organization, dep.module.name)))
+        .map { dep =>
+          dep.copy(
+            exclusions = dep.exclusions ++ alwaysExclude
+          )
+        },
+      verbose = verboseOutput,
+      output = printer.errStream,
+      fetchCacheOpt = storage.coursierFetchCacheOpt,
+      hooks = resolutionHooks
+    ).right.map(_.toSet)
   }
 
   abstract class DefaultLoadJar extends LoadJar {
