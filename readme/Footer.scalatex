@@ -93,7 +93,7 @@
         monorepo (monorepi?) codebase
       @li
         Yang Bo from ThoughtWorks created
-        @link("an sbt plug-in", "https://github.com/ThoughtWorksInc/sbt-ammonite-classpath")
+        @lnk("an sbt plug-in", "https://github.com/ThoughtWorksInc/sbt-ammonite-classpath")
         to export the classpath of an sbt project to Ammonite Script.
       @li
         @link("Elastic", "https://www.elastic.co/")
