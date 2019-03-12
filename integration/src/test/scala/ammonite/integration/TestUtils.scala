@@ -18,19 +18,20 @@ object TestUtils {
   val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.sc"
 
   //we use an empty predef file here to isolate the tests from external forces.
-  def execBase(name: RelPath, extraAmmArgs: Seq[String], args: Seq[String]) = {
+  def execBase(name: RelPath, extraAmmArgs: Seq[String], home: os.Path, args: Seq[String]) = {
     %%bash(
       executable,
       extraAmmArgs,
       "--no-remote-logging",
       "--home",
-      tmp.dir(),
+      home,
       replStandaloneResources / name,
       args
     )
   }
-  def exec(name: RelPath, args: String*) = execBase(name, Nil, args)
-  def execSilent(name: RelPath, args: String*) = execBase(name, Seq("-s"), args)
+  def exec(name: RelPath, args: String*) = execBase(name, Nil, tmp.dir(), args)
+  def execWithHome(home: os.Path, name: RelPath, args: String*) = execBase(name, Nil, home, args)
+  def execSilent(name: RelPath, args: String*) = execBase(name, Seq("-s"), tmp.dir(), args)
 
   /**
     *Counts number of non-overlapping occurrences of `subs` in `s`

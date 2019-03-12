@@ -618,11 +618,12 @@ class Interpreter(val printer: Printer,
           output = printer.errStream,
           hooks = resolutionHooks
         )match{
-          case Right(loaded) =>
+          case Right((canBeCached, loaded)) =>
             val loadedSet = loaded.toSet
-            storage.ivyCache() = storage.ivyCache().updated(
-              cacheKey, loadedSet.map(_.getAbsolutePath)
-            )
+            if (canBeCached)
+              storage.ivyCache() = storage.ivyCache().updated(
+                cacheKey, loadedSet.map(_.getAbsolutePath)
+              )
             Right(loadedSet)
           case Left(l) =>
             Left(l)

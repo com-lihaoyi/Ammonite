@@ -191,12 +191,18 @@ object BasicTests extends TestSuite{
     'testIvySnapshotNoCache{
 
       // test disabled on windows because sbt not available
-      if (!Util.windowsPlatform && !scala.util.Properties.versionNumberString.contains("2.12")) {
+      if (!Util.windowsPlatform) {
         val buildRoot = pwd/'target/"some-dummy-library"
         cp.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
+        // using the same home to share the ivymap cache across runs
+        val home = tmp.dir()
 
-        def publishJarAndRunScript(theThing: String): Unit = {
+        def publishJarAndRunScript(
+          theThing: String,
+          script: String,
+          firstRun: Boolean = false
+        ): Unit = {
           // 1. edit code
           write.over(
             dummyScala,
@@ -207,15 +213,25 @@ object BasicTests extends TestSuite{
           )
 
           // 2. build & publish code locally
-          %%("sbt", "+package", "+publishLocal")(buildRoot)
+          %.extend(
+            Nil,
+            Seq(
+              "SCALA_VERSION" -> scala.util.Properties.versionNumberString,
+              "FIRST_RUN" -> s"$firstRun"
+            )
+          )(
+            "sbt", "-batch", "-no-colors", "publishLocal"
+          )(buildRoot)
 
           // 3. use published artifact in a script
-          val evaled = exec('basic/"ivyResolveSnapshot.sc")
+          val evaled = execWithHome(home, 'basic/script)
           assert(evaled.out.string.contains(theThing))
         }
 
-        publishJarAndRunScript("thing1")
-        publishJarAndRunScript("thing2")
+        publishJarAndRunScript("thing1", "ivyResolveSnapshot1.sc", firstRun = true)
+        // if ever the artifact list is cached in the first run, things will fail in the second
+        // (as the snapshot artifact doesn't have the same dependencies)
+        publishJarAndRunScript("thing2", "ivyResolveSnapshot2.sc")
       }
     }
 
