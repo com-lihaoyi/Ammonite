@@ -198,9 +198,14 @@ object BasicTests extends TestSuite{
         // using the same home to share the ivymap cache across runs
         val home = tmp.dir()
 
+        val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+        val previous = os.home / ".ivy2" / "local" / "com.lihaoyi" / ("some-dummy-library_" + sbv)
+        os.remove.all(previous)
+
         def publishJarAndRunScript(
           theThing: String,
           script: String,
+          version: String,
           firstRun: Boolean = false
         ): Unit = {
           // 1. edit code
@@ -217,7 +222,8 @@ object BasicTests extends TestSuite{
             Nil,
             Seq(
               "SCALA_VERSION" -> scala.util.Properties.versionNumberString,
-              "FIRST_RUN" -> s"$firstRun"
+              "FIRST_RUN" -> s"$firstRun",
+              "VERSION" -> version
             )
           )(
             "sbt", "-batch", "-no-colors", "publishLocal"
@@ -228,10 +234,14 @@ object BasicTests extends TestSuite{
           assert(evaled.out.string.contains(theThing))
         }
 
-        publishJarAndRunScript("thing1", "ivyResolveSnapshot1.sc", firstRun = true)
+        publishJarAndRunScript("thing1", "ivyResolveSnapshot1.sc", "0.1-SNAPSHOT", firstRun = true)
         // if ever the artifact list is cached in the first run, things will fail in the second
         // (as the snapshot artifact doesn't have the same dependencies)
-        publishJarAndRunScript("thing2", "ivyResolveSnapshot2.sc")
+        publishJarAndRunScript("thing2", "ivyResolveSnapshot2.sc", "0.1-SNAPSHOT")
+
+        publishJarAndRunScript("thing1", "ivyResolveItv1.sc", "0.2.1", firstRun = true)
+        // if ever the artifact list is cached in the first run, things will fail in the second
+        publishJarAndRunScript("thing2", "ivyResolveItv2.sc", "0.2.2")
       }
     }
 

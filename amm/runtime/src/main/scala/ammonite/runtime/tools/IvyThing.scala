@@ -41,9 +41,12 @@ object IvyThing{
     Function.chain(hooks)(fetch).eitherResult() match {
       case Left(err) => Left("Failed to resolve ivy dependencies:" + err.getMessage)
       case Right((_, artifacts)) =>
-        val canBeCached = artifacts.forall(!_._1.changing)
+        val noChangingArtifact = artifacts.forall(!_._1.changing)
+        def noVersionInterval = dependencies.map(_.version).forall { v =>
+          coursier.core.Parse.versionConstraint(v).interval == coursier.core.VersionInterval.zero
+        }
         val files = artifacts.map(_._2)
-        Right((canBeCached, files))
+        Right((noChangingArtifact && noVersionInterval, files))
     }
   }
 
