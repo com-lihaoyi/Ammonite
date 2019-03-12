@@ -14,6 +14,7 @@ import annotation.tailrec
 import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
+import coursier.util.Task
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -46,7 +47,7 @@ class Interpreter(val printer: Printer,
 
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
-  val resolutionHooks = mutable.Buffer.empty[coursier.Resolution => coursier.Resolution]
+  val resolutionHooks = mutable.Buffer.empty[coursier.Fetch[Task] => coursier.Fetch[Task]]
 
   headFrame.classloader.specialLocalClasses ++= Seq(
     "ammonite.interp.InterpBridge",
@@ -617,15 +618,13 @@ class Interpreter(val printer: Printer,
           output = printer.errStream,
           hooks = resolutionHooks
         )match{
-          case (srcWarnings, Right(loaded)) =>
-            srcWarnings.foreach(printer.info)
+          case Right(loaded) =>
             val loadedSet = loaded.toSet
             storage.ivyCache() = storage.ivyCache().updated(
               cacheKey, loadedSet.map(_.getAbsolutePath)
             )
             Right(loadedSet)
-          case (srcWarnings, Left(l)) =>
-            srcWarnings.foreach(printer.info)
+          case Left(l) =>
             Left(l)
         }
     }

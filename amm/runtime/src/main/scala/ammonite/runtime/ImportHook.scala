@@ -6,6 +6,7 @@ import java.net.URI
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.Util.CodeSource
 import ammonite.util._
+import coursier.core.{ModuleName, Organization}
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
@@ -156,15 +157,25 @@ object ImportHook{
       val splitted = for (signature <- signatures) yield {
         signature.split(':') match{
           case Array(a, b, c) =>
-            Right(coursier.Dependency(coursier.Module(a, b), c))
+            Right(coursier.Dependency(coursier.Module(Organization(a), ModuleName(b)), c))
           case Array(a, "", b, c) =>
             Right(
-              coursier.Dependency(coursier.Module(a, b + "_" + IvyThing.scalaBinaryVersion), c)
+              coursier.Dependency(
+                coursier.Module(
+                  Organization(a),
+                  ModuleName(b + "_" + IvyThing.scalaBinaryVersion)
+                ),
+                c
+              )
             )
           case Array(a, "", "", b, c) =>
             Right(
               coursier.Dependency(
-                coursier.Module(a, b + "_" + IvyThing.scalaFullBinaryVersion), c
+                coursier.Module(
+                  Organization(a),
+                  ModuleName(b + "_" + IvyThing.scalaFullBinaryVersion)
+                ),
+                c
               )
             )
           case _ => Left(signature)
