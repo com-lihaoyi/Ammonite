@@ -1,7 +1,8 @@
 package ammonite.repl
 
 import ammonite.ops.Internals
-import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Session}
+import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Location, Session, SourceAPI}
+import ammonite.repl.tools.{Desugared, SourceRuntime}
 import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._
@@ -135,6 +136,70 @@ object ClipboardImpl extends Clipboard {
     )
     systemClipboard.setContents(newContents, newContents)
   }
+}
+
+trait SourceAPIImpl extends SourceAPI {
+
+  def loadObjectMemberInfo(symbolOwnerCls: Class[_],
+                           value: Option[Any],
+                           memberName: String,
+                           returnType: Class[_],
+                           argTypes: Class[_]*): Either[String, Location] =
+    SourceRuntime.loadObjectMemberInfo(
+      symbolOwnerCls,
+      value,
+      memberName,
+      returnType,
+      argTypes: _*
+    )
+
+  def loadObjectInfo(value: Any): Either[String, Location] =
+    SourceRuntime.loadObjectInfo(value)
+
+  def browseObjectMember(symbolOwnerCls: Class[_],
+                         value: Option[Any],
+                         memberName: String,
+                         pprinter: pprint.PPrinter,
+                         colors: CodeColors,
+                         command: Int => Seq[String],
+                         returnType: Class[_],
+                         argTypes: Class[_]*): Any =
+    SourceRuntime.browseObjectMember(
+      symbolOwnerCls,
+      value,
+      memberName,
+      pprinter,
+      colors,
+      n => command(n),
+      returnType,
+      argTypes: _*
+    )
+
+  def browseObject(value: Any,
+                   pprinter: pprint.PPrinter,
+                   colors: CodeColors,
+                   command: Int => Seq[String]): Any =
+    SourceRuntime.browseObject(
+      value,
+      pprinter,
+      colors,
+      n => command(n)
+    )
+
+  def desugarImpl(s: String)(implicit colors: ammonite.util.CodeColors): Desugared = {
+
+    new Desugared(
+      ammonite.repl.Highlighter.defaultHighlight(
+        s.toVector,
+        colors.comment,
+        colors.`type`,
+        colors.literal,
+        colors.keyword,
+        fansi.Attr.Reset
+      ).mkString
+    )
+  }
+
 }
 
 trait FrontEndAPIImpl extends FrontEndAPI {

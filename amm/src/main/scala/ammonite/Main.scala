@@ -3,10 +3,10 @@ package ammonite
 import java.io.{InputStream, OutputStream, PrintStream}
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter, Preprocessor}
+import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter}
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.{FrontEndAPIImpl, Repl}
+import ammonite.repl.{FrontEndAPIImpl, Repl, SourceAPIImpl}
 import ammonite.util.Util.newLine
 import ammonite.util._
 
@@ -153,6 +153,11 @@ case class Main(predefCode: String = "",
           PredefInfo(Name("CodePredef"), predefCode, false, None)
         ),
         Seq(
+          (
+            "ammonite.repl.api.SourceBridge",
+            "source",
+            new SourceAPIImpl {}
+          ),
           (
             "ammonite.repl.api.FrontEndBridge",
             "frontEnd",

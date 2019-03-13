@@ -1,12 +1,17 @@
 package ammonite
 
-import ammonite.interp.{CodeClassWrapper, Preprocessor}
+import ammonite.interp.CodeClassWrapper
+import ammonite.repl.api.SourceBridge
+import ammonite.repl.SourceAPIImpl
 import ammonite.util.{Evaluated, Res}
 
 /**
   * Wraps several [[TestRepl]], and runs its tests against all of them.
   */
 class DualTestRepl { dual =>
+
+  if (SourceBridge.value0 == null)
+    SourceBridge.value0 = new SourceAPIImpl {}
 
   def predef: (String, Option[os.Path]) = ("", None)
 

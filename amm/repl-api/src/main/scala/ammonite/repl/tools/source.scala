@@ -1,5 +1,6 @@
 package ammonite.repl.tools
 
+import ammonite.repl.api.Location
 import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
 import sourcecode.Compat._
@@ -51,7 +52,7 @@ object source{
                   colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     val defaultBrowseExpr = c.Expr[Int => Strings](
-      q"_root_.ammonite.repl.tools.SourceRuntime.browseSourceCommand"
+      q"_root_.ammonite.repl.api.SourceBridge.value.browseSourceCommand"
     )
 
     applyCustomizeCommandMacro(c)(f, defaultBrowseExpr)(pprinter, colors)
@@ -84,7 +85,7 @@ object source{
 
   def prefix(c: Context) = {
     import c.universe._
-    q"ammonite.repl.tools.SourceRuntime"
+    q"ammonite.repl.api.SourceBridge.value"
   }
   /**
     * Attempts to up an expression, into either a LHS + methodcall + rhs. We

@@ -2,7 +2,7 @@ package ammonite.repl
 
 import java.io.{InputStream, InputStreamReader, OutputStream}
 
-import ammonite.repl.api.{FrontEnd, FrontEndAPI, History, ReplLoad}
+import ammonite.repl.api.{FrontEnd, FrontEndAPI, History, ReplLoad, SourceAPI}
 import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
@@ -110,6 +110,11 @@ class Repl(input: InputStream,
             }
           }
         }
+      ),
+      (
+        "ammonite.repl.api.SourceBridge",
+        "source",
+        new SourceAPIImpl {}
       ),
       (
         "ammonite.repl.api.FrontEndBridge",
