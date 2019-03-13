@@ -203,6 +203,19 @@ object EvaluatorTests extends TestSuite{
         res5: Int = 2
       """)
     }
+    'nestedImports - {
+      check.session("""
+        @ class Foo { object values { def a = "a" }; override def toString = "Foo" }
+        defined class Foo
+
+        @ val foo = new Foo; import foo.values._
+        foo: Foo = Foo
+        import foo.values._
+
+        @ val a0 = a
+        a0: String = "a"
+      """)
+    }
     'multistatement{
       check.session(s"""
         @ ;1; 2L; '3';
