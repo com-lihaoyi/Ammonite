@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.repl.api
 
 import scala.collection.generic.IsSeq
 import scala.collection.{Iterable, SeqOps, mutable}

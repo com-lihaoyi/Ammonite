@@ -161,10 +161,23 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
+  object `repl-api` extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
+  class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
+    def crossFullScalaVersion = true
+    def dependencyResourceFileName = "amm-dependencies.txt"
+    def moduleDeps = Seq(
+      ops(), amm.util(),
+      `interp-api`()
+    )
+    def ivyDeps = Agg(
+      ivy"com.github.scopt::scopt:3.7.1"
+    )
+  }
+
 
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), `interp-api`())
+    def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), `repl-api`())
     def ivyDeps = T{
       Agg(
         ivy"io.get-coursier::coursier:2.0.0-RC2",
@@ -232,6 +245,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     terminal(), ops(),
     amm.util(), amm.runtime(),
     amm.`interp-api`(),
+    amm.`repl-api`(),
     amm.interp(), amm.repl()
   )
 
@@ -242,6 +256,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     amm.util().sources() ++
     amm.runtime().sources() ++
     amm.`interp-api`().sources() ++
+    amm.`repl-api`().sources() ++
     amm.interp().sources() ++
     amm.repl().sources() ++
     sources() ++
@@ -274,6 +289,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
       amm.util().sources() ++
       amm.runtime().sources() ++
       amm.`interp-api`().sources() ++
+      amm.`repl-api`().sources() ++
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++

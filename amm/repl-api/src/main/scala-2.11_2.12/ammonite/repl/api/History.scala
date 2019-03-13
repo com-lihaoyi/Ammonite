@@ -1,4 +1,4 @@
-package ammonite.runtime
+package ammonite.repl.api
 
 
 import ammonite.util._

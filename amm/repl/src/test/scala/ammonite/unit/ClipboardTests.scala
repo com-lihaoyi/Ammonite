@@ -1,6 +1,7 @@
 package ammonite.unit
 
-import ammonite.repl.{Clipboard, ClipboardImpl}
+import ammonite.repl.api.Clipboard
+import ammonite.repl.ClipboardImpl
 
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor

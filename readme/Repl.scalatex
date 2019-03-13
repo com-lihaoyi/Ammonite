@@ -537,7 +537,7 @@
           @code{repl.history}, @code{repl.width}, @code{repl.frontEnd()} to
           change the front-end terminal implementation, etc.:
 
-        @hl.ref('amm/'repl/'src/'main/'scala/'ammonite/'repl/"ReplAPI.scala", "trait ReplAPI")
+        @hl.ref('amm/"repl-api"/'src/'main/'scala/'ammonite/'repl/'api/"ReplAPI.scala", "trait ReplAPI")
 
         @p
           All of these are available as part of the @hl.scala{repl} object

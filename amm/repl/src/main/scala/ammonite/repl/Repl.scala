@@ -2,6 +2,7 @@ package ammonite.repl
 
 import java.io.{InputStream, InputStreamReader, OutputStream}
 
+import ammonite.repl.api.{FrontEnd, History, ReplLoad}
 import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
@@ -29,7 +30,7 @@ class Repl(input: InputStream,
 
   val frontEnd = Ref[FrontEnd](
     if (scala.util.Properties.isWin)
-      ammonite.repl.FrontEnd.JLineWindows
+      ammonite.repl.FrontEnds.JLineWindows
     else
       AmmoniteFrontEnd(Filter.empty)
   )
@@ -69,46 +70,48 @@ class Repl(input: InputStream,
     storage,
     basePredefs,
     customPredefs,
-    Seq((
-      "ammonite.repl.ReplBridge",
-      "repl",
-      new ReplApiImpl {
-        def replArgs0 = repl.replArgs
-        def printer = repl.printer
-        val colors = repl.colors
-        def sess = repl.sess0
-        val prompt = repl.prompt
-        val frontEnd = repl.frontEnd
+    Seq(
+      (
+        "ammonite.repl.ReplBridge",
+        "repl",
+        new ReplApiImpl {
+          def replArgs0 = repl.replArgs
+          def printer = repl.printer
+          val colors = repl.colors
+          def sess = repl.sess0
+          val prompt = repl.prompt
+          val frontEnd = repl.frontEnd
 
-        def lastException = repl.lastException
-        def fullHistory = storage.fullHistory()
-        def history = repl.history
-        def newCompiler() = interp.compilerManager.init(force = true)
-        def compiler = interp.compilerManager.compiler.compiler
-        def interactiveCompiler = interp.compilerManager.pressy.compiler
-        def fullImports = repl.fullImports
-        def imports = repl.imports
-        def usedEarlierDefinitions = repl.usedEarlierDefinitions
-        def width = frontEnd().width
-        def height = frontEnd().height
+          def lastException = repl.lastException
+          def fullHistory = storage.fullHistory()
+          def history = repl.history
+          def newCompiler() = interp.compilerManager.init(force = true)
+          def compiler = interp.compilerManager.compiler.compiler
+          def interactiveCompiler = interp.compilerManager.pressy.compiler
+          def fullImports = repl.fullImports
+          def imports = repl.imports
+          def usedEarlierDefinitions = repl.usedEarlierDefinitions
+          def width = frontEnd().width
+          def height = frontEnd().height
 
-        object load extends ReplLoad with (String => Unit){
+          object load extends ReplLoad with (String => Unit){
 
-          def apply(line: String) = {
-            interp.processExec(line, currentLine, () => currentLine += 1) match{
-              case Res.Failure(s) => throw new CompilationError(s)
-              case Res.Exception(t, s) => throw t
-              case _ =>
+            def apply(line: String) = {
+              interp.processExec(line, currentLine, () => currentLine += 1) match{
+                case Res.Failure(s) => throw new CompilationError(s)
+                case Res.Exception(t, s) => throw t
+                case _ =>
+              }
+            }
+
+            def exec(file: os.Path): Unit = {
+              interp.watch(file)
+              apply(normalizeNewlines(os.read(file)))
             }
           }
-
-          def exec(file: os.Path): Unit = {
-            interp.watch(file)
-            apply(normalizeNewlines(os.read(file)))
-          }
         }
-      }
-    )),
+      ),
+    ),
     wd,
     colors,
     verboseOutput = true,

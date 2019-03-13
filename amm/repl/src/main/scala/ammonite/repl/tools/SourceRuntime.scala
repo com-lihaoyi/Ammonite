@@ -5,7 +5,8 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
 import ammonite.repl.Highlighter
 import ammonite.runtime.tools.browse.Strings
-import ammonite.util.{CodeColors, Util}
+import ammonite.util.CodeColors
+import ammonite.util.Util.newLine
 import scala.collection.mutable
 import scala.language.experimental.macros
 
@@ -152,7 +153,7 @@ object SourceRuntime{
           val concreteCls = v.getClass.getMethod(memberName, argTypes:_*).getDeclaringClass
           loadSourceFrom(concreteCls, memberName, desc)
         }catch{case e: NoSuchMethodException =>
-          Left(s"$e1${Util.newLine}Unable to find method${value.getClass.getName}#$memberName")
+          Left(s"$e1${newLine}Unable to find method${value.getClass.getName}#$memberName")
         }
     }
   }

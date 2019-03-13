@@ -25,7 +25,7 @@ class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.net.URL],
-            private[this] var usedEarlierDefinitions0: Seq[String]){
+            private[this] var usedEarlierDefinitions0: Seq[String]) extends ammonite.repl.api.Frame{
   private var frozen0 = false
   def frozen = frozen0
   def freeze(): Unit = {
@@ -84,7 +84,7 @@ object Frame{
 case class SessionChanged(removedImports: Set[scala.Symbol],
                           addedImports: Set[scala.Symbol],
                           removedJars: Set[java.net.URL],
-                          addedJars: Set[java.net.URL])
+                          addedJars: Set[java.net.URL]) extends ammonite.repl.api.SessionChanged
 object SessionChanged{
 
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {

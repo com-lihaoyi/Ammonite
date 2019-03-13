@@ -36,7 +36,7 @@ object PredefInitialization {
       initBridge(evalClassloader, name, bridge)
     }
 
-    // import ammonite.repl.ReplBridge.{value => repl}
+    // import ammonite.repl.api.ReplBridge.{value => repl}
     // import ammonite.interp.api.InterpBridge.{value => interp}
     val bridgePredefs =
       for ((name, shortName, bridge) <- bridges)

@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import ammonite.interp.api.APIHolder
+import ammonite.repl.api.ReplAPI
 import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 

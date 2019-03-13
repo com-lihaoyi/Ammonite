@@ -4,6 +4,7 @@ import java.nio.file.FileAlreadyExistsException
 import java.nio.file.{Files, Paths}
 
 
+import ammonite.repl.api.History
 import ammonite.util._
 import ammonite.util.Util._
 

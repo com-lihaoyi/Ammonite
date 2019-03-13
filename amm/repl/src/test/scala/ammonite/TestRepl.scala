@@ -5,7 +5,8 @@ import java.io.PrintStream
 import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
 import ammonite.main.Defaults
 import ammonite.repl._
-import ammonite.runtime.{Frame, History, Storage}
+import ammonite.repl.api.{FrontEnd, History, ReplLoad}
+import ammonite.runtime.{Frame, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
 import pprint.{TPrint, TPrintColors}

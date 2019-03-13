@@ -2,6 +2,7 @@ package ammonite.repl
 
 import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
+import ammonite.repl.api.FrontEnd
 import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
 import ammonite.terminal._

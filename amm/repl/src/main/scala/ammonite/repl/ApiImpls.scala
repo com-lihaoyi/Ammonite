@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import ammonite.ops.Internals
+import ammonite.repl.api.{Clipboard, Session}
 import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._

@@ -4,7 +4,7 @@ import java.io.PrintStream
 
 import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
 import ammonite.main.Defaults
-import ammonite.runtime.{Frame, History, Storage}
+import ammonite.runtime.{Frame, Storage}
 import ammonite.util._
 import ammonite.runtime.ImportHook
 

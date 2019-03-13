@@ -11,23 +11,11 @@ import org.jline.reader.impl.DefaultParser.ArgumentList
 import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
+import ammonite.repl.api.FrontEnd
 import ammonite.interp.{Parsers, Preprocessor}
 
-/** JLine interface */
-trait FrontEnd {
-  def width: Int
-  def height: Int
-  def action(input: InputStream,
-             reader: java.io.Reader,
-             output: OutputStream,
-             prompt: String,
-             colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: IndexedSeq[String],
-             addHistory: String => Unit): Res[(String, Seq[String])]
-}
 
-object FrontEnd {
+object FrontEnds {
   object JLineUnix extends JLineTerm
   object JLineWindows extends JLineTerm
   class JLineTerm() extends FrontEnd {
