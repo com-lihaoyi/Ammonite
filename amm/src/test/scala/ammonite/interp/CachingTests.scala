@@ -5,7 +5,7 @@ import ammonite.main
 import ammonite.main.{Defaults, Scripts}
 
 import ammonite.runtime.Storage
-import ammonite.runtime.tools.IvyConstructor._
+import ammonite.interp.api.IvyConstructor._
 import ammonite.util.{Res, Util}
 import utest._
 

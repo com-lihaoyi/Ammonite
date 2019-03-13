@@ -1,6 +1,6 @@
 package ammonite.shell
 
-import ammonite.interp.InterpAPI
+import ammonite.interp.api.InterpAPI
 import ammonite.repl.ReplAPI
 
 /**

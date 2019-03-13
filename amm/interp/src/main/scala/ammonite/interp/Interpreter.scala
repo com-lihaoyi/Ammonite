@@ -3,6 +3,7 @@ package ammonite.interp
 import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
+import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 import ammonite.interp.CodeWrapper
 
 import scala.collection.mutable
@@ -52,8 +53,8 @@ class Interpreter(val printer: Printer,
   val resolutionHooks = mutable.Buffer.empty[coursier.Fetch[Task] => coursier.Fetch[Task]]
 
   headFrame.classloader.specialLocalClasses ++= Seq(
-    "ammonite.interp.InterpBridge",
-    "ammonite.interp.InterpBridge$"
+    "ammonite.interp.api.InterpBridge",
+    "ammonite.interp.api.InterpBridge$"
   )
 
   headFrame.classloader.specialLocalClasses ++= extraBridges
@@ -108,7 +109,7 @@ class Interpreter(val printer: Printer,
   // ReplAPIs available in the predef need access to the Interpreter object
   def initializePredef(): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
     PredefInitialization.apply(
-      ("ammonite.interp.InterpBridge", "interp", interpApi) +: extraBridges,
+      ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
       interpApi,
       evalClassloader,
       storage,

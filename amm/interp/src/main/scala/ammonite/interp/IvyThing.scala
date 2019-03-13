@@ -9,20 +9,6 @@ import coursier.cache.loggers.RefreshLogger
 import coursier.core.{Classifier, ModuleName, Organization}
 
 
-object IvyConstructor extends IvyConstructor
-trait IvyConstructor{
-  implicit class GroupIdExt(groupId: String){
-    def %(artifactId: String) = coursier.Module(Organization(groupId), ModuleName(artifactId))
-    def %%(artifactId: String) = coursier.Module(
-      Organization(groupId),
-      ModuleName(artifactId + "_" + IvyThing.scalaBinaryVersion)
-    )
-  }
-  implicit class ArtifactIdExt(t: coursier.Module){
-    def %(version: String) = coursier.Dependency(t, version)
-  }
-}
-
 object IvyThing{
   def completer(
     repositories: Seq[coursier.Repository],
@@ -67,21 +53,6 @@ object IvyThing{
     LocalRepositories.ivy2Local,
     coursier.MavenRepository("https://repo1.maven.org/maven2")
   )
-
-  val scalaFullBinaryVersion =
-    scala.util.Properties
-      .versionNumberString
-
-  val scalaBinaryVersion = {
-    if (scalaFullBinaryVersion.forall(c => c.isDigit || c == '.'))
-      scalaFullBinaryVersion
-        .split('.')
-        .take(2)
-        .mkString(".")
-    else
-      // e.g. for versions like 2.13.0-M5
-      scalaFullBinaryVersion
-  }
 
 }
 

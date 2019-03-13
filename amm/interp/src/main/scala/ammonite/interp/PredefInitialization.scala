@@ -1,7 +1,8 @@
 package ammonite.interp
 
 
-import ammonite.runtime.{APIHolder, SpecialClassLoader, Storage}
+import ammonite.interp.api.{APIHolder, InterpAPI}
+import ammonite.runtime.{SpecialClassLoader, Storage}
 import ammonite.util.ScriptOutput.Metadata
 import ammonite.util.{Imports, Name, PredefInfo, Res}
 import ammonite.util.Util.CodeSource
@@ -11,6 +12,16 @@ import ammonite.util.Util.CodeSource
   * initialization
   */
 object PredefInitialization {
+  def initBridge[T >: Null <: AnyRef](classloader: SpecialClassLoader,
+                    name: String,
+                    t: T) = {
+    classloader.findClassPublic(name + "$")
+    classloader.findClassPublic(name)
+      .getDeclaredMethods
+      .find(_.getName == "value0_$eq")
+      .get
+      .invoke(null, t)
+  }
   def apply(bridges: Seq[(String, String, AnyRef)],
             interpApi: InterpAPI,
             evalClassloader: SpecialClassLoader,
@@ -22,11 +33,11 @@ object PredefInitialization {
             watch: os.Path => Unit): Res[_] = {
 
     for ((name, shortName, bridge) <- bridges ){
-      APIHolder.initBridge(evalClassloader, name, bridge)
+      initBridge(evalClassloader, name, bridge)
     }
 
     // import ammonite.repl.ReplBridge.{value => repl}
-    // import ammonite.runtime.InterpBridge.{value => interp}
+    // import ammonite.interp.api.InterpBridge.{value => interp}
     val bridgePredefs =
       for ((name, shortName, bridge) <- bridges)
       yield PredefInfo(

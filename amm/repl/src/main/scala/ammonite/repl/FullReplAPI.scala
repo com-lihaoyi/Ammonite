@@ -1,10 +1,10 @@
 package ammonite.repl
 
+import ammonite.interp.api.APIHolder
 import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 
 import scala.reflect.runtime.universe._
-import ammonite.runtime.APIHolder
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

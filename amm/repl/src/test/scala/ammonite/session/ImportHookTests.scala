@@ -2,7 +2,7 @@ package ammonite.session
 
 import ammonite.DualTestRepl
 import ammonite.TestUtils._
-import ammonite.runtime.tools.IvyThing
+import ammonite.interp.api.IvyConstructor
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -89,7 +89,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
-            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.7.0`
+            @ import $$ivy.`com.lihaoyi:scalatags_${IvyConstructor.scalaBinaryVersion}:0.7.0`
 
             @ import scalatags.Text.all._
 

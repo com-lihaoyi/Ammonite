@@ -1,9 +1,7 @@
-package ammonite.interp
+package ammonite.interp.api
 
 
 import ammonite.util.{Colors, Ref}
-import ammonite.runtime.APIHolder
-import ammonite.runtime.Evaluator.AmmoniteExit
 import coursier.util.Task
 
 import scala.collection.mutable

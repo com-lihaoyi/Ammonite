@@ -1,6 +1,6 @@
 package ammonite
 
-import ammonite.runtime.APIHolder
+import ammonite.interp.api.APIHolder
 
 trait TestReplApi {
   def message: String

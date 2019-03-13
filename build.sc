@@ -150,9 +150,21 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 
 
+  object `interp-api` extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
+  class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
+    def moduleDeps = Seq(ops(), amm.util())
+    def crossFullScalaVersion = true
+    def ivyDeps = Agg(
+      ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+      ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
+      ivy"io.get-coursier::coursier:1.1.0-M13-1"
+    )
+  }
+
+
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util())
+    def moduleDeps = Seq(ops(), amm.util(), `interp-api`())
     def ivyDeps = T{
       Agg(
         ivy"io.get-coursier::coursier:2.0.0-RC2",
@@ -219,6 +231,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
   def moduleDeps = Seq(
     terminal(), ops(),
     amm.util(), amm.runtime(),
+    amm.`interp-api`(),
     amm.interp(), amm.repl()
   )
 
@@ -228,6 +241,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     terminal().sources() ++
     amm.util().sources() ++
     amm.runtime().sources() ++
+    amm.`interp-api`().sources() ++
     amm.interp().sources() ++
     amm.repl().sources() ++
     sources() ++
@@ -259,6 +273,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
       terminal().sources() ++
       amm.util().sources() ++
       amm.runtime().sources() ++
+      amm.`interp-api`().sources() ++
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++
@@ -371,6 +386,7 @@ def generateDependenciesFile(scalaVersion: String,
 
   mkdir(dir)
   println(s"Writing $dest")
+  dir.toIO.mkdirs()
   write(dest, content.getBytes("UTF-8"))
 
   dir
