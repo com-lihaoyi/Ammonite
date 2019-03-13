@@ -24,7 +24,9 @@ class Repl(input: InputStream,
            replCodeWrapper: CodeWrapper,
            scriptCodeWrapper: CodeWrapper,
            alreadyLoadedDependencies: Seq[coursier.Dependency],
-           importHooks: Map[Seq[String], ImportHook]) { repl =>
+           importHooks: Map[Seq[String], ImportHook],
+           initialClassLoader: ClassLoader =
+             classOf[ammonite.repl.api.ReplAPI].getClassLoader) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -49,7 +51,7 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frames = Ref(List(Frame.createInitial()))
+  val frames = Ref(List(Frame.createInitial(initialClassLoader)))
 
   /**
     * The current line number of the REPL, used to make sure every snippet

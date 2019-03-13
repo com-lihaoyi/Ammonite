@@ -70,7 +70,8 @@ case class Main(predefCode: String = "",
                 scriptCodeWrapper: CodeWrapper = CodeWrapper,
                 alreadyLoadedDependencies: Seq[coursier.Dependency] =
                   Defaults.alreadyLoadedDependencies(),
-                importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults){
+                importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+                thin: Boolean = false){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -80,6 +81,22 @@ case class Main(predefCode: String = "",
       }
     case None => Right(None)
   }
+
+  def initialClassLoader: ClassLoader = {
+    val contextClassLoader = Thread.currentThread().getContextClassLoader
+    if (thin) {
+      val replApiClassLoader = classOf[ammonite.repl.api.ReplAPI].getClassLoader
+      if (replApiClassLoader == contextClassLoader) {
+        System.err.println(
+          s"Warning: --thin passed, but ReplAPI and the core of Ammonite seem to be loaded by " +
+            "the same class loader, which effectively disables --thin / class loader isolation."
+        )
+      }
+      replApiClassLoader
+    } else
+      contextClassLoader
+  }
+
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
@@ -122,7 +139,8 @@ case class Main(predefCode: String = "",
         replCodeWrapper = replCodeWrapper,
         scriptCodeWrapper = scriptCodeWrapper,
         alreadyLoadedDependencies = alreadyLoadedDependencies,
-        importHooks = importHooks
+        importHooks = importHooks,
+        initialClassLoader = initialClassLoader
       )
     }
 
@@ -141,7 +159,7 @@ case class Main(predefCode: String = "",
         errorStream,
         verboseOutput
       )
-      val frame = Frame.createInitial()
+      val frame = Frame.createInitial(initialClassLoader)
 
       val interp: Interpreter = new Interpreter(
         printer,
@@ -435,7 +453,8 @@ class MainRunner(cliConfig: Cli.Config,
       remoteLogging = cliConfig.remoteLogging,
       colors = colors,
       replCodeWrapper = codeWrapper,
-      scriptCodeWrapper = codeWrapper
+      scriptCodeWrapper = codeWrapper,
+      thin = cliConfig.thin
     )
 
   }
