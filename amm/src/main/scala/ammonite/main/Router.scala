@@ -1,8 +1,5 @@
 package ammonite.main
 
-import ammonite.main.Compat
-import sourcecode.Compat.Context
-
 import scala.annotation.StaticAnnotation
 import scala.collection.mutable
 import scala.language.experimental.macros
@@ -347,10 +344,10 @@ class Router [C <: Context](val c: C) {
 
       val (docUnwrappedType, docOpt) = varargUnwrappedType match{
         case t: AnnotatedType =>
-
+          import compat._
           val (remaining, docValue) = getDocAnnotation(t.annotations)
           if (remaining.isEmpty) (t.underlying, docValue)
-          else (Compat.copyAnnotatedType(c)(t, remaining), docValue)
+          else (c.universe.AnnotatedType(remaining, t.underlying), docValue)
 
         case t => (t, None)
       }

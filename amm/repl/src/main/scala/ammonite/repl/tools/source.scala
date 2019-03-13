@@ -140,7 +140,7 @@ object source{
       }
 
       val ownerTree =
-        if (staticJavaLhsClass) Compat.companion(c)(ownerCls)
+        if (staticJavaLhsClass) q"classOf[${ownerCls.companion}]"
         else q"classOf[${paramedOwnerCls.erasure}]"
 
       Tuple5(
