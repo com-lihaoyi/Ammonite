@@ -86,6 +86,55 @@ trait AmmModule extends AmmInternalModule with PublishModule{
     )
   )
 
+  trait CustomRunnerTests extends super.Tests {
+    def forkArgs = T {
+      val testBaseCp = amm.`test-api`().runClasspath() ++
+        amm.`test-api`().sources() ++
+        amm.`test-api`().transitiveSources() ++
+        amm.`test-api`().externalSources()
+      super.forkArgs() ++ Seq(
+        "-Dtest.base.classpath=" +
+          testBaseCp
+            .map(_.path.toIO.getAbsolutePath)
+            .mkString(java.io.File.pathSeparator)
+      )
+    }
+
+    def test(args: String*) = T.command{
+      val outputPath = T.ctx().dest/"out.json"
+
+      mill.modules.Jvm.runSubprocess(
+        mainClass = "ammonite.TestRunner",
+        classPath = amm.`test-runner`.runClasspath().map(_.path),
+        jvmArgs = forkArgs(),
+        envArgs = forkEnv(),
+        mainArgs =
+          Seq(testFrameworks().length.toString) ++
+            testFrameworks() ++
+            Seq(runClasspath().length.toString) ++
+            runClasspath().map(_.path.toString) ++
+            Seq(args.length.toString) ++
+            args ++
+            Seq(outputPath.toString, T.ctx().log.colored.toString, compile().classes.path.toString, T.ctx().home.toString),
+        workingDir = forkWorkingDir()
+      )
+
+      try {
+        val jsonOutput = ujson.read(outputPath.toIO)
+        val (doneMsg, results) = upickle.default.read[(String, Seq[TestRunner.Result])](jsonOutput)
+        TestModule.handleResults(doneMsg, results)
+      } catch {
+        case e: Throwable =>
+          mill.eval.Result.Failure("Test reporting failed: " + e)
+      }
+    }
+  }
+
+  def transitiveSources: T[Seq[PathRef]] = T{
+    mill.define.Task.traverse(this +: moduleDeps)(m =>
+      T.task{m.sources()}
+    )().flatten
+  }
 
 }
 trait AmmDependenciesResourceFileModule extends JavaModule{
@@ -172,6 +221,19 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"com.github.scopt::scopt:3.7.1"
     )
+
+    def generatedSources = T{
+      Seq(PathRef(generateConstantsFile(buildVersion)))
+    }
+  }
+
+  object `test-api` extends Cross[TestApiModule](fullCrossScalaVersions:_*)
+  class TestApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
+    def crossFullScalaVersion = true
+    def dependencyResourceFileName = "amm-test-dependencies.txt"
+    def moduleDeps = Seq(
+      `repl-api`()
+    )
   }
 
 
@@ -184,10 +246,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ivy"com.lihaoyi::requests:0.2.0"
       )
     }
-
-    def generatedSources = T{
-      Seq(PathRef(generateConstantsFile(buildVersion)))
-    }
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*)
@@ -199,6 +257,13 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.1.3",
       ivy"org.javassist:javassist:3.21.0-GA"
+    )
+  }
+
+  object `test-runner` extends mill.scalalib.SbtModule {
+    def scalaVersion = "2.12.8"
+    def ivyDeps = Agg(
+      ivy"com.lihaoyi::mill-scalalib:${sys.props("MILL_VERSION")}"
     )
   }
 
@@ -218,9 +283,11 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"com.github.scopt::scopt:3.7.1"
     )
 
-    object test extends Tests with AmmDependenciesResourceFileModule{
+    object test extends CustomRunnerTests{
+      def moduleDeps = super.moduleDeps ++ Seq(
+        amm.`test-api`()
+      )
       def crossScalaVersion = ReplModule.this.crossScalaVersion
-      def dependencyResourceFileName = "amm-test-dependencies.txt"
       def resources = T.sources {
         (super.resources() ++
         ReplModule.this.sources() ++
@@ -276,7 +343,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
 
   def dependencyResourceFileName = "amm-dependencies.txt"
 
-  object test extends Tests{
+  object test extends CustomRunnerTests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.chuusai::shapeless:2.3.3"
@@ -302,7 +369,7 @@ object shell extends Cross[ShellModule](fullCrossScalaVersions:_*)
 class ShellModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
   def crossFullScalaVersion = true
-  object test extends Tests{
+  object test extends CustomRunnerTests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,

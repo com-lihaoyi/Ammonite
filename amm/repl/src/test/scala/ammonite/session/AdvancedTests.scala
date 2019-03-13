@@ -153,7 +153,7 @@ object AdvancedTests extends TestSuite{
     }
     test("trappedType"){
       check.session("""
-        @ val nope = ammonite.TestRepl.Nope(2); val n = 2
+        @ val nope = ammonite.Nope(2); val n = 2
         n: Int = 2
       """)
     }

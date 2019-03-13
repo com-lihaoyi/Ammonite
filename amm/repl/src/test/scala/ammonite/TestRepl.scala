@@ -51,7 +51,14 @@ class TestRepl {
     x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
-  val frames = Ref(List(Frame.createInitial()))
+  val loader = {
+    val cl = classOf[ammonite.TestReplApi].getClassLoader
+    // requiring class loader isolation - if it's enabled, cl is only a *parent*
+    // of the context class loader.
+    assert(cl != Thread.currentThread().getContextClassLoader)
+    cl
+  }
+  val frames = Ref(List(Frame.createInitial(loader)))
   val sess0 = new SessionApiImpl(frames)
 
   var currentLine = 0
@@ -131,7 +138,7 @@ class TestRepl {
                   tcolors: TPrintColors,
                   classTagT: ClassTag[T]
                 ): Iterator[String] =
-                  if (classTagT == scala.reflect.classTag[TestRepl.Nope])
+                  if (classTagT == scala.reflect.classTag[ammonite.Nope])
                     Iterator()
                   else
                     super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
@@ -374,11 +381,5 @@ class TestRepl {
       println("FAILURE TRACE" + Util.newLine + allOutput)
       throw e
     }
-
-}
-
-object TestRepl {
-
-  case class Nope(n: Int)
 
 }

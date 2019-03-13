@@ -7,3 +7,5 @@ trait TestReplApi {
 }
 
 object TestReplBridge extends APIHolder[TestReplApi]
+
+case class Nope(n: Int)

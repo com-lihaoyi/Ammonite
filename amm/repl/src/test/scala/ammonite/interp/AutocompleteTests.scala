@@ -55,11 +55,11 @@ object AutocompleteTests extends TestSuite{
       )
       test("import") - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
-          complete("""import <from><caret>""", Set("java", "javax", "scala", "javassist") -- _)
-          complete("""import <from>j<caret>""", Set("java", "javax", "javassist") -- _)
+          complete("""import <from><caret>""", Set("java", "javax", "scala") -- _)
+          complete("""import <from>j<caret>""", Set("java", "javax") -- _)
           complete(
             """import <from>ja<caret>""",
-            x => Set("java", "javax", "javassist") ^ (x - "javafx")
+            x => Set("java", "javax") ^ (x - "javafx")
           )
         }
         complete("""import java.<from><caret>""", Set("lang", "util") -- _)
