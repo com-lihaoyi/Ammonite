@@ -6,7 +6,7 @@ import java.nio.file.NoSuchFileException
 import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter, Preprocessor}
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.Repl
+import ammonite.repl.{FrontEndAPIImpl, Repl}
 import ammonite.util.Util.newLine
 import ammonite.util._
 
@@ -152,7 +152,13 @@ case class Main(predefCode: String = "",
         predefFileInfoOpt.toSeq ++ Seq(
           PredefInfo(Name("CodePredef"), predefCode, false, None)
         ),
-        Vector.empty,
+        Seq(
+          (
+            "ammonite.repl.api.FrontEndBridge",
+            "frontEnd",
+            new FrontEndAPIImpl {}
+          )
+        ),
         wd,
         colorsRef,
         verboseOutput,
