@@ -269,8 +269,7 @@ object BasicTests extends TestSuite{
              |  functionB
              |    --i     Int
              |    --s     String
-             |    --path  ammonite.ops.Path (default $pwd)
-             |""".stripMargin
+             |    --path  ammonite.ops.Path (default""".stripMargin
         )
         assert(out.contains(expected))
       }
