@@ -32,7 +32,7 @@ object Cli{
                     classBased: Boolean = false)
 
 
-  import ammonite.main.Scripts.pathScoptRead
+  import ammonite.repl.tools.Util.pathScoptRead
   val genericSignature = Seq(
     Arg[Config, String](
       "predef-code", None,

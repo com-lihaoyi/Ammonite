@@ -315,7 +315,7 @@ object Main{
 
   val extraPredefString = s"""
     |import ammonite.main.Router.{doc, main}
-    |import ammonite.main.Scripts.pathScoptRead
+    |import ammonite.repl.tools.Util.pathScoptRead
     |""".stripMargin
 
 }
