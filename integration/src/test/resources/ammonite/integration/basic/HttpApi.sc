@@ -1,7 +1,10 @@
 #!/usr/bin/env amm
 // HttpApi.sc
 
-import $ivy.`com.lihaoyi::requests:0.2.0`
+import $ivy.{
+  `com.lihaoyi::requests:0.2.0`,
+  `com.lihaoyi::ujson:0.7.5`
+}
 
 @main
 def addPost(title: String, body: String) = {

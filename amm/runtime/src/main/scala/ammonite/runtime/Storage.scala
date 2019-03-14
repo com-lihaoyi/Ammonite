@@ -56,6 +56,35 @@ object Storage{
   implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
   implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
   implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
+  implicit def tagRW: upickle.default.ReadWriter[Tag] = upickle.default.macroRW
+  /**
+    * Read/write [[Name]]s as unboxed strings, in order to save verbosity
+    * in the JSON cache files as well as improving performance of
+    * reading/writing since we read/write [[Name]]s a *lot*.
+    */
+  implicit val nameRW: upickle.default.ReadWriter[Name] =
+    upickle.default.readwriter[String].bimap[Name](
+      name => name.raw,
+      raw => Name(raw)
+  )
+  implicit def importTreeRW: upickle.default.ReadWriter[ImportTree] = upickle.default.macroRW
+  implicit def versionedWrapperIdRW: upickle.default.ReadWriter[VersionedWrapperId] =
+    upickle.default.macroRW
+  implicit def blockMetadataRW: upickle.default.ReadWriter[ScriptOutput.BlockMetadata] =
+    upickle.default.macroRW
+  implicit def metadataRW: upickle.default.ReadWriter[ScriptOutput.Metadata] =
+    upickle.default.macroRW
+  implicit def importHookInfoRW: upickle.default.ReadWriter[ImportHookInfo] =
+    upickle.default.macroRW
+  implicit val importDataRW: upickle.default.ReadWriter[ImportData] = upickle.default.macroRW
+  implicit val importTypeRW: upickle.default.ReadWriter[ImportData.ImportType] =
+    upickle.default.macroRW
+  implicit val importsRW: upickle.default.ReadWriter[Imports] =
+    upickle.default.readwriter[Seq[ImportData]].bimap[Imports](
+      imports => imports.value,
+      data => Imports(data)
+  )
+
   private def loadIfTagMatches(loadedTag: Tag,
                                cacheTag: Tag,
                                classFilesList: Seq[ScriptOutput.BlockMetadata],

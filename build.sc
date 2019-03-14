@@ -201,10 +201,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.7.5",
       ivy"com.lihaoyi::pprint:0.5.5",
       ivy"com.lihaoyi::fansi:0.2.7",
-      ivy"org.scala-lang.modules::scala-collection-compat:2.0.0"
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -254,6 +252,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), `repl-api`())
+    def ivyDeps = Agg(
+      ivy"com.lihaoyi::upickle:0.7.5"
+    )
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*)

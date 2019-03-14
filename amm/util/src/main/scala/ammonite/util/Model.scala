@@ -34,9 +34,6 @@ class CompilationError(message: String) extends Exception(message)
 case class Tag(code: String, env: String){
   def combined = code + env
 }
-object Tag{
-  implicit def rw: upickle.default.ReadWriter[Tag] = upickle.default.macroRW
-}
 
 
 /**
@@ -60,16 +57,6 @@ case class Name(raw: String){
 }
 
 object Name{
-  /**
-    * Read/write [[Name]]s as unboxed strings, in order to save verbosity
-    * in the JSON cache files as well as improving performance of
-    * reading/writing since we read/write [[Name]]s a *lot*.
-    */
-  implicit val nameRW: upickle.default.ReadWriter[Name] =
-    upickle.default.readwriter[String].bimap[Name](
-      name => name.raw,
-      raw => Name(raw)
-  )
 
   val alphaKeywords = Set(
     "abstract", "case", "catch", "class", "def", "do", "else",
@@ -274,7 +261,6 @@ case class ImportTree(prefix: Seq[String],
                       end: Int)
 
 object ImportTree{
-  implicit def rw: upickle.default.ReadWriter[ImportTree] = upickle.default.macroRW
   type ImportMapping = Seq[(String, Option[String])]
 }
 

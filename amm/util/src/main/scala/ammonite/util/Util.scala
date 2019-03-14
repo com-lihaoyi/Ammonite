@@ -69,9 +69,6 @@ object Util{
     */
   case class VersionedWrapperId(wrapperPath: String,
                                 tag: Tag)
-  object VersionedWrapperId{
-    implicit def rw: upickle.default.ReadWriter[VersionedWrapperId] = upickle.default.macroRW
-  }
 
 
 
