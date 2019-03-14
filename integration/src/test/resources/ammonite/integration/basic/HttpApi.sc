@@ -1,6 +1,8 @@
 #!/usr/bin/env amm
 // HttpApi.sc
 
+import $ivy.`com.lihaoyi::requests:0.2.0`
+
 @main
 def addPost(title: String, body: String) = {
   ujson.read(
