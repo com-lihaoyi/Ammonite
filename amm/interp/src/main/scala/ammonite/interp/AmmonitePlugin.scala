@@ -143,16 +143,21 @@ object AmmonitePlugin{
          */
         val wrapperSym = unit.body.children.last.children
           .last.asInstanceOf[g.ImplDef].symbol
-        val uses0 = stats
-          .flatMap(t =>
-            t.collect {
-              case g.Select(node, g.TermName(name)) if node.symbol == wrapperSym =>
-                name
-            }
-          )
-          .distinct
+        val uses0 = for {
+          tree <- stats
+          names <- tree.collect {
+            case g.Select(node, g.TermName(name)) if node.symbol == wrapperSym =>
+              name :: Nil
+            case tt @ g.TypeTree() =>
+              tt.tpe.collect {
+                case g.SingleType(pre, sym) if pre.typeSymbol == wrapperSym =>
+                  sym.name.decoded
+              }
+          }
+          name <- names
+        } yield name
 
-        usedEarlierDefinitions(uses0)
+        usedEarlierDefinitions(uses0.distinct)
     }
 
     val symbols = stats.filter(x => !Option(x.symbol).exists(_.isPrivate))

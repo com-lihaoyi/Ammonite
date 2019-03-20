@@ -350,5 +350,21 @@ object EvaluatorTests extends TestSuite{
 
       """)
     }
+    'referenceTraitFromPreviousCommand - {
+      // When class-based wrapping is enabled, the second command references a trait from the
+      // first one, and this case has to be handled by the "used earlier definitions" mechanism.
+      check.session("""
+        @ trait A; class X(x: Int) extends A { override def toString = s"X($x)" }
+        defined trait A
+        defined class X
+
+        @ class Z[T <: A](t: T) { override def toString = s"Z($t)" }; val z1 = new Z(new X(7))
+        defined class Z
+        z1: Z[X] = Z(X(7))
+
+        @ val z2 = new Z(new X(7))
+        z2: Z[X] = Z(X(7))
+      """)
+    }
   }
 }
