@@ -123,6 +123,14 @@
 
 
   @sect{Changelog}
+    @sect{1.6.5}
+      @ul
+        @li Don't keep resolutions involving snapshot artifacts or version
+	    intervals in the resolution cache of Ammonite
+      @ul
+        @li Switch to coursier @code{1.1.0-M13}
+      @ul
+        @li Fix various issues with class-based wrapper (@code{--class-based})
     @sect{1.6.4}
       @ul
         @li
