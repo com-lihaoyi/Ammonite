@@ -186,9 +186,6 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     amm.util(), amm.runtime(),
     amm.interp(), amm.repl()
   )
-  def ivyDeps = Agg(
-    ivy"com.github.scopt::scopt:3.5.0",
-  )
 
   def runClasspath =
     super.runClasspath() ++
