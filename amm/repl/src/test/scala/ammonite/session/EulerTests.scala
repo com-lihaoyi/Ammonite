@@ -130,13 +130,16 @@ object EulerTests extends TestSuite{
         @ val limit = (1 to 1000).find(n => n + math.sqrt(n) >= 1000).get
         limit: Int = 969
 
+        @ import scala.collection.immutable.IndexedSeq
+        import scala.collection.immutable.IndexedSeq
+
         @ val rs = for{
         @   b <- 2 until limit
         @   a <- 1 until b
         @   c = 1000 - a - b
         @   if a * a + b * b  == c * c
         @ } yield a * b * c
-        rs: collection.immutable.IndexedSeq[Int] = Vector(31875000)
+        rs: IndexedSeq[Int] = Vector(31875000)
       """)
     }
     'p10{
@@ -587,7 +590,7 @@ object EulerTests extends TestSuite{
         @ val r = {
         @   lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
         @     ps.takeWhile(j => j * j <= i).forall(i % _ > 0))
-        @   def isPrime(n: Int) = ps.view.takeWhile(_ <= n).contains(n)
+        @   def isPrime(n: Int) = ps.view.takeWhile(_ <= n).exists(_ == n)
         @   val ns = (-99 until 100).flatMap { a =>
         @     (-99 until 100).map(b => (a, b, (0 to 100).view
         @       .takeWhile(n => isPrime(n * n + a * n + b)).size))

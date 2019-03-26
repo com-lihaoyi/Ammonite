@@ -1,6 +1,7 @@
 package ammonite.util
 
 
+import scala.collection.compat._
 import scala.util.Try
 
 
@@ -36,10 +37,10 @@ object Res{
     * bailing out if any individual element fails.
     */
   def map[M[_] <: Traversable[_], T, V](inputs: M[T])(f: T => Res[V])
-                                       (implicit cbf: collection.generic.CanBuildFrom[_, V, M[V]])
+                                       (implicit cbf: Factory[V, M[V]])
   : Res[M[V]] = {
 
-    fold(cbf.apply(), inputs){ (b, v) => f(v).map(b += _) }.map(_.result())
+    fold(cbf.newBuilder, inputs){ (b, v) => f(v).map(b += _) }.map(_.result())
   }
   def apply[T](o: Option[T], errMsg: => String) = o match{
     case Some(s) => Success(s)

@@ -7,7 +7,7 @@
 package ammonite.ops
 
 import java.io.File
-import java.nio.file._
+import java.nio.file.{Path => _, _}
 
 import scala.io.Codec
 

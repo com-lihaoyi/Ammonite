@@ -160,7 +160,7 @@ class Repl(input: InputStream,
       colors().prompt()(prompt()).render,
       colors(),
       interp.compilerManager.complete(_, fullImports.toString, _),
-      storage.fullHistory(),
+      storage.fullHistory().elements,
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code
         history = history :+ code

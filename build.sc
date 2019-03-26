@@ -13,10 +13,11 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.11.12", "2.12.8")
+val binCrossScalaVersions = Seq("2.11.12", "2.12.8", "2.13.0-M5")
 val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8"
+  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
+  "2.13.0-M5"
 )
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
@@ -83,7 +84,10 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(ivy"com.lihaoyi::os-lib:0.2.6")
+  def ivyDeps = Agg(
+    ivy"com.lihaoyi::os-lib:0.2.9",
+    ivy"org.scala-lang.modules::scala-collection-compat:0.3.0"
+  )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
 }
@@ -92,7 +96,7 @@ object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
     ivy"com.lihaoyi::sourcecode:0.1.5",
-    ivy"com.lihaoyi::fansi:0.2.4"
+    ivy"com.lihaoyi::fansi:0.2.6"
   )
   def compileIvyDeps = Agg(
     ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -106,9 +110,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.7.1",
-      ivy"com.lihaoyi::pprint:0.5.2",
-      ivy"com.lihaoyi::fansi:0.2.4"
+      ivy"com.lihaoyi::upickle:0.7.4",
+      ivy"com.lihaoyi::pprint:0.5.4",
+      ivy"com.lihaoyi::fansi:0.2.6",
+      ivy"org.scala-lang.modules::scala-collection-compat:0.3.0"
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -122,7 +127,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util())
     def ivyDeps = Agg(
       ivy"io.get-coursier::coursier:1.1.0-M13-1",
-      ivy"com.lihaoyi::requests:0.1.7"
+      ivy"com.lihaoyi::requests:0.1.8"
     )
 
     def generatedSources = T{
@@ -168,7 +173,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         resolveDeps(ivyDeps, sources = true)()).distinct
       }
       def ivyDeps = super.ivyDeps() ++ Agg(
-        ivy"org.scalaz::scalaz-core:7.2.26"
+        ivy"org.scalaz::scalaz-core:7.2.27"
       )
     }
   }

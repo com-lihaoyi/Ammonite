@@ -1,34 +1,23 @@
 package ammonite.ops
 
-import scala.collection.{Seq, GenTraversableOnce, TraversableLike}
-
-import scala.collection.generic.{CanBuildFrom => CBF, GenericTraversableTemplate, SeqFactory}
+import scala.collection.{GenTraversableOnce, Seq}
 
 trait Extensions{
   implicit def PipeableImplicit[T](t: T): Pipeable[T] = new Pipeable(t)
 
-  implicit def FilterMapExtImplicit[T, Repr](i: TraversableLike[T, Repr]): FilterMapExt[T, Repr] =
-    new FilterMapExt(i)
+  implicit def FilterMapExtImplicit[T](i:  Iterable[T]): FilterMapExt[T] =
+    new FilterMapExt[T](i)
   /**
    * Lets you call [[FilterMapExt]] aliases on Arrays too
    */
-  implicit def FilterMapArraysImplicit[T](a: Array[T]): FilterMapExt[T, Array[T]] =
-    new FilterMapExt(a)
+  implicit def FilterMapArraysImplicit[T](a: Array[T]): FilterMapExt[T] =
+    new FilterMapExt[T](a)
 
   implicit def FilterMapIteratorsImplicit[T](a: Iterator[T]): FilterMapExt2[T] =
     new FilterMapExt2(a)
 
   implicit def FilterMapGeneratorsImplicit[T](a: geny.Generator[T]): FilterMapExtGen[T] =
     new FilterMapExtGen(a)
-
-  /**
-   * Allows you to pipe sequences into other sequences to convert them,
-   * e.g. Seq(1, 2, 3) |> Vector
-   */
-  implicit def SeqFactoryFunc[T, CC[X] <: Seq[X] with GenericTraversableTemplate[X, CC]]
-                             (s: SeqFactory[CC]) = {
-    (t: Seq[T]) => s(t:_*)
-  }
 
 
   implicit class iterShow[T](t: Iterator[T]){
@@ -71,16 +60,16 @@ class Pipeable[T](t: T) {
  * used operations, so we can make it easy to use from the
  * command line.
  */
-class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]) {
+class FilterMapExt[+T](i: Iterable[T]) {
   /**
    * Alias for `map`
    */
-  def |[B, That](f: T => B)(implicit bf: CBF[Repr, B, That]): That = i.map(f)
+  def |[B, That](f: T => B): Iterable[B] = i.map(f)
 
   /**
    * Alias for `flatMap`
    */
-  def ||[B, That](f: T => GenTraversableOnce[B])(implicit bf: CBF[Repr, B, That]): That = {
+  def ||[B, That](f: T => GenTraversableOnce[B]): Iterable[B] = {
     i.flatMap(f)
   }
 
@@ -92,7 +81,7 @@ class FilterMapExt[+T, Repr](i: TraversableLike[T, Repr]) {
   /**
    * Alias for `filter`
    */
-  def |?(p: T => Boolean): Repr = i.filter(p)
+  def |?(p: T => Boolean): Iterable[T] = i.filter(p)
 
   /**
    * Alias for `reduce`

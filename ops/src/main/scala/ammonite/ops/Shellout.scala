@@ -96,7 +96,7 @@ object Shellout{
         Thread.sleep(2)
     }
 
-    val res = CommandResult(process.exitValue(), chunks)
+    val res = CommandResult(process.exitValue(), chunks.toSeq)
     if (res.exitCode == 0) res
     else throw ShelloutException(res)
   }

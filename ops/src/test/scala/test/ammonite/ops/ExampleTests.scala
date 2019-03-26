@@ -173,11 +173,11 @@ object ExampleTests extends TestSuite{
       val dots = ls! wd |? (_.last(0) == '.')
 
       // Find the names of the 10 largest files in the current working directory
-      ls.rec! wd | (x => x.size -> x) sortBy (-_._1) take 10
+      (ls.rec! wd | (x => x.size -> x)).toSeq sortBy (-_._1) take 10
 
       // Sorted list of the most common words in your .scala source files
       def txt = ls.rec! wd |? (_.ext == "scala") | read
-      def freq(s: Seq[String]) = s groupBy (x => x) mapValues (_.length) toSeq
+      def freq(s: Iterable[String]) = s groupBy (x => x) mapValues (_.size) toSeq
       val map = txt || (_.split("[^a-zA-Z0-9_]")) |> freq sortBy (-_._2)
 
       assert(
@@ -304,11 +304,11 @@ object ExampleTests extends TestSuite{
             | (Path(_, ammonite.ops.pwd))
             |? (_.ext == "scala")
             | longLines
-            |? (_._2.length > 0)
+            |? (_._2.size > 0)
             |? (!_._1.segments.contains("src_managed"))
       )
 
-      assert(filesWithTooLongLines.length == 0)
+      assert(filesWithTooLongLines.isEmpty)
     }
     'rename{
 //      val d1/"omg"/x1 = wd

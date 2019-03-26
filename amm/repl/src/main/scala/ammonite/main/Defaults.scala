@@ -35,7 +35,6 @@ object Defaults{
     |  FilterMapArraysImplicit,
     |  FilterMapIteratorsImplicit,
     |  FilterMapGeneratorsImplicit,
-    |  SeqFactoryFunc,
     |  RegexContextMaker,
     |  Callable1Implicit
     |}

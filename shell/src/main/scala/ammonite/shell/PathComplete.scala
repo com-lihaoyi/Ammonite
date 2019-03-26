@@ -184,16 +184,16 @@ object PathComplete {
 
 
 
-        val details2 = details.map(x => pprint.tokenize(stat(x._1)).mkString)
+        val details2 = details.toSeq.map(x => pprint.tokenize(stat(x._1)).mkString)
 
         val stdout =
-          FrontEndUtils.printCompletions(coloredCompletions, details2)
+          FrontEndUtils.printCompletions(coloredCompletions.toSeq, details2)
                        .mkString
 
-        if (details.length != 0 || completions.length == 0)
+        if (details.nonEmpty || completions.nonEmpty)
           Printing(TermState(rest, b, c), stdout)
         else {
-          val common = FrontEndUtils.findPrefix(completions.map(_._2), 0)
+          val common = FrontEndUtils.findPrefix(completions.toSeq.map(_._2), 0)
           val newBuffer = b.take(c - cursorOffset) ++ common ++ b.drop(c)
           Printing(TermState(rest, newBuffer, c - cursorOffset + common.length + 1), stdout)
         }

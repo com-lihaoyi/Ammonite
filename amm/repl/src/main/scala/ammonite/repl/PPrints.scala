@@ -14,7 +14,7 @@ object PPrints{
     case x: ammonite.ops.Path => PPrints.pathRepr(os.Path(x.toString))
     case x: ammonite.ops.RelPath => PPrints.relPathRepr(os.RelPath(x.toString))
     case x: ammonite.ops.CommandResult => PPrints.commandResultRepr(x)
-    case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString(Util.newLine)))
+    case t: History => pprint.Tree.Lazy(ctx => Iterator(t.elements.mkString(Util.newLine)))
     case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
     case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
   }
@@ -37,7 +37,7 @@ object PPrints{
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
 
     if (validIdentifier.findFirstIn(s) == Some(s)){
-      cfg.literalColor(''' + s)
+      cfg.literalColor('\'' + s)
     }else{
       cfg.literalColor(pprint.Util.literalize(s))
     }

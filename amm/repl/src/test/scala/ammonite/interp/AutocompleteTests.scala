@@ -123,7 +123,7 @@ object AutocompleteTests extends TestSuite{
         )
 
         complete( """scala.Option.<caret>""",
-          (anyCompletion ++ Set("apply", "empty")) ^
+          (anyCompletion ++ Set("apply", "empty", "unless", "when")) ^
         )
 
         complete( """Seq(1, 2, 3).map(_.<caret>)""",

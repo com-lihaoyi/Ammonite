@@ -9,7 +9,7 @@ import ammonite.repl.tools.source.load
 import ammonite.util.Util
 //import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
-import scala.tools.nsc.interpreter.InputStream
+import java.io.InputStream
 object SourceTests extends TestSuite{
   val tests = Tests{
 
@@ -194,16 +194,11 @@ object SourceTests extends TestSuite{
         'reverse  - check212(load(List().reverse _), "List.scala", "def reverse")
         'isEmpty  - check212(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
         'nonEmpty - check212(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
-        'orElse   - check212(load(List().orElse _), "PartialFunction.scala", "def orElse")
         'mkString - check212(load(List().mkString _), "TraversableOnce.scala", "def mkString")
-        'aggregate- check212(load(List().aggregate _), "TraversableOnce.scala", "def aggregate")
 
         //    These result in a divering implicit expansion, even in plain Scala
   //      'min      - check212(load(List().min _), "TraversableOnce.scala", "def min")
   //      'max      - check212(load(List().max _), "TraversableOnce.scala", "def max")
-
-        'groupBy  - check212(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
-        'compose  - check212(load(List().compose _), "Function1.scala", "def compose")
 
         'prefixLength - check212(
           load(List().prefixLength _),
@@ -215,12 +210,6 @@ object SourceTests extends TestSuite{
           load(List().hasDefiniteSize _),
           "TraversableLike.scala",
           "def hasDefiniteSize"
-        )
-
-        'productIterator - check212(
-          load(List().productIterator _),
-          "Product.scala",
-          "def productIterator"
         )
       }
       'scalaz{
@@ -247,7 +236,6 @@ object SourceTests extends TestSuite{
         'instance  - check212(load(instance), "Map.scala", "case object Tip")
         'adjust    - check212(load(instance.adjust _), "Map.scala", "def adjust")
         'values    - check212(load(instance.values _), "Map.scala", "def values")
-        'mapAccumL - check212(load(instance.mapAccumL _), "Map.scala", "def mapAccumL")
         'split     - check212(load(instance.split _), "Map.scala", "def split")
       }
 //      'fastparse{

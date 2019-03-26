@@ -71,8 +71,8 @@ class LineReader(width: Int,
 
     writer.write(
       buffer.render.flatMap{
-        case '\n' => newlineReplacement
-        case x => Array(x)
+        case '\n' => newlineReplacement.toSeq
+        case x => Seq(x)
       }.toArray
     )
     writer.write(lineStuffer)
@@ -118,7 +118,7 @@ class LineReader(width: Int,
     // being pasted
     lazy val (renderedCursor, rendered) = computeRendered(lastState)
 
-    val rowLengths = LineReader.splitBuffer(lastState.buffer ++ lastState.msg.plainText)
+    val rowLengths = LineReader.splitBuffer(lastState.buffer ++ lastState.msg.plainText).toVector
 
     val narrowWidth = width - prompt.lastLine.length
     val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
@@ -207,12 +207,12 @@ object LineReader{
       if (c == '\n') frags.append(0)
       else frags(frags.length - 1) = frags.last + 1
     }
-    frags
+    frags.toIndexedSeq
   }
   def calculateHeight(buffer: Vector[Char],
                       width: Int,
                       prompt: String): Seq[Int] = {
-    val rowLengths = splitBuffer(buffer)
+    val rowLengths = splitBuffer(buffer).toVector
 
     calculateHeight0(rowLengths, width - prompt.length)
   }
