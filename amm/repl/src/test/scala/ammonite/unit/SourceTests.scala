@@ -6,7 +6,7 @@ import utest._
 import ammonite.repl.tools.source.load
 import ammonite.util.Util
 
-import scala.tools.nsc.interpreter.InputStream
+import java.io.InputStream
 object SourceTests extends TestSuite{
   val tests = Tests{
 

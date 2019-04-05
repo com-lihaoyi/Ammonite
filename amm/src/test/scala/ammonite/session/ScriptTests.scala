@@ -319,7 +319,7 @@ object ScriptTests extends TestSuite{
       }
       'resolverWithinScript{
         'pass - {
-          if (!scala2_12) check.session(s"""
+          if (scala2_11) check.session(s"""
             @ import os._
 
             @ interp.load.module($printedScriptPath/"Resolvers.sc")
@@ -328,7 +328,7 @@ object ScriptTests extends TestSuite{
           """)
         }
         'fail - {
-          if (!scala2_12) check.session(s"""
+          if (scala2_11) check.session(s"""
             @ import os._
 
             @ interp.load.module($printedScriptPath/"ResolversFail.sc")

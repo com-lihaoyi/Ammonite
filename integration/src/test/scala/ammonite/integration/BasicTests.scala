@@ -99,7 +99,7 @@ object BasicTests extends TestSuite{
 
     'complex {
       // Spire not published for 2.12
-      if (!scala.util.Properties.versionNumberString.contains("2.12")) {
+      if (scala.util.Properties.versionNumberString.contains("2.11")) {
         val evaled = exec('basic / "Complex.sc")
         assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
       }

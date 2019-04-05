@@ -99,7 +99,7 @@ object Preprocessor{
           blocks.append((ncomment, code))
         }
 
-        Res.Success(blocks)
+        Res.Success(blocks.toIndexedSeq)
     }
   }
 

@@ -106,7 +106,7 @@ object GrepResult{
         for((rangeStart, rangeEnd) <- rangeBuffer)
         yield (highlightColor.highlight, rangeStart - wideStart, rangeEnd - wideStart)
 
-      val colored = grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges)
+      val colored = grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges.toSeq)
 
       val dotDotDot = highlightColor.dotDotDotColor("...")
       val prefix = if (shiftedStart > 0) dotDotDot else fansi.Str("")

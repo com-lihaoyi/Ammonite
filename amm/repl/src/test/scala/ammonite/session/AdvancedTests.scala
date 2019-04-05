@@ -291,7 +291,7 @@ object AdvancedTests extends TestSuite{
       }
     }
     'compilerPlugin - retry(3){
-      if (!scala2_12) check.session("""
+      if (scala2_11) check.session("""
         @ // Compiler plugins imported without `.$plugin` are not loaded
 
         @ import $ivy.`org.spire-math::kind-projector:0.6.3`
@@ -314,7 +314,7 @@ object AdvancedTests extends TestSuite{
 
         @ // Importing plugins doesn't affect the run-time classpath
 
-        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.2`
+        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.8`
 
         @ import scalatags.Text
         error: not found: value scalatags
@@ -341,14 +341,17 @@ object AdvancedTests extends TestSuite{
       """)
     }
     'macroParadiseWorks{
-      val scalaVersion: String = scala.util.Properties.versionNumberString
-      val c1: DualTestRepl = new DualTestRepl()
-      c1.session(s"""
-        @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.0")
-      """)
-      c1.session("""
-        @ val x = 1
-      """)
+      // no more macroparadise in 2.13
+      if (scala2_11 || scala2_12) {
+        val scalaVersion: String = scala.util.Properties.versionNumberString
+        val c1: DualTestRepl = new DualTestRepl()
+        c1.session(s"""
+          @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.0")
+        """)
+        c1.session("""
+          @ val x = 1
+        """)
+      }
     }
     'desugar{
       check.session("""
@@ -470,9 +473,15 @@ object AdvancedTests extends TestSuite{
     }
 
     'loadURL - {
-      val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+      val sbv = {
+        val sv = scala.util.Properties.versionNumberString
+        if (sv.forall(c => c.isDigit || c == '.'))
+          sv.split('.').take(2).mkString(".")
+        else
+          sv
+      }
       val url = "https://repo1.maven.org/maven2/" +
-        s"io/argonaut/argonaut_$sbv/6.2.2/argonaut_$sbv-6.2.2.jar"
+        s"io/argonaut/argonaut_$sbv/6.2.3/argonaut_$sbv-6.2.3.jar"
       check.session(s"""
         @ interp.load.cp(new java.net.URL("$url"))
 

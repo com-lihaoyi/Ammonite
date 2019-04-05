@@ -75,7 +75,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
-            @ import $ivy.`com.lihaoyi::scalatags:0.6.2`
+            @ import $ivy.`com.lihaoyi::scalatags:0.6.8`
 
             @ import scalatags.Text.all._
 
@@ -89,7 +89,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
-            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.6.2`
+            @ import $$ivy.`com.lihaoyi:scalatags_${IvyThing.scalaBinaryVersion}:0.6.8`
 
             @ import scalatags.Text.all._
 
@@ -103,7 +103,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
-            @ import $ivy.`com.lihaoyi::scalatags:0.6.2`, scalatags.Text.all._
+            @ import $ivy.`com.lihaoyi::scalatags:0.6.8`, scalatags.Text.all._
 
             @ div("Hello").render
             res1: String = "<div>Hello</div>"
@@ -111,7 +111,8 @@ object ImportHookTests extends TestSuite{
         }
 
         'inlineFull - {
-          check.session("""
+          // no more macroparadise in 2.13
+          if (scala2_11 || scala2_12) check.session("""
             @ import org.scalamacros.paradise.Settings._
             error: object scalamacros is not a member of package org
 

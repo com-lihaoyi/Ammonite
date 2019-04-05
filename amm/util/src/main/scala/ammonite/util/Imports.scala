@@ -157,6 +157,6 @@ object Imports{
         data.prefix.headOption.foreach(stompedTerms.remove)
       }
     }
-    new Imports(out.reverse)
+    new Imports(out.reverse.toSeq)
   }
 }

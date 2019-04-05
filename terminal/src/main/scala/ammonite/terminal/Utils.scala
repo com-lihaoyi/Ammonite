@@ -39,7 +39,7 @@ abstract class Enum(implicit enumName: sourcecode.Name){
 }
 
 class AnsiNav(output: Writer){
-  def control(n: Int, c: Char) = output.write(s"\033[" + n + c)
+  def control(n: Int, c: Char) = output.write("\u001b[" + n + c)
 
   /**
    * Move up `n` squares

@@ -55,17 +55,20 @@ object IvyThing{
     coursier.MavenRepository("https://repo1.maven.org/maven2")
   )
 
-  val scalaBinaryVersion =
+  val scalaFullBinaryVersion =
     scala.util.Properties
-              .versionString
-              .stripPrefix("version ")
-              .split('.')
-              .take(2)
-              .mkString(".")
+      .versionNumberString
 
-  val scalaFullBinaryVersion = 
-    scala.util.Properties
-              .versionNumberString
-  
+  val scalaBinaryVersion = {
+    if (scalaFullBinaryVersion.forall(c => c.isDigit || c == '.'))
+      scalaFullBinaryVersion
+        .split('.')
+        .take(2)
+        .mkString(".")
+    else
+      // e.g. for versions like 2.13.0-M5
+      scalaFullBinaryVersion
+  }
+
 }
 

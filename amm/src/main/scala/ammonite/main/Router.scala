@@ -126,7 +126,10 @@ object Router{
       } else {
         missing0.filter(x => incomplete != Some(x))
       }
-      val duplicates = accumulatedKeywords.toSeq.filter(_._2.length > 1)
+      val duplicates = accumulatedKeywords.toSeq.collect {
+        case (k, l) if l.lengthCompare(1) > 0 =>
+          k -> l.toSeq
+      }
 
       if (
         incomplete.nonEmpty ||
@@ -136,7 +139,7 @@ object Router{
       ){
         Result.Error.MismatchedArguments(
           missing = missing,
-          unknown = leftoverArgs,
+          unknown = leftoverArgs.toSeq,
           duplicate = duplicates,
           incomplete = incomplete
 
@@ -144,10 +147,10 @@ object Router{
       } else {
         val mapping = accumulatedKeywords
           .iterator
-          .collect{case (k, Seq(single)) => (k.name, single)}
+          .collect{case (k, b) if b.lengthCompare(1) == 0 => (k.name, b.head)}
           .toMap
 
-        try invoke0(target, mapping, leftoverArgs)
+        try invoke0(target, mapping, leftoverArgs.toSeq)
         catch{case e: Throwable =>
           Result.Error.Exception(e)
         }

@@ -20,7 +20,7 @@ object ProjectTests extends TestSuite{
           @ import scalatags.Text.all._
           error: not found: value scalatags
 
-          @ import $$ivy.`com.lihaoyi::scalatags:0.6.2`
+          @ import $$ivy.`com.lihaoyi::scalatags:0.6.8`
 
           @ import scalatags.Text.all._
           import scalatags.Text.all._
@@ -30,7 +30,7 @@ object ProjectTests extends TestSuite{
         """)
         }
         'akkahttp - {
-            if (!scala2_12) check.session(
+            if (scala2_11) check.session(
               """
               @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0-M3`
 
@@ -68,7 +68,7 @@ object ProjectTests extends TestSuite{
         'resolvers - {
           retry(2){
             // ivy flakyness...
-            if (!scala2_12) check.session("""
+            if (scala2_11) check.session("""
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
               error: Failed to resolve ivy dependencies
 
@@ -96,7 +96,7 @@ object ProjectTests extends TestSuite{
 
     'shapeless {
       check.session("""
-        @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless._
+        @ import $ivy.`com.chuusai::shapeless:2.3.3`, shapeless._
 
         @ (1 :: "lol" :: List(1, 2, 3) :: HNil)
         res1: Int :: String :: List[Int] :: HNil = 1 :: "lol" :: List(1, 2, 3) :: HNil
@@ -113,7 +113,7 @@ object ProjectTests extends TestSuite{
 
     'scalaz{
       check.session("""
-        @ import $ivy.`org.scalaz::scalaz-core:7.2.7`, scalaz._, Scalaz._
+        @ import $ivy.`org.scalaz::scalaz-core:7.2.27`, scalaz._, Scalaz._
 
         @ (Option(1) |@| Option(2))(_ + _)
         res1: Option[Int] = Some(3)
@@ -121,7 +121,7 @@ object ProjectTests extends TestSuite{
     }
     'cats{
       check.session("""
-        @ import $ivy.`org.typelevel::cats-core:0.9.0`, cats._
+        @ import $ivy.`org.typelevel::cats-core:1.6.0`, cats._
 
       """)
     }
@@ -171,7 +171,7 @@ object ProjectTests extends TestSuite{
 
     'finagle{
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      if (!scala2_12) check.session("""
+      if (scala2_11) check.session("""
         @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
 
         @ import com.twitter.finagle._, com.twitter.util._
@@ -262,8 +262,8 @@ object ProjectTests extends TestSuite{
     }
 
     'deeplearning {
-      // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.10
-      check.session(
+      // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.13
+      if (scala2_11 || scala2_12) check.session(
         """
         @ import $ivy.`com.thoughtworks.deeplearning::plugins-builtins:2.0.0-RC0`
         import $ivy.$
@@ -319,7 +319,7 @@ object ProjectTests extends TestSuite{
 
         @ // should only add the shapeless-specific JARs
 
-        @ import $ivy.`com.chuusai::shapeless:2.3.2`
+        @ import $ivy.`com.chuusai::shapeless:2.3.3`
         import $ivy.$
 
         @ val addedAfterShapeless = scalaLibJarCount() - initCount

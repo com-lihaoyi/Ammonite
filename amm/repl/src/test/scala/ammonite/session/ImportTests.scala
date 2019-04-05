@@ -139,8 +139,7 @@ object ImportTests extends TestSuite{
             @ "foo" // Make sure this still works
             res4: String = "foo"
 
-            @ Duration.Inf // This fails due to a compiler bug SI-6039
-            ${ if (scala2_11 || scala2_12) "" else "error: Compilation Failed" }
+            @ Duration.Inf // This used to fail due to a compiler bug SI-6039
           """)
         }
         // This failed kinda non-deterministically in 0.5.2 (#248); it depended
