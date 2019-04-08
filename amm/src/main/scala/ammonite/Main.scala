@@ -195,7 +195,7 @@ case class Main(predefCode: String = "",
           warmupThread.start()
 
           val exitValue = Res.Success(repl.run())
-          (exitValue.map(repl.beforeExit), repl.interp.watchedFiles)
+          (exitValue.map(repl.beforeExit), repl.interp.watchedFiles.toSeq)
         }
     }
   }
@@ -211,7 +211,7 @@ case class Main(predefCode: String = "",
     instantiateInterpreter() match{
       case Right(interp) =>
         val result = main.Scripts.runScript(wd, path, interp, scriptArgs)
-        (result, interp.watchedFiles)
+        (result, interp.watchedFiles.toSeq)
       case Left(problems) => problems
     }
   }
@@ -223,7 +223,7 @@ case class Main(predefCode: String = "",
     instantiateInterpreter() match{
       case Right(interp) =>
         val res = interp.processExec(code, 0, () => ())
-        (res, interp.watchedFiles)
+        (res, interp.watchedFiles.toSeq)
       case Left(problems) => problems
     }
   }

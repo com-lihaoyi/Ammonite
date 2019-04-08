@@ -140,7 +140,7 @@ object Highlighter {
     }
     // Make sure there's an index right at the start and right at the end! This
     // resets the colors at the snippet's end so they don't bleed into later output
-    indices ++ Seq((999999999, endColor))
+    (indices ++ Seq((999999999, endColor))).toSeq
   }
 
 }

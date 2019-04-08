@@ -7,9 +7,7 @@
 package ammonite.ops
 
 import java.io.File
-import java.nio.file._
-
-import scala.io.Codec
+import java.nio.file.{Path => _, _}
 
 
 object Internals{
@@ -132,22 +130,12 @@ object cp extends Function2[Path, Path, Unit] with CopyMove{
     }
 
     copyOne(from)
-    if (stat(from).isDir) new ammonite.ops.FilterMapExt(os.walk(from)) | copyOne
+    if (stat(from).isDir) os.walk(from) | copyOne
   }
 
 }
 
 
-
-/**
- * A specialized Seq[Path] used to provide better a better pretty-printed
- * experience
- */
-case class LsSeq(base: Path, listed: RelPath*) extends Seq[Path]{
-  def length = listed.length
-  def apply(idx: Int) = base/listed.apply(idx)
-  def iterator = listed.iterator.map(base/)
-}
 
 /**
  * Kills the given process with the given signal, e.g.

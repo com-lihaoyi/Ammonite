@@ -122,8 +122,11 @@ object AutocompleteTests extends TestSuite{
           Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
         )
 
+        val extra =
+          if (scala2_11 || scala2_12) Set()
+          else Set("unless", "when")
         complete( """scala.Option.<caret>""",
-          (anyCompletion ++ Set("apply", "empty")) ^
+          (anyCompletion ++ Set("apply", "empty") ++ extra) ^
         )
 
         complete( """Seq(1, 2, 3).map(_.<caret>)""",

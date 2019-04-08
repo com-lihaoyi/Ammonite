@@ -22,6 +22,7 @@ private[ammonite] object ProxyFromEnv {
   private def getEnvs =
     sys.env.map { case (k, v) => (k.toLowerCase, v.toLowerCase) }
       .filterKeys(_.endsWith("proxy"))
+      .toMap
 
   /**
     * Convert single proxy environment variable to corresponding system proxy properties.

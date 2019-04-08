@@ -3,5 +3,5 @@
 def main(i: Int, s: String, things: String*): Unit = {
   println(i)
   println(s)
-  println(things)
+  println(things.toList)
 }

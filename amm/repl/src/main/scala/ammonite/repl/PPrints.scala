@@ -37,7 +37,7 @@ object PPrints{
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
 
     if (validIdentifier.findFirstIn(s) == Some(s)){
-      cfg.literalColor(''' + s)
+      cfg.literalColor('\'' + s)
     }else{
       cfg.literalColor(pprint.Util.literalize(s))
     }

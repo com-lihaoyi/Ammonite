@@ -24,6 +24,11 @@ matrix:
     scala: 2.12.8
 
   - stage: build
+    env: CI_SCRIPT="mill -i unitTest"
+    jdk: oraclejdk8
+    scala: 2.13.0-M5
+
+  - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk8
     scala: 2.11.12
@@ -37,6 +42,11 @@ matrix:
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk8
     scala: 2.12.8
+
+  - stage: build
+    env: CI_SCRIPT="mill -i integrationTest"
+    jdk: oraclejdk8
+    scala: 2.13.0-M5
 
 
   # Everything worked, *then* kick off a release

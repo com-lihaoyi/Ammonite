@@ -5,7 +5,7 @@ import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.typechecker.Analyzer
 
-object CompilerCompatibility {
+object CompilerCompatibility extends ExtraCompilerCompatibility {
   def newUnitParser(compiler: Global, line: String, fileName: String) = {
     compiler.newUnitParser(line, fileName)
   }

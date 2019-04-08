@@ -28,7 +28,7 @@ object MainTests extends TestSuite{
     }
 
     'compilerCrash{
-      if(!TestUtils.scala2_12){
+      if(TestUtils.scala2_11){
         val evaled = exec("CompilerCrash.sc")
         // Make sure we do not accidentally lose the stack trace in the case
         // where the script fails during compilation before entering the evaluator
@@ -237,7 +237,7 @@ object MainTests extends TestSuite{
         assert(
           out.contains("31337"),
           out.contains("zomg"),
-          out.contains("ArrayBuffer(-cow, --omg, bbq, -i, x, --i)")
+          out.contains("List(-cow, --omg, bbq, -i, x, --i)")
         )
       }
       'argsGivenButNoMain{

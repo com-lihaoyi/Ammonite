@@ -72,7 +72,7 @@ object HighlightJava{
       }
       indices.append((999999999, fansi.Attr.Reset))
 
-      fansi.Str(flattenIndices(indices, sourceCode.toVector))
+      fansi.Str(flattenIndices(indices.toSeq, sourceCode.toVector))
     }
   }
 }

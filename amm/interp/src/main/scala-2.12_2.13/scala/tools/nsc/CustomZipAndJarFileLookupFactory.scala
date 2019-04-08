@@ -10,7 +10,6 @@ import java.net.URL
 
 import ammonite.interp.internal.CustomURLZipArchive
 
-import scala.collection.Seq
 import FileUtils.AbstractFileOps
 
 // Originally based on

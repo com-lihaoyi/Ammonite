@@ -13,10 +13,11 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.11.12", "2.12.8")
+val binCrossScalaVersions = Seq("2.11.12", "2.12.8", "2.13.0-M5")
 val fullCrossScalaVersions = Seq(
   "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8"
+  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
+  "2.13.0-M5"
 )
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
@@ -32,16 +33,45 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.last
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
-  def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
-  def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.7")
+  def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.8")
+  def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.8")
   trait Tests extends super.Tests{
-    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.0")
+    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.6")
     def testFrameworks = Seq("utest.runner.Framework")
     def forkArgs = Seq("-XX:MaxPermSize=2g", "-Xmx4g", "-Dfile.encoding=UTF8")
+    def sources = T.sources{
+      val is211 = crossScalaVersion.startsWith("2.11.")
+      val is212 = crossScalaVersion.startsWith("2.12.")
+      val shared211_212 =
+        if (is211 || is212)
+          Seq(PathRef(millSourcePath / 'src / 'test / "scala-2.11_2.12"))
+        else
+          Seq()
+      super.sources() ++
+        shared211_212
+    }
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
+  }
+  def sources = T.sources{
+    val is211 = crossScalaVersion.startsWith("2.11.")
+    val is212 = crossScalaVersion.startsWith("2.12.")
+    val is213 = crossScalaVersion.startsWith("2.13.")
+    val shared211_212 =
+      if (is211 || is212)
+        Seq(PathRef(millSourcePath / 'src / 'main / "scala-2.11_2.12"))
+      else
+        Seq()
+    val shared212_213 =
+      if (is212 || is213)
+        Seq(PathRef(millSourcePath / 'src / 'main / "scala-2.12_2.13"))
+      else
+        Seq()
+    super.sources() ++
+      shared211_212 ++
+      shared212_213
   }
 }
 trait AmmModule extends AmmInternalModule with PublishModule{
@@ -83,7 +113,10 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(ivy"com.lihaoyi::os-lib:0.2.6")
+  def ivyDeps = Agg(
+    ivy"com.lihaoyi::os-lib:0.2.9",
+    ivy"org.scala-lang.modules::scala-collection-compat:0.3.0"
+  )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
 }
@@ -91,8 +124,8 @@ class OpsModule(val crossScalaVersion: String) extends AmmModule{
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::sourcecode:0.1.3",
-    ivy"com.lihaoyi::fansi:0.2.4"
+    ivy"com.lihaoyi::sourcecode:0.1.5",
+    ivy"com.lihaoyi::fansi:0.2.6"
   )
   def compileIvyDeps = Agg(
     ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -106,9 +139,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.7.1",
-      ivy"com.lihaoyi::pprint:0.5.2",
-      ivy"com.lihaoyi::fansi:0.2.4"
+      ivy"com.lihaoyi::upickle:0.7.4",
+      ivy"com.lihaoyi::pprint:0.5.4",
+      ivy"com.lihaoyi::fansi:0.2.6",
+      ivy"org.scala-lang.modules::scala-collection-compat:0.3.0"
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -122,7 +156,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util())
     def ivyDeps = Agg(
       ivy"io.get-coursier::coursier:1.1.0-M13-1",
-      ivy"com.lihaoyi::requests:0.1.7"
+      ivy"com.lihaoyi::requests:0.1.8"
     )
 
     def generatedSources = T{
@@ -155,7 +189,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.jline:jline-terminal-jna:3.6.2",
       ivy"org.jline:jline-reader:3.6.2",
       ivy"com.github.javaparser:javaparser-core:3.2.5",
-      ivy"com.github.scopt::scopt:3.5.0"
+      ivy"com.github.scopt::scopt:3.7.1"
     )
 
     object test extends Tests with AmmDependenciesResourceFileModule{
@@ -168,7 +202,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         resolveDeps(ivyDeps, sources = true)()).distinct
       }
       def ivyDeps = super.ivyDeps() ++ Agg(
-        ivy"org.scalaz::scalaz-core:7.2.24"
+        ivy"org.scalaz::scalaz-core:7.2.27"
       )
     }
   }
@@ -185,9 +219,6 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     terminal(), ops(),
     amm.util(), amm.runtime(),
     amm.interp(), amm.repl()
-  )
-  def ivyDeps = Agg(
-    ivy"com.github.scopt::scopt:3.5.0",
   )
 
   def runClasspath =
@@ -218,7 +249,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.chuusai::shapeless:2.3.2"
+      ivy"com.chuusai::shapeless:2.3.3"
     )
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
@@ -272,7 +303,7 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
       // slf4j-nop makes sshd server use logger that writes into the void
       ivy"org.slf4j:slf4j-nop:1.7.12",
       ivy"com.jcraft:jsch:0.1.54",
-      ivy"org.scalacheck::scalacheck:1.12.6"
+      ivy"org.scalacheck::scalacheck:1.14.0"
     )
   }
 }

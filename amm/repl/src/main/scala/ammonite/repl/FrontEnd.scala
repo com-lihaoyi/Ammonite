@@ -5,7 +5,7 @@ import java.io.{InputStream, OutputStream}
 import scala.collection.JavaConverters._
 import fastparse.Parsed
 import fastparse.ParserInput
-import org.jline.reader._
+import org.jline.reader.{Highlighter => _, _}
 import org.jline.reader.impl.history.DefaultHistory
 import org.jline.reader.impl.DefaultParser.ArgumentList
 import org.jline.terminal._
@@ -92,7 +92,7 @@ object FrontEnd {
   }
 }
 
-class AmmCompleter(highlighter: Highlighter) extends Completer {
+class AmmCompleter(highlighter: org.jline.reader.Highlighter) extends Completer {
   // completion varies from action to action
   var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
     (x, y) => (0, Seq.empty, Seq.empty)
@@ -189,7 +189,7 @@ class AmmoniteParsedLine(
 
 class SyntaxError(val msg: String) extends RuntimeException
 
-class AmmHighlighter extends Highlighter {
+class AmmHighlighter extends org.jline.reader.Highlighter {
 
   var colors: Colors = Colors.Default
 
