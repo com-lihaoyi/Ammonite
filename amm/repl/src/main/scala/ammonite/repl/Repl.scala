@@ -6,8 +6,7 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.interp.{Interpreter, Parsers, Preprocessor}
-
+import ammonite.interp.{CodeWrapper, Interpreter, Parsers, Preprocessor}
 
 import scala.annotation.tailrec
 
@@ -21,8 +20,8 @@ class Repl(input: InputStream,
            welcomeBanner: Option[String],
            replArgs: IndexedSeq[Bind[_]] = Vector.empty,
            initialColors: Colors = Colors.Default,
-           replCodeWrapper: Preprocessor.CodeWrapper,
-           scriptCodeWrapper: Preprocessor.CodeWrapper,
+           replCodeWrapper: CodeWrapper,
+           scriptCodeWrapper: CodeWrapper,
            alreadyLoadedDependencies: Seq[coursier.Dependency]) { repl =>
 
   val prompt = Ref("@ ")

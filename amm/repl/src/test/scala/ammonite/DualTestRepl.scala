@@ -1,6 +1,6 @@
 package ammonite
 
-import ammonite.interp.Preprocessor
+import ammonite.interp.{CodeClassWrapper, Preprocessor}
 import ammonite.util.{Evaluated, Res}
 
 /**
@@ -16,7 +16,7 @@ class DualTestRepl { dual =>
     },
     new TestRepl {
       override def predef = dual.predef
-      override def codeWrapper = Preprocessor.CodeClassWrapper
+      override def codeWrapper = CodeClassWrapper
     }
   )
 

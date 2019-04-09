@@ -1,14 +1,14 @@
 package ammonite.session
 
 import ammonite.TestRepl
-import ammonite.interp.Preprocessor
+import ammonite.interp.CodeClassWrapper
 import utest._
 
 object SerializationTests extends TestSuite{
   val tests = Tests{
     println("SerializationTests")
     val check = new TestRepl {
-      override def codeWrapper = Preprocessor.CodeClassWrapper
+      override def codeWrapper = CodeClassWrapper
     }
 
     'closure {
