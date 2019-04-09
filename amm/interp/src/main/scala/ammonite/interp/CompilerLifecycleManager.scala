@@ -50,7 +50,7 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
 
   def preprocess(fileName: String) = synchronized{
     if (compiler == null) init(force = true)
-    Preprocessor(compiler.parse(fileName, _))
+    DefaultPreprocessor(compiler.parse(fileName, _))
   }
 
 
