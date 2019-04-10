@@ -2,7 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.interp.{Interpreter, Preprocessor}
+import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
 import ammonite.main.Defaults
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util._
@@ -31,8 +31,8 @@ object TestUtils {
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
-      replCodeWrapper = Preprocessor.CodeWrapper,
-      scriptCodeWrapper = Preprocessor.CodeWrapper,
+      replCodeWrapper = CodeWrapper,
+      scriptCodeWrapper = CodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt")
     )
     interp.initializePredef()
