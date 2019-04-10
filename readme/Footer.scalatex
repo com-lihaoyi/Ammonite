@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{1.6.6}
+      @ul
+        @li
+          Add support for scala @code{2.13.0-M5}
     @sect{1.6.5}
       @ul
         @li
