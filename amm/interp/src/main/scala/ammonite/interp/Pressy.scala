@@ -192,7 +192,11 @@ object Pressy {
             handleTypeCompletion(expr.pos.end, "", 1)
           }
         }else {// I they're been defined, just use typeCompletion
-          handleTypeCompletion(selectors.last.namePos, selectors.last.name.decoded, 0)
+          val selector = selectors
+            .filter(s => Math.max(s.namePos, s.renamePos) <= index)
+            .lastOption
+            .getOrElse(selectors.last)
+          handleTypeCompletion(selector.namePos, selector.name.decoded, 0)
         }
       case t @ pressy.Ident(name) =>
         lazy val shallow = handleCompletion(

@@ -84,6 +84,12 @@ object AutocompleteTests extends TestSuite{
           """import scala.colltion.<caret>""", Set.empty[String] -- _
         )
         complete("""object X { import y<caret> ; def y(z: Int)""", Set.empty[String] -- _)
+        complete(
+          """import scala.collection.immutable.List.{<from>em<caret>, fi}""", Set("empty") -- _
+        )
+        complete(
+          """import scala.collection.immutable.List.{em, <from>fi<caret>}""", Set("fill") -- _
+        )
       }
 
       'scope - checking{ complete =>
