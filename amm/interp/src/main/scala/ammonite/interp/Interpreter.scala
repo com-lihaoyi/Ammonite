@@ -11,6 +11,7 @@ import ammonite.runtime._
 import fastparse._
 
 import annotation.tailrec
+import ammonite.runtime.tools.IvyThing
 import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
@@ -66,7 +67,14 @@ class Interpreter(val printer: Printer,
   def frameImports = headFrame.imports
   def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
-  val compilerManager = new CompilerLifecycleManager(storage, headFrame)
+  def dependencyComplete: String => (Int, Seq[String]) =
+    IvyThing.completer(repositories(), verbose = verboseOutput)
+
+  val compilerManager = new CompilerLifecycleManager(
+    storage,
+    headFrame,
+    Some(dependencyComplete)
+  )
 
   val eval = Evaluator(headFrame)
 

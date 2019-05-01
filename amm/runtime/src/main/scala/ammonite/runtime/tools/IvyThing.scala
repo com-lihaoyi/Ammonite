@@ -24,6 +24,18 @@ trait IvyConstructor{
 }
 
 object IvyThing{
+  def completer(
+    repositories: Seq[coursier.Repository],
+    verbose: Boolean
+  ): String => (Int, Seq[String]) = {
+    val cache = FileCache()
+      .withLogger(if (verbose) RefreshLogger.create() else CacheLogger.nop)
+    val complete = coursier.complete.Complete(cache)
+      .withScalaVersion(scala.util.Properties.versionNumberString)
+
+    s =>
+      complete.withInput(s).complete().unsafeRun()(cache.ec)
+  }
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
                       verbose: Boolean,
