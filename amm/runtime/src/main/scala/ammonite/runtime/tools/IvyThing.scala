@@ -3,7 +3,8 @@ package ammonite.runtime.tools
 import java.io.PrintStream
 
 import coursier.util.Task
-import coursier.cache.{CacheLogger, FileCache, LocalRepositories}
+import coursier.LocalRepositories
+import coursier.cache.{CacheLogger, FileCache}
 import coursier.cache.loggers.RefreshLogger
 import coursier.core.{Classifier, ModuleName, Organization}
 
