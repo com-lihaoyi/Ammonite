@@ -3,6 +3,7 @@ package ammonite.interp
 import java.io.{OutputStream, PrintWriter}
 
 import ammonite.interp.Compiler.makeReporter
+import ammonite.util.Name
 
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
 import scala.reflect.io.VirtualDirectory
@@ -38,6 +39,7 @@ object Pressy {
    */
   class Run(val pressy: nsc.interactive.Global,
             currentFile: BatchSourceFile,
+            dependencyCompleteOpt: Option[String => (Int, Seq[String])],
             allCode: String,
             index: Int){
 
@@ -191,8 +193,31 @@ object Pressy {
             // the next thing
             handleTypeCompletion(expr.pos.end, "", 1)
           }
-        }else {// I they're been defined, just use typeCompletion
-          handleTypeCompletion(selectors.last.namePos, selectors.last.name.decoded, 0)
+        }else {
+          val isImportIvy = expr.isInstanceOf[pressy.Ident] &&
+            expr.asInstanceOf[pressy.Ident].name.decoded == "$ivy"
+          val selector = selectors
+            .filter(s => Math.max(s.namePos, s.renamePos) <= index)
+            .lastOption
+            .getOrElse(selectors.last)
+
+          if (isImportIvy) {
+            def forceOpenedBacktick(s: String): String = {
+              val res = Name(s).backticked
+              if (res.startsWith("`")) res.stripSuffix("`")
+              else "`" + res
+            }
+            dependencyCompleteOpt match {
+              case None => 0 -> Seq.empty[(String, Option[String])]
+              case Some(complete) =>
+                val input = selector.name.decoded
+                val (pos, completions) = complete(input)
+                val input0 = input.take(pos)
+                (selector.namePos, completions.map(s => forceOpenedBacktick(input0 + s) -> None))
+            }
+          } else
+            // just use typeCompletion
+            handleTypeCompletion(selector.namePos, selector.name.decoded, 0)
         }
       case t @ pressy.Ident(name) =>
         lazy val shallow = handleCompletion(
@@ -230,7 +255,8 @@ object Pressy {
   def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
-            settings: Settings): Pressy = new Pressy {
+            settings: Settings,
+            dependencyCompleteOpt: => Option[String => (Int, Seq[String])]): Pressy = new Pressy {
 
     @volatile var cachedPressy: nsc.interactive.Global = null
 
@@ -269,7 +295,7 @@ object Pressy {
       pressy.askReload(List(currentFile), r)
       r.get.fold(x => x, e => throw e)
 
-      val run = Try(new Run(pressy, currentFile, allCode, index))
+      val run = Try(new Run(pressy, currentFile, dependencyCompleteOpt, allCode, index))
 
       val (i, all): (Int, Seq[(String, Option[String])]) = run.map(_.prefixed) match {
         case Success(prefixed) => prefixed

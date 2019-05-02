@@ -38,6 +38,10 @@ object AutocompleteTests extends TestSuite{
     c.check.interps.map(_.compilerManager.shutdownPressy())
     res
   }
+  implicit class SetExt[T](s1: Set[T]) {
+    def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
+  }
+
   val tests = Tests{
     println("AutocompleteTests")
     'selection{
@@ -49,10 +53,6 @@ object AutocompleteTests extends TestSuite{
         "toString", "equals", "hashCode",
         "getClass", "asInstanceOf", "isInstanceOf"
       )
-      implicit class SetExt[T](s1: Set[T]) {
-        def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
-      }
-
       'import - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete("""import <from><caret>""", Set("java", "javax", "scala", "javassist") -- _)
@@ -84,6 +84,12 @@ object AutocompleteTests extends TestSuite{
           """import scala.colltion.<caret>""", Set.empty[String] -- _
         )
         complete("""object X { import y<caret> ; def y(z: Int)""", Set.empty[String] -- _)
+        complete(
+          """import scala.collection.immutable.List.{<from>em<caret>, fi}""", Set("empty") -- _
+        )
+        complete(
+          """import scala.collection.immutable.List.{em, <from>fi<caret>}""", Set("fill") -- _
+        )
       }
 
       'scope - checking{ complete =>
@@ -219,6 +225,41 @@ object AutocompleteTests extends TestSuite{
           Set("`new`") -- _
         )
       }
+    }
+
+    'dependencies {
+      // re-enable if we can use the same coursier version again in 2.13
+      if (scala.util.Properties.versionNumberString != "2.13.0-M5")
+        checking { complete =>
+          complete(
+            """import $ivy.<from>`io.get-c<caret>`""",
+            Set("`io.get-coursier") ^ _
+          )
+          complete(
+            """import $ivy.<from>`io.get-coursier::coursier-co<caret>`""",
+            Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+          )
+          complete(
+            """import $ivy.{<from>`io.get-coursier::coursier-co<caret>`}""",
+            Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+          )
+          complete(
+            """import $ivy.{`io.get-coursier::coursier-cache:1.0.3`, """ +
+              """<from>`io.get-coursier::coursier-co<caret>`}""",
+            Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+          )
+          complete(
+            """import $ivy.{<from>`io.get-coursier::coursier-co<caret>`, """ +
+              """`io.get-coursier::coursier-cache:1.0.3`}""",
+            Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+          )
+          complete(
+            """import $ivy.<from>`io.get-coursier::coursier-cache:1.0.<caret>`""",
+            c =>
+              (Set("1.0.0", "1.0.3").map(v => s"`io.get-coursier::coursier-cache:$v") -- c) ++
+                c.filter(!_.startsWith("`io.get-coursier::coursier-cache:1.0."))
+          )
+        }
     }
   }
 }

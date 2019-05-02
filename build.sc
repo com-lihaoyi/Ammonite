@@ -154,10 +154,16 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util())
-    def ivyDeps = Agg(
-      ivy"io.get-coursier::coursier:1.1.0-M13-1",
-      ivy"com.lihaoyi::requests:0.1.8"
-    )
+    def ivyDeps = T{
+      // try again using the same version when we switch to the latest scala 2.13
+      val coursierVersion =
+        if (scalaVersion() == "2.13.0-M5") "1.1.0-M14-2"
+        else "1.1.0-M14-3"
+      Agg(
+        ivy"io.get-coursier::coursier:$coursierVersion",
+        ivy"com.lihaoyi::requests:0.1.8"
+      )
+    }
 
     def generatedSources = T{
       Seq(PathRef(generateConstantsFile(buildVersion)))

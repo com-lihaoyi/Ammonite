@@ -3,7 +3,8 @@ package ammonite.runtime.tools
 import java.io.PrintStream
 
 import coursier.util.Task
-import coursier.cache.{CacheLogger, FileCache, LocalRepositories}
+import coursier.LocalRepositories
+import coursier.cache.{CacheLogger, FileCache}
 import coursier.cache.loggers.RefreshLogger
 import coursier.core.{Classifier, ModuleName, Organization}
 
@@ -23,6 +24,18 @@ trait IvyConstructor{
 }
 
 object IvyThing{
+  def completer(
+    repositories: Seq[coursier.Repository],
+    verbose: Boolean
+  ): String => (Int, Seq[String]) = {
+    val cache = FileCache()
+      .withLogger(if (verbose) RefreshLogger.create() else CacheLogger.nop)
+    val complete = coursier.complete.Complete(cache)
+      .withScalaVersion(scala.util.Properties.versionNumberString)
+
+    s =>
+      complete.withInput(s).complete().unsafeRun()(cache.ec)
+  }
   def resolveArtifact(repositories: Seq[coursier.Repository],
                       dependencies: Seq[coursier.Dependency],
                       verbose: Boolean,

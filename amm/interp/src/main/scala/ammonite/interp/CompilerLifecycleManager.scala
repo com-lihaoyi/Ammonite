@@ -20,7 +20,11 @@ import scala.tools.nsc.Settings
   * compiler objects are initialized, or worry about initializing them more
   * than necessary
   */
-class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
+class CompilerLifecycleManager(
+  storage: Storage,
+  headFrame: => Frame,
+  dependencyCompleteOpt: => Option[String => (Int, Seq[String])]
+){
 
 
 
@@ -93,7 +97,8 @@ class CompilerLifecycleManager(storage: Storage, headFrame: => Frame){
         dynamicClasspath,
         headFrame.classloader,
 
-        settings.copy()
+        settings.copy(),
+        dependencyCompleteOpt
       )
 
       Internal.preConfiguredSettingsChanged = false
