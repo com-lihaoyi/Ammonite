@@ -1,5 +1,6 @@
 package ammonite.repl
 
+import ammonite.ops.Internals
 import ammonite.util._
 
 import scala.reflect.runtime.universe._
@@ -160,6 +161,8 @@ trait ReplAPI {
   def sess: Session
 
   def load: ReplLoad
+
+  def clipboard: Clipboard
 }
 trait ReplLoad{
   /**
@@ -206,4 +209,17 @@ trait Session{
     */
   def delete(name: String): Unit
 }
-
+trait Clipboard{
+  /**
+    * Reads contents from the system clipboard.
+    * @return System clipboard contents if they are readable as `String`,
+    *         empty string otherwise.
+    */
+  def read: String
+  /**
+    * Sets the contents of the system clipboard.
+    *
+    * @param data New contents for the clipboard.
+    */
+  def write(data: Internals.Writable): Unit
+}
