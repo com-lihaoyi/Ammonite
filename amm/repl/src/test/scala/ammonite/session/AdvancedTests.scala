@@ -302,7 +302,7 @@ object AdvancedTests extends TestSuite{
         @ type TC0EitherStr = TC0[Either[String, ?]]
         error: not found: type ?
 
-        @ // You need to use `import $ivy.$plugin`
+        @ // You need to use `import $plugin.$ivy`
 
         @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
 
