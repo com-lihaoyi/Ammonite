@@ -461,7 +461,7 @@
 
         @p
           If you want to load a compiler plugin, you can do so using
-          @hl.scala{import $ivy.$plugin}:
+          @hl.scala{import $plugin.$ivy}:
 
         @hl.ref(ammoniteTests/"AdvancedTests.scala", Seq("'compilerPlugin", "@"))
 
