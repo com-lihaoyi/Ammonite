@@ -250,9 +250,9 @@ span.hljs-tag, span.hljs-symbol{
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.6.6-7-5e5461b:
+    1.6.6-8-7a0fd41:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-7-5e5461b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-8-7a0fd41) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     Alternatively, on macOS you can install Ammonite via brew:
@@ -317,9 +317,9 @@ sourceGenerators in Test += Def.task {
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.6.6-7-5e5461b:
+    1.6.6-8-7a0fd41:
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.6-7-5e5461b&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.6-8-7a0fd41&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
   <p>
     After that, simply hit
@@ -772,7 +772,7 @@ res1: Boolean = false</code><a class=" scalatex-site-Styles-headerLink" style="p
 
         <p>
           If you want to load a compiler plugin, you can do so using
-          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $ivy.$plugin</code>:
+          <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">import $plugin.$ivy</code>:
 </p>
         <pre class=" scalatex-site-Styles-hoverContainer"><code class="scala scalatex-site-Styles-highlightMe">@ // Compiler plugins imported without `.$plugin` are not loaded
 
@@ -784,7 +784,7 @@ defined trait TC0
 @ type TC0EitherStr = TC0[Either[String, ?]]
 error: not found: type ?
 
-@ // You need to use `import $ivy.$plugin`
+@ // You need to use `import $plugin.$ivy`
 
 @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
 
@@ -1361,11 +1361,11 @@ sshd
 terminal
 .travis.yml
 
-real	0m0.002s
+real	0m0.003s
 user	0m0.000s
 sys	0m0.000s</pre><pre><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc</span><span>
 </span><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2</span><span>
-Welcome to the Ammonite Repl 1.6.6-7-5e5461b
+Welcome to the Ammonite Repl 1.6.6-8-7a0fd41
 (Scala 2.12.8 Java 1.8.0_151)
 If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #8e44ad;">@ </span><span>time{ls!} 
@@ -1378,7 +1378,7 @@ If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">&quot;fail.txt&quot;</span><span>          </span><span style="color: #27ae60;">'readme</span><span>
 </span><span style="color: #27ae60;">&quot;appveyor.yml&quot;</span><span>      </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 ,
-  23114208 nanoseconds
+  21184927 nanoseconds
 )
 </span></pre></div>
 
@@ -2162,9 +2162,9 @@ replServer.start()
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.6.6-7-5e5461b:
+    1.6.6-8-7a0fd41:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-7-5e5461b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-8-7a0fd41) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     And read on to learn about how Scala scripts work.
@@ -4085,16 +4085,16 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (HEAD detached at 5e5461b)
+* (HEAD detached at 7a0fd41)
   master</pre><pre><span style="color: #8e44ad;">@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (HEAD detached at 5e5461b)
+* (HEAD detached at 7a0fd41)
   master
 
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Sun May  5 05:17:40 UTC 2019</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
-Sun May  5 05:17:48 UTC 2019
+Fri May 10 08:13:58 UTC 2019</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
+Fri May 10 08:14:06 UTC 2019
 
 </span></pre></div>
 
@@ -4332,10 +4332,10 @@ Hello from Java!
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 
 </span><span style="color: #8e44ad;">@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Sun May 05 05:19:44 UTC 2019
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Fri May 10 08:15:59 UTC 2019
 
 </span><span style="color: #8e44ad;">@ </span><span>date.getDay() 
-</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">0</span><span>
+</span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">5</span><span>
 </span></pre>
 
       <p>
@@ -6387,10 +6387,10 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>1.6.6</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>1.6.6-7-5e5461b</code> and is available for direct
+      <code>1.6.6-8-7a0fd41</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-7-5e5461b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-8-7a0fd41) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
     <p>
       On Cygwin, run the following after the above:
@@ -6401,12 +6401,12 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The latest build can also be run as Windows batch; just save the following as amm.bat:
 </p>
     <p>
-      <a href="https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-7-5e5461b">https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-7-5e5461b</a>
+      <a href="https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-8-7a0fd41">https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.12-1.6.6-8-7a0fd41</a>
 </p>
     <p>
       For usage in a SBT project:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.6-7-5e5461b&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.6-8-7a0fd41&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
     <p>
       Ammonite also provides standalone unstable executables for older versions
@@ -6414,9 +6414,9 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </p>
     
       <b>
-        Scala 1.6.6/2.11-1.6.6-7-5e5461b
+        Scala 1.6.6/2.11-1.6.6-8-7a0fd41
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.11-1.6.6-7-5e5461b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.6/2.11-1.6.6-8-7a0fd41) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
