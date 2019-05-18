@@ -123,6 +123,13 @@
 
 
   @sect{Changelog}
+    @sect{1.6.7}
+      @ul
+        @li
+          Fix regression in @code{source} builtin (@issue(964))
+
+        @li
+          Autocomplete for @code{import $ivy} statements (@issue(957))
     @sect{1.6.6}
       @ul
         @li
