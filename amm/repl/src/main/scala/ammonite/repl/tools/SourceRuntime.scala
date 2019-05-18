@@ -252,7 +252,7 @@ object SourceRuntime{
 
         val targetLine = math.max(0, loc.lineNum - verticalOffset)
         val tmpFile = os.temp(output.mkString("\n"), suffix = "." + loc.fileName)
-        os.proc(command(targetLine).values, tmpFile).call(stdin=os.Inherit, stdout=os.Inherit, stder=os.Inherit)
+        os.proc(command(targetLine).values, tmpFile).call(stdin=os.Inherit, stdout=os.Inherit, stderr=os.Inherit)
       case Left(msg) => println(msg)
     }
   }
