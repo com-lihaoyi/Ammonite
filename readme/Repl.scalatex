@@ -844,7 +844,7 @@
         public package repositories and find the name and version of a dependency
         that you want:
 
-      @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
+      @img(src:="IvyComplete.gif", display.block, marginLeft.auto, marginRight.auto, height := 400)
 
 
       @p
