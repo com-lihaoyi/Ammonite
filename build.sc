@@ -390,20 +390,18 @@ def publishExecutable() = {
     val latestAssemblyJars = mill.define.Task.sequence(latestAssemblies)()
 
     println("MASTER COMMIT: Creating a release")
-    import ujson.Js
     if (!unstable){
-      scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
-        .postData(
-          ujson.write(
-            Js.Obj(
-              "tag_name" -> buildVersion,
-              "name" -> buildVersion,
-              "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
-            )
+      requests.post(
+        "https://api.github.com/repos/lihaoyi/Ammonite/releases",
+        data = ujson.write(
+          ujson.Obj(
+            "tag_name" -> buildVersion,
+            "name" -> buildVersion,
+            "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
           )
-        )
-        .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
-        .asString
+        ),
+        headers = Seq("Authorization" -> s"token ${sys.env("AMMONITE_BOT_AUTH_TOKEN")}")
+      )
     }
 
     for ((version, jar) <- binCrossScalaVersions.zip(latestAssemblyJars)) {
@@ -528,6 +526,7 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
       "https://oss.sonatype.org/content/repositories/snapshots",
       sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
       Option(sys.env("SONATYPE_PGP_PASSWORD")),
+      None,
       true,
       T.ctx().log
     ).publishAll(
