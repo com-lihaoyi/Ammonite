@@ -161,7 +161,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         else "1.1.0-M14-3"
       Agg(
         ivy"io.get-coursier::coursier:$coursierVersion",
-        ivy"com.lihaoyi::requests:0.1.8"
+        ivy"com.lihaoyi::requests:0.1.9"
       )
     }
 
