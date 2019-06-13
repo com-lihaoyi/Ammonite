@@ -114,7 +114,10 @@ object AutocompleteTests extends TestSuite{
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
 
-          complete( """Seq(1, 2, 3).map(argNameLol => <from>argNam<caret>)""", Set("argNameLol") ^ _)
+          complete(
+            """Seq(1, 2, 3).map(argNameLol => <from>argNam<caret>)""",
+            Set("argNameLol") ^ _
+          )
 
           complete( """object Zomg{ <from>Zom<caret> }""", Set("Zomg") ^ _)
           complete( """object Zomg{ <from>Zo<caret>m }""", Set("Zomg") ^ _)
