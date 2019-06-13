@@ -99,14 +99,14 @@ object AutocompleteTests extends TestSuite{
           complete( """object Zomg{ <from><caret> }""", Set("Zomg") -- _)
           complete(
             "<from>printl<caret>",
-            Set("println") ^,
-            Set[String]() ^
+            Set("println") ^ _,
+            Set[String]() ^ _
           )
         }
         //      Not sure why this doesnt work
         //      complete(
         //        "println<caret>",
-        //        Set[String]() ^,
+        //        Set[String]() ^ _,
         //        Set("def println(x: Any): Unit", "def println(): Unit") ^
         //      )
       }
@@ -114,25 +114,25 @@ object AutocompleteTests extends TestSuite{
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
 
-          complete( """Seq(1, 2, 3).map(argNameLol => <from>argNam<caret>)""", Set("argNameLol") ^)
+          complete( """Seq(1, 2, 3).map(argNameLol => <from>argNam<caret>)""", Set("argNameLol") ^ _)
 
-          complete( """object Zomg{ <from>Zom<caret> }""", Set("Zomg") ^)
-          complete( """object Zomg{ <from>Zo<caret>m }""", Set("Zomg") ^)
-          complete( """object Zomg{ <from>Z<caret>om }""", Set("Zomg") ^)
-          complete( """object Zomg{ <from><caret>Zom }""", Set("Zomg") ^)
+          complete( """object Zomg{ <from>Zom<caret> }""", Set("Zomg") ^ _)
+          complete( """object Zomg{ <from>Zo<caret>m }""", Set("Zomg") ^ _)
+          complete( """object Zomg{ <from>Z<caret>om }""", Set("Zomg") ^ _)
+          complete( """object Zomg{ <from><caret>Zom }""", Set("Zomg") ^ _)
         }
       }
       'dot - checking{ complete =>
 
         complete( """java.math.<caret>""",
-          Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^
+          Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^ _
         )
 
         val extra =
           if (scala2_11 || scala2_12) Set()
           else Set("unless", "when")
         complete( """scala.Option.<caret>""",
-          (anyCompletion ++ Set("apply", "empty") ++ extra) ^
+          (anyCompletion ++ Set("apply", "empty") ++ extra) ^ _
         )
 
         complete( """Seq(1, 2, 3).map(_.<caret>)""",
@@ -147,21 +147,21 @@ object AutocompleteTests extends TestSuite{
 
       'deep - checking{ complete =>
         complete( """<from>fromN<caret>""",
-          Set("scala.concurrent.duration.fromNow") ^
+          Set("scala.concurrent.duration.fromNow") ^ _
         )
         complete( """<from>Fut<caret>""",
           Set("scala.concurrent.Future", "java.util.concurrent.Future") -- _
         )
         complete( """SECO<caret>""",
-          Set("scala.concurrent.duration.SECONDS") ^
+          Set("scala.concurrent.duration.SECONDS") ^ _
         )
       }
       'dotPrefix - checking{ complete =>
         complete( """java.math.<from>Big<caret>""",
-          Set("BigDecimal", "BigInteger") ^
+          Set("BigDecimal", "BigInteger") ^ _
         )
         complete( """scala.Option.option2<caret>""",
-          Set() ^
+          Set() ^ _
         )
         complete( """val x = 1; x + x.<from>><caret>""",
           Set(">>", ">>>") -- _,
@@ -173,7 +173,7 @@ object AutocompleteTests extends TestSuite{
             "def >(x: Long): Boolean",
             "def >(x: Char): Boolean",
             "def >(x: Byte): Boolean"
-          ) ^
+          ) ^ _
         )
 
 
@@ -198,7 +198,7 @@ object AutocompleteTests extends TestSuite{
 
       'Array - checking{ complete =>
         //Test around https://github.com/lihaoyi/Ammonite/issues/252
-        complete("""new Array<caret>""", Set() ^)
+        complete("""new Array<caret>""", Set() ^ _)
       }
 
       'LOCAL_SUFFIX_STRING - checking { complete =>

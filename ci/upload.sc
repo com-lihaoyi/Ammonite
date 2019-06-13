@@ -1,6 +1,5 @@
 #!/usr/bin/env amm
 import ammonite.ops._
-import scalaj.http._
 
 @main
 def apply(uploadedFile: Path,
@@ -12,9 +11,10 @@ def apply(uploadedFile: Path,
   println(tagName)
   println(uploadName)
   println(authKey)
-  val body = Http("https://api.github.com/repos/lihaoyi/Ammonite/releases/tags/" + tagName)
-    .header("Authorization", "token " + authKey)
-    .asString.body
+  val body = requests.get(
+    "https://api.github.com/repos/lihaoyi/Ammonite/releases/tags/" + tagName,
+    headers = Seq("Authorization" -> s"token $authKey")
+  ).text
 
   val parsed = ujson.read(body)
 
@@ -27,15 +27,21 @@ def apply(uploadedFile: Path,
     s"https://uploads.github.com/repos/lihaoyi/Ammonite/releases/" +
       s"$snapshotReleaseId/assets?name=$uploadName"
 
-  val res = Http(uploadUrl)
-    .header("Content-Type", "application/octet-stream")
-    .header("Authorization", "token " + authKey)
-    .timeout(connTimeoutMs = 5000, readTimeoutMs = 60000)
-    .postData(read.bytes! uploadedFile)
-    .asString
+  val res = requests.post(
+    uploadUrl,
+    headers = Seq(
+      "Content-Type" -> "application/octet-stream",
+      "Authorization" -> s"token $authKey"
+    ),
+    connectTimeout = 5000, 
+    readTimeout = 60000,
+    data = read.bytes(uploadedFile)
+  ).text
+   
 
-  println(res.body)
-  val longUrl = ujson.read(res.body)("browser_download_url").toString
+  println(res)
+
+  val longUrl = ujson.read(res)("browser_download_url").toString
 
   longUrl
 }

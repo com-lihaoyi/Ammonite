@@ -95,7 +95,7 @@ object FullReplAPI {
         )
         val output = mutable.Buffer.empty[fansi.Str]
 
-        prefix.foreach(output +=)
+        prefix.foreach(output += _)
 
         val rhs = custom match {
           case None =>

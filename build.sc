@@ -13,11 +13,10 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.11.12", "2.12.8", "2.13.0-M5")
+val binCrossScalaVersions = Seq("2.12.8", "2.13.0")
 val fullCrossScalaVersions = Seq(
-  "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.11.9", "2.11.11", "2.11.12",
   "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
-  "2.13.0-M5"
+  "2.13.0"
 )
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
@@ -33,10 +32,10 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.last
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
-  def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.8")
-  def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.1.8")
+  def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
+  def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
   trait Tests extends super.Tests{
-    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.6")
+    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.6.9")
     def testFrameworks = Seq("utest.runner.Framework")
     def forkArgs = Seq("-XX:MaxPermSize=2g", "-Xmx4g", "-Dfile.encoding=UTF8")
     def sources = T.sources{
@@ -114,8 +113,8 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::os-lib:0.2.9",
-    ivy"org.scala-lang.modules::scala-collection-compat:0.3.0"
+    ivy"com.lihaoyi::os-lib:0.3.0",
+    ivy"org.scala-lang.modules::scala-collection-compat:2.0.0"
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
@@ -124,8 +123,8 @@ class OpsModule(val crossScalaVersion: String) extends AmmModule{
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::sourcecode:0.1.5",
-    ivy"com.lihaoyi::fansi:0.2.6"
+    ivy"com.lihaoyi::sourcecode:0.1.7",
+    ivy"com.lihaoyi::fansi:0.2.7"
   )
   def compileIvyDeps = Agg(
     ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -139,10 +138,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.7.4",
-      ivy"com.lihaoyi::pprint:0.5.4",
-      ivy"com.lihaoyi::fansi:0.2.6",
-      ivy"org.scala-lang.modules::scala-collection-compat:0.3.0"
+      ivy"com.lihaoyi::upickle:0.7.5",
+      ivy"com.lihaoyi::pprint:0.5.5",
+      ivy"com.lihaoyi::fansi:0.2.7",
+      ivy"org.scala-lang.modules::scala-collection-compat:2.0.0"
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -156,12 +155,11 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util())
     def ivyDeps = T{
       // try again using the same version when we switch to the latest scala 2.13
-      val coursierVersion =
-        if (scalaVersion() == "2.13.0-M5") "1.1.0-M14-2"
-        else "1.1.0-M14-3"
+      val coursierVersion = "2.0.0-RC2"
+
       Agg(
         ivy"io.get-coursier::coursier:$coursierVersion",
-        ivy"com.lihaoyi::requests:0.1.9"
+        ivy"com.lihaoyi::requests:0.2.0"
       )
     }
 
@@ -177,7 +175,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.1.0",
+      ivy"com.lihaoyi::scalaparse:2.1.3",
       ivy"org.javassist:javassist:3.21.0-GA"
     )
   }
@@ -392,18 +390,17 @@ def publishExecutable() = {
     println("MASTER COMMIT: Creating a release")
     import ujson.Js
     if (!unstable){
-      scalaj.http.Http("https://api.github.com/repos/lihaoyi/Ammonite/releases")
-        .postData(
-          ujson.write(
-            Js.Obj(
-              "tag_name" -> buildVersion,
-              "name" -> buildVersion,
-              "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
-            )
+      requests.post(
+        "https://api.github.com/repos/lihaoyi/Ammonite/releases",
+        data = ujson.write(
+          Js.Obj(
+            "tag_name" -> buildVersion,
+            "name" -> buildVersion,
+            "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
           )
-        )
-        .header("Authorization", "token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))
-        .asString
+        ),
+        headers = Seq("Authorization" -> ("token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))),
+      )
     }
 
     for ((version, jar) <- binCrossScalaVersions.zip(latestAssemblyJars)) {
@@ -528,7 +525,10 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
       "https://oss.sonatype.org/content/repositories/snapshots",
       sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
       Option(sys.env("SONATYPE_PGP_PASSWORD")),
+      None,
       true,
+      60000,
+      60000,
       T.ctx().log
     ).publishAll(
       true,

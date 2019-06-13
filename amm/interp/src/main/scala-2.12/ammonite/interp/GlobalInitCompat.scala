@@ -1,13 +1,14 @@
 package ammonite.interp
 
 import ammonite.runtime.Classpath
+
 import scala.reflect.io.{AbstractFile, FileZipArchive, VirtualDirectory}
 import scala.tools.nsc
 import scala.tools.nsc.classpath._
-import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
+import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 
 object GlobalInitCompat{
 

@@ -70,6 +70,7 @@ object Highlighter {
       case "Interp" => reset
       case "Comment" => comment
       case "ExprLiteral" => literal
+      case "PatLiteral" => literal
       case "TypeId" => `type`
       case BackTicked(body)
         if parse(body, scalaparse.syntax.Identifiers.AlphabetKeywords(_)).isSuccess => keyword

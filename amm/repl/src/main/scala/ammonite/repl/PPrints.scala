@@ -24,7 +24,7 @@ object PPrints{
     )
     val snippets = for (p <- t) yield {
       fansi.Str.join(
-        renderer.rec(relPathRepr(os.RelPath(p relativeTo t.base toString)), 0, 0)
+        renderer.rec(relPathRepr(os.RelPath(p.relativeTo(t.base).toString)), 0, 0)
                 .iter
                 .toStream:_*
       )
