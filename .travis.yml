@@ -36,7 +36,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk8
-    scala: 2.13.0-M5
+    scala: 2.13.0
 
 
   # Everything worked, *then* kick off a release
