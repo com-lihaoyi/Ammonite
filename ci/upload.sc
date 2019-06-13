@@ -13,10 +13,10 @@ def apply(uploadedFile: Path,
   println(authKey)
   val body = requests.get(
     "https://api.github.com/repos/lihaoyi/Ammonite/releases/tags/" + tagName,
-    headers = Seq("Authorization" -> s"token $authKey")
-  ).text
+    headers = Seq("Authorization" -> s"token $authKey"),
+  )
 
-  val parsed = ujson.read(body)
+  val parsed = ujson.read(body.text)
 
   println(body)
 
@@ -41,7 +41,7 @@ def apply(uploadedFile: Path,
 
   println(res)
 
-  val longUrl = ujson.read(res)("browser_download_url").toString
+  val longUrl = ujson.read(res)("browser_download_url").str
 
   longUrl
 }

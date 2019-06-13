@@ -388,18 +388,17 @@ def publishExecutable() = {
     val latestAssemblyJars = mill.define.Task.sequence(latestAssemblies)()
 
     println("MASTER COMMIT: Creating a release")
-    import ujson.Js
     if (!unstable){
       requests.post(
         "https://api.github.com/repos/lihaoyi/Ammonite/releases",
         data = ujson.write(
-          Js.Obj(
+          ujson.Obj(
             "tag_name" -> buildVersion,
             "name" -> buildVersion,
             "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
           )
         ),
-        headers = Seq("Authorization" -> ("token " + sys.env("AMMONITE_BOT_AUTH_TOKEN"))),
+        headers = Seq("Authorization" -> s"token ${sys.env("AMMONITE_BOT_AUTH_TOKEN")}")
       )
     }
 
