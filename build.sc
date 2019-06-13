@@ -363,7 +363,7 @@ def generateDependenciesFile(scalaVersion: String,
 
   val content = deps
     .map { dep =>
-      (dep.module.organization, dep.module.name, dep.version)
+      (dep.module.organization.value, dep.module.name.value, dep.version)
     }
     .sorted
     .map {
