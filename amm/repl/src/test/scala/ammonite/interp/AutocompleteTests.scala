@@ -232,7 +232,7 @@ object AutocompleteTests extends TestSuite{
 
     'dependencies {
       // re-enable if we can use the same coursier version again in 2.13
-      if (scala.util.Properties.versionNumberString != "2.13.0-M5")
+      if (scala.util.Properties.versionNumberString != "2.13.0")
         checking { complete =>
           complete(
             """import $ivy.<from>`io.get-c<caret>`""",

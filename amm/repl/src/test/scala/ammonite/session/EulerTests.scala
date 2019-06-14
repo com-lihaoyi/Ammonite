@@ -49,7 +49,7 @@ object EulerTests extends TestSuite{
       check.session("""
         @ {
         @ (100 to 999).view
-        @             .flatMap(i => (i to 999).map(i *))
+        @             .flatMap(i => (i to 999).map(i * _))
         @             .filter(n => n.toString == n.toString.reverse)
         @             .max
         @ }
@@ -551,7 +551,7 @@ object EulerTests extends TestSuite{
       check.session("""
         @ def ps(s: String): Iterator[String] = {
         @   if (s.length == 1) Iterator(s)
-        @   else s.toIterator.flatMap(c => ps(s.filter(c !=)).map(c +))
+        @   else s.toIterator.flatMap(c => ps(s.filter(c !=)).map(c + _))
         @ }
 
         @ val r = ps("0123456789").drop(999999).next().toLong
