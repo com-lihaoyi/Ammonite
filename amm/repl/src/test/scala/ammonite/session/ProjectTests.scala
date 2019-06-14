@@ -20,7 +20,7 @@ object ProjectTests extends TestSuite{
           @ import scalatags.Text.all._
           error: not found: value scalatags
 
-          @ import $$ivy.`com.lihaoyi::scalatags:0.6.8`
+          @ import $$ivy.`com.lihaoyi::scalatags:0.7.0`
 
           @ import scalatags.Text.all._
           import scalatags.Text.all._
