@@ -154,11 +154,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util())
     def ivyDeps = T{
-      // try again using the same version when we switch to the latest scala 2.13
-      val coursierVersion = "2.0.0-RC2"
-
       Agg(
-        ivy"io.get-coursier::coursier:$coursierVersion",
+        ivy"io.get-coursier::coursier:2.0.0-RC2",
         ivy"com.lihaoyi::requests:0.2.0"
       )
     }

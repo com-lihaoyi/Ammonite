@@ -231,21 +231,21 @@ object AutocompleteTests extends TestSuite{
     }
 
     'dependencies {
-      // re-enable if we can use the same coursier version again in 2.13
-      if (scala.util.Properties.versionNumberString != "2.13.0")
-        checking { complete =>
-          complete(
-            """import $ivy.<from>`io.get-c<caret>`""",
-            Set("`io.get-coursier") ^ _
-          )
-          complete(
-            """import $ivy.<from>`io.get-coursier::coursier-co<caret>`""",
-            Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
-          )
-          complete(
-            """import $ivy.{<from>`io.get-coursier::coursier-co<caret>`}""",
-            Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
-          )
+      checking { complete =>
+        complete(
+          """import $ivy.<from>`io.get-c<caret>`""",
+          Set("`io.get-coursier") ^ _
+        )
+        complete(
+          """import $ivy.<from>`io.get-coursier::coursier-co<caret>`""",
+          Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+        )
+        complete(
+          """import $ivy.{<from>`io.get-coursier::coursier-co<caret>`}""",
+          Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+        )
+        // these rely on versions not around in 2.13
+        if (scala.util.Properties.versionNumberString.startsWith("2.12.")) {
           complete(
             """import $ivy.{`io.get-coursier::coursier-cache:1.0.3`, """ +
               """<from>`io.get-coursier::coursier-co<caret>`}""",
@@ -263,6 +263,7 @@ object AutocompleteTests extends TestSuite{
                 c.filter(!_.startsWith("`io.get-coursier::coursier-cache:1.0."))
           )
         }
+      }
     }
   }
 }
