@@ -424,8 +424,8 @@ def publishDocs() = {
     println("MISC COMMIT: Building readme for verification")
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.12.8").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.8").assembly().path,
+      AMMONITE_SHELL=shell("2.13.0").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.13.0").assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
@@ -437,20 +437,20 @@ def publishDocs() = {
     val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
       if (!unstable){
         (
-          s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-          s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-          for(v <- Seq("2.11"))
+          s"$latestTaggedVersion/2.13-$latestTaggedVersion",
+          s"$latestTaggedVersion/2.13-$latestTaggedVersion",
+          for(v <- Seq("2.12"))
             yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
-          for(v <- Seq("2.11"))
+          for(v <- Seq("2.12"))
             yield s"$latestTaggedVersion/$v-$latestTaggedVersion"
         )
       }else{
         (
-          s"$latestTaggedVersion/2.12-$latestTaggedVersion",
-          s"$latestTaggedVersion/2.12-$buildVersion",
-          for(v <- Seq("2.11"))
+          s"$latestTaggedVersion/2.13-$latestTaggedVersion",
+          s"$latestTaggedVersion/2.13-$buildVersion",
+          for(v <- Seq("2.12"))
             yield s"$latestTaggedVersion/$v-$latestTaggedVersion",
-          for(v <- Seq("2.11"))
+          for(v <- Seq("2.12"))
             yield s"$latestTaggedVersion/$v-$buildVersion"
         )
       }
@@ -469,8 +469,8 @@ def publishDocs() = {
 
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.12.8").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.12.8").assembly().path,
+      AMMONITE_SHELL=shell("2.13.0").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.13.0").assembly().path,
       CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")
