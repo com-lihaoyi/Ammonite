@@ -1,0 +1,11 @@
+{
+    "value": [
+        "ref:024ec386:/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/java",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala-2.13.0",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala-2.13",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/scala-2"
+    ],
+    "valueHash": 1115374576,
+    "inputsHash": 255075107
+}

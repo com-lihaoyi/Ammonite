@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/resources",
+        "ref:c4bfa7a5:/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.0/resources/dest/extra-resources",
+        "ref:aae1b46c:/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.0/compile/dest/classes"
+    ],
+    "valueHash": 276508424,
+    "inputsHash": -1398321265
+}

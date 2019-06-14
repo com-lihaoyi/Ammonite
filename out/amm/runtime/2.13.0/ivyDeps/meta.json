@@ -1,0 +1,80 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "io.get-coursier"
+                    },
+                    "name": {
+                        "value": "coursier"
+                    },
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.0.0-RC2",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "com.lihaoyi"
+                    },
+                    "name": {
+                        "value": "requests"
+                    },
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.2.0",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 1813123497,
+    "inputsHash": -1337963699
+}

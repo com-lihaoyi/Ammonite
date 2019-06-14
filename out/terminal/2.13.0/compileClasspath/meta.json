@@ -1,0 +1,11 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/resources",
+        "qref:5cc21807:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.2.7/fansi_2.13-0.2.7.jar",
+        "qref:4d5a5d6c:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.1.7/sourcecode_2.13-0.1.7.jar",
+        "qref:fa00130d:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.0/scala-reflect-2.13.0.jar",
+        "qref:50a80d5f:/home/travis/.coursier/cache/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.0/scala-library-2.13.0.jar"
+    ],
+    "valueHash": -1102478713,
+    "inputsHash": -1097797035
+}

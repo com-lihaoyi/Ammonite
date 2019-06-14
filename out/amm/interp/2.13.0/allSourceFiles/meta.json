@@ -1,0 +1,23 @@
+{
+    "value": [
+        "ref:90dfcc83:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/PredefInitialization.scala",
+        "ref:f8578651:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/DefaultPreprocessor.scala",
+        "ref:abff6ed0:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/AmmonitePlugin.scala",
+        "ref:1d0f90d7:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Pressy.scala",
+        "ref:8f8d94a1:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Interpreter.scala",
+        "ref:ac6dfc60:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Preprocessor.scala",
+        "ref:af14e90e:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Parsers.scala",
+        "ref:b122c49a:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CodeWrapper.scala",
+        "ref:a9c27464:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CodeClassWrapper.scala",
+        "ref:7b196172:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/internal/CustomURLZipArchive.scala",
+        "ref:61a7ef93:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CompilerLifecycleManager.scala",
+        "ref:311894ee:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Compiler.scala",
+        "ref:ee1e88cf:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/InterpAPI.scala",
+        "ref:c62b8664:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/scala/tools/nsc/CustomZipAndJarFileLookupFactory.scala",
+        "ref:96c525e1:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.13/ammonite/interp/GlobalInitCompat.scala",
+        "ref:8b9981ed:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.13/ammonite/interp/ExtraCompilerCompatibility.scala",
+        "ref:12954d14:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.13/ammonite/interp/CompilerCompatibility.scala"
+    ],
+    "valueHash": 1900036865,
+    "inputsHash": 82599634
+}

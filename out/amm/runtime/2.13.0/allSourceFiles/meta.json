@@ -1,0 +1,21 @@
+{
+    "value": [
+        "ref:7ef6a9c9:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/package.scala",
+        "ref:0c1e9e35:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ClassLoaders.scala",
+        "ref:6368dabb:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ImportHook.scala",
+        "ref:4fe00357:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/APIHolder.scala",
+        "ref:3a48a393:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/tools/package.scala",
+        "ref:5d1ed7e0:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/tools/Tools.scala",
+        "ref:c6e2bd0a:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/tools/IvyThing.scala",
+        "ref:58f43d0d:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Evaluator.scala",
+        "ref:80fb0da0:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Storage.scala",
+        "ref:d81ae214:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Classpath.scala",
+        "ref:7bd637cb:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/java/io/github/retronym/java9rtexport/Export.java",
+        "ref:ffe3464a:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/java/io/github/retronym/java9rtexport/Copy.java",
+        "ref:6fb4b132:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala-2.13/ammonite/runtime/History.scala",
+        "ref:e97390f7:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala-2.13/coursier/complete/Complete.scala",
+        "ref:4a082916:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.0/generatedSources/dest/Constants.scala"
+    ],
+    "valueHash": 739605684,
+    "inputsHash": 672612865
+}
