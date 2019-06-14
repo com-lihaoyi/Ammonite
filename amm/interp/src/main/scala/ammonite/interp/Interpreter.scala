@@ -215,6 +215,11 @@ class Interpreter(val printer: Printer,
                          source: CodeSource,
                          wrapperPath: Seq[Name]): Res[ImportHookInfo] = synchronized{
 
+    // Fake an update to the classpath to force re-creation of the compiler
+    // Workaround for https://github.com/scala/bug/issues/11564#issuecomment-501834821,
+    // which I caused in 2.13.0 and should be fixed in 2.13.1
+    if (scala.util.Properties.versionNumberString == "2.13.0") headFrame.addClasspath(Nil)
+
     for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _, wrapperPath)))
     yield ImportHookInfo(
       Imports(hookImports.flatten.flatMap(_.value)),

@@ -168,7 +168,7 @@ object BuiltinTests extends TestSuite{
 
         @ // Let's try this new cool new library
 
-        @ import $ivy.`com.lihaoyi::scalatags:0.6.8`
+        @ import $ivy.`com.lihaoyi::scalatags:0.7.0`
 
         @ veryImportant
         res4: Int = 1

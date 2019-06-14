@@ -25,6 +25,7 @@ object CustomZipAndJarFileLookupFactory {
     def zipFile: File = null
 
     override def asURLs: Seq[URL] = Seq(zipUrl)
+
     override def asClassPathStrings: Seq[String] = Seq(zipUrl.toURI.toASCIIString) // ???
 
     private val archive = new CustomURLZipArchive(zipUrl)
@@ -51,6 +52,7 @@ object CustomZipAndJarFileLookupFactory {
       } yield createFileEntry(entry)
 
     def hasPackage(pkg: String) = findDirEntry(pkg).isDefined
+
     override private[nsc] def list(inPackage: String): ClassPathEntries = {
       val foundDirEntry = findDirEntry(inPackage)
 
@@ -76,6 +78,7 @@ object CustomZipAndJarFileLookupFactory {
       val (pkg, simpleClassName) = PackageNameUtils.separatePkgAndClassNames(className)
       file(pkg, simpleClassName + ".class").map(_.file)
     }
+
     // This method is performance sensitive as it is used by SBT's ExtractDependencies phase.
     override def findClass(className: String): Option[ClassRepresentation] = {
       val (pkg, simpleClassName) = PackageNameUtils.separatePkgAndClassNames(className)
@@ -87,6 +90,7 @@ object CustomZipAndJarFileLookupFactory {
 
     protected def createFileEntry(file: CustomURLZipArchive#Entry): ClassFileEntryImpl =
       ClassFileEntryImpl(file)
+
     protected def isRequiredFileType(file: AbstractFile): Boolean =
       !file.isDirectory && file.hasExtension("class")
   }

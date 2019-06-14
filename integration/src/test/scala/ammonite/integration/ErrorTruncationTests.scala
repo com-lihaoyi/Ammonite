@@ -69,10 +69,15 @@ object ErrorTruncationTests extends TestSuite{
     'runtimeError - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
-        s"""java.lang.ArithmeticException: / by zero
-          |  $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
-          |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
-          |""".stripMargin
+        if (scala.util.Properties.versionNumberString.startsWith("2.12"))
+          s"""java.lang.ArithmeticException: / by zero
+             |  $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
+             |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
+             |""".stripMargin
+        else
+          s"""java.lang.ArithmeticException: / by zero
+             |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc:1)
+             |""".stripMargin
       )
     )
   }

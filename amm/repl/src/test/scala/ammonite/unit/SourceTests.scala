@@ -95,7 +95,7 @@ object SourceTests extends TestSuite{
         check(
           load(Predef.println()),
           "Predef.scala",
-          "def println() ="
+          "def println()"
         )
       }
 
@@ -122,7 +122,7 @@ object SourceTests extends TestSuite{
         check(
           load(opt.get),
           "Option.scala",
-          "def get = "
+          "def get"
         )
       }
     }

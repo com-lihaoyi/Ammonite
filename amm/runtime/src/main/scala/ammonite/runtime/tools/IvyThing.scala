@@ -53,17 +53,17 @@ object IvyThing{
 
     Function.chain(hooks)(fetch).eitherResult() match {
       case Left(err) => Left("Failed to resolve ivy dependencies:" + err.getMessage)
-      case Right((_, artifacts)) =>
-        val noChangingArtifact = artifacts.forall(!_._1.changing)
+      case Right(result) =>
+        val noChangingArtifact = result.artifacts.forall(!_._1.changing)
         def noVersionInterval = dependencies.map(_.version).forall { v =>
           coursier.core.Parse.versionConstraint(v).interval == coursier.core.VersionInterval.zero
         }
-        val files = artifacts.map(_._2)
+        val files = result.artifacts.map(_._2)
         Right((noChangingArtifact && noVersionInterval, files))
     }
   }
 
-  val defaultRepositories = List(
+  val defaultRepositories = List[coursier.Repository](
     LocalRepositories.ivy2Local,
     coursier.MavenRepository("https://repo1.maven.org/maven2")
   )

@@ -10,11 +10,6 @@ matrix:
 
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
-    jdk: oraclejdk8
-    scala: 2.11.12
-
-  - stage: build
-    env: CI_SCRIPT="mill -i unitTest"
     jdk: openjdk11
     scala: 2.12.8
 
@@ -26,12 +21,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill -i unitTest"
     jdk: oraclejdk8
-    scala: 2.13.0-M5
-
-  - stage: build
-    env: CI_SCRIPT="mill -i integrationTest"
-    jdk: oraclejdk8
-    scala: 2.11.12
+    scala: 2.13.0
 
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
@@ -46,7 +36,7 @@ matrix:
   - stage: build
     env: CI_SCRIPT="mill -i integrationTest"
     jdk: oraclejdk8
-    scala: 2.13.0-M5
+    scala: 2.13.0
 
 
   # Everything worked, *then* kick off a release
@@ -82,7 +72,7 @@ script:
 - export PATH=~/bin/amm:~/bin/mill:$PATH
 - mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- if [ ! -f ~/bin/mill-0.3.3 ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.3.3/0.3.3) > ~/bin/mill-0.3.3 && chmod +x ~/bin/mill-0.3.3 && ( cd ~/bin && rm -f mill && ln -s mill-0.3.3 mill)'; fi
+- if [ ! -f ~/bin/mill-0.4.1 ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.4.1/0.4.1) > ~/bin/mill-0.4.1 && chmod +x ~/bin/mill-0.4.1 && ( cd ~/bin && rm -f mill && ln -s mill-0.4.1 mill)'; fi
 - JAVAOPTS="-Xmx2048m" $CI_SCRIPT
 
 notifications:

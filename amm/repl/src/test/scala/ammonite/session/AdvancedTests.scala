@@ -314,7 +314,7 @@ object AdvancedTests extends TestSuite{
 
         @ // Importing plugins doesn't affect the run-time classpath
 
-        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.6.8`
+        @ import $plugin.$ivy.`com.lihaoyi::scalatags:0.7.0`
 
         @ import scalatags.Text
         error: not found: value scalatags
@@ -426,7 +426,8 @@ object AdvancedTests extends TestSuite{
 
     'dontRefreshCompiler {
       * - {
-        check.session("""
+        // Conditional check due to https://github.com/scala/bug/issues/11564
+        if (scala.util.Properties.versionNumberString != "2.13.0") check.session("""
           @ val c1 = repl.compiler
 
           @ val n = 2
@@ -446,7 +447,8 @@ object AdvancedTests extends TestSuite{
       }
 
       'preconfigured - {
-        check.session("""
+        // Conditional check due to https://github.com/scala/bug/issues/11564
+        if (scala.util.Properties.versionNumberString != "2.13.0") check.session("""
           @ val c0 = repl.compiler
 
           @ interp.preConfigureCompiler(_ => ())

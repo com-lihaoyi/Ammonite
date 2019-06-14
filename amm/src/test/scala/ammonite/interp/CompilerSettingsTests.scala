@@ -13,15 +13,18 @@ object CompilerSettingsTests extends TestSuite {
     val scriptPath = os.pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
 
     'configureYrangepos {
+    
       // In this test, the script sets -Yrangepos to true using "configureCompiler",
       // which is called AFTER the compiler instantiates. As useOffsetPositions
       // is set eagerly during the compiler instantiation as !Yrangepos, its
       // value remains "true".
-      val storage = Storage.InMemory()
-      val interp = createTestInterp(storage)
-      Scripts.runScript(os.pwd, scriptPath / "configureCompiler.sc", interp)
+      if (scala.util.Properties.versionNumberString.startsWith("2.12.")){
+        val storage = Storage.InMemory()
+        val interp = createTestInterp(storage)
+        Scripts.runScript(os.pwd, scriptPath / "configureCompiler.sc", interp)
 
-      assert(interp.compilerManager.compiler.compiler.useOffsetPositions)
+        assert(interp.compilerManager.compiler.compiler.useOffsetPositions)
+      }
     }
 
     'preConfigureYrangepos {

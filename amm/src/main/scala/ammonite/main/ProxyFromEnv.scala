@@ -42,7 +42,7 @@ private[ammonite] object ProxyFromEnv {
         val propPassword = credPair.drop(1).map(s"$proto.proxyPassword" -> _)
         Seq(propUser) ++ propPassword
       } else Nil
-      Seq(propHost, propPort) ++ propCred toMap
+      (Seq(propHost, propPort) ++ propCred).toMap
     case bad => Map.empty
   }
 

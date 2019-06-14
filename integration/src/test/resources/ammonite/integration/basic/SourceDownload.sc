@@ -1,4 +1,4 @@
-import $ivy.`com.lihaoyi::scalatags:0.6.8`
+import $ivy.`com.lihaoyi::scalatags:0.7.0`
 
 val loc = source.load(scalatags.Text)
 val snip = Predef.augmentString(loc.fileContent)

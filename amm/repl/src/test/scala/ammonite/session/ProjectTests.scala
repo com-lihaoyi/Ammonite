@@ -20,7 +20,7 @@ object ProjectTests extends TestSuite{
           @ import scalatags.Text.all._
           error: not found: value scalatags
 
-          @ import $$ivy.`com.lihaoyi::scalatags:0.6.8`
+          @ import $$ivy.`com.lihaoyi::scalatags:0.7.0`
 
           @ import scalatags.Text.all._
           import scalatags.Text.all._
@@ -121,7 +121,7 @@ object ProjectTests extends TestSuite{
     }
     'cats{
       check.session("""
-        @ import $ivy.`org.typelevel::cats-core:1.6.0`, cats._
+        @ import $ivy.`org.typelevel::cats-core:2.0.0-M4`, cats._
 
       """)
     }
