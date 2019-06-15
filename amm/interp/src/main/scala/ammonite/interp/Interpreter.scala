@@ -42,7 +42,8 @@ class Interpreter(val printer: Printer,
                   val createFrame: () => Frame,
                   replCodeWrapper: CodeWrapper,
                   scriptCodeWrapper: CodeWrapper,
-                  alreadyLoadedDependencies: Seq[coursier.Dependency])
+                  alreadyLoadedDependencies: Seq[coursier.Dependency],
+                  importHooks: Map[Seq[String], ImportHook])
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -96,16 +97,6 @@ class Interpreter(val printer: Printer,
 
   def compilationCount = compilerManager.compilationCount
 
-  val importHooks = Ref(Map[Seq[String], ImportHook](
-    Seq("url") -> ImportHook.URL,
-    Seq("file") -> ImportHook.File,
-    Seq("exec") -> ImportHook.Exec,
-    Seq("ivy") -> ImportHook.Ivy,
-    Seq("cp") -> ImportHook.Classpath,
-    Seq("plugin", "ivy") -> ImportHook.PluginIvy,
-    Seq("plugin", "cp") -> ImportHook.PluginClasspath
-  ))
-
 
   // Use a var and callbacks instead of a fold, because when running
   // `processModule0` user code may end up calling `processModule` which depends
@@ -149,7 +140,7 @@ class Interpreter(val printer: Printer,
     wrapperPath: Seq[Name]
   ) = synchronized{
     val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
-    val hookOpt = importHooks().collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
+    val hookOpt = importHooks.collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
     for{
       (hookPrefix, hook) <- Res(hookOpt, s"Import Hook ${tree.prefix} could not be resolved")
       hooked <- Res(

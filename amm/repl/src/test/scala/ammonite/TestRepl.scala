@@ -13,6 +13,7 @@ import utest._
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import ammonite.runtime.ImportHook
 
 /**
  * A test REPL which does not read from stdin or stdout files, but instead lets
@@ -142,7 +143,8 @@ class TestRepl {
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
-      alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt")
+      alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
+      importHooks = ImportHook.defaults
     )
 
   }catch{ case e: Throwable =>

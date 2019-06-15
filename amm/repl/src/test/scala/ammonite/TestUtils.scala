@@ -6,6 +6,7 @@ import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
 import ammonite.main.Defaults
 import ammonite.runtime.{Frame, History, Storage}
 import ammonite.util._
+import ammonite.runtime.ImportHook
 
 object TestUtils {
   def scala2_11 = scala.util.Properties.versionNumberString.contains("2.11")
@@ -33,7 +34,8 @@ object TestUtils {
       createFrame = () => throw new Exception("unsupported"),
       replCodeWrapper = CodeWrapper,
       scriptCodeWrapper = CodeWrapper,
-      alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt")
+      alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
+      importHooks = ImportHook.defaults
     )
     interp.initializePredef()
     interp
