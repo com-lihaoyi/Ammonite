@@ -11,6 +11,7 @@ import ammonite.util.Util.newLine
 import ammonite.util._
 
 import scala.annotation.tailrec
+import ammonite.runtime.ImportHook
 
 
 
@@ -68,7 +69,8 @@ case class Main(predefCode: String = "",
                 replCodeWrapper: CodeWrapper = CodeWrapper,
                 scriptCodeWrapper: CodeWrapper = CodeWrapper,
                 alreadyLoadedDependencies: Seq[coursier.Dependency] =
-                  Defaults.alreadyLoadedDependencies()){
+                  Defaults.alreadyLoadedDependencies(),
+                importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -119,7 +121,8 @@ case class Main(predefCode: String = "",
         initialColors = colors,
         replCodeWrapper = replCodeWrapper,
         scriptCodeWrapper = scriptCodeWrapper,
-        alreadyLoadedDependencies = alreadyLoadedDependencies
+        alreadyLoadedDependencies = alreadyLoadedDependencies,
+        importHooks = importHooks
       )
     }
 
@@ -157,7 +160,8 @@ case class Main(predefCode: String = "",
         () => throw new Exception("session loading / saving not possible here"),
         replCodeWrapper,
         scriptCodeWrapper,
-        alreadyLoadedDependencies = alreadyLoadedDependencies
+        alreadyLoadedDependencies = alreadyLoadedDependencies,
+        importHooks = importHooks
       )
       interp.initializePredef() match{
         case None => Right(interp)

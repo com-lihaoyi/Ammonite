@@ -35,6 +35,16 @@ trait ImportHook{
 
 object ImportHook{
 
+  val defaults = Map[Seq[String], ImportHook](
+    Seq("url") -> URL,
+    Seq("file") -> File,
+    Seq("exec") -> Exec,
+    Seq("ivy") -> Ivy,
+    Seq("cp") -> Classpath,
+    Seq("plugin", "ivy") -> PluginIvy,
+    Seq("plugin", "cp") -> PluginClasspath
+  )
+
   /**
     * The minimal interface that is exposed to the import hooks from the
     * Interpreter. Open for extension, if someone needs more stuff, but by
