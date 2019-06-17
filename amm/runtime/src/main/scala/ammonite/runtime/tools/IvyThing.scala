@@ -49,7 +49,6 @@ object IvyThing{
           .withLogger(if (verbose) RefreshLogger.create() else CacheLogger.nop)
       )
       .withMainArtifacts()
-      .addClassifiers(Classifier.sources)
 
     Function.chain(hooks)(fetch).eitherResult() match {
       case Left(err) => Left("Failed to resolve ivy dependencies:" + err.getMessage)
