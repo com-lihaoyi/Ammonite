@@ -12,8 +12,8 @@ object PPrintTests extends TestSuite{
   )
   val tests = Tests{
 
-    'paths{
-      'pprint{
+    test("paths"){
+      test("pprint"){
 
         check(pprinter.tokenize(os.root/'hello/'world).mkString, "root/'hello/'world")
         check(pprinter.tokenize(os.rel/'hello/'world).mkString, "'hello/'world")

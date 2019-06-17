@@ -19,7 +19,7 @@ object LineNumberTests extends TestSuite{
     }
 
 
-    'compilationErrorInSecondBlock - checkErrorMessage(
+    test("compilationErrorInSecondBlock") - checkErrorMessage(
       file = 'lineNumbers/"compilationErrorInSecondBlock.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorInSecondBlock.sc:14: not found: value printnl

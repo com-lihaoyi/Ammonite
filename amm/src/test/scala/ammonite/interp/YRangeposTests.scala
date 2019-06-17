@@ -21,7 +21,7 @@ object YRangeposTests extends TestSuite {
     val scriptFolderPath =
       os.pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
 
-    'Yrangepos {
+    test("Yrangepos"){
       // This tests shows that enabling Yrangepos does not mess with ammonite's
       // behaviour. The compiler not crashing is the test itself.
       val storage = Storage.InMemory()
@@ -30,7 +30,7 @@ object YRangeposTests extends TestSuite {
       assert(res.isSuccess)
     }
 
-    'YrangeposError {
+    test("YrangeposError"){
       // This tests shows that enabling Yrangepos does not mess with ammonite's
       // behaviour, by checking that the line at which the error is found matches
       // the expected one in the file

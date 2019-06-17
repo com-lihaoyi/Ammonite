@@ -8,7 +8,7 @@ import utest._
 object ExampleTests extends TestSuite{
 
   val tests = Tests {
-    'reference{
+    test("reference"){
       import ammonite.ops._
 
       // Let's pick our working directory
@@ -110,7 +110,7 @@ object ExampleTests extends TestSuite{
       fullInfo.group: GroupPrincipal
       ()
     }
-    'longExample{
+    test("longExample"){
       import ammonite.ops._
 
       // Pick the directory you want to work with,
@@ -186,7 +186,7 @@ object ExampleTests extends TestSuite{
         map == Seq("Hello" -> 1, "World" -> 1)
       )
     }
-    'comparison{
+    test("comparison"){
       rm! pwd/'target/'folder/'thing/'file
       write(pwd/'target/'folder/'thing/'file, "Hello!", createFolders = true)
 
@@ -211,7 +211,7 @@ object ExampleTests extends TestSuite{
       assert(ls(pwd/'target/'folder).toSeq == Nil)
     }
 
-    'constructingPaths{
+    test("constructingPaths"){
       // Get the process' Current Working Directory. As a convention
       // the directory that "this" code cares about (which may differ
       // from the pwd) is called `wd`
@@ -232,10 +232,10 @@ object ExampleTests extends TestSuite{
       // Up two levels from the wd
       wd/up/up
     }
-    'newPath{
+    test("newPath"){
       val target = pwd/'target
     }
-    'relPaths{
+    test("relPaths"){
       // The path "folder/file"
       val rel1 = 'folder/'file
       val rel2 = 'folder/'file
@@ -255,17 +255,17 @@ object ExampleTests extends TestSuite{
       rel2: RelPath
       rel3: RelPath
     }
-    'relPathCombine{
+    test("relPathCombine"){
       val target = pwd/'target/'file
       val rel = target relativeTo pwd
       val newBase = root/'code/'server
       assert(newBase/rel == root/'code/'server/'target/'file)
     }
-    'relPathUp{
+    test("relPathUp"){
       val target = root/'target/'file
       assert(target/up == root/'target)
     }
-    'canonical - {if (Unix()){
+    test("canonical"){if (Unix()){
 
       assert((root/'folder/'file/up).toString == "/folder")
       // not "/folder/file/.."
@@ -273,7 +273,7 @@ object ExampleTests extends TestSuite{
       assert(('folder/'file/up).toString == "folder")
       // not "folder/file/.."
     }}
-    'findWc{
+    test("findWc"){
       val wd = pwd/'ops/'src/'test/'resources/'testdata
 
       // find . -name '*.txt' | xargs wc -l
@@ -281,17 +281,17 @@ object ExampleTests extends TestSuite{
 
       assert(lines == 20)
     }
-    'addUpScalaSize{
+    test("addUpScalaSize"){
       ls.rec! pwd |? (_.ext == "scala") | (_.size) |& (_ + _)
     }
-    'concatAll{if (Unix()){
+    test("concatAll"){if (Unix()){
 
       ls.rec! pwd |? (_.ext == "scala") | read |> (
         write(pwd/'target/'test/"omg.txt", _, createFolders = true)
       )
     }}
 
-    'noLongLines{
+    test("noLongLines"){
       // Ensure that we don't have any Scala files in the current working directory
       // which have lines more than 100 characters long, excluding generated sources
       // in `src_managed` folders.
@@ -310,12 +310,12 @@ object ExampleTests extends TestSuite{
 
       assert(filesWithTooLongLines.length == 0)
     }
-    'rename{
+    test("rename"){
 //      val d1/"omg"/x1 = wd
 //      val d2/"omg"/x2 = wd
 //      ls! wd |? (_.ext == "scala") | (x => mv! x ! x.pref)
     }
-    'allSubpathsResolveCorrectly{
+    test("allSubpathsResolveCorrectly"){
       for(abs <- ls.rec! pwd){
         val rel = abs relativeTo pwd
         assert(rel.ups == 0)

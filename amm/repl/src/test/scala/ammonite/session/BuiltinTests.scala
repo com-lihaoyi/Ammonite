@@ -9,7 +9,7 @@ object BuiltinTests extends TestSuite{
   val tests = Tests{
     println("BuiltinTests")
     val check = new DualTestRepl()
-    'basicConfig{
+    test("basicConfig"){
       check.session("""
         @ // Set the shell prompt to be something else
 
@@ -53,7 +53,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
-    'imports{
+    test("imports"){
       check.session("""
         @ assert(repl.imports.toString == ""); assert(repl.fullImports.toString != "")
 
@@ -69,7 +69,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
-    'loadCP{
+    test("loadCP"){
       check.session("""
         @ import ammonite.ops._, ImplicitWd._
 
@@ -87,7 +87,7 @@ object BuiltinTests extends TestSuite{
         res6: String = "Hello!"
       """)
     }
-    'settings{
+    test("settings"){
       val fruitlessTypeTestWarningMessageBlahBlahBlah =
         "fruitless type test: a value of type List[Int] cannot also be a List[Double]"
 
@@ -142,7 +142,7 @@ object BuiltinTests extends TestSuite{
         res10: Boolean = false
       """)
     }
-    'infoLogging{
+    test("infoLogging"){
       check.session("""
         @ 1 + 1
         res0: Int = 2
@@ -155,7 +155,7 @@ object BuiltinTests extends TestSuite{
     }
 
 
-    'saveLoad {
+    test("saveLoad"){
       check.session(
         """
         @ val veryImportant = 1
@@ -195,7 +195,7 @@ object BuiltinTests extends TestSuite{
         error: not found: value scalatags
         """)
     }
-    'saveLoad2{
+    test("saveLoad2"){
       check.session("""
         @ val (x, y) = (1, 2)
         x: Int = 1
@@ -229,8 +229,8 @@ object BuiltinTests extends TestSuite{
         res11: Int = -1
                     """)
     }
-    'discardLoadCommandResult{
-      * - check.session("""
+    test("discardLoadCommandResult"){
+      test - check.session("""
         @ repl.sess.save("foo")
 
         @ val a = repl.sess.load("foo")
@@ -239,7 +239,7 @@ object BuiltinTests extends TestSuite{
         error: not found: value a
       """)
 
-      * - check.session("""
+      test - check.session("""
         @ val n = 2
         n: Int = 2
 
@@ -251,7 +251,7 @@ object BuiltinTests extends TestSuite{
         n0: Int = 2
       """)
     }
-    'firstFrameNotFrozen{
+    test("firstFrameNotFrozen"){
       check.session("""
         @ 2
         res0: Int = 2

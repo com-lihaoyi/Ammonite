@@ -10,7 +10,7 @@ object AdvancedTests extends TestSuite{
   val tests = Tests{
     println("AdvancedTests")
     val check = new DualTestRepl()
-    'pprint{
+    test("pprint"){
       check.session(s"""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(
@@ -45,14 +45,14 @@ object AdvancedTests extends TestSuite{
       """)
     }
 
-    'exit{
+    test("exit"){
       check.result("exit", Res.Exit())
     }
-    'skip{
+    test("skip"){
       check.result("", Res.Skip)
     }
 
-    'predef{
+    test("predef"){
       val check2 = new DualTestRepl{
         override def predef = (
           """
@@ -78,7 +78,7 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
-    'predefSettings{
+    test("predefSettings"){
       val check2 = new DualTestRepl{
         override def predef = (
           """
@@ -93,7 +93,7 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
-    'macros{
+    test("macros"){
       check.session("""
         @ import language.experimental.macros
 
@@ -114,7 +114,7 @@ object AdvancedTests extends TestSuite{
         res4: String = "Hello!"
       """)
     }
-    'typeScope{
+    test("typeScope"){
       // Fancy type-printing isn't implemented at all in 2.10.x
       check.session("""
         @ collection.mutable.Buffer(1)
@@ -134,7 +134,7 @@ object AdvancedTests extends TestSuite{
         res5: Buffer[Int] = ArrayBuffer(1)
       """)
     }
-    'customTypePrinter{
+    test("customTypePrinter"){
       check.session("""
         @ Array(1)
         res0: Array[Int] = Array(1)
@@ -151,13 +151,13 @@ object AdvancedTests extends TestSuite{
         res3: Int Array = Array(1)
       """)
     }
-    'trappedType{
+    test("trappedType"){
       check.session("""
         @ val nope = ammonite.TestRepl.Nope(2); val n = 2
         n: Int = 2
       """)
     }
-    'unwrapping{
+    test("unwrapping"){
       check.session("""
         @ {
         @   val x = 1
@@ -169,7 +169,7 @@ object AdvancedTests extends TestSuite{
         res0_2: Int = 3
       """)
     }
-    'forceWrapping{
+    test("forceWrapping"){
       check.session("""
         @ {{
         @   val x = 1
@@ -179,7 +179,7 @@ object AdvancedTests extends TestSuite{
         res0: Int = 3
       """)
     }
-    'truncation {
+    test("truncation"){
       // Need a way to capture stdout in tests to make these tests work
       if(false) check.session("""
         @ Seq.fill(20)(100)
@@ -241,8 +241,8 @@ object AdvancedTests extends TestSuite{
         ...
       """)
     }
-    'private{
-      'vals - check.session("""
+    test("private"){
+      test("vals") - check.session("""
         @ private val x = 1; val y = x + 1
         y: Int = 2
 
@@ -264,7 +264,7 @@ object AdvancedTests extends TestSuite{
         
       """)
 
-      'dontPrint - {
+      test("dontPrint"){
         check.session(
           """
           @ private object Foo { def get = "a" }; val s = Foo.get
@@ -290,7 +290,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
-    'compilerPlugin - retry(3){
+    test("compilerPlugin") - retry(3){
       if (scala2_11) check.session("""
         @ // Compiler plugins imported without `.$plugin` are not loaded
 
@@ -320,7 +320,7 @@ object AdvancedTests extends TestSuite{
         error: not found: value scalatags
       """)
     }
-    'replApiUniqueness{
+    test("replApiUniqueness"){
       // Make sure we can instantiate multiple copies of Interpreter, with each
       // one getting its own `ReplBridge`. This ensures that the various
       // Interpreters are properly encapsulated and don't interfere with each
@@ -340,7 +340,7 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
-    'macroParadiseWorks{
+    test("macroParadiseWorks"){
       // no more macroparadise in 2.13
       if (scala2_11 || scala2_12) {
         val scalaVersion: String = scala.util.Properties.versionNumberString
@@ -353,16 +353,16 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
-    'desugar{
+    test("desugar"){
       check.session("""
         @ desugar{1 + 2 max 3}
         res0: Desugared = scala.Predef.intWrapper(3).max(3)
       """)
     }
-    'loadingModulesInPredef{
+    test("loadingModulesInPredef"){
 
       val dir = os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
-      'loadExec {
+      test("loadExec"){
         val c1 = new DualTestRepl() {
           override def predef = (
             os.read(dir/"PredefLoadExec.sc"),
@@ -374,7 +374,7 @@ object AdvancedTests extends TestSuite{
           previouslyLoaded: Int = 1337
         """)
       }
-      'loadModule{
+      test("loadModule"){
         val c2 = new DualTestRepl(){
           override def predef = (
             os.read(dir/"PredefLoadModule.sc"),
@@ -386,7 +386,7 @@ object AdvancedTests extends TestSuite{
           previouslyLoaded: Int = 1337
         """)
       }
-      'importIvy{
+      test("importIvy"){
         val c2 = new DualTestRepl(){
           override def predef = (
             os.read(dir/"PredefMagicImport.sc"),
@@ -402,7 +402,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
-    'bytecodeForReplClasses{
+    test("bytecodeForReplClasses"){
       check.session("""
         @ case class Child(name: String)
 
@@ -417,15 +417,15 @@ object AdvancedTests extends TestSuite{
         res4: Boolean = true
       """)
     }
-    'customBridge{
+    test("customBridge"){
       check.session("""
         @ val s = test.message
         s: String = "ba"
       """)
     }
 
-    'dontRefreshCompiler {
-      * - {
+    test("dontRefreshCompiler"){
+      test{
         // Conditional check due to https://github.com/scala/bug/issues/11564
         if (scala.util.Properties.versionNumberString != "2.13.0") check.session("""
           @ val c1 = repl.compiler
@@ -446,7 +446,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
 
-      'preconfigured - {
+      test("preconfigured"){
         // Conditional check due to https://github.com/scala/bug/issues/11564
         if (scala.util.Properties.versionNumberString != "2.13.0") check.session("""
           @ val c0 = repl.compiler
@@ -474,7 +474,7 @@ object AdvancedTests extends TestSuite{
       }
     }
 
-    'loadURL - {
+    test("loadURL"){
       val sbv = {
         val sv = scala.util.Properties.versionNumberString
         if (sv.forall(c => c.isDigit || c == '.'))
@@ -494,7 +494,7 @@ object AdvancedTests extends TestSuite{
       """)
     }
 
-    'accessPressy - {
+    test("accessPressy"){
       check.session("""
         @ def typeAt(code: String, pos: Int) = {
         @   import scala.tools.nsc.interactive.Response

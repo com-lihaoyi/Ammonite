@@ -11,7 +11,7 @@ import SshTestingUtils._
 
 object SshServerTests extends TestSuite with ScalaCheckSupport {
   override val tests = Tests {
-    'canConnectAndAuthenticate{
+    test("canConnectAndAuthenticate"){
       withTmpDirectory { implicit tmpDir =>
         check {
           forAll(genCreds) { user =>
@@ -24,7 +24,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
         }
       }
     }
-    'cantConnectWithInvalidCredentials{
+    test("cantConnectWithInvalidCredentials"){
       withTmpDirectory { implicit tmpDir =>
         check {
           forAll(genNonMatchingCredsPair) { credsPair =>
@@ -40,7 +40,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
         }
       }
     }
-    'thenConnectedExecutesShellTerminalTask{
+    test("thenConnectedExecutesShellTerminalTask"){
       withTmpDirectory { implicit tmpDir =>
         val remoteShellGetsExecuted = Promise[Unit]()
         def shellSession = () => remoteShellGetsExecuted.success((): Unit)
@@ -53,7 +53,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
         }
       }
     }
-    'cantOpenWildChannel{
+    test("cantOpenWildChannel"){
       withTmpDirectory { implicit tmpDir =>
         withTestSshServer(testUser) { server =>
           val client = sshClient(testUser, server)

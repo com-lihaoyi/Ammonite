@@ -27,9 +27,9 @@ object ClipboardTests extends TestSuite{
 
   override def tests = Tests {
     println("ClipboardTests")
-    'clipboard {
+    test("clipboard"){
       val newClipboardContents = "hello Ammonite"
-      'copyandpaste - {
+      test("copyandpaste"){
         if (canTest) {
           clipboard.write(newClipboardContents)
           assert(clipboard.read == newClipboardContents)

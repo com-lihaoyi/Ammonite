@@ -7,17 +7,17 @@ object ShelloutTests extends TestSuite{
   val scriptFolder = pwd/'ops/'src/'test/'resources/'scripts
 
   val tests = Tests {
-    'implicitWd{
+    test("implicitWd"){
       import ammonite.ops.ImplicitWd._
-      'lines{
+      test("lines"){
         val res = %%('ls, "ops/src/test/resources/testdata")
         assert(res.out.lines == Seq("File.txt", "folder1", "folder2"))
       }
-      'string{
+      test("string"){
         val res = %%('ls, "ops/src/test/resources/testdata")
         assert(res.out.string == "File.txt\nfolder1\nfolder2\n")
       }
-      'bytes{
+      test("bytes"){
         if(Unix()){
           val res = %%('echo, "abc")
           val listed = res.out.bytes
@@ -25,22 +25,22 @@ object ShelloutTests extends TestSuite{
           listed.toSeq
         }
       }
-      'chained{
+      test("chained"){
         assert(%%('git, 'init).out.string.contains("Reinitialized existing Git repository"))
         assert(%%('git, "init").out.string.contains("Reinitialized existing Git repository"))
         assert(%%('ls, pwd).out.string.contains("readme.md"))
       }
-      'basicList{
+      test("basicList"){
         val files = List("readme.md", "build.sbt")
         val output = %%('ls, files).out.string
         assert(files.forall(output.contains))
       }
-      'listMixAndMatch{
+      test("listMixAndMatch"){
         val stuff = List("I", "am", "bovine")
         val result = %%('echo, "Hello,", stuff, "hear me roar")
         assert(result.out.string.contains("Hello, " + stuff.mkString(" ") + " hear me roar"))
       }
-      'failures{
+      test("failures"){
         val ex = intercept[ShelloutException]{ %%('ls, "does-not-exist") }
         val res: CommandResult = ex.result
         assert(
@@ -49,7 +49,7 @@ object ShelloutTests extends TestSuite{
         )
       }
 
-      'filebased{
+      test("filebased"){
         if(Unix()){
           assert(%%(scriptFolder/'echo, 'HELLO).out.lines.mkString == "HELLO")
 
@@ -59,7 +59,7 @@ object ShelloutTests extends TestSuite{
           assert(res.out.string.trim == "Hello123")
         }
       }
-      'filebased2{
+      test("filebased2"){
         if(Unix()){
           val res = %%('which, 'echo)
           val echoRoot = Path(res.out.string.trim)
@@ -69,7 +69,7 @@ object ShelloutTests extends TestSuite{
         }
       }
 
-      'envArgs{
+      test("envArgs"){
         val res0 = %%('bash, "-c", "echo \"Hello$ENV_ARG\"", ENV_ARG=12)
         assert(res0.out.lines == Seq("Hello12"))
 
@@ -84,7 +84,7 @@ object ShelloutTests extends TestSuite{
       }
 
     }
-    'workingDirectory{
+    test("workingDirectory"){
       implicit var wd = pwd
       val listed1 = %%('ls)
 
@@ -94,13 +94,13 @@ object ShelloutTests extends TestSuite{
 
       assert(listed2 != listed1)
     }
-    'customWorkingDir{
+    test("customWorkingDir"){
       val res1 = %.ls()(pwd) // explicitly
       // or implicitly
       import ammonite.ops.ImplicitWd._
       val res2 = %ls
     }
-    'fileCustomWorkingDir - {
+    test("fileCustomWorkingDir"){
       if(Unix()){
         val output = %%.apply(scriptFolder/'echo_with_wd, 'HELLO)(root/'usr)
         assert(output.out.lines == Seq("HELLO /usr"))

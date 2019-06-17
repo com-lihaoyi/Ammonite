@@ -21,7 +21,7 @@ object ProjectTests extends TestSuite{
   val tests = Tests {
     println("Running ProjectTest")
 
-    'playframework- {
+    test("playframework"){
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
           val evaled = exec('basic/"PlayFramework.sc")
@@ -30,7 +30,7 @@ object ProjectTests extends TestSuite{
       }
     }
 //    Disabled due to travis instability
-//    'spark - {
+//    test("spark"){
 //      // Note that this script screws up if you try to run it within SBT! It has to
 //      // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
 //      if (!Util.windowsPlatform) {
@@ -41,7 +41,7 @@ object ProjectTests extends TestSuite{
 //      }
 //    }
 
-    'spark2 - {
+    test("spark2"){
       // Note that this script screws up if you try to run it within SBT! It has to
       // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
       if (!Util.windowsPlatform) {
@@ -52,12 +52,12 @@ object ProjectTests extends TestSuite{
       }
     }
 
-    'httpApi{
-      'addPost {
+    test("httpApi"){
+      test("addPost"){
         val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text")
         assert(res.out.trim.contains("101"))
       }
-      'comments{
+      test("comments"){
         val res = exec('basic / "HttpApi.sc", "comments", "40")
         assert(res.out.trim.contains("totam vel saepe aut"))
         assert(res.out.trim.contains("aperiam et omnis totam"))

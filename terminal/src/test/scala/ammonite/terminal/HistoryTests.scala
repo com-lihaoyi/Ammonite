@@ -24,7 +24,7 @@ object HistoryTests extends TestSuite{
 
     // When you page up with something that doesn't exist in history, it
     // should preserve the current line and move your cursor to the end
-    'noHistory{
+    test("noHistory"){
       checker("Hell_o")
         .runMsg(history.startHistory)
         .check("Hello_")
@@ -35,9 +35,9 @@ object HistoryTests extends TestSuite{
     }
 
 
-    'ctrlR {
+    test("ctrlR"){
       // If you hit Ctrl-R on an empty line, it shows a nice help message
-      'empty{
+      test("empty"){
         checker("_")
           .runMsg(history.ctrlR)
           .check("_")
@@ -48,7 +48,7 @@ object HistoryTests extends TestSuite{
           .check("_")
           .checkMsg(HistoryFilter.emptySearchMessage)
       }
-      'nonEmpty{
+      test("nonEmpty"){
         checker("cd_")
           .runMsg(history.ctrlR)
           .check("abcd_e")
@@ -61,7 +61,7 @@ object HistoryTests extends TestSuite{
           .check("abcdefgh_i")
       }
     }
-    'historyNoSearch{
+    test("historyNoSearch"){
       checker("_")
         .runMsg(history.startHistory)
         .check("abcde_")
@@ -73,7 +73,7 @@ object HistoryTests extends TestSuite{
 
     // When you page up with something that doesn't exist in history, it
     // should preserve the current line and move your cursor to the end
-    'ups{
+    test("ups"){
       checker("abc_")
         .runMsg(history.startHistory)
         .check("abc_de")
@@ -91,7 +91,7 @@ object HistoryTests extends TestSuite{
         .runMsg(history.up)
         .check("abc_de")
     }
-    'upsTyping{
+    test("upsTyping"){
       checker("de_")
         .runMsg(history.startHistory)
         .check("abcde_")
@@ -121,7 +121,7 @@ object HistoryTests extends TestSuite{
         .check("abcdefghi_")
 
     }
-    'cannotFindSearch{
+    test("cannotFindSearch"){
       checker("abcde_")
         .runMsg(history.startHistory)
         .check("abcde_")
@@ -129,7 +129,7 @@ object HistoryTests extends TestSuite{
         .check("abcdeZ_")
         .checkMsg(HistoryFilter.cannotFindSearchMessage)
     }
-    'down{
+    test("down"){
       checker("abc_")
         .runMsg(history.startHistory)
         .check("abc_de")

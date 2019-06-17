@@ -15,9 +15,9 @@ object ScriptTests extends TestSuite{
 
     val printedScriptPath = """pwd/'amm/'src/'test/'resources/'scripts"""
 
-    'exec{
-      'compilationBlocks{
-        'loadIvy - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
+    test("exec"){
+      test("compilationBlocks"){
+        test("loadIvy") - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
           check.session(s"""
             @ import os._
 
@@ -28,7 +28,7 @@ object ScriptTests extends TestSuite{
 
             """)
           }
-        'preserveImports{
+        test("preserveImports"){
           check.session(s"""
             @ import os._
 
@@ -38,7 +38,7 @@ object ScriptTests extends TestSuite{
             r: Left[String, Nothing] = Left("asd")
             """)
         }
-        'annotation{
+        test("annotation"){
           check.session(s"""
             @ import os._
 
@@ -48,7 +48,7 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        'syntax{
+        test("syntax"){
           check.session(s"""
             @ import os._
 
@@ -58,7 +58,7 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        'limitImports{
+        test("limitImports"){
           check.session(s"""
             @ import os._
 
@@ -69,8 +69,8 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'failures{
-        'syntaxError{
+      test("failures"){
+        test("syntaxError"){
           check.session(s"""
             @ import os._
 
@@ -84,7 +84,7 @@ object ScriptTests extends TestSuite{
             Compilation Failed
             """)
         }
-        'compilationError{
+        test("compilationError"){
           check.session(s"""
             @  import os._
 
@@ -98,7 +98,7 @@ object ScriptTests extends TestSuite{
             Compilation Failed
             """)
         }
-        'nofile{
+        test("nofile"){
           check.session(s"""
             @ import os._
 
@@ -107,7 +107,7 @@ object ScriptTests extends TestSuite{
             """
           )
         }
-        'multiBlockError{
+        test("multiBlockError"){
           check.session(s"""
             @ import os._
 
@@ -122,7 +122,7 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'nestedScripts{
+      test("nestedScripts"){
         check.session(s"""
           @ import os._
 
@@ -135,8 +135,8 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
-      'sheBang{
-        'singleLine{
+      test("sheBang"){
+        test("singleLine"){
           check.session(s"""
             @  import os._
 
@@ -146,7 +146,7 @@ object ScriptTests extends TestSuite{
             r: Int = 42
             """)
         }
-        'multiLine {
+        test("multiLine"){
           check.session(
             s"""
             @  import os._
@@ -161,9 +161,9 @@ object ScriptTests extends TestSuite{
 
     }
 
-    'module{
-      'compilationBlocks{
-        'loadIvy{
+    test("module"){
+      test("compilationBlocks"){
+        test("loadIvy"){
           check.session(s"""
             @ import os._
 
@@ -173,7 +173,7 @@ object ScriptTests extends TestSuite{
             r: String = "<a href=\\"www.google.com\\">omg</a>"
            """)
         }
-        'preserveImports{
+        test("preserveImports"){
           check.session(s"""
             @ import os._
 
@@ -184,7 +184,7 @@ object ScriptTests extends TestSuite{
             """)
 
         }
-        'annotation{
+        test("annotation"){
 
           check.session(s"""
           @ import os._
@@ -195,7 +195,7 @@ object ScriptTests extends TestSuite{
           r: Int = 24
           """)
         }
-        'syntax{
+        test("syntax"){
             check.session(s"""
               @ import os._
 
@@ -205,7 +205,7 @@ object ScriptTests extends TestSuite{
               r: Int = 24
             """)
         }
-        'limitImports{
+        test("limitImports"){
           check.session(s"""
             @ import os._
 
@@ -216,8 +216,8 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'failures{
-        'syntaxError{
+      test("failures"){
+        test("syntaxError"){
           check.session(s"""
             @ import os._
 
@@ -231,7 +231,7 @@ object ScriptTests extends TestSuite{
             Compilation Failed
             """)
         }
-        'compilationError{
+        test("compilationError"){
           check.session(s"""
             @ import os._
 
@@ -244,7 +244,7 @@ object ScriptTests extends TestSuite{
                     ^
             Compilation Failed""")
         }
-        'nofile{
+        test("nofile"){
           check.session(s"""
             @ import os._
 
@@ -253,7 +253,7 @@ object ScriptTests extends TestSuite{
             """
           )
         }
-        'scriptWithoutExtension{
+        test("scriptWithoutExtension"){
           val storage = new Storage.Folder(os.temp.dir(prefix = "ammonite-tester"))
           val interp2 = createTestInterp(
             storage,
@@ -265,7 +265,7 @@ object ScriptTests extends TestSuite{
 
           assert(msg.contains("Script file not found"))
         }
-        'multiBlockError{
+        test("multiBlockError"){
           check.session(s"""
             @ import os._
 
@@ -280,7 +280,7 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      'encapsulation{
+      test("encapsulation"){
         check.session(s"""
             @ import os._
 
@@ -291,7 +291,7 @@ object ScriptTests extends TestSuite{
             """
         )
       }
-      'nestedScripts{
+      test("nestedScripts"){
         check.session(s"""
           @ import os._
 
@@ -304,7 +304,7 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
-      'noUnWrapping{
+      test("noUnWrapping"){
         check.session(s"""
           @ import os._
 
@@ -317,8 +317,8 @@ object ScriptTests extends TestSuite{
           error: not found: value wrappedValue
         """)
       }
-      'resolverWithinScript{
-        'pass - {
+      test("resolverWithinScript"){
+        test("pass"){
           if (scala2_11) check.session(s"""
             @ import os._
 
@@ -327,7 +327,7 @@ object ScriptTests extends TestSuite{
 
           """)
         }
-        'fail - {
+        test("fail"){
           if (scala2_11) check.session(s"""
             @ import os._
 
@@ -336,7 +336,7 @@ object ScriptTests extends TestSuite{
           """)
         }
       }
-      'loadIvyAdvanced{
+      test("loadIvyAdvanced"){
         check.session(s"""
         @ import os._
 

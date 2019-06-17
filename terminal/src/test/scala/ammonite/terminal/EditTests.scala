@@ -17,9 +17,9 @@ object EditTests extends TestSuite{
     )
 
     import check._
-    'cutting{
+    test("cutting"){
 
-      * - check(
+      test - check(
         """
         abcd
         _fgh
@@ -27,7 +27,7 @@ object EditTests extends TestSuite{
         """,
         edit.cutWordLeft
       )
-      * - check(
+      test - check(
         """
         abcd
         e_
@@ -35,7 +35,7 @@ object EditTests extends TestSuite{
         """,
         edit.cutWordRight
       )
-      * - check(
+      test - check(
         """
         abcd
         _e
@@ -44,7 +44,7 @@ object EditTests extends TestSuite{
         edit.cutWordRight,
         wordLeft
       )
-      * - check(
+      test - check(
         """
         abcd
         _fgh
@@ -52,7 +52,7 @@ object EditTests extends TestSuite{
         """,
         edit.cutLineLeft
       )
-      * - check(
+      test - check(
         """
         abcd_fgh
         ijkl
@@ -60,7 +60,7 @@ object EditTests extends TestSuite{
         edit.cutLineLeft,
         edit.cutLineLeft
       )
-      * - check(
+      test - check(
         """
         _fgh
         ijkl
@@ -69,7 +69,7 @@ object EditTests extends TestSuite{
         edit.cutLineLeft,
         edit.cutLineLeft
       )
-      * - check(
+      test - check(
         """
         abcd
         e_
@@ -77,7 +77,7 @@ object EditTests extends TestSuite{
         """,
         edit.cutLineRight
       )
-      * - check(
+      test - check(
         """
         abcd
         e_ijkl
@@ -85,7 +85,7 @@ object EditTests extends TestSuite{
         edit.cutLineRight,
         edit.cutLineRight
       )
-      * - check(
+      test - check(
         """
         abcd
         e_
@@ -95,7 +95,7 @@ object EditTests extends TestSuite{
         edit.cutLineRight
       )
 
-      * - check (
+      test - check (
         """
         abcd
         _fgh
@@ -104,7 +104,7 @@ object EditTests extends TestSuite{
         edit.cutCharLeft
       )
 
-      * - check (
+      test - check (
         """
         abc_fgh
         ijkl
@@ -114,9 +114,9 @@ object EditTests extends TestSuite{
         edit.cutCharLeft
       )
     }
-    'pasting{
+    test("pasting"){
 
-      * - check(
+      test - check(
         """
         abcd
         e_fgh
@@ -125,7 +125,7 @@ object EditTests extends TestSuite{
         edit.cutWordLeft,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         ee_fgh
@@ -135,7 +135,7 @@ object EditTests extends TestSuite{
         edit.paste,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         efghfgh_
@@ -145,7 +145,7 @@ object EditTests extends TestSuite{
         edit.paste,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         efghefgh_
@@ -157,7 +157,7 @@ object EditTests extends TestSuite{
         edit.paste
       )
 
-      * - check (
+      test - check (
         """
         abcd
         fgh_
@@ -167,7 +167,7 @@ object EditTests extends TestSuite{
         edit.cutCharLeft,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         e_fgh
@@ -176,7 +176,7 @@ object EditTests extends TestSuite{
         edit.cutLineLeft,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         e_fgh
@@ -186,7 +186,7 @@ object EditTests extends TestSuite{
         edit.cutLineLeft,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         e_fgh
@@ -197,7 +197,7 @@ object EditTests extends TestSuite{
         edit.cutLineLeft,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         efgh_
@@ -206,7 +206,7 @@ object EditTests extends TestSuite{
         edit.cutLineRight,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         efgh
@@ -216,7 +216,7 @@ object EditTests extends TestSuite{
         edit.cutLineRight,
         edit.paste
       )
-      * - check(
+      test - check(
         """
         abcd
         efgh
@@ -228,7 +228,7 @@ object EditTests extends TestSuite{
         edit.paste
       )
     }
-    'transpose{
+    test("transpose"){
       val check = Checker(
         width = 7,
         """
@@ -239,9 +239,9 @@ object EditTests extends TestSuite{
           tuvwxyz
         """
       )
-      'words{
+      test("words"){
         // Trying to transpose something at the start of the input does nothing
-        'start - Checker(width = 20, "_abc  defg    hijkl")
+        test("start") - Checker(width = 20, "_abc  defg    hijkl")
           .run(ReadlineFilters.transposeWord)
           .check("_abc  defg    hijkl")
           .run((b, c) => (b, c+2))
@@ -256,7 +256,7 @@ object EditTests extends TestSuite{
           .check("defg  abc_    hijkl")
 
         // Reverse works anywhere inside the last word
-        'end - Checker(width = 20, "abc  defg    h_ijkl")
+        test("end") - Checker(width = 20, "abc  defg    h_ijkl")
           .run(ReadlineFilters.transposeWord)
           .check("abc  hijkl    defg_")
           .run(ReadlineFilters.transposeWord)
@@ -264,21 +264,21 @@ object EditTests extends TestSuite{
           .run(ReadlineFilters.transposeWord)
           .check("abc  hijkl    defg_")
 
-        'middle - Checker(width = 20, "abc _ defg    hijkl")
+        test("middle") - Checker(width = 20, "abc _ defg    hijkl")
           .run(ReadlineFilters.transposeWord)
           .check("defg  abc_    hijkl")
           .run(ReadlineFilters.transposeWord)
           .check("defg  hijkl    abc_")
       }
-      'letter{
+      test("letter"){
         // Trying to transpose something at the start of the input does nothing
-        'start - Checker(width = 20, "_abcd")
+        test("start") - Checker(width = 20, "_abcd")
           .run(ReadlineFilters.transposeLetter)
           .check("_abcd")
 
         // Trying to transpose at the end of the input transposes the *two*
         // previous characters, rather than the 1 char before and 1 char after
-        'end - Checker(width = 20, "a_bcd")
+        test("end") - Checker(width = 20, "a_bcd")
           .run(ReadlineFilters.transposeLetter)
           .check("ba_cd")
           .run(ReadlineFilters.transposeLetter)
@@ -290,7 +290,7 @@ object EditTests extends TestSuite{
           .run(ReadlineFilters.transposeLetter)
           .check("bcda_")
 
-        'middling - check
+        test("middling") - check
           // single movement
           .run(ReadlineFilters.transposeLetter)
           .check("""

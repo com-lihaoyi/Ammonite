@@ -7,7 +7,7 @@ import scala.collection.{immutable => imm}
 object HeightTests extends TestSuite{
   val tests = Tests{
 
-    'a - {
+    test("a"){
       val height = LineReader.calculateHeight0(
         LineReader.splitBuffer("abcde".toVector),
         width = 2
@@ -17,7 +17,7 @@ object HeightTests extends TestSuite{
       //cd
       //e
     }
-    'b - {
+    test("b"){
       val height = LineReader.calculateHeight0(
         LineReader.splitBuffer("abcd".toVector),
         width = 2
@@ -27,7 +27,7 @@ object HeightTests extends TestSuite{
       //cd
       //|
     }
-    'c - {
+    test("c"){
       val height = LineReader.calculateHeight0(
         LineReader.splitBuffer("abcd".toVector),
         width = 2
@@ -38,7 +38,7 @@ object HeightTests extends TestSuite{
       //_
     }
 
-    'd - {
+    test("d"){
       val height = LineReader.calculateHeight0(
         LineReader.splitBuffer("ab\ncd".toVector),
         width = 2
@@ -50,7 +50,7 @@ object HeightTests extends TestSuite{
       //_
     }
 
-    'e - {
+    test("e"){
       val height = LineReader.calculateHeight0(
         LineReader.splitBuffer("ab\ncd".toVector),
         width = 2
@@ -61,7 +61,7 @@ object HeightTests extends TestSuite{
       //cd
       //|
     }
-    'f - {
+    test("f"){
       val height = LineReader.calculateHeight0(
         LineReader.splitBuffer("ab\ncd".toVector),
         width = 2

@@ -19,7 +19,7 @@ object CachingTests extends TestSuite{
 
 
     val tempDir = os.temp.dir(prefix="ammonite-tester")
-    'noAutoIncrementWrapper{
+    test("noAutoIncrementWrapper"){
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
       Scripts.runScript(os.pwd, scriptPath/"ThreeBlocks.sc", interp)
@@ -31,7 +31,7 @@ object CachingTests extends TestSuite{
         case e: Exception => assert(false)
       }
     }
-    'blocks{
+    test("blocks"){
       def check(fileName: String, expected: Int) = {
         val storage = Storage.InMemory()
         val interp = createTestInterp(storage)
@@ -44,12 +44,12 @@ object CachingTests extends TestSuite{
         assert(n == expected)
 
       }
-      * - check("OneBlock.sc", 2)
-      * - check("TwoBlocks.sc", 3)
-      * - check("ThreeBlocks.sc", 4)
+      test - check("OneBlock.sc", 2)
+      test - check("TwoBlocks.sc", 3)
+      test - check("ThreeBlocks.sc", 4)
     }
 
-    'processModuleCaching{
+    test("processModuleCaching"){
       def check(script: os.RelPath){
         val storage = new Storage.Folder(tempDir)
 
@@ -71,19 +71,19 @@ object CachingTests extends TestSuite{
         assert(interp2.compilerManager.compiler == null)
       }
 
-      'testOne - check(os.rel/'scriptLevelCaching/"scriptTwo.sc")
-      'testTwo - check(os.rel/'scriptLevelCaching/"scriptOne.sc")
-      'testThree - check(os.rel/'scriptLevelCaching/"QuickSort.sc")
-      'testLoadModule - check(os.rel/'scriptLevelCaching/"testLoadModule.sc")
-      'testFileImport - check(os.rel/'scriptLevelCaching/"testFileImport.sc")
-      'testIvyImport - check(os.rel/'scriptLevelCaching/"ivyCacheTest.sc")
-      'testIvyResource- {
+      test("testOne") - check(os.rel/'scriptLevelCaching/"scriptTwo.sc")
+      test("testTwo") - check(os.rel/'scriptLevelCaching/"scriptOne.sc")
+      test("testThree") - check(os.rel/'scriptLevelCaching/"QuickSort.sc")
+      test("testLoadModule") - check(os.rel/'scriptLevelCaching/"testLoadModule.sc")
+      test("testFileImport") - check(os.rel/'scriptLevelCaching/"testFileImport.sc")
+      test("testIvyImport") - check(os.rel/'scriptLevelCaching/"ivyCacheTest.sc")
+      test("testIvyResource"){
         if (!scala2_12) check(os.rel/'scriptLevelCaching/"ivyCachedResourceTest.sc")
       }
 
     }
 
-    'testRunTimeExceptionForCachedScripts{
+    test("testRunTimeExceptionForCachedScripts"){
       val storage = new Storage.Folder(tempDir)
       val numFile = os.pwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
       os.remove.all(numFile)
@@ -115,7 +115,7 @@ object CachingTests extends TestSuite{
       )
     }
 
-    'persistence{
+    test("persistence"){
 
       val tempDir = os.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
@@ -130,7 +130,7 @@ object CachingTests extends TestSuite{
       assert(n1 == 2) // customLolz predef + OneBlock.sc
       assert(n2 == 0) // both should be cached
     }
-    'tags{
+    test("tags"){
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
       Scripts.runScript(os.pwd, scriptPath/"TagBase.sc", interp)
@@ -142,7 +142,7 @@ object CachingTests extends TestSuite{
       assert(n == 5) // customLolz predef + two blocks for each loaded file
     }
 
-    'compilerInit{
+    test("compilerInit"){
       val tempDir = os.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
       )
@@ -155,7 +155,7 @@ object CachingTests extends TestSuite{
       assert(interp2.compilationCount == 0)
     }
 
-    'changeScriptInvalidation{
+    test("changeScriptInvalidation"){
       // This makes sure that the compile caches are properly utilized, and
       // flushed, in a variety of circumstances: changes to the number of
       // blocks in the predef, predefs containing magic imports, and changes
@@ -205,7 +205,7 @@ object CachingTests extends TestSuite{
       processAndCheckCompiler(_ != null)
       processAndCheckCompiler(_ == null)
     }
-    'changeImportedScriptInvalidation{
+    test("changeImportedScriptInvalidation"){
 
       val storageFolder = os.temp.dir()
 
@@ -223,7 +223,7 @@ object CachingTests extends TestSuite{
         val ident = tmpFile.last.stripSuffix(".sc")
         (tmpFile, ident)
       }
-      'simple{
+      test("simple"){
 
 
         val (upstream, upstreamIdent) = createScript(
@@ -321,7 +321,7 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
       }
 
-      'diamond{
+      test("diamond"){
         val (upstream, upstreamIdent) = createScript(
           """println("uppstreamm")
             |val x = 1

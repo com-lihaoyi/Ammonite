@@ -10,9 +10,9 @@ object ProjectTests extends TestSuite{
   val tests = Tests{
     println("ProjectTests")
     val check = new DualTestRepl()
-    'load {
-      'ivy {
-        'standalone - {
+    test("load"){
+      test("ivy"){
+        test("standalone"){
             // ivy or maven central are flaky =/
             val tq = "\"\"\""
             check.session(
@@ -29,7 +29,7 @@ object ProjectTests extends TestSuite{
           res2: String = "<a href=\\"www.google.com\\">omg</a>"
         """)
         }
-        'akkahttp - {
+        test("akkahttp"){
             if (scala2_11) check.session(
               """
               @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0-M3`
@@ -65,7 +65,7 @@ object ProjectTests extends TestSuite{
               @ system.shutdown()
              """)
         }
-        'resolvers - {
+        test("resolvers"){
           retry(2){
             // ivy flakyness...
             if (scala2_11) check.session("""
@@ -84,7 +84,7 @@ object ProjectTests extends TestSuite{
           }
         }
       }
-      'code{
+      test("code"){
         check.session("""
           @ repl.load("val x = 1")
 
@@ -94,7 +94,7 @@ object ProjectTests extends TestSuite{
       }
     }
 
-    'shapeless {
+    test("shapeless"){
       check.session("""
         @ import $ivy.`com.chuusai::shapeless:2.3.3`, shapeless._
 
@@ -111,7 +111,7 @@ object ProjectTests extends TestSuite{
       """)
     }
 
-    'scalaz{
+    test("scalaz"){
       check.session("""
         @ import $ivy.`org.scalaz::scalaz-core:7.2.27`, scalaz._, Scalaz._
 
@@ -119,13 +119,13 @@ object ProjectTests extends TestSuite{
         res1: Option[Int] = Some(3)
       """)
     }
-    'cats{
+    test("cats"){
       check.session("""
         @ import $ivy.`org.typelevel::cats-core:2.0.0-M4`, cats._
 
       """)
     }
-    'guava{
+    test("guava"){
       check.session("""
         @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._
 
@@ -138,7 +138,7 @@ object ProjectTests extends TestSuite{
         res3: Int = 2
       """)
     }
-    'resources{
+    test("resources"){
       if (!scala2_12) check.session("""
         @ import ammonite.ops._
 
@@ -152,7 +152,7 @@ object ProjectTests extends TestSuite{
         @ read! path // Should work now
       """)
     }
-    'scalaparse{
+    test("scalaparse"){
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       if (scala2_12) check.session(s"""
@@ -169,7 +169,7 @@ object ProjectTests extends TestSuite{
       """)
     }
 
-    'finagle{
+    test("finagle"){
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       if (scala2_11) check.session("""
         @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
@@ -214,7 +214,7 @@ object ProjectTests extends TestSuite{
         @ server.close()
       """)
     }
-    'spire{
+    test("spire"){
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       //buggy in 2.10, spire not yet published for 2.12
       if (scala2_11)
@@ -251,7 +251,7 @@ object ProjectTests extends TestSuite{
           res10: Rational = 2/3
         """)
           }
-    'pegdown{
+    test("pegdown"){
       check.session(
         s"""
            @ import $$ivy.`org.pegdown:pegdown:1.6.0`
@@ -261,7 +261,7 @@ object ProjectTests extends TestSuite{
          """)
     }
 
-    'deeplearning {
+    test("deeplearning"){
       // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.13
       if (scala2_11 || scala2_12) check.session(
         """
@@ -285,7 +285,7 @@ object ProjectTests extends TestSuite{
       )
     }
 
-    'jadb {
+    test("jadb"){
       // tests for jitpack and optional dependencies
       check.session(
         """
@@ -336,7 +336,7 @@ object ProjectTests extends TestSuite{
       )
     }
 
-    'profiles {
+    test("profiles"){
       val testCore =
         """
             @ import $ivy.`org.apache.spark::spark-sql:1.6.2`
@@ -357,7 +357,7 @@ object ProjectTests extends TestSuite{
             @     .openStream()
             @ )
         """
-      'default {
+      test("default"){
         // should load hadoop 2.2 stuff by default
         if (scala2_11)
           check.session(
@@ -369,7 +369,7 @@ object ProjectTests extends TestSuite{
             """
           )
       }
-      'withProfile {
+      test("withProfile"){
         // with the right profile, should load hadoop 2.6 stuff
         if (scala2_11)
           check.session(
@@ -392,7 +392,7 @@ object ProjectTests extends TestSuite{
           )
       }
     }
-    'onlyJarLikeArtifactTypes {
+    test("onlyJarLikeArtifactTypes"){
       check.session(
         """
            @ import $ivy.`log4j:log4j:1.2.17`

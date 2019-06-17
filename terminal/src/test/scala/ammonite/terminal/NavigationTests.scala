@@ -6,7 +6,7 @@ import utest._
 object NavigationTests extends TestSuite{
 
   val tests = Tests{
-    'simple{
+    test("simple"){
       // Tests for a simple, not-wrap-around
       // grid of characters
       val check = Checker(
@@ -21,7 +21,7 @@ object NavigationTests extends TestSuite{
 
       import check._
 
-      'noop - check(
+      test("noop") - check(
         """
         abcd
         e_fgh
@@ -30,9 +30,9 @@ object NavigationTests extends TestSuite{
         (g, v) => (g, v)
       )
 
-      'upsAndDowns{
+      test("upsAndDowns"){
 
-        'down - check(
+        test("down") - check(
           """
           abcd
           efgh
@@ -40,7 +40,7 @@ object NavigationTests extends TestSuite{
           """,
           down
         )
-        'up - check(
+        test("up") - check(
           """
           a_bcd
           efgh
@@ -48,7 +48,7 @@ object NavigationTests extends TestSuite{
           """,
           up
         )
-        'updown - check(
+        test("updown") - check(
           """
           abcd
           e_fgh
@@ -56,7 +56,7 @@ object NavigationTests extends TestSuite{
           """,
           up, down
         )
-        'upup - check(
+        test("upup") - check(
           """
           _abcd
           efgh
@@ -64,7 +64,7 @@ object NavigationTests extends TestSuite{
           """,
           up, up
         )
-        'downdown- check(
+        test("downdown") - check(
           """
           abcd
           efgh
@@ -72,7 +72,7 @@ object NavigationTests extends TestSuite{
           """,
           down, down
         )
-        'upupdown - check(
+        test("upupdown") - check(
           """
           abcd
           _efgh
@@ -80,7 +80,7 @@ object NavigationTests extends TestSuite{
           """,
           up, up, down
         )
-        'downdownup - check(
+        test("downdownup") - check(
           """
           abcd
           efgh_
@@ -89,8 +89,8 @@ object NavigationTests extends TestSuite{
           down, down, up
         )
       }
-      'startEnd{
-        'end - check(
+      test("startEnd"){
+        test("end") - check(
           """
           abcd
           efgh_
@@ -98,7 +98,7 @@ object NavigationTests extends TestSuite{
           """,
           end
         )
-        'start - check(
+        test("start") - check(
           """
           abcd
           _efgh
@@ -108,7 +108,7 @@ object NavigationTests extends TestSuite{
         )
       }
     }
-    'jagged{
+    test("jagged"){
       // tests where the lines of characters
       // are of uneven lengths
       val check = Checker(
@@ -124,7 +124,7 @@ object NavigationTests extends TestSuite{
 
       import check._
 
-      'truncate - check(
+      test("truncate") - check(
         """
         abcdefg
         hijk
@@ -134,7 +134,7 @@ object NavigationTests extends TestSuite{
         """,
         down, down
       )
-      'truncateBackUp - check(
+      test("truncateBackUp") - check(
         """
         abcdefg
         hijk
@@ -144,7 +144,7 @@ object NavigationTests extends TestSuite{
         """,
         down, down, up, up
       )
-      'upup- check(
+      test("upup") - check(
         """
         ab_cdefg
         hijk
@@ -154,7 +154,7 @@ object NavigationTests extends TestSuite{
         """,
         up, up
       )
-      'endup- check(
+      test("endup") - check(
         """
         abcdefg
         hijk_
@@ -165,7 +165,7 @@ object NavigationTests extends TestSuite{
         end, up
       )
     }
-    'wrapping{
+    test("wrapping"){
       // tests where some lines are so long that they start
       // wrapping onto the next ones. Navigating around they
       // should behave like separate lines
@@ -180,8 +180,8 @@ object NavigationTests extends TestSuite{
         """
       )
       import check._
-      'updown{
-        * - {
+      test("updown"){
+        test{
           check
             .run(up)
             .check(
@@ -204,7 +204,7 @@ object NavigationTests extends TestSuite{
               """
             )
         }
-        * - {
+        test{
           check
           .run(down)
           .check(
@@ -229,9 +229,9 @@ object NavigationTests extends TestSuite{
         }
 
       }
-      'startend{
+      test("startend"){
 
-        * - check(
+        test - check(
           """
           abcdefg\
           hijk
@@ -241,7 +241,7 @@ object NavigationTests extends TestSuite{
           """,
           end
         )
-        * - check(
+        test - check(
           """
           abcdefg\
           hijk
@@ -251,7 +251,7 @@ object NavigationTests extends TestSuite{
           """,
           home
         )
-        * - check(
+        test - check(
           """
           abcdefg\
           _hijk
@@ -261,7 +261,7 @@ object NavigationTests extends TestSuite{
           """,
           up, home
         )
-        * - check(
+        test - check(
           """
           abcdefg\
           _hijk
@@ -271,7 +271,7 @@ object NavigationTests extends TestSuite{
           """,
           up, home, home, home
         )
-        * - check(
+        test - check(
           """
           abcdefg\
           _hijk
@@ -283,7 +283,7 @@ object NavigationTests extends TestSuite{
         )
       }
     }
-    'wordnav{
+    test("wordnav"){
       // Tests of word-by-word navigation
       val check = Checker(
         width = 10,
@@ -298,7 +298,7 @@ object NavigationTests extends TestSuite{
       import check._
 
 
-      'leftRight - check
+      test("leftRight") - check
         .run(wordLeft)
         .check(
           """
@@ -320,7 +320,7 @@ object NavigationTests extends TestSuite{
           """
         )
 
-      'manyLeft - check
+      test("manyLeft") - check
         .run(wordLeft, wordLeft)
         .check(
           """
@@ -353,7 +353,7 @@ object NavigationTests extends TestSuite{
         )
 
 
-      'manyRight - check
+      test("manyRight") - check
         .run(wordRight)
         .check(
           """
@@ -405,7 +405,7 @@ object NavigationTests extends TestSuite{
           """
         )
 
-      'oneOffs - check
+      test("oneOffs") - check
         .run((b, c) => (b, c+2))
         .check(
           """
