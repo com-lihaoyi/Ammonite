@@ -14,7 +14,7 @@ object SessionTests extends TestSuite{
 
   val tests = Tests{
     val check = new TestRepl()
-    'workingDir{
+    test("workingDir"){
       check.session(s"""
         @ import ammonite.ops._
 
@@ -39,7 +39,7 @@ object SessionTests extends TestSuite{
         @ assert(originalLs2 != (ls!))
       """)
     }
-    'specialPPrint{
+    test("specialPPrint"){
       // Make sure these various "special" data structures get pretty-printed
       // correctly, i.e. not as their underlying type but as something more
       // pleasantly human-readable
@@ -57,7 +57,7 @@ object SessionTests extends TestSuite{
       """)
     }
 
-    'cdIntoDirSymlink {
+    test("cdIntoDirSymlink"){
       check.session(
         s"""
         @ import ammonite.ops._
@@ -86,7 +86,7 @@ object SessionTests extends TestSuite{
       """)
     }
 
-    'nestedSymlinks {
+    test("nestedSymlinks"){
       check.session(
         s"""
         @ import ammonite.ops._
@@ -132,7 +132,7 @@ object SessionTests extends TestSuite{
         @ rm! tmpdir
       """)
     }
-    'opsInSymlinkedDir {
+    test("opsInSymlinkedDir"){
       // test mkdir, write, read, stat/stat.full, cp, and ls inside a symlinked directory
       // (both while wd = symlinked and outside)
       check.session(

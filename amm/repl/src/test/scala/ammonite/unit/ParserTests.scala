@@ -8,7 +8,7 @@ object ParserTests extends TestSuite{
 
   val tests = Tests {
     println("ParserTests")
-    'shebang{
+    test("shebang"){
       def check(original: String, expected: String) = {
         val skipped = ammonite.interp.Interpreter.skipSheBangLine(
           ammonite.util.Util.normalizeNewlines(original)
@@ -67,7 +67,7 @@ object ParserTests extends TestSuite{
     //
     // Not nearly comprehensive, but hopefully if someone really borks this
     // somewhat-subtle logic around the parsers, one of these will catch it
-    'endOfCommandDetection{
+    test("endOfCommandDetection"){
       def assertResult(x: String, pred: Option[fastparse.Parsed[_]] => Boolean) = {
         val res = ammonite.interp.Parsers.split(x)
         assert(pred(res))
@@ -77,56 +77,56 @@ object ParserTests extends TestSuite{
       def assertInvalid(x: String) =
         assertResult(x, res => res.isDefined && res.get.isInstanceOf[fastparse.Parsed.Failure])
 
-      'endOfCommand{
-        * - assertComplete("{}")
-        * - assertComplete("foo.bar")
-        * - assertComplete("foo.bar // line comment")
-        * - assertComplete("foo.bar /* block comment */")
-        * - assertComplete("va va") // postfix
-        * - assertComplete("")
-        * - assertComplete("""
+      test("endOfCommand"){
+        test - assertComplete("{}")
+        test - assertComplete("foo.bar")
+        test - assertComplete("foo.bar // line comment")
+        test - assertComplete("foo.bar /* block comment */")
+        test - assertComplete("va va") // postfix
+        test - assertComplete("")
+        test - assertComplete("""
           {
             val x = 1
           }
         """)
-        * - assertComplete("""
+        test - assertComplete("""
           {{
             val x = 1
           }}
         """)
-        * - assertComplete("""
+        test - assertComplete("""
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0).sum
         """)
       }
-      'notEndOfCommand{
+      test("notEndOfCommand"){
 
-        * - assertIncomplete("{")
-        * - assertIncomplete("foo.bar /* incomplete block comment")
-        * - assertIncomplete("""
+        test - assertIncomplete("{")
+        test - assertIncomplete("foo.bar /* incomplete block comment")
+        test - assertIncomplete("""
           val r = (1 until 1000.view.filter(n => n % 3 == 0 || n % 5 == 0)
         """)
-        * - assertIncomplete("""
+        test - assertIncomplete("""
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0
         """)
         
       }
-      'commandIsBroken{
-        * - assertInvalid("}")
-        * - assertInvalid("{val val ")
-        * - assertInvalid("val val ")
-        * - assertInvalid("""
+      test("commandIsBroken"){
+        test - assertInvalid("}")
+        test - assertInvalid("{val val ")
+        test - assertInvalid("val val ")
+        test - assertInvalid("""
           {
           val val
         """)
-        * - assertInvalid("""
+        test - assertInvalid("""
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 <- 0
         """)
-        * - assertInvalid("""
+        test - assertInvalid("""
           val r <- (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0
         """)
       }
-      'examples{
-        'small{
+      test("examples"){
+        test("small"){
           val input = Util.normalizeNewlines(
             """ for {
                  a <- List(1);
@@ -142,7 +142,7 @@ object ParserTests extends TestSuite{
             else assertIncomplete(prefix)
           }
         }
-        'medium{
+        test("medium"){
           val input = Util.normalizeNewlines(
             """ val ls = for(y <- 1900 to 2000; m <- 1 to 12) yield {
                   if(m == 2)
@@ -160,7 +160,7 @@ object ParserTests extends TestSuite{
             else assertIncomplete(prefix)
           }
         }
-        'big{
+        test("big"){
           val input = Util.normalizeNewlines(
             """import play.core.server._, play.api.routing.sird._, play.api.mvc._ // 0
                import scalaj.http._                                               // 1

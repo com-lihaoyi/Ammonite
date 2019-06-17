@@ -29,13 +29,13 @@ object BasicTests extends TestSuite{
       JAVA_OPTS = "-verbose:class"
     )
 
-    'hello{
+    test("hello"){
       val evaled = exec('basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
     }
 
     //make sure scripts with symbols in path names work fine
-    'scriptWithSymbols {
+    test("scriptWithSymbols"){
       if (!Util.windowsPlatform){
         val dirAddr =
           pwd/'target/'test/'resources/'ammonite/'integration/'basic
@@ -53,7 +53,7 @@ object BasicTests extends TestSuite{
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }
-    'scalacNotLoadedByCachedScripts{
+    test("scalacNotLoadedByCachedScripts"){
       val tmpDir = tmp.dir()
       val evaled1 = execWithJavaOptsSet(
         'basic/"Print.sc",
@@ -70,7 +70,7 @@ object BasicTests extends TestSuite{
       assert(count1 > 10)
       assert(count2 < 5)
     }
-    'fastparseNotLoadedByCachedScritps{
+    test("fastparseNotLoadedByCachedScritps"){
       val tmpDir = tmp.dir()
       val evaled1 = execWithJavaOptsSet(
         'basic/"Print.sc",
@@ -86,7 +86,7 @@ object BasicTests extends TestSuite{
     }
 
 
-    'scriptInSomeOtherDir{
+    test("scriptInSomeOtherDir"){
       val scriptAddr = tmp.dir()/"script.sc"
       rm(scriptAddr)
       write(scriptAddr, """println("Worked!!")""")
@@ -97,7 +97,7 @@ object BasicTests extends TestSuite{
       assert(evaled.out.trim == "Worked!!" )
     }
 
-    'complex {
+    test("complex"){
       // Spire not published for 2.12
       if (scala.util.Properties.versionNumberString.contains("2.11")) {
         val evaled = exec('basic / "Complex.sc")
@@ -106,7 +106,7 @@ object BasicTests extends TestSuite{
     }
 
 
-    'shell {
+    test("shell"){
       // make sure you can load the example-predef.sc, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = %%bash(
@@ -128,7 +128,7 @@ object BasicTests extends TestSuite{
     }
 
     // Ensure we can load the source code of the built-in Java standard library
-    'source{
+    test("source"){
       // This fails on windows because for some reason the windows subprocess
       // interface eats the double-quotes inside the `-c` argument, even though
       // the argument is being passed programmatically and not through any shell =(
@@ -156,15 +156,15 @@ object BasicTests extends TestSuite{
 
     // Ensure we can load the source code of external libraries, which needs to
     // get pulled down together with the library code when you `import $ivy`
-    'sourceExternal{
+    test("sourceExternal"){
       exec('basic / "SourceDownload.sc")
     }
 
-    'classloaders{
+    test("classloaders"){
       val evaled = exec('basic / "Resources.sc")
       assert(evaled.out.string.contains("1745"))
     }
-    'testSilentScriptRunning{
+    test("testSilentScriptRunning"){
       val evaled1 = exec('basic/"Hello.sc")
       // check Compiling Script is being printed
 
@@ -173,14 +173,14 @@ object BasicTests extends TestSuite{
       // make sure with `-s` flag script running is silent
       assert(!evaled2.err.string.contains("Compiling"))
     }
-    'testSilentRunningWithExceptions{
+    test("testSilentRunningWithExceptions"){
       val errorMsg = intercept[ShelloutException]{
         exec('basic/"Failure.sc")
       }.result.err.string
 
       assert(errorMsg.contains("not found: value x"))
     }
-    'testSilentIvyExceptions{
+    test("testSilentIvyExceptions"){
       val errorMsg = intercept[ShelloutException]{
         exec('basic/"wrongIvyCordinates.sc")
       }.result.err.string
@@ -188,7 +188,7 @@ object BasicTests extends TestSuite{
 
       assert(errorMsg.contains("Failed to resolve ivy dependencies"))
     }
-    'testIvySnapshotNoCache{
+    test("testIvySnapshotNoCache"){
 
       // test disabled on windows because sbt not available
       if (!Util.windowsPlatform) {
@@ -248,14 +248,14 @@ object BasicTests extends TestSuite{
     // Most of the logic around main methods is tested in `MainTests.scala`
     // in our unit test suite, but test a few cases as integration tests
     // to make sure things work end-to-end
-    'multiMain{
-      'positiveArgs{
+    test("multiMain"){
+      test("positiveArgs"){
         val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
 
         val out = evaled.out.string
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
-      'specifyMain{
+      test("specifyMain"){
         val evaled = intercept[ShelloutException](exec('basic/"MultiMain.sc"))
 
         val out = evaled.result.err.string

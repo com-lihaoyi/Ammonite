@@ -11,7 +11,7 @@ object SerializationTests extends TestSuite{
       override def codeWrapper = CodeClassWrapper
     }
 
-    'closure {
+    test("closure"){
       // User values from the REPL shouldn't be recomputed upon
       // deserialization. The test below checks that the value `a`, whose
       // computation is side-effecting, is indeed serialized along `closure`,

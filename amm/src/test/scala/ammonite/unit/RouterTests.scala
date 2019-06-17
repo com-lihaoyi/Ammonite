@@ -22,12 +22,12 @@ object RouterTests extends TestSuite{
   }
   val tests = Tests {
     println("UnitTests")
-    'transpose{
+    test("transpose"){
       // Make sure this doesn't stack-overflow
       val inner = List.fill(1000000)(1)
       assert(Util.transpose(List.fill(10)(inner)) == List.fill(1000000)(List.fill(10)(1)))
     }
-    'router{
+    test("router"){
       case object MyException extends Exception
       object Target{
         @main
@@ -52,7 +52,7 @@ object RouterTests extends TestSuite{
       }
       val routes = Router.generateRoutes[Target.type]
 
-      'basicModelling{
+      test("basicModelling"){
         val names = routes.map(_.name)
         assert(
           names == List("foo", "bar", "qux", "ex", "pureVariadic", "mixedVariadic")
@@ -78,7 +78,7 @@ object RouterTests extends TestSuite{
       }
 
 
-      'invoke - {
+      test("invoke"){
         check(Target, routes(0), List(), Router.Result.Success(1))
         check(Target, routes(1), List("2"), Router.Result.Success(2))
         check(Target, routes(1), List("--i", "2"), Router.Result.Success(2))
@@ -88,16 +88,16 @@ object RouterTests extends TestSuite{
         check(Target, routes(2), List("--i", "3", "x"), Router.Result.Success("xxx"))
         check(Target, routes(2), List("--i", "3", "--s", "x"), Router.Result.Success("xxx"))
       }
-      'varargs{
-        'happyPathPasses - {
+      test("varargs"){
+        test("happyPathPasses"){
           check(Target, routes(4), List("1", "2", "3"), Router.Result.Success(6))
           check(Target, routes(5), List("1", "2", "3", "4", "5"), Router.Result.Success("12345"))
         }
-        'emptyVarargsPasses - {
+        test("emptyVarargsPasses"){
           check(Target, routes(4), List(), Router.Result.Success(0))
           check(Target, routes(5), List("1"), Router.Result.Success("1"))
         }
-        'varargsAreAlwaysPositional - {
+        test("varargsAreAlwaysPositional"){
           val invoked = parseInvoke(Target, routes(4), List("--nums", "31337"))
           assertMatch(invoked){
             case InvalidArguments(List(
@@ -124,12 +124,12 @@ object RouterTests extends TestSuite{
           }
         }
 
-        'notEnoughNormalArgsStillFails{
+        test("notEnoughNormalArgsStillFails"){
           assertMatch(parseInvoke(Target, routes(5), List())){
             case MismatchedArguments(List(ArgSig("first", _, _, _)), Nil, Nil, None) =>
           }
         }
-        'multipleVarargParseFailures{
+        test("multipleVarargParseFailures"){
           assertMatch(parseInvoke(Target, routes(4), List("aa", "bb", "3"))){
             case InvalidArguments(
             List(
@@ -148,8 +148,8 @@ object RouterTests extends TestSuite{
         }
       }
 
-      'failures{
-        'missingParams - {
+      test("failures"){
+        test("missingParams"){
           assertMatch(parseInvoke(Target, routes(1), List.empty)){
             case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil, None) =>
           }
@@ -157,19 +157,19 @@ object RouterTests extends TestSuite{
             case MismatchedArguments(List(ArgSig("i", _, _, _)), Nil, Nil, None) =>
           }
         }
-        'invalidParams - assertMatch(parseInvoke(Target, routes(1), List("lol"))){
+        test("invalidParams") - assertMatch(parseInvoke(Target, routes(1), List("lol"))){
           case InvalidArguments(
           List(ParamError.Invalid(ArgSig("i", _, _, _), "lol", _))
           ) =>
         }
 
-        'tooManyParams - check(
+        test("tooManyParams") - check(
           Target, routes(0), List("1", "2"),
           MismatchedArguments(Nil, List("1", "2"), Nil, None)
         )
 
 
-        'redundantParams - {
+        test("redundantParams"){
           val parsed = parseInvoke(Target, routes(2), List("1", "--i", "2"))
           assertMatch(parsed){
             case MismatchedArguments(
@@ -177,7 +177,12 @@ object RouterTests extends TestSuite{
             ) =>
           }
         }
-        'failing - check(Target, routes(3), List(), Router.Result.Error.Exception(MyException))
+        test("failing") - check(
+          Target,
+          routes(3),
+          List(),
+          Router.Result.Error.Exception(MyException)
+        )
       }
     }
   }

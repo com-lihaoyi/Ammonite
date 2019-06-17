@@ -26,15 +26,15 @@ object SourceTests extends TestSuite{
     }
 
 
-    'objectInfo{
-      'thirdPartyJava{
+    test("objectInfo"){
+      test("thirdPartyJava"){
         check(
           load(new javassist.ClassPool()),
           "ClassPool.java",
           "public class ClassPool"
         )
       }
-      'thirdPartyScala{
+      test("thirdPartyScala"){
 //        Not published for 2.10
 //        check(
 //          load(shapeless.::),
@@ -47,8 +47,8 @@ object SourceTests extends TestSuite{
           "object Read"
         )
       }
-      'stdLibScala{
-        'direct - {
+      test("stdLibScala"){
+        test("direct"){
           // The Scala standard library classes for some reason don't get
           // properly included in the classpath in 2.10; it's unfortunate but
           // we'll just ignore it since the community has already moved on to
@@ -59,7 +59,7 @@ object SourceTests extends TestSuite{
             "case object Nil extends List[Nothing]"
           )
         }
-        'runtimeTyped - {
+        test("runtimeTyped"){
           val empty: Seq[Int] = Seq()
           val nonEmpty: Seq[Int] = Seq(1)
           check(
@@ -76,8 +76,8 @@ object SourceTests extends TestSuite{
       }
 
     }
-    'objectMemberInfo{
-      'thirdPartyJava{
+    test("objectMemberInfo"){
+      test("thirdPartyJava"){
         val pool = new javassist.ClassPool()
         check(
           load(pool.find _),
@@ -91,7 +91,7 @@ object SourceTests extends TestSuite{
           "public URL find(String classname)"
         )
       }
-      'void{
+      test("void"){
         check(
           load(Predef.println()),
           "Predef.scala",
@@ -99,7 +99,7 @@ object SourceTests extends TestSuite{
         )
       }
 
-      'overloaded{
+      test("overloaded"){
         val pool = new javassist.ClassPool()
         check(
           load(pool.makeClass(_: InputStream)),
@@ -117,7 +117,7 @@ object SourceTests extends TestSuite{
           "public CtClass makeClass(ClassFile classfile, boolean ifNotFrozen)"
         )
       }
-      'implementedBySubclass{
+      test("implementedBySubclass"){
         val opt: Option[Int] = Option(1)
         check(
           load(opt.get),

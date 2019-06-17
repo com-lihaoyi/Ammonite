@@ -17,7 +17,7 @@ object ToolsTests extends TestSuite{
       fansi.Color.Red, fansi.Attrs.Empty
     )
 
-    'grep{
+    test("grep"){
 
       implicit val pprinter = pprint.PPrinter.Color.copy(
         colorLiteral = fansi.Attr.Reset,
@@ -28,7 +28,7 @@ object ToolsTests extends TestSuite{
       )
       val items = Seq(123, 456, 789)
       import ammonite.ops._
-      'filter{
+      test("filter"){
         assert(
           (items |? grep! "45") == Seq(456),
           (items |? grep! "45".r) == Seq(456),
@@ -38,7 +38,7 @@ object ToolsTests extends TestSuite{
           (items |? grep! "^[123456]$".r) == Seq()
         )
       }
-      'flatMap{
+      test("flatMap"){
         def check[T: Grepper](items: Seq[Any], regex: T, expected: Seq[String]) = {
 
           val grepped = items || grep! regex
@@ -52,40 +52,40 @@ object ToolsTests extends TestSuite{
               }
           assert(displayed == expected)
         }
-        'string{
+        test("string"){
           check(items, "12", Seq("<12>3"))
           check(items, "23", Seq("1<23>"))
 
         }
-        'regex{
+        test("regex"){
           check(items, "^[123456]".r, Seq("<1>23", "<4>56"))
           check(items, "[123456]$".r, Seq("12<3>", "45<6>"))
         }
-        'long{
+        test("long"){
           val longItems = Seq("123456789012345678901234567890")
 
           // If you grep near the start, peg the context to the start
-          'truncateStart - check(
+          test("truncateStart") - check(
             longItems,
             "\"123".r,
             Seq("<\"123>45678901234567...")
           )
           // If you grep near the end, peg the context to the end
-          'truncateEnd- check(
+          test("truncateEnd") - check(
             longItems,
             "890\"".r,
             Seq("...45678901234567<890\">")
           )
 
           // If your greps are close together, peg around the middle
-          'closeTogether  - check(
+          test("closeTogether") - check(
             longItems,
             "0123",
             Seq("...89<0123>456789<0123>45...")
           )
 
           // If your greps are far apart, peg each one
-          'farApart - check(
+          test("farApart") - check(
             longItems,
             "\"123|890\"".r,
             Seq("<\"123>45678901234567..." + newLine + "...45678901234567<890\">")
@@ -93,7 +93,7 @@ object ToolsTests extends TestSuite{
 
           // Make sure that when the different matches are relatively close
           // together, the snippets of context displayed do not overlap.
-          'noOverlap - check(
+          test("noOverlap") - check(
             longItems,
             "123",
             Seq("\"<123>4567890<123>4567..." + newLine + "...890<123>4567890\"")

@@ -22,12 +22,12 @@ object MainTests extends TestSuite{
   val tests = Tests {
     println("Running MainTests")
 
-    'hello{
+    test("hello"){
       val evaled = exec("Hello.sc")
       assert(evaled.out.trim == "Hello World")
     }
 
-    'compilerCrash{
+    test("compilerCrash"){
       if(TestUtils.scala2_11){
         val evaled = exec("CompilerCrash.sc")
         // Make sure we do not accidentally lose the stack trace in the case
@@ -38,7 +38,7 @@ object MainTests extends TestSuite{
 
     // Not really related to main methods, but related since most of the main
     // logic revolves around handling arguments. Make sure this fails properly
-    'badAmmoniteFlag{
+    test("badAmmoniteFlag"){
       val evaled = new InProcessMainMethodRunner(
         os.rel / 'mains/"Hello.sc",
         List("--doesnt-exist"),
@@ -50,27 +50,27 @@ object MainTests extends TestSuite{
     }
     //make sure scripts with symbols in path names work fine
 
-    'main{
-      'single{
+    test("main"){
+      test("single"){
         val evaled = exec("Main.sc")
         assert(evaled.success)
         val out = evaled.out
         assert(out.contains("Hello! 1"))
       }
-      'multiple{
-        'positiveNoArgs{
+      test("multiple"){
+        test("positiveNoArgs"){
           val evaled = exec("MultiMain.sc", "mainA")
           assert(evaled.success)
           val out = evaled.out
           assert(out == "Hello! 1" + Util.newLine)
         }
-        'positiveArgs{
+        test("positiveArgs"){
           val evaled = exec("MultiMainDoc.sc", "functionB", "2", "foo")
           assert(evaled.success)
           val out = evaled.out
           assert(out == "Hello! foofoo ." + Util.newLine)
         }
-        'specifyMain{
+        test("specifyMain"){
           val evaled = exec("MultiMain.sc")
           assert(!evaled.success)
           val out = evaled.err
@@ -90,7 +90,7 @@ object MainTests extends TestSuite{
           )
           assert(out.contains(expected.trim))
         }
-        'specifyMainDoc{
+        test("specifyMainDoc"){
           val evaled = exec("MultiMainDoc.sc")
           assert(!evaled.success)
           val out = evaled.err
@@ -112,7 +112,7 @@ object MainTests extends TestSuite{
           )
           assert(out.contains(expected.trim))
         }
-        'cantFindMain{
+        test("cantFindMain"){
           val evaled = exec("MultiMainDoc.sc", "doesntExist")
           assert(!evaled.success)
           val out = evaled.err
@@ -134,21 +134,21 @@ object MainTests extends TestSuite{
           )
           assert(out.contains(expected.trim))
         }
-        'emptyArg {
+        test("emptyArg"){
           val evaled = exec("ArgList.sc", "")
           assert(evaled.success)
         }
       }
     }
 
-    'args{
-      'full{
+    test("args"){
+      test("full"){
         val evaled = exec("Args.sc", "-i", "3", "--s", "Moo", (os.pwd/'omg/'moo).toString)
         assert(evaled.success)
         assert(evaled.out == ("\"Hello! MooMooMoo moo.\"" + Util.newLine))
       }
 
-      'default{
+      test("default"){
         val evaled = exec("Args.sc", "3", "Moo")
         assert(evaled.success)
         assert(
@@ -157,7 +157,7 @@ object MainTests extends TestSuite{
           evaled.out == ("\"Hello! MooMooMoo ammonite.\"" + Util.newLine)
         )
       }
-      'manualPrintln{
+      test("manualPrintln"){
         val evaled = exec("Args2.sc", "3", "Moo")
         assert(evaled.success)
         assert(
@@ -175,7 +175,7 @@ object MainTests extends TestSuite{
            |  --s     String
            |  --path  os.Path (default ${os.pwd})
            |""".stripMargin
-      'tooFew{
+      test("tooFew"){
         val evaled = exec("Args.sc", "3")
         assert(!evaled.success)
 
@@ -186,7 +186,7 @@ object MainTests extends TestSuite{
           )
         ))
       }
-      'badHalfFlag{
+      test("badHalfFlag"){
         // Make sure if someone passes in a flag without a corresponding RHS
         // value, it gets treated as a keyword rather than a dumb parameter
         // and raises an error if it doesn't exist
@@ -200,7 +200,7 @@ object MainTests extends TestSuite{
           )
         ))
       }
-      'goodHalfFlag{
+      test("goodHalfFlag"){
         // Make sure if someone passes in a flag without a corresponding RHS
         // value, it gets treated as a keyword rather than a dumb parameter
         // and raises an error if it doesn't exist
@@ -214,7 +214,7 @@ object MainTests extends TestSuite{
           )
         ))
       }
-      'varargs{
+      test("varargs"){
         // Make sure varargs are able to slurp up everything, including args
         // which start with `--`. This allows a user to define a main method
         // taking `String*`, slurping up all args un-changed, and then passing
@@ -240,7 +240,7 @@ object MainTests extends TestSuite{
           out.contains("List(-cow, --omg, bbq, -i, x, --i)")
         )
       }
-      'argsGivenButNoMain{
+      test("argsGivenButNoMain"){
         val evaled = exec("Hello.sc", "a", "b", "\"")
         assert(!evaled.success)
 
@@ -248,7 +248,7 @@ object MainTests extends TestSuite{
           """Script Hello.sc does not take arguments: "a" "b" "\"""""
         ))
       }
-      'tooMany{
+      test("tooMany"){
         val evaled = exec("Args.sc", "3", "4", "5", "6", "7")
         assert(!evaled.success)
 
@@ -259,7 +259,7 @@ object MainTests extends TestSuite{
           )
         ))
       }
-      'multipleErrors{
+      test("multipleErrors"){
         val evaled = exec("Args.sc", "3", "-i", "4", "--unknown", "6")
         assert(!evaled.success)
 
@@ -272,7 +272,7 @@ object MainTests extends TestSuite{
           )
         ))
       }
-      'cantParse{
+      test("cantParse"){
         val evaled = exec("Args.sc", "foo", "moo")
         assert(!evaled.success)
 

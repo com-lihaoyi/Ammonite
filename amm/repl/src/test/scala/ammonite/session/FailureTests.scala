@@ -8,7 +8,7 @@ object FailureTests extends TestSuite{
   val tests = Tests{
     println("FailureTests")
     val check = new DualTestRepl()
-    'compileFailure {
+    test("compileFailure"){
       check.session("""
         @ doesnt_exist
         error: not found: value doesnt_exist
@@ -29,7 +29,7 @@ object FailureTests extends TestSuite{
         Compilation Failed
       """)
     }
-    'compilerCrash{
+    test("compilerCrash"){
       // Make sure compiler crashes provide the appropriate error
       // messaging, and the REPL continues functioning after
       if (TestUtils.scala2_11) check.session("""
@@ -43,14 +43,14 @@ object FailureTests extends TestSuite{
         res1: Int = 2
       """)
     }
-    'ivyFail{
+    test("ivyFail"){
       check.session("""
         @ import $ivy.`com.lihaoyi::upickle-doest-exist:0.1.0`
         error: Failed to resolve ivy dependencies
       """)
     }
 
-    'exceptionHandling{
+    test("exceptionHandling"){
       check.fail("""throw new Exception("lol", new Exception("hoho"))""", x =>
         // It contains the things we want
         x.contains("java.lang.Exception: lol") &&

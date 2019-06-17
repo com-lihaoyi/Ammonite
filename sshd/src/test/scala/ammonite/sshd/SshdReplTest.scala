@@ -13,7 +13,7 @@ object SshdReplTest extends TestSuite {
   override val tests = Tests {
 //  Diabled on charge of flakiness
 
-//    'canExecuteRemoteCommand - retry(3){ // Flaky, not sure why
+//    test("canExecuteRemoteCommand") - retry(3){ // Flaky, not sure why
 //      withTmpDirectory { tmpDir =>
 //        val repl = new SshdRepl(
 //          SshServerConfig("localhost", 0, testUsername, testPassword, tmpDir),

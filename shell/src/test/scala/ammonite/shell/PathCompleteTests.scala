@@ -4,8 +4,8 @@ import utest._
 
 object PathCompleteTests extends TestSuite{
   val tests = Tests{
-    'path{
-      'parse{
+    test("path"){
+      test("parse"){
         def check(s: String,
                   expected: (Option[String], Seq[Option[String]], Option[String], Int)) = {
           val cursor = s.indexOf("<caret>")
@@ -17,7 +17,7 @@ object PathCompleteTests extends TestSuite{
           val res = PathComplete.findPathLiteral(s.take(cursor), cursor)
           assert(res == None)
         }
-        'pos{
+        test("pos"){
           check("""'hello/<caret>""", (None, Seq(Some("hello")), None, 0))
           check("""'hello / <caret>""", (None, Seq(Some("hello")), None, 0))
           check("""'hello / 'worl<caret>""", (None, Seq(Some("hello")), Some("'worl"), 5))
@@ -46,7 +46,7 @@ object PathCompleteTests extends TestSuite{
           check("""home/'fi<caret>""", (Some("home"), Nil, Some("'fi"), 3))
           check("""home/'fi<caret>nd""", (Some("home"), Nil, Some("'fi"), 3))
         }
-        'neg{
+        test("neg"){
           checkNeg(""" "hello".<caret>""")
           checkNeg(""" omg/<caret>""")
           checkNeg(""" omg / <caret>""")

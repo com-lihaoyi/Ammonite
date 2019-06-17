@@ -44,7 +44,7 @@ object AutocompleteTests extends TestSuite{
 
   val tests = Tests{
     println("AutocompleteTests")
-    'selection{
+    test("selection"){
 
 
       // Not sure why clone and finalize don't appear in this list
@@ -53,7 +53,7 @@ object AutocompleteTests extends TestSuite{
         "toString", "equals", "hashCode",
         "getClass", "asInstanceOf", "isInstanceOf"
       )
-      'import - checking{ complete =>
+      test("import") - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete("""import <from><caret>""", Set("java", "javax", "scala", "javassist") -- _)
           complete("""import <from>j<caret>""", Set("java", "javax", "javassist") -- _)
@@ -92,7 +92,7 @@ object AutocompleteTests extends TestSuite{
         )
       }
 
-      'scope - checking{ complete =>
+      test("scope") - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete( """<caret>""", Set("scala") -- _)
           complete( """Seq(1, 2, 3).map(argNameLol => <from><caret>)""", Set("argNameLol") -- _)
@@ -110,7 +110,7 @@ object AutocompleteTests extends TestSuite{
         //        Set("def println(x: Any): Unit", "def println(): Unit") ^
         //      )
       }
-      'scopePrefix - checking{ complete =>
+      test("scopePrefix") - checking{ complete =>
         if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
           complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
 
@@ -125,7 +125,7 @@ object AutocompleteTests extends TestSuite{
           complete( """object Zomg{ <from><caret>Zom }""", Set("Zomg") ^ _)
         }
       }
-      'dot - checking{ complete =>
+      test("dot") - checking{ complete =>
 
         complete( """java.math.<caret>""",
           Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^ _
@@ -148,7 +148,7 @@ object AutocompleteTests extends TestSuite{
 
       }
 
-      'deep - checking{ complete =>
+      test("deep") - checking{ complete =>
         complete( """<from>fromN<caret>""",
           Set("scala.concurrent.duration.fromNow") ^ _
         )
@@ -159,7 +159,7 @@ object AutocompleteTests extends TestSuite{
           Set("scala.concurrent.duration.SECONDS") ^ _
         )
       }
-      'dotPrefix - checking{ complete =>
+      test("dotPrefix") - checking{ complete =>
         complete( """java.math.<from>Big<caret>""",
           Set("BigDecimal", "BigInteger") ^ _
         )
@@ -194,17 +194,17 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
       }
 
-      'defTab  - checking{ complete =>
+      test("defTab") - checking{ complete =>
         //Assert no NullPointerException was thrown. Does not verify any completions.
         complete( """def<caret>""", Set.empty -- _)
       }
 
-      'Array - checking{ complete =>
+      test("Array") - checking{ complete =>
         //Test around https://github.com/lihaoyi/Ammonite/issues/252
         complete("""new Array<caret>""", Set() ^ _)
       }
 
-      'LOCAL_SUFFIX_STRING - checking { complete =>
+      test("LOCAL_SUFFIX_STRING") - checking { complete =>
         complete(
           // The following object creation pattern triggers nsc to return
           // symbols w/ trailing whitespace, which we strip.
@@ -214,15 +214,15 @@ object AutocompleteTests extends TestSuite{
       }
     }
 
-    'backquotes {
-      'spaces - checking { complete =>
+    test("backquotes"){
+      test("spaces") - checking { complete =>
         complete(
           """object x { val `Backquoted Bar` = 1 }; x.<caret>""",
           Set("`Backquoted Bar`") -- _
         )
       }
 
-      'keywords - checking { complete =>
+      test("keywords") - checking { complete =>
         complete(
           """object x { val `new` = 1; }; x.<caret>""",
           Set("`new`") -- _
@@ -230,7 +230,7 @@ object AutocompleteTests extends TestSuite{
       }
     }
 
-    'dependencies {
+    test("dependencies"){
       checking { complete =>
         complete(
           """import $ivy.<from>`io.get-c<caret>`""",

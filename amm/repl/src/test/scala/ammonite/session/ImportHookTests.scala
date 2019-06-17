@@ -14,30 +14,30 @@ object ImportHookTests extends TestSuite{
   val tests = Tests{
     println("ImportHookTests")
     val check = new DualTestRepl()
-    'repl{
-      'file{
-        'basic - check.session("""
+    test("repl"){
+      test("file"){
+        test("basic") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
 
-        'inline - check.session("""
+        test("inline") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Basic, Basic.basicValue
 
           @ basicValue
           res1: Int = 31337
         """)
 
-        'partiallyQualified - check.session("""
+        test("partiallyQualified") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Basic
 
           @ Basic.basicValue
           res1: Int = 31337
         """)
 
-        'multiImport - check.session("""
+        test("multiImport") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.{Basic, BasicTwo}
 
           @ Basic.basicValue
@@ -47,7 +47,7 @@ object ImportHookTests extends TestSuite{
           res2: Int = 1337
         """)
 
-        'rename - check.session("""
+        test("rename") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
 
           @ Basic.basicValue
@@ -57,20 +57,20 @@ object ImportHookTests extends TestSuite{
           res2: Int = 1337
         """)
 
-        'deep - check.session("""
+        test("deep") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Deep.DeepObject.DeepInner.deepValue
           error: Cannot resolve $file import
         """)
 
 
-        'deepRenamed - check.session("""
+        test("deepRenamed") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
           error: Cannot resolve $file import
          """)
 
       }
-      'ivy{
-        'basic - {
+      test("ivy"){
+        test("basic"){
           check.session("""
             @ import scalatags.Text.all._
             error: not found: value scalatags
@@ -84,7 +84,7 @@ object ImportHookTests extends TestSuite{
            """)
         }
 
-        'explicitBinaryVersion - {
+        test("explicitBinaryVersion"){
           check.session(s"""
             @ import scalatags.Text.all._
             error: not found: value scalatags
@@ -98,7 +98,7 @@ object ImportHookTests extends TestSuite{
            """)
         }
 
-        'inline - {
+        test("inline"){
           check.session("""
             @ import scalatags.Text.all._
             error: not found: value scalatags
@@ -110,7 +110,7 @@ object ImportHookTests extends TestSuite{
            """)
         }
 
-        'inlineFull - {
+        test("inlineFull"){
           // no more macroparadise in 2.13
           if (scala2_11 || scala2_12) check.session("""
             @ import org.scalamacros.paradise.Settings._
@@ -123,11 +123,11 @@ object ImportHookTests extends TestSuite{
            """)
         }
       }
-      'url{
+      test("url"){
         val scriptUrl =
           "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
           "master/amm/src/test/resources/scripts/Annotation.sc"
-        'basic - {
+        test("basic"){
           check.session(s"""
           @ import $$url.`$scriptUrl`
           error: $$url import failed
@@ -138,7 +138,7 @@ object ImportHookTests extends TestSuite{
           res1: Int = 24
         """)
         }
-        'inline - {
+        test("inline"){
           check.session(s"""
           @ import $$url.`$scriptUrl`
           error: $$url import failed
@@ -151,22 +151,22 @@ object ImportHookTests extends TestSuite{
         }
       }
     }
-    'scripts{
-      'file - check.session("""
+    test("scripts"){
+      test("file") - check.session("""
         @ import $file.amm.src.test.resources.importHooks.FileImport
 
         @ FileImport.fileImportVal
         res1: Int = 31338
        """)
 
-      'indirectFile - check.session("""
+      test("indirectFile") - check.session("""
         @ import $file.amm.src.test.resources.importHooks.IndirectFileImport
 
         @ IndirectFileImport.indirectFileImportVal
         res1: Int = 31339
        """)
 
-      'ivy - {
+      test("ivy"){
         check.session("""
           @ import $file.amm.src.test.resources.importHooks.IvyImport
 
@@ -175,7 +175,7 @@ object ImportHookTests extends TestSuite{
          """)
       }
 
-      'deepImport - check.session("""
+      test("deepImport") - check.session("""
         @ import $file.amm.src.test.resources.importHooks.DeepImport.deepValueImported
         error: Cannot resolve $file import
 

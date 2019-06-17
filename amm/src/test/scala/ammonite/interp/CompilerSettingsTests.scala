@@ -12,7 +12,7 @@ object CompilerSettingsTests extends TestSuite {
 
     val scriptPath = os.pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
 
-    'configureYrangepos {
+    test("configureYrangepos"){
     
       // In this test, the script sets -Yrangepos to true using "configureCompiler",
       // which is called AFTER the compiler instantiates. As useOffsetPositions
@@ -27,7 +27,7 @@ object CompilerSettingsTests extends TestSuite {
       }
     }
 
-    'preConfigureYrangepos {
+    test("preConfigureYrangepos"){
       // In this test, the script sets -Yrangepos using "preConfigureCompiler",
       // which is called BEFORE the compiler instantiates, resulting in
       // useOffsetPositions initializing as false, as expected

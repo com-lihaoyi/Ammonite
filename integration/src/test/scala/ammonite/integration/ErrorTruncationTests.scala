@@ -28,7 +28,7 @@ object ErrorTruncationTests extends TestSuite{
   }
   val tests = Tests {
     println("ErrorTruncationTests")
-    'compileError - checkErrorMessage(
+    test("compileError") - checkErrorMessage(
       file = 'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
         s"""compileError.sc:1: not found: value doesntexist
@@ -38,7 +38,7 @@ object ErrorTruncationTests extends TestSuite{
           |""".stripMargin
       )
     )
-    'multiExpressionError - checkErrorMessage(
+    test("multiExpressionError") - checkErrorMessage(
       file = 'errorTruncation/"compileErrorMultiExpr.sc",
       expected = Util.normalizeNewlines(
         s"""compileErrorMultiExpr.sc:11: not found: value doesntexist
@@ -49,7 +49,7 @@ object ErrorTruncationTests extends TestSuite{
       )
     )
 
-    'parseError - {
+    test("parseError"){
       if(!Util.windowsPlatform){
         checkErrorMessage(
           file = 'errorTruncation/"parseError.sc",
@@ -66,7 +66,7 @@ object ErrorTruncationTests extends TestSuite{
     val runtimeErrorResourcePackage =
       "ammonite.$file.integration.src.test.resources.ammonite.integration.errorTruncation"
 
-    'runtimeError - checkErrorMessage(
+    test("runtimeError") - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
         if (scala.util.Properties.versionNumberString.startsWith("2.12"))

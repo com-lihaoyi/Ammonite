@@ -11,7 +11,7 @@ object EvaluatorTests extends TestSuite{
   val tests = Tests{
     println("EvaluatorTests")
     val check = new DualTestRepl()
-    'simpleExpressions{
+    test("simpleExpressions"){
       check.session("""
         @ 1 + 2
         res0: Int = 3
@@ -23,7 +23,7 @@ object EvaluatorTests extends TestSuite{
         res2: Int = 6
       """)
     }
-    'vals{
+    test("vals"){
       check.session("""
         @ val x = 10L
         x: Long = 10L
@@ -44,7 +44,7 @@ object EvaluatorTests extends TestSuite{
         res5: String = "class"
       """)
     }
-    'lazyvals{
+    test("lazyvals"){
       // It actually appears when I ask for it, and the
       // actual evaluation happens in the correct order
       check.session("""
@@ -74,7 +74,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'vars{
+    test("vars"){
       check.session("""
         @ var x: Int = 10
         x: Int = 10
@@ -89,7 +89,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'defs{
+    test("defs"){
       check.session("""
         @ def sumItAll[T: Numeric](i: Seq[T]): T = {i.sum}
         defined function sumItAll
@@ -101,7 +101,7 @@ object EvaluatorTests extends TestSuite{
         res2: Long = 15L
       """)
     }
-    'types{
+    test("types"){
       check.session(s"""
         @ type Funky = Array[Array[String]]
         defined type Funky
@@ -116,8 +116,8 @@ object EvaluatorTests extends TestSuite{
         arr: Funky2[Int] = Array(Array(123))
       """)
     }
-    'library{
-      // x and y pprinted value is 'non-empty iterator' up to 2.12.6,
+    test("library"){
+      // x and y pprinted value is test("non") - empty iterator' up to 2.12.6,
       // '<iterator>' since 2.12.7, hence the '?' (don't check the value)
       check.session("""
         @ val x = Iterator.continually(1)
@@ -131,7 +131,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'classes{
+    test("classes"){
       check.session(s"""
         @ class C{override def toString() = "Ceee"}
         defined class C
@@ -174,7 +174,7 @@ object EvaluatorTests extends TestSuite{
       // CO != res3 should test roughly the same thing
     }
 
-    'packageImport{
+    test("packageImport"){
       check.session("""
         @ import java.util._
 
@@ -182,7 +182,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'nesting{
+    test("nesting"){
       check.session("""
         @ val x = 1
         x: Int = 1
@@ -203,7 +203,7 @@ object EvaluatorTests extends TestSuite{
         res5: Int = 2
       """)
     }
-    'nestedImports - {
+    test("nestedImports"){
       check.session("""
         @ class Foo { object values { def a = "a" }; override def toString = "Foo" }
         defined class Foo
@@ -216,7 +216,7 @@ object EvaluatorTests extends TestSuite{
         a0: String = "a"
       """)
     }
-    'multistatement{
+    test("multistatement"){
       check.session(s"""
         @ ;1; 2L; '3';
         res0_0: Int = 1
@@ -241,7 +241,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    'multiassign{
+    test("multiassign"){
       check.session("""
         @ val (a, b) = (1, 2)
         a: Int = 1
@@ -257,7 +257,7 @@ object EvaluatorTests extends TestSuite{
         d: Int = 4
       """)
     }
-    'parsingProblems{
+    test("parsingProblems"){
       check.session("""
         @ (1 + 1)
         res0: Int = 2
@@ -279,7 +279,7 @@ object EvaluatorTests extends TestSuite{
         res3: Seq[Int] = List(1)
       """)
     }
-    'backticks{
+    test("backticks"){
       check.session("""
         @ val `1+1` = 1
         `1+1`: Int = 1
@@ -350,7 +350,7 @@ object EvaluatorTests extends TestSuite{
 
       """)
     }
-    'referenceTraitFromPreviousCommand - {
+    test("referenceTraitFromPreviousCommand"){
       // When class-based wrapping is enabled, the second command references a trait from the
       // first one, and this case has to be handled by the "used earlier definitions" mechanism.
       check.session("""

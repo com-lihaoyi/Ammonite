@@ -22,7 +22,7 @@ object LineNumberTests extends TestSuite{
     //All Syntax Error tests currently don't pass on windows as fastparse gives out some 10
     //surrounding chars which are different on windows and linux due to `\n` and `\r\n`
     //as `\r\n` counts as 2 so less number of surrounding chars are shown on windows
-    'errorTest - {
+    test("errorTest"){
       if(!Util.windowsPlatform) {
         checkErrorMessage(
           file = os.rel / 'lineNumbers / "ErrorLineNumberTest.sc",
@@ -35,7 +35,7 @@ object LineNumberTests extends TestSuite{
       }
     }
 
-    'multipleCompilationUnitErrorTest1 - {
+    test("multipleCompilationUnitErrorTest1"){
       if(!Util.windowsPlatform) {
         checkErrorMessage(
           file = os.rel / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
@@ -49,7 +49,7 @@ object LineNumberTests extends TestSuite{
     }
 
 
-    'multipleCompilationUnitErrorTest2 - {
+    test("multipleCompilationUnitErrorTest2"){
       if(!Util.windowsPlatform) {
         checkErrorMessage(
           file = os.rel / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
@@ -62,7 +62,7 @@ object LineNumberTests extends TestSuite{
       }
     }
 
-    'compilationErrorWithCommentsAtTop - checkErrorMessage(
+    test("compilationErrorWithCommentsAtTop") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorWithCommentsAtTop.sc:11: not found: value quicort
@@ -71,7 +71,7 @@ object LineNumberTests extends TestSuite{
       )
     )
 
-    'compilationErrorInSecondBlock - checkErrorMessage(
+    test("compilationErrorInSecondBlock") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"compilationErrorInSecondBlock.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorInSecondBlock.sc:14: not found: value printnl
@@ -80,7 +80,7 @@ object LineNumberTests extends TestSuite{
       )
     )
 
-    'compilationErrorInFourthBlock - checkErrorMessage(
+    test("compilationErrorInFourthBlock") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"compilationErrorInFourthBlock.sc",
       expected = Util.normalizeNewlines(
         """compilationErrorInFourthBlock.sc:30: not found: value prinntl
@@ -89,12 +89,12 @@ object LineNumberTests extends TestSuite{
       )
     )
 
-    'compilationErrorInClass - checkErrorMessage(
+    test("compilationErrorInClass") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"compilationErrorInClass.sc",
       expected = "compilationErrorInClass.sc:17: value a is not a member of"
     )
 
-    'CompilationErrorLineNumberTest - checkErrorMessage(
+    test("CompilationErrorLineNumberTest") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"CompilationErrorLineNumberTest.sc",
       expected = Util.normalizeNewlines(
         """CompilationErrorLineNumberTest.sc:7: not found: value noSuchObject
@@ -103,7 +103,7 @@ object LineNumberTests extends TestSuite{
       )
     )
 
-    'RuntimeCompilationErrorLineNumberTest - checkErrorMessage(
+    test("RuntimeCompilationErrorLineNumberTest") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
       expected = {
         val p = InProcessMainMethodRunner.base/'lineNumbers

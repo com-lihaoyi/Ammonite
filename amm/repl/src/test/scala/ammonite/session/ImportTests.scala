@@ -12,8 +12,8 @@ object ImportTests extends TestSuite{
     println("ImportTests")
     val check = new DualTestRepl()
 
-    'basic {
-      'hello{
+    test("basic"){
+      test("hello"){
         check.session("""
           @ import math.abs
           import math.abs
@@ -27,7 +27,7 @@ object ImportTests extends TestSuite{
 
       }
 
-      'java {
+      test("java"){
         check.session("""
           @ import Thread._
           import Thread._
@@ -45,7 +45,7 @@ object ImportTests extends TestSuite{
           res4: Boolean = true
         """)
       }
-      'multi{
+      test("multi"){
         check.session("""
           @ import math._, Thread._
           import math._, Thread._
@@ -58,7 +58,7 @@ object ImportTests extends TestSuite{
         """)
       }
 
-      'renaming{
+      test("renaming"){
         check.session("""
           @ import math.{abs => sba}
 
@@ -86,8 +86,8 @@ object ImportTests extends TestSuite{
         """)
       }
     }
-    'shadowing{
-      'sameName{
+    test("shadowing"){
+      test("sameName"){
         check.session("""
           @ val abs = 'a'
           abs: Char = 'a'
@@ -120,8 +120,8 @@ object ImportTests extends TestSuite{
           res9: Int = 4
         """)
       }
-      'shadowPrefix{
-        * - {
+      test("shadowPrefix"){
+        test{
           // fixed in 2.11 and 2.12
           check.session(raw"""
             @ object importing_issue {
@@ -148,7 +148,7 @@ object ImportTests extends TestSuite{
         // is arbitrary. Choosing different identifiers for `foo` `bar` and
         // `baz` affected this ordering and whether or not it fail.
         // Nevertheless, here's a test case that used to fail, but now doesn't
-        * - check.session("""
+        test - check.session("""
           @ object baz { val foo = 1 }
 
           @ object foo { val bar = 2 }
@@ -163,11 +163,11 @@ object ImportTests extends TestSuite{
 
       }
 
-      'typeTermSeparation{
+      test("typeTermSeparation"){
         // Make sure that you can have a term and a type of the same name
         // coming from different places and they don't stomp over each other
         // (#199) and both are accessible.
-        * - check.session(s"""
+        test - check.session(s"""
           @ val Foo = 1
 
           @ type Foo = Int
@@ -179,7 +179,7 @@ object ImportTests extends TestSuite{
           res3: Foo = 2
         """)
 
-        * - {
+        test{
 
           check.session(s"""
             @ object pkg1{ val Order = "lolz" }
@@ -213,7 +213,7 @@ object ImportTests extends TestSuite{
         // results in a quadratic number of class files)
         //
         // This is sufficiently edge-casey that I'm gonna call this a wontfix
-        * - check.session("""
+        test - check.session("""
           @ object bar { val foo = 1; type foo = Int }
 
           @ object baz { val foo = 2 }
@@ -229,7 +229,7 @@ object ImportTests extends TestSuite{
           error: Compilation Failed
         """)
         // Prefix things properly in Scala-2.10 where the type printer is dumb
-        'paulp - {
+        test("paulp"){
 
           check.session(s"""
           @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
@@ -301,7 +301,7 @@ object ImportTests extends TestSuite{
           @ Paulp
           """)
         }
-        'paulpTypeRegression{
+        test("paulpTypeRegression"){
           check.session(s"""
           @ type Paulp = Int
 
@@ -313,7 +313,7 @@ object ImportTests extends TestSuite{
         }
       }
     }
-    'collapsing{
+    test("collapsing"){
       check.session("""
         @ object Foo{ val bar = 1 }
 

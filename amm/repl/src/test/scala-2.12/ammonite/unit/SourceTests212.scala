@@ -26,8 +26,8 @@ object SourceTests212 extends TestSuite{
     }
 
 
-    'objectInfo{
-      'fieldsAreTreatedAsObjects{
+    test("objectInfo"){
+      test("fieldsAreTreatedAsObjects"){
         // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
         check(
           load(com.github.javaparser.JavaToken.INVALID),
@@ -37,8 +37,8 @@ object SourceTests212 extends TestSuite{
       }
 
     }
-    'objectMemberInfo{
-      'implementedBySuperclass{
+    test("objectMemberInfo"){
+      test("implementedBySuperclass"){
         // The file has changed names since earlier versions...
 
         val list: List[Int] = List(1, 2, 3)
@@ -50,7 +50,7 @@ object SourceTests212 extends TestSuite{
       }
 
     }
-    'staticMethod{
+    test("staticMethod"){
       // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
       check(
         load(com.github.javaparser.JavaParser.parseBlock _),
@@ -59,7 +59,7 @@ object SourceTests212 extends TestSuite{
       )
     }
 
-    'fuzz{
+    test("fuzz"){
       // Feed a bunch of arbitrary classes and methods from a variety of places
       // through our location-finder logic to try and find edge cases where
       // things misbehave or blow up
@@ -74,124 +74,128 @@ object SourceTests212 extends TestSuite{
         * confidence it works across a range of Scala versions
         */
 
-      'List{
+      test("List"){
 
 
-        'head     - check(load(List().head), "IterableLike.scala", "def head")
-        'apply    - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
-        'take     - check(load(List().take _), "List.scala", "override def take")
-        'drop     - check(load(List().drop _), "List.scala", "override def drop")
-        'slice    - check(load(List().slice _), "List.scala", "override def slice")
-        'iterator - check(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
-        'hashCode - check(
+        test("head") - check(load(List().head), "IterableLike.scala", "def head")
+        test("apply") - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
+        test("take") - check(load(List().take _), "List.scala", "override def take")
+        test("drop") - check(load(List().drop _), "List.scala", "override def drop")
+        test("slice") - check(load(List().slice _), "List.scala", "override def slice")
+        test("iterator") - check(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
+        test("hashCode") - check(
           load(List().hashCode _),
           "LinearSeqLike.scala",
           "override def hashCode"
         )
-        'reverse  - check(load(List().reverse _), "List.scala", "def reverse")
-        'isEmpty  - check(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
-        'nonEmpty - check(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
-        'orElse   - check(load(List().orElse _), "PartialFunction.scala", "def orElse")
-        'mkString - check(load(List().mkString _), "TraversableOnce.scala", "def mkString")
-        'aggregate- check(load(List().aggregate _), "TraversableOnce.scala", "def aggregate")
+        test("reverse") - check(load(List().reverse _), "List.scala", "def reverse")
+        test("isEmpty") - check(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
+        test("nonEmpty") - check(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
+        test("orElse") - check(load(List().orElse _), "PartialFunction.scala", "def orElse")
+        test("mkString") - check(load(List().mkString _), "TraversableOnce.scala", "def mkString")
+        test("aggregate") - check(
+          load(List().aggregate _),
+          "TraversableOnce.scala", "def aggregate"
+        )
 
         //    These result in a divering implicit expansion, even in plain Scala
-  //      'min      - check(load(List().min _), "TraversableOnce.scala", "def min")
-  //      'max      - check(load(List().max _), "TraversableOnce.scala", "def max")
+  //      test("min") - check(load(List().min _), "TraversableOnce.scala", "def min")
+  //      test("max") - check(load(List().max _), "TraversableOnce.scala", "def max")
 
-        'groupBy  - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
-        'compose  - check(load(List().compose _), "Function1.scala", "def compose")
+        test("groupBy") - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
+        test("compose") - check(load(List().compose _), "Function1.scala", "def compose")
 
-        'prefixLength - check(
+        test("prefixLength") - check(
           load(List().prefixLength _),
           "GenSeqLike.scala",
           "def prefixLength"
         )
 
-        'hasDefiniteSize - check(
+        test("hasDefiniteSize") - check(
           load(List().hasDefiniteSize _),
           "TraversableLike.scala",
           "def hasDefiniteSize"
         )
 
-        'productIterator - check(
+        test("productIterator") - check(
           load(List().productIterator _),
           "Product.scala",
           "def productIterator"
         )
       }
-      'scalaz{
+      test("scalaz"){
 
-        'base - check(load(scalaz.==>>), "Map.scala", "object ==>>")
+        test("base") - check(load(scalaz.==>>), "Map.scala", "object ==>>")
         // Some aliases the make our code shorter
         import scalaz.==>>
         implicit val scalazOrder: scalaz.Order[Int] = scalaz.Order.fromScalaOrdering(Ordering[Int])
         implicit val scalazShow: scalaz.Show[Int] = scalaz.Show.show[Int](_.toString)
         type I = Int
-        'empty     - check(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
-        'singleton - check(load(==>>.singleton[I, I] _), "Map.scala", "final def singleton")
-        'unions    - check(load(==>>.unions[I, I] _), "Map.scala", "final def unions")
+        test("empty") - check(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
+        test("singleton") - check(load(==>>.singleton[I, I] _), "Map.scala", "final def singleton")
+        test("unions") - check(load(==>>.unions[I, I] _), "Map.scala", "final def unions")
         // inherited
-        'mapShow   - check(load(==>>.mapShow[I, I]), "Map.scala", "implicit def mapShow")
-        'mapOrder  - check(load(==>>.mapOrder[I, I]), "Map.scala", "implicit def mapOrder")
-        'mapBifoldable - check(
+        test("mapShow") - check(load(==>>.mapShow[I, I]), "Map.scala", "implicit def mapShow")
+        test("mapOrder") - check(load(==>>.mapOrder[I, I]), "Map.scala", "implicit def mapOrder")
+        test("mapBifoldable") - check(
           load(==>>.mapBifoldable),
           "Map.scala",
           "implicit val mapBifoldable"
         )
 
         val instance = ==>>.empty[I, I]
-        'instance  - check(load(instance), "Map.scala", "case object Tip")
-        'adjust    - check(load(instance.adjust _), "Map.scala", "def adjust")
-        'values    - check(load(instance.values _), "Map.scala", "def values")
-        'mapAccumL - check(load(instance.mapAccumL _), "Map.scala", "def mapAccumL")
-        'split     - check(load(instance.split _), "Map.scala", "def split")
+        test("instance") - check(load(instance), "Map.scala", "case object Tip")
+        test("adjust") - check(load(instance.adjust _), "Map.scala", "def adjust")
+        test("values") - check(load(instance.values _), "Map.scala", "def values")
+        test("mapAccumL") - check(load(instance.mapAccumL _), "Map.scala", "def mapAccumL")
+        test("split") - check(load(instance.split _), "Map.scala", "def split")
       }
-//      'fastparse{
+//      test("fastparse"){
 //        import fastparse.all._
-//        'all - check(load(fastparse.all), "StringApi.scala", "object all extends StringApi")
-//        'pApply - check(load(P("hello")), "Api.scala", "def P")
-//        'pParse - check(load(P("hello").parse _), "Parsing.scala", "def parse")
-//        'elemsWhileRaw - check(load(ElemsWhile.raw _), "Api.scala", "def raw")
-//        'frameIndex - check(
+//        test("all") - check(load(fastparse.all),
+      //        "StringApi.scala", "object all extends StringApi")
+//        test("pApply") - check(load(P("hello")), "Api.scala", "def P")
+//        test("pParse") - check(load(P("hello").parse _), "Parsing.scala", "def parse")
+//        test("elemsWhileRaw") - check(load(ElemsWhile.raw _), "Api.scala", "def raw")
+//        test("frameIndex") - check(
 //          load(fastparse.core.Frame(1, null).index),
 //          "Parsing.scala",
 //          "case class Frame"
 //        )
-//        'successValue - check(
+//        test("successValue") - check(
 //          load(fastparse.all.Parsed.Success(0, 0).value),
 //          "Parsing.scala",
 //          "case class Success"
 //        )
-//        'bitSet - check(
+//        test("bitSet") - check(
 //          load(new fastparse.utils.Utils.BitSet[Char](Array[Int](), 0, 0).apply _),
 //          "Utils.scala",
 //          "def apply(c: Elem)"
 //        )
 //
-//        'elemPredApply- check(
+//        test("elemPredApply") - check(
 //          load(fastparse.parsers.Intrinsics.ElemPred.apply[Char, String] _),
 //          "Intrinsics.scala",
 //          "case class ElemPred"
 //        )
 //
 //
-//        'parserInput - check(
+//        test("parserInput") - check(
 //          load(IndexedParserInput("")),
 //          "ParserInput.scala",
 //          "case class IndexedParserInput"
 //        )
-//        'parserInputData - check(
+//        test("parserInputData") - check(
 //          load(IndexedParserInput("").data),
 //          "ParserInput.scala",
 //          "case class IndexedParserInput"
 //        )
-//        'implicitlyHelper - check(
+//        test("implicitlyHelper") - check(
 //          load(implicitly[ElemSetHelper[Char]]),
 //          "Predef.scala",
 //          "def implicitly"
 //        )
-//        'implicitlyReprGenerate - check(
+//        test("implicitlyReprGenerate") - check(
 //          // Type annotation necessary in 2.11 and below
 //          load(implicitly[ElemSetHelper[Char]].generateValues(_: Generator.Callback[Char])),
 //          "ElemSetHelper.scala",

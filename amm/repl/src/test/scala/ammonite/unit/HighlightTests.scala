@@ -14,7 +14,7 @@ object HighlightTests extends TestSuite{
     fansi.Attr.Reset
   )
 
-  def test(source: String, expected: String) = {
+  def check(source: String, expected: String) = {
     val highlighted =
       testHighlight(source.toVector)
         .mkString
@@ -26,8 +26,8 @@ object HighlightTests extends TestSuite{
   }
   val tests = Tests {
     println("HighlightTests")
-    'highlighting {
-      'fuzz - {
+    test("highlighting"){
+      test("fuzz"){
 
 
         val paths = os.walk(os.pwd).filter(_.ext == "scala")
@@ -51,23 +51,23 @@ object HighlightTests extends TestSuite{
         }
         paths.length
       }
-      'comment - test("//a", "<B|//a>")
-      'type - test("x: y.type", "x: <G|y>.<Y|type>")
-      'literal - test("1", "<G|1>")
-      'expressions - test("val (x, y) = 1 + 2 + 3", "<Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
-      'interpolation - test(
+      test("comment")- check("//a", "<B|//a>")
+      test("type")- check("x: y.type", "x: <G|y>.<Y|type>")
+      test("literal")- check("1", "<G|1>")
+      test("expressions")- check("val (x, y) = 1 + 2 + 3", "<Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
+      test("interpolation")- check(
         """(s"hello ${world + 1}")""",
         """(<G|s"hello >${world + <G|1>}<G|">)"""
       )
-      'runOff - test(
+      test("runOff")- check(
         """(1 + "Hello...""",
         """(<G|1> + <G|"Hello...>"""
       )
-      'underscore - test(
+      test("underscore")- check(
         """val _ = 1""",
         """<Y|val> <Y|_> = <G|1>"""
       )
-      'nonTrivial - test(
+      test("nonTrivial")- check(
         """def processLine(stmts: Seq[String],
                             saveHistory: (String => Unit, String) => Unit,
                             printer: Iterator[String] => Unit) = for{
