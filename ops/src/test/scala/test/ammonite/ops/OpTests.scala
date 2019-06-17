@@ -59,7 +59,7 @@ object OpTests extends TestSuite{
         }
 
         test("relative"){
-          val cls = classOf[test.ammonite.ops.Testing]
+          val cls = classOf[_root_.test.ammonite.ops.Testing]
           val contents = read! resource(cls)/'folder/"file.txt"
           assert(contents.contains("file contents lols"))
 
@@ -73,7 +73,7 @@ object OpTests extends TestSuite{
         }
 
         test - intercept[ResourceNotFoundException]{
-          read(resource(classOf[test.ammonite.ops.Testing])/'test/'ammonite/'ops/'folder/"file.txt")
+          read(resource(classOf[_root_.test.ammonite.ops.Testing])/'test/'ammonite/'ops/'folder/"file.txt")
         }
         test - intercept[ResourceNotFoundException]{
           read(resource(getClass)/'test/'ammonite/'ops/'folder/"file.txt")
@@ -88,11 +88,11 @@ object OpTests extends TestSuite{
       rm! pwd/'target/'nonexistent
     }
     test("Mutating"){
-      val test = pwd/'target/'test
-      rm! test
-      mkdir! test
+      val testPath = pwd/'target/'test
+      rm! testPath
+      mkdir! testPath
       test("cp"){
-        val d = test/'copying
+        val d = testPath/'copying
         test("basic"){
           assert(
             !exists(d/'folder),
@@ -125,14 +125,14 @@ object OpTests extends TestSuite{
       }
       test("mv"){
         test("basic"){
-          val d = test/'moving
+          val d = testPath/'moving
           mkdir! d/'folder
           assert(ls(d) == Seq(d/'folder))
           mv(d/'folder, d/'folder2)
           assert(ls(d) == Seq(d/'folder2))
         }
         test("shallow"){
-          val d = test/'moving2
+          val d = testPath/'moving2
           mkdir(d)
           write(d/"A.scala", "AScala")
           write(d/"B.scala", "BScala")
@@ -154,7 +154,7 @@ object OpTests extends TestSuite{
           }
         }
         test("deep"){
-          val d = test/'moving2
+          val d = testPath/'moving2
           mkdir(d)
           mkdir(d/'scala)
           mkdir(d/'py)
@@ -203,14 +203,14 @@ object OpTests extends TestSuite{
       }
       test("mkdirRm"){
         test("singleFolder"){
-          val single = test/'single
+          val single = testPath/'single
           mkdir! single/'inner
           assert(ls(single) == Seq(single/'inner))
           rm! single/'inner
           assert(ls(single) == Seq())
         }
         test("nestedFolders"){
-          val nested = test/'nested
+          val nested = testPath/'nested
           mkdir! nested/'inner/'innerer/'innerest
           assert(
             ls(nested) == Seq(nested/'inner),
@@ -222,7 +222,7 @@ object OpTests extends TestSuite{
         }
       }
       test("readWrite"){
-        val d = test/'readWrite
+        val d = testPath/'readWrite
         mkdir! d
         test("simple"){
           write(d/'file, "i am a cow")
@@ -256,7 +256,7 @@ object OpTests extends TestSuite{
         }
       }
       test("Failures"){
-        val d = test/'failures
+        val d = testPath/'failures
         mkdir! d
         test("nonexistant"){
           test - intercept[nio.NoSuchFileException](ls! d/'nonexistent)
