@@ -177,7 +177,12 @@ object RouterTests extends TestSuite{
             ) =>
           }
         }
-        test("failing") - check(Target, routes(3), List(), Router.Result.Error.Exception(MyException))
+        test("failing") - check(
+          Target,
+          routes(3),
+          List(),
+          Router.Result.Error.Exception(MyException)
+        )
       }
     }
   }

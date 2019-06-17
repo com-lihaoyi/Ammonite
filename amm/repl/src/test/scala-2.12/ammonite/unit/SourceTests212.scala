@@ -77,30 +77,33 @@ object SourceTests212 extends TestSuite{
       test("List"){
 
 
-        'head     - check(load(List().head), "IterableLike.scala", "def head")
-        'apply    - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
-        'take     - check(load(List().take _), "List.scala", "override def take")
-        'drop     - check(load(List().drop _), "List.scala", "override def drop")
-        'slice    - check(load(List().slice _), "List.scala", "override def slice")
+        test("head") - check(load(List().head), "IterableLike.scala", "def head")
+        test("apply") - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
+        test("take") - check(load(List().take _), "List.scala", "override def take")
+        test("drop") - check(load(List().drop _), "List.scala", "override def drop")
+        test("slice") - check(load(List().slice _), "List.scala", "override def slice")
         test("iterator") - check(load(List().iterator _), "LinearSeqLike.scala", "def iterator")
         test("hashCode") - check(
           load(List().hashCode _),
           "LinearSeqLike.scala",
           "override def hashCode"
         )
-        'reverse  - check(load(List().reverse _), "List.scala", "def reverse")
-        'isEmpty  - check(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
+        test("reverse") - check(load(List().reverse _), "List.scala", "def reverse")
+        test("isEmpty") - check(load(List().isEmpty _), "SeqLike.scala", "def isEmpty")
         test("nonEmpty") - check(load(List().nonEmpty _), "TraversableOnce.scala", "def nonEmpty")
-        'orElse   - check(load(List().orElse _), "PartialFunction.scala", "def orElse")
+        test("orElse") - check(load(List().orElse _), "PartialFunction.scala", "def orElse")
         test("mkString") - check(load(List().mkString _), "TraversableOnce.scala", "def mkString")
-        test("aggregate") - check(load(List().aggregate _), "TraversableOnce.scala", "def aggregate")
+        test("aggregate") - check(
+          load(List().aggregate _),
+          "TraversableOnce.scala", "def aggregate"
+        )
 
         //    These result in a divering implicit expansion, even in plain Scala
-  //      'min      - check(load(List().min _), "TraversableOnce.scala", "def min")
-  //      'max      - check(load(List().max _), "TraversableOnce.scala", "def max")
+  //      test("min") - check(load(List().min _), "TraversableOnce.scala", "def min")
+  //      test("max") - check(load(List().max _), "TraversableOnce.scala", "def max")
 
-        'groupBy  - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
-        'compose  - check(load(List().compose _), "Function1.scala", "def compose")
+        test("groupBy") - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
+        test("compose") - check(load(List().compose _), "Function1.scala", "def compose")
 
         test("prefixLength") - check(
           load(List().prefixLength _),
@@ -128,12 +131,12 @@ object SourceTests212 extends TestSuite{
         implicit val scalazOrder: scalaz.Order[Int] = scalaz.Order.fromScalaOrdering(Ordering[Int])
         implicit val scalazShow: scalaz.Show[Int] = scalaz.Show.show[Int](_.toString)
         type I = Int
-        'empty     - check(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
+        test("empty") - check(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
         test("singleton") - check(load(==>>.singleton[I, I] _), "Map.scala", "final def singleton")
-        'unions    - check(load(==>>.unions[I, I] _), "Map.scala", "final def unions")
+        test("unions") - check(load(==>>.unions[I, I] _), "Map.scala", "final def unions")
         // inherited
-        'mapShow   - check(load(==>>.mapShow[I, I]), "Map.scala", "implicit def mapShow")
-        'mapOrder  - check(load(==>>.mapOrder[I, I]), "Map.scala", "implicit def mapOrder")
+        test("mapShow") - check(load(==>>.mapShow[I, I]), "Map.scala", "implicit def mapShow")
+        test("mapOrder") - check(load(==>>.mapOrder[I, I]), "Map.scala", "implicit def mapOrder")
         test("mapBifoldable") - check(
           load(==>>.mapBifoldable),
           "Map.scala",
@@ -141,15 +144,16 @@ object SourceTests212 extends TestSuite{
         )
 
         val instance = ==>>.empty[I, I]
-        'instance  - check(load(instance), "Map.scala", "case object Tip")
-        'adjust    - check(load(instance.adjust _), "Map.scala", "def adjust")
-        'values    - check(load(instance.values _), "Map.scala", "def values")
+        test("instance") - check(load(instance), "Map.scala", "case object Tip")
+        test("adjust") - check(load(instance.adjust _), "Map.scala", "def adjust")
+        test("values") - check(load(instance.values _), "Map.scala", "def values")
         test("mapAccumL") - check(load(instance.mapAccumL _), "Map.scala", "def mapAccumL")
-        'split     - check(load(instance.split _), "Map.scala", "def split")
+        test("split") - check(load(instance.split _), "Map.scala", "def split")
       }
 //      test("fastparse"){
 //        import fastparse.all._
-//        test("all") - check(load(fastparse.all), "StringApi.scala", "object all extends StringApi")
+//        test("all") - check(load(fastparse.all),
+      //        "StringApi.scala", "object all extends StringApi")
 //        test("pApply") - check(load(P("hello")), "Api.scala", "def P")
 //        test("pParse") - check(load(P("hello").parse _), "Parsing.scala", "def parse")
 //        test("elemsWhileRaw") - check(load(ElemsWhile.raw _), "Api.scala", "def raw")

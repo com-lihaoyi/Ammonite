@@ -73,7 +73,10 @@ object OpTests extends TestSuite{
         }
 
         test - intercept[ResourceNotFoundException]{
-          read(resource(classOf[_root_.test.ammonite.ops.Testing])/'test/'ammonite/'ops/'folder/"file.txt")
+          val cls = classOf[_root_.test.ammonite.ops.Testing]
+          read(
+            resource(cls)/'test/'ammonite/'ops/'folder/"file.txt"
+          )
         }
         test - intercept[ResourceNotFoundException]{
           read(resource(getClass)/'test/'ammonite/'ops/'folder/"file.txt")

@@ -78,7 +78,7 @@ object ToolsTests extends TestSuite{
           )
 
           // If your greps are close together, peg around the middle
-          'closeTogether  - check(
+          test("closeTogether") - check(
             longItems,
             "0123",
             Seq("...89<0123>456789<0123>45...")
