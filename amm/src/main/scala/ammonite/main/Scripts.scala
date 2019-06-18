@@ -86,8 +86,11 @@ object Scripts {
             .asInstanceOf[() => Seq[Router.EntryPoint[Any]]]
             .apply()
 
-
-      mainObj = mainCls.getField("MODULE$").get(null)
+      mainObj <- try {
+        Res.Success(mainCls.getField("MODULE$").get(null))
+      } catch {
+        case e : Throwable => Res.Exception(e, "Initialization error")
+      }
 
       res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {
@@ -190,6 +193,7 @@ object Scripts {
     def pluralize(s: String, n: Int) = {
       if (n == 1) s else s + "s"
     }
+
 
     mainMethod.invoke(base, scriptArgs) match{
       case Router.Result.Success(x) => Res.Success(x)

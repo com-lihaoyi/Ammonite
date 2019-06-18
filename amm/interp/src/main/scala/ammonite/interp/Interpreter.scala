@@ -3,8 +3,6 @@ package ammonite.interp
 import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
-import ammonite.interp.CodeWrapper
-
 import scala.collection.mutable
 
 import ammonite.runtime._
@@ -204,7 +202,7 @@ class Interpreter(val printer: Printer,
   def resolveImportHooks(importTrees: Seq[ImportTree],
                          hookedStmts: Seq[String],
                          source: CodeSource,
-                         wrapperPath: Seq[Name]): Res[ImportHookInfo] = synchronized{
+                         wrapperPath: Seq[Name]): Res[ImportHookInfo] = synchronized {
 
     // Fake an update to the classpath to force re-creation of the compiler
     // Workaround for https://github.com/scala/bug/issues/11564#issuecomment-501834821,
@@ -521,9 +519,7 @@ class Interpreter(val printer: Printer,
           )
         }
 
-
-
-        val cachedLoaded = for{
+        val cachedLoaded = for {
           (classFiles, blockMetadata) <- blocks.head
           // We don't care about the results of resolving the import hooks;
           // Assuming they still *can* be resolved, the `envHash` check will
@@ -543,11 +539,11 @@ class Interpreter(val printer: Printer,
             compilerManager.addToClasspath(classFiles)
 
             val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-            val evaluated =
-              try cls.map(eval.evalMain(_, evalClassloader))
-              catch Evaluator.userCodeExceptionHandler
+            // val evaluated =
+            //   try cls.map(eval.evalMain(_, evalClassloader))
+            //   catch Evaluator.userCodeExceptionHandler
 
-            evaluated.map(_ => blockMetadata)
+            cls.map(_ => blockMetadata)
           }
         }
 
@@ -606,7 +602,7 @@ class Interpreter(val printer: Printer,
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
     val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
 
-    storage.ivyCache().get(cacheKey) match{
+    storage.ivyCache().get(cacheKey) match {
       case Some(res) => Right(res.map(new java.io.File(_)))
       case None =>
         ammonite.runtime.tools.IvyThing.resolveArtifact(
@@ -621,7 +617,7 @@ class Interpreter(val printer: Printer,
           verbose = verboseOutput,
           output = printer.errStream,
           hooks = resolutionHooks.toSeq
-        )match{
+        ) match {
           case Right((canBeCached, loaded)) =>
             val loadedSet = loaded.toSet
             if (canBeCached)
@@ -701,7 +697,7 @@ class Interpreter(val printer: Printer,
           ),
           autoImport = true,
           extraCode = "",
-          hardcoded = false
+          hardcoded = false,
         ) match{
           case Res.Failure(s) => throw new CompilationError(s)
           case Res.Exception(t, s) => throw t

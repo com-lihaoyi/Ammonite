@@ -92,7 +92,6 @@ object Evaluator{
 
     def evalMain(cls: Class[_], contextClassloader: ClassLoader) =
       Util.withContextClassloader(contextClassloader){
-
         val (method, instance) =
           try {
             (cls.getDeclaredMethod("$main"), null)
@@ -108,8 +107,7 @@ object Evaluator{
                   throw e
               }
           }
-
-        method.invoke(instance)
+          method.invoke(instance)
       }
 
     def processLine(classFiles: Util.ClassFiles,
@@ -154,9 +152,8 @@ object Evaluator{
         _ <- Catching{userCodeExceptionHandler}
       } yield {
         headFrame.usedEarlierDefinitions = usedEarlierDefinitions
-        evalMain(cls, contextClassLoader)
-        val res = evaluationResult(pkgName :+ wrapperName, wrapperPath, newImports)
-        res
+        // evalMain(cls, contextClassLoader)
+        evaluationResult(pkgName :+ wrapperName, wrapperPath, newImports)
       }
     }
 

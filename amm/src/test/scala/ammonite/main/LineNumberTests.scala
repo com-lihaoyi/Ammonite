@@ -15,7 +15,6 @@ object LineNumberTests extends TestSuite{
 
     def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
       val e = new InProcessMainMethodRunner(file, Nil, Nil)
-
       assert(e.err.contains(expected))
     }
 
@@ -106,7 +105,7 @@ object LineNumberTests extends TestSuite{
     test("RuntimeCompilationErrorLineNumberTest") - checkErrorMessage(
       file = os.rel / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
       expected = {
-        val p = InProcessMainMethodRunner.base/'lineNumbers
+        // val p = InProcessMainMethodRunner.base/'lineNumbers
         s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
       }
     )
