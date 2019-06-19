@@ -8,7 +8,7 @@ interp.load.ivy(
   dep"net.sf.json-lib:json-lib:2.4,classifier=jdk15"
 )
 
-@
+
 
 // Code using the dependencies
 val serializer = new net.sf.json.xml.XMLSerializer

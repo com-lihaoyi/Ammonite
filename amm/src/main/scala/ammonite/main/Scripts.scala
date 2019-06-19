@@ -9,6 +9,7 @@ import ammonite.util.Name.backtickWrap
 import ammonite.util.Util.CodeSource
 import ammonite.util.{Name, Res, Util}
 import fastparse.internal.Util.literalize
+import ammonite.runtime.Evaluator
 
 /**
   * Logic around using Ammonite as a script-runner; invoking scripts via the
@@ -88,9 +89,7 @@ object Scripts {
 
       mainObj <- try {
         Res.Success(mainCls.getField("MODULE$").get(null))
-      } catch {
-        case e : Throwable => Res.Exception(e, "Initialization error")
-      }
+      } catch (Evaluator.userCodeExceptionHandler)
 
       res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {

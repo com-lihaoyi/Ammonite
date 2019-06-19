@@ -64,6 +64,7 @@ object Evaluator{
 
     case Ex(_: InvEx, _: InitEx, userEx@_*) => Res.Exception(userEx(0), "")
     case Ex(_: InvEx, userEx@_*)            => Res.Exception(userEx(0), "")
+    case Ex(_: InitEx, userEx@_*)           => Res.Exception(userEx(0), "")
     case Ex(userEx@_*)                      => Res.Exception(userEx(0), "")
   }
 

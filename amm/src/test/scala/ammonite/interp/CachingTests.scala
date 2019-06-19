@@ -108,7 +108,6 @@ object CachingTests extends TestSuite{
         resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc",
         interp2
       )
-
       assert(
         interp2.compilerManager.compiler == null &&
         ex.toString == "java.lang.ArithmeticException: / by zero"
