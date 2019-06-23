@@ -30,13 +30,11 @@ trait Evaluator{
                   silent: Boolean,
                   contextClassLoader: ClassLoader): Res[Evaluated]
 
-  def processScriptBlock(cls: Class[_],
-                         newImports: Imports,
+  def processScriptBlock(newImports: Imports,
                          usedEarlierDefinitions: Seq[String],
                          wrapperName: Name,
                          wrapperPath: Seq[Name],
-                         pkgName: Seq[Name],
-                         contextClassLoader: ClassLoader): Res[Evaluated]
+                         pkgName: Seq[Name]): Res[Evaluated]
 }
 
 object Evaluator{
@@ -142,13 +140,11 @@ object Evaluator{
     }
 
 
-    def processScriptBlock(cls: Class[_],
-                           newImports: Imports,
+    def processScriptBlock(newImports: Imports,
                            usedEarlierDefinitions: Seq[String],
                            wrapperName: Name,
                            wrapperPath: Seq[Name],
-                           pkgName: Seq[Name],
-                           contextClassLoader: ClassLoader) = {
+                           pkgName: Seq[Name]) = {
       for {
         _ <- Catching{userCodeExceptionHandler}
       } yield {

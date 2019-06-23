@@ -423,7 +423,7 @@
 
         @li
           @code{~/.ammonite/predefShared.sc} is gone; if you want it back, you
-          can do it yourself by adding @hl.scala{import $exec.predefShared}
+          can do it yourself by adding @hl.scala{import $predef.predefShared}
           within your @code{predef.sc} and @code{predefScript.sc} files. You
           can also import any others files into your @code{predef.sc} and
           @code{predefScript.sc} the same way
@@ -894,7 +894,7 @@
           @li
             @hl.scala{load.module}, @hl.scala{load.exec}, @hl.scala{load.ivy} are
             now largely superseded by @hl.scala{import $file},
-            @hl.scala{import $exec}, and @hl.scala{import $ivy}
+            @hl.scala{import $predef}, and @hl.scala{import $ivy}
           @li
             The way you pass in @sect.ref{Script Arguments} to a script, has been
             totally revamped, and should be faster, more intuitive, and provide

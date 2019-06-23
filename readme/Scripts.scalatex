@@ -216,7 +216,7 @@
         val scalazVersion = "7.2.7"
         interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
 
-        // This @@ is necessary for Ammonite to process the `interp.load.ivy` 
+        // This @@ is necessary for Ammonite to process the `interp.load.ivy`
         // before continuing
         @@
 
@@ -641,9 +641,9 @@
         @code{$file}:
 
       @hl.scala
-        @@ import $exec.MyScript
+        @@ import $predef.MyScript
         Welcome to the XYZ custom REPL!!
-        import $exec.$
+        import $predef.$
         @@ mutable.Buffer(x)
         res1: mutable.Buffer[Int] = ArrayBuffer(123)
       @p
@@ -655,7 +655,7 @@
         common functions and definitions, @code{$exec} imports are useful as
         aliases for common setup to get your REPL environment just the way you
         want it. Of course, any files you import via @hl.scala{import $file} or
-        @hl.scala{import $exec} can themselves import other Scala scripts in the
+        @hl.scala{import $predef} can themselves import other Scala scripts in the
         same way, and the same rules apply.
 
 
@@ -755,7 +755,7 @@
       @p
         If you have already started an SBT repl, then you can run the above without the quotes:
         @code{test:run /path/to/script.sc arg1 arg2 arg3}
-        
+
       @p
         Running a script from your SBT project can be achieved with
         @code{ammonite.Main.main(Array("--predef-code", """println("welcome!")""", "file.sc"))}

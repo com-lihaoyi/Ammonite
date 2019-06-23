@@ -78,7 +78,8 @@ class CompilerLifecycleManager(
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
-      onSettingsInit.foreach(_(settings))
+      onSettingsInit.foreach{s =>
+        s(settings)}
       Internal.compiler = Compiler(
         Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
         dynamicClasspath,

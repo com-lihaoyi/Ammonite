@@ -14,6 +14,7 @@ import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
 import coursier.util.Task
+import scala.tools.reflect.Eval
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -149,22 +150,22 @@ class Interpreter(val printer: Printer,
           wrapperPath
         )
       )
-      hookResults <- Res.map(hooked){
+      hookResults <- Res.traverse(hooked){
         case res: ImportHook.Result.Source =>
           for{
-            processed <- processModule(
+            metadata <- processModule(
               res.code, res.codeSource,
-              autoImport = false, extraCode = "", hardcoded = false
+              autoImport = false, extraCode = "", hardcoded = false, stage = res.stage
             )
           } yield {
             // For $file imports, we do not propagate any imports from the imported scripted
             // to the enclosing session. Instead, the imported script wrapper object is
             // brought into scope and you're meant to use the methods defined on that.
             //
-            // Only $exec imports merge the scope of the imported script into your enclosing
+            // Only $predef imports merge the scope of the imported script into your enclosing
             // scope, but those are comparatively rare.
-            if (!res.exec) res.hookImports
-            else processed.blockInfo.last.finalImports ++ res.hookImports
+            if (!res.predef) res.hookImports
+            else metadata.blockInfo.last.finalImports ++ res.hookImports
           }
         case res: ImportHook.Result.ClassPath =>
 
@@ -209,7 +210,7 @@ class Interpreter(val printer: Printer,
     // which I caused in 2.13.0 and should be fixed in 2.13.1
     if (scala.util.Properties.versionNumberString == "2.13.0") headFrame.addClasspath(Nil)
 
-    for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _, wrapperPath)))
+    for (hookImports <- Res.traverse(importTrees)(resolveSingleImportHook(source, _, wrapperPath)))
     yield ImportHookInfo(
       Imports(hookImports.flatten.flatMap(_.value)),
       hookedStmts,
@@ -254,7 +255,7 @@ class Interpreter(val printer: Printer,
         skipEmpty = true,
         codeWrapper = replCodeWrapper
       )
-      (out, tag) <- evaluateLine(
+      EvalResult(out, tag) <- evaluateLine(
         processed, printer,
         wrapperName.encoded + ".sc", wrapperName,
         silent,
@@ -269,7 +270,7 @@ class Interpreter(val printer: Printer,
                    fileName: String,
                    indexedWrapperName: Name,
                    silent: Boolean = false,
-                   incrementLine: () => Unit): Res[(Evaluated, Tag)] = synchronized{
+                   incrementLine: () => Unit): Res[EvalResult] = synchronized{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
       output <- compilerManager.compileClass(
@@ -288,13 +289,14 @@ class Interpreter(val printer: Printer,
         silent,
         evalClassloader
       )
-    } yield (res, Tag("", ""))
+    } yield EvalResult(res, Tag("", ""))
   }
 
 
   def processSingleBlock(processed: Preprocessor.Output,
                          codeSource0: CodeSource,
-                         indexedWrapperName: Name) = synchronized{
+                         indexedWrapperName: Name,
+                         stage: Boolean) = synchronized{
 
 
     val codeSource = codeSource0.copy(wrapperName = indexedWrapperName)
@@ -313,13 +315,11 @@ class Interpreter(val printer: Printer,
       cls <- eval.loadClass(fullyQualifiedName, output.classFiles)
 
       res <- eval.processScriptBlock(
-        cls,
         output.imports,
         output.usedEarlierDefinitions.getOrElse(Nil),
         codeSource.wrapperName,
         scriptCodeWrapper.wrapperPath,
         codeSource.pkgName,
-        evalClassloader
       )
     } yield {
       storage.compileCacheSave(
@@ -328,7 +328,7 @@ class Interpreter(val printer: Printer,
         Storage.CompileCache(output.classFiles, output.imports)
       )
 
-      (res, tag)
+      EvalResult(res, tag, cls)
     }
   }
 
@@ -338,6 +338,7 @@ class Interpreter(val printer: Printer,
                     autoImport: Boolean,
                     extraCode: String,
                     hardcoded: Boolean,
+                    stage : Boolean = false,
                     moduleCodeWrapper: CodeWrapper = scriptCodeWrapper)
                     : Res[ScriptOutput.Metadata] = synchronized{
 
@@ -354,7 +355,6 @@ class Interpreter(val printer: Printer,
 
 
         val cachedScriptData = storage.classFilesListLoad(codeSource.filePathPrefix, tag)
-
 
         // Lazy, because we may not always need this if the script is already cached
         // and none of it's blocks end up needing to be re-compiled. We don't know up
@@ -383,9 +383,10 @@ class Interpreter(val printer: Printer,
             splittedScript,
             predefImports,
             codeSource,
-            processSingleBlock(_, codeSource, _),
+            processSingleBlock(_, codeSource, _, stage),
             autoImport,
-            extraCode
+            extraCode,
+            stage
           )
         } yield {
           storage.classFilesListSave(
@@ -420,7 +421,8 @@ class Interpreter(val printer: Printer,
         (processed, indexedWrapperName) =>
           evaluateLine(processed, printer, fileName, indexedWrapperName, false, incrementLine),
         autoImport = true,
-        ""
+        "",
+        stage = false
       )
     } yield {
       metadata.blockInfo.last.finalImports
@@ -430,14 +432,29 @@ class Interpreter(val printer: Printer,
 
   type BlockData = Option[(ClassFiles, ScriptOutput.BlockMetadata)]
 
+  abstract class EvalResult(val e : Evaluated, val tag: Tag){
+    def run() : Res[Unit]
+  }
+  object EvalResult {
+    def apply(e : Evaluated, tag: Tag) : EvalResult = new EvalResult(e, tag) {
+      def run() = Res.Success(())
+    }
+    def apply(e : Evaluated, tag: Tag, cls : Class[_]) : EvalResult =  new EvalResult(e, tag){
+      def run() = try Res.Success(eval.evalMain(cls, evalClassloader))
+        catch Evaluator.userCodeExceptionHandler
+    }
+
+    def unapply(er : EvalResult) : Option[(Evaluated, Tag)] = Some((er.e, er.tag))
+  }
 
   def processAllScriptBlocks(blocks: Seq[BlockData],
                              splittedScript: => Res[IndexedSeq[(String, Seq[String])]],
                              startingImports: Imports,
                              codeSource: CodeSource,
-                             evaluate: (Preprocessor.Output, Name) => Res[(Evaluated, Tag)],
+                             evaluate: (Preprocessor.Output, Name) => Res[EvalResult],
                              autoImport: Boolean,
-                             extraCode: String): Res[ScriptOutput.Metadata] = synchronized{
+                             extraCode: String,
+                             stage: Boolean): Res[ScriptOutput.Metadata] = synchronized{
 
     // we store the old value, because we will reassign this in the loop
     val outerScriptImportCallback = scriptImportCallback
@@ -476,6 +493,7 @@ class Interpreter(val printer: Printer,
                       wrapperIndex: Int,
                       perBlockMetadata: List[ScriptOutput.BlockMetadata])
                       : Res[ScriptOutput.Metadata] = {
+
       if (blocks.isEmpty) {
         // No more blocks
         // if we have imports to pass to the upper layer we do that
@@ -509,14 +527,13 @@ class Interpreter(val printer: Printer,
               skipEmpty = false,
               codeWrapper = scriptCodeWrapper
             )
-
-            (ev, tag) <- evaluate(processed, indexedWrapperName)
+            er <- evaluate(processed, indexedWrapperName)
           } yield ScriptOutput.BlockMetadata(
-            VersionedWrapperId(ev.wrapper.map(_.encoded).mkString("."), tag),
+            VersionedWrapperId(er.e.wrapper.map(_.encoded).mkString("."), er.tag),
             leadingSpaces,
             hookInfo,
-            ev.imports
-          )
+            er.e.imports
+          ) -> (() => er.run())
         }
 
         val cachedLoaded = for {
@@ -537,13 +554,8 @@ class Interpreter(val printer: Printer,
             compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
           } else{
             compilerManager.addToClasspath(classFiles)
-
             val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-            // val evaluated =
-            //   try cls.map(eval.evalMain(_, evalClassloader))
-            //   catch Evaluator.userCodeExceptionHandler
-
-            cls.map(_ => blockMetadata)
+            Res.Success(blockMetadata -> (() => cls.map(eval.evalMain(_, evalClassloader)).map(_ => ())))
           }
         }
 
@@ -559,7 +571,12 @@ class Interpreter(val printer: Printer,
           } yield res
         }
 
-        res match{
+        val evaluated = res.flatMap {
+          case (blockMetadata, run) if stage => run().map(_ => blockMetadata)
+          case (blockMetadata, _ ) => Res.Success(blockMetadata)
+        }
+
+        evaluated match{
           case Res.Success(blockMetadata) =>
             val last =
               blockMetadata.hookInfo.imports ++
@@ -585,13 +602,15 @@ class Interpreter(val printer: Printer,
     }
     // wrapperIndex starts off as 1, so that consecutive wrappers can be named
     // Wrapper, Wrapper2, Wrapper3, Wrapper4, ...
-    try {
+    val res = try {
 
       for(res <- loop(blocks, startingImports, Imports(), wrapperIndex = 1, List()))
       // We build up `blockInfo` backwards, since it's a `List`, so reverse it
       // before giving it to the outside world
       yield ScriptOutput.Metadata(res.blockInfo.reverse)
     } finally scriptImportCallback = outerScriptImportCallback
+
+    res
   }
 
 

@@ -38,7 +38,8 @@ object ImportHook{
   val defaults = Map[Seq[String], ImportHook](
     Seq("url") -> URL,
     Seq("file") -> File,
-    Seq("exec") -> Exec,
+    Seq("predef") -> Predef,
+    Seq("stage") -> Stage,
     Seq("ivy") -> Ivy,
     Seq("cp") -> Classpath,
     Seq("plugin", "ivy") -> PluginIvy,
@@ -64,12 +65,14 @@ object ImportHook{
     case class Source(code: String,
                       codeSource: CodeSource,
                       hookImports: Imports,
-                      exec: Boolean) extends Result
+                      predef: Boolean,
+                      stage: Boolean) extends Result
     case class ClassPath(file: os.Path, plugin: Boolean) extends Result
   }
 
-  object File extends SourceHook(false)
-  object Exec extends SourceHook(true)
+  object File extends SourceHook(predef = false, stage = false)
+  object Predef extends SourceHook(predef = true, stage = false)
+  object Stage  extends SourceHook(predef = false, stage = true)
 
   def resolveFiles(tree: ImportTree, currentScriptPath: os.Path, extensions: Seq[String])
                   : (Seq[(os.RelPath, Option[String])], Seq[os.Path], Seq[os.Path]) = {
@@ -97,7 +100,7 @@ object ImportHook{
 
     (relativeModules, files, missing)
   }
-  class SourceHook(exec: Boolean) extends ImportHook {
+  class SourceHook(predef: Boolean, stage : Boolean) extends ImportHook {
     // import $file.foo.Bar, to import the file `foo/Bar.sc`
     def handle(source: CodeSource,
                tree: ImportTree,
@@ -142,7 +145,8 @@ object ImportHook{
                   Util.normalizeNewlines(os.read(filePath)),
                   codeSrc,
                   Imports(importData),
-                  exec
+                  predef,
+                  stage
                 )
               }
             )
@@ -288,7 +292,8 @@ object ImportHook{
                 Util.normalizeNewlines(code),
                 codeSrc,
                 Imports(importData),
-                exec=false
+                predef = false,
+                stage = false
               )
           })
       }

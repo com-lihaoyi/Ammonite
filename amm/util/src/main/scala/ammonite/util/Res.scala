@@ -36,7 +36,7 @@ object Res{
     * Maps a Res-returning function across a collection `M[T]`, failing fast and
     * bailing out if any individual element fails.
     */
-  def map[M[_] <: Traversable[_], T, V](inputs: M[T])(f: T => Res[V])
+  def traverse[M[_] <: Traversable[_], T, V](inputs: M[T])(f: T => Res[V])
                                        (implicit cbf: Factory[V, M[V]])
   : Res[M[V]] = {
 
