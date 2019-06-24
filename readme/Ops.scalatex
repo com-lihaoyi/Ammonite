@@ -157,7 +157,7 @@
     @p
       @sect.ref{Paths} not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:
 
-    @hl.ref(opsExamples, Seq("'reference", "import"))
+    @hl.ref(opsExamples, Seq("""test("reference")""", "import"))
 
     @p
       In these definitions, @hl.scala{Op1} and @hl.scala{Op2} are isomorphic to @hl.scala{Function1} and @hl.scala{Function2}. The main difference is that ops can be called in two ways:
@@ -320,22 +320,22 @@
       @p
         @hl.scala{%%} on the other hand is intended for programmatic usage: rather than printing to stdout, it returns a @hl.scala{CommandResult}, which contains the standard output @hl.scala{.out} and standard error @hl.scala{.err} of the subprocess. These provide helper methods to retrieve the stdout or stderr as a list of lines
   
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'lines", ""))
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("lines")""", ""))
   
       @p
         Or as a single string:
   
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'string", ""))
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("string")""", ""))
   
       @p
         Or as an array of bytes:
   
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'bytes", ""))
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("bytes")""", ""))
   
       @p
         @hl.scala{%%} throws an @hl.scala{ShelloutException} containing the @hl.scala{CommandResult} if the return-code is non-zero.
   
-      @hl.ref(opsTests/"ShelloutTests.scala", Seq("'failures", ""))
+      @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("failures")""", ""))
   
       @p
         In both cases, you end up with a @hl.scala{CommandResult} can then be used however you like.
@@ -409,21 +409,21 @@
         @p
           Ammonite lets you pass in environment variables to subprocess calls; just pass them in as named arguments when you invoke the subprocess ia @code{%} or @code{%%}:
   
-        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'envArgs", "val"))
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("envArgs")""", "val"))
   
       @sect{Invoking Files}
         @p
           You can invoke files on disk using @code{%} and @code{%%} the same way you can invoke shell commands:
   
-        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'filebased", "val"))
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("filebased")""", "val"))
   
       @sect{Current Working Directory}
         @p
           In Ammonite the current working directory is not a side-effect unlike in bash. Instead it is an argument to the command you are invoking. It can be passed in explicitly or implicitly.
   
-        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'customWorkingDir", ""))
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("customWorkingDir")""", ""))
   
         @p
           Note how passing it in explicitly, you need to use a @code{.} before the command-name in order for it to parse properly. That's a limitation of the Scala syntax that isn't likely to change. Another limitation is that when invoking a file, you need to call @code{.apply} explicitly rather than relying on the plain-function-call syntax:
   
-        @hl.ref(opsTests/"ShelloutTests.scala", Seq("'fileCustomWorkingDir", ""))
+        @hl.ref(opsTests/"ShelloutTests.scala", Seq("""test("fileCustomWorkingDir")""", ""))
