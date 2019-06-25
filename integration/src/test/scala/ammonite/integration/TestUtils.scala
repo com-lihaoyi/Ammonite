@@ -22,6 +22,7 @@ object TestUtils {
     %%bash(
       executable,
       extraAmmArgs,
+      "--thin",
       "--no-remote-logging",
       "--home",
       home,
