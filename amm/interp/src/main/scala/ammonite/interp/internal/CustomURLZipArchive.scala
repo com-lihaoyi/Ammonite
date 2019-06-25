@@ -1,6 +1,6 @@
 package ammonite.interp.internal
 
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import java.util.zip.{ZipEntry, ZipFile, ZipInputStream}
 
 import scala.reflect.io.{AbstractFile, Streamable, VirtualFile}
@@ -69,6 +69,9 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
     final class File(name: String, content: Array[Byte]) extends Entry(name) {
       override val toByteArray: Array[Byte] = content
       override def sizeOption = Some(toByteArray.length)
+      // Seems we have to provide that one in 2.13
+      override def input: InputStream =
+        new ByteArrayInputStream(content)
     }
   }
 

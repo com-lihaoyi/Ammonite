@@ -483,14 +483,15 @@ object AdvancedTests extends TestSuite{
           sv
       }
       val url = "https://repo1.maven.org/maven2/" +
-        s"io/argonaut/argonaut_$sbv/6.2.3/argonaut_$sbv-6.2.3.jar"
+        s"org/scalacheck/scalacheck_$sbv/1.14.0/scalacheck_$sbv-1.14.0.jar"
       check.session(s"""
         @ interp.load.cp(new java.net.URL("$url"))
 
-        @ import argonaut._, Argonaut._
+        @ import org.scalacheck.Gen
+        import org.scalacheck.Gen
 
-        @ val json = Json.obj("a" -> Json.jBool(false)).nospaces
-        json: String = "{\\"a\\":false}"
+        @ val check = Gen.choose(1, 5).sample.exists(_ <= 5)
+        check: Boolean = true
       """)
     }
 
