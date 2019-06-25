@@ -146,7 +146,7 @@
 
     @sect{Pretty-printed output}
 
-      @hl.ref(advancedTests, Seq("'pprint", "@"), "\"\"\"")
+      @hl.ref(advancedTests, Seq("""test("pprint")""", "@"), "\"\"\"")
 
       @p
         Ammonite-REPL uses @lnk("PPrint", "https://lihaoyi.github.io/upickle-pprint/pprint/") to display its output by default. That means that everything is nicely formatted to fit within the width of the terminal, and is copy-paste-able!
@@ -160,7 +160,7 @@
         before truncation.
 
       @sect{Configurable Truncation}
-        @hl.ref(advancedTests, Seq("'truncation", "@"), "\"\"\"")
+        @hl.ref(advancedTests, Seq("""test("truncation")""", "@"), "\"\"\"")
 
         @p
           Ammonite-REPL intelligently truncates your output when it's beyond a
@@ -253,7 +253,7 @@
           @hl.scala("{ ... }"), and Ammonite will wait until you close it before
           evaluating the contents:
 
-        @hl.ref(advancedTests, Seq("'unwrapping", "@"))
+        @hl.ref(advancedTests, Seq("""test("unwrapping")""", "@"))
 
         @p
           As you can see, the contents of the @hl.scala("{ ... }") block are
@@ -267,7 +267,7 @@
           curlies and the block will be evaluated as a normal block, to a single
           expression:
 
-        @hl.ref(advancedTests, Seq("'forceWrapping", "@"))
+        @hl.ref(advancedTests, Seq("""test("forceWrapping")""", "@"))
 
       @sect{Undo & Redo}
         @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154)
@@ -440,7 +440,7 @@
           For example, here is loading @lnk("Scalaz",
           "https://github.com/scalaz/scalaz") and using it in the Ammonite-REPL:
 
-        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'scalaz", "@"))
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("""test("scalaz")""", "@"))
 
         @p
           Note that the different portions of the @hl.scala{$ivy} import are
@@ -450,20 +450,20 @@
           @code{org:library:version} format, e.g. here we load the
           @lnk("Google Guava", "https://github.com/google/guava") Java library
 
-        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("'guava", "@"))
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("""test("guava")""", "@"))
 
         @p
           As well as the @code{org:::library:version} syntax for loading Scala
           libraries cross-published against the full Scala version (e.g.
           @code{2.12.2} rather than just @code{2.12}):
 
-        @hl.ref(ammoniteTests/"ImportHookTests.scala", Seq("'inlineFull", "@"))
+        @hl.ref(ammoniteTests/"ImportHookTests.scala", Seq("""test("inlineFull")""", "@"))
 
         @p
           If you want to load a compiler plugin, you can do so using
           @hl.scala{import $plugin.$ivy}:
 
-        @hl.ref(ammoniteTests/"AdvancedTests.scala", Seq("'compilerPlugin", "@"))
+        @hl.ref(ammoniteTests/"AdvancedTests.scala", Seq("""test("compilerPlugin")""", "@"))
 
         @p
           This makes Ammonite ideal for trying out new libraries or tools. You
@@ -777,7 +777,7 @@
         important work, do whatever you want later, and simply discard all the
         jars you loaded, variables you defined
 
-      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("'saveLoad", "@"))
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("""test("saveLoad")""", "@"))
       @p
         Apart from plain @hl.scala{save}s and @hl.scala{load}s, which simply
         discard everything after the most recent save, you can also provide a
@@ -785,7 +785,7 @@
         something else for a while, and be able to come back later to continue
         where you left off:
 
-      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("'saveLoad2", "@"))
+      @hl.ref(ammoniteTests/"BuiltinTests.scala", Seq("""test("saveLoad2")""", "@"))
 
 
       @p
