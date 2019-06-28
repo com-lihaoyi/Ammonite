@@ -3,7 +3,8 @@
   */
 import $ivy.{
   `com.typesafe.play::play:2.5.0`,
-  `com.typesafe.play::play-netty-server:2.5.0`
+  `com.typesafe.play::play-netty-server:2.5.0`,
+  `com.lihaoyi::requests:0.2.0`
 }
 
 import play.core.server._, play.api.routing.sird._, play.api.mvc._

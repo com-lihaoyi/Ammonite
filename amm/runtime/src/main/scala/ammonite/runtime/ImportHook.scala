@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.{ByteArrayOutputStream, File}
 import java.net.URI
 
-import ammonite.runtime.tools.IvyThing
+import ammonite.interp.api.IvyConstructor
 import ammonite.util.Util.CodeSource
 import ammonite.util._
 import coursier.core.{ModuleName, Organization}
@@ -173,7 +173,7 @@ object ImportHook{
               coursier.Dependency(
                 coursier.Module(
                   Organization(a),
-                  ModuleName(b + "_" + IvyThing.scalaBinaryVersion)
+                  ModuleName(b + "_" + IvyConstructor.scalaBinaryVersion)
                 ),
                 c
               )
@@ -183,7 +183,7 @@ object ImportHook{
               coursier.Dependency(
                 coursier.Module(
                   Organization(a),
-                  ModuleName(b + "_" + IvyThing.scalaFullBinaryVersion)
+                  ModuleName(b + "_" + IvyConstructor.scalaFullBinaryVersion)
                 ),
                 c
               )

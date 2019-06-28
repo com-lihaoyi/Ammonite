@@ -1,7 +1,7 @@
 package ammonite.unit
 
 
-import ammonite.repl.tools.Location
+import ammonite.repl.api.Location
 import utest._
 import ammonite.repl.tools.source.load
 import ammonite.util.Util

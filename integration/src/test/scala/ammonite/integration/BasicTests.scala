@@ -22,6 +22,7 @@ object BasicTests extends TestSuite{
 
     def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
       executable,
+      "--thin",
       "--no-remote-logging",
       "-h",
       home,
@@ -45,6 +46,7 @@ object BasicTests extends TestSuite{
         write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
         val evaled = %%bash(
           executable,
+          "--thin",
           "-s",
           scriptAddr,
           // Somehow this is being set of travis and causing weird errors/warnings
@@ -92,6 +94,7 @@ object BasicTests extends TestSuite{
       write(scriptAddr, """println("Worked!!")""")
       val evaled = %% bash(
         executable,
+        "--thin",
         scriptAddr
         )
       assert(evaled.out.trim == "Worked!!" )
@@ -111,6 +114,7 @@ object BasicTests extends TestSuite{
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = %%bash(
         executable,
+        "--thin",
         "--no-home-predef",
         "--predef",
         exampleBarePredef,
@@ -141,6 +145,7 @@ object BasicTests extends TestSuite{
       if (!Util.windowsPlatform && !Util.java9OrAbove) {
         %%bash(
           executable,
+          "--thin",
           "-c",
           """val loc = source.load(new String().substring(_: Int))
             |val snip = Predef.augmentString(loc.fileContent)
@@ -269,8 +274,7 @@ object BasicTests extends TestSuite{
              |  functionB
              |    --i     Int
              |    --s     String
-             |    --path  ammonite.ops.Path (default $pwd)
-             |""".stripMargin
+             |    --path  ammonite.ops.Path (default""".stripMargin
         )
         assert(out.contains(expected))
       }

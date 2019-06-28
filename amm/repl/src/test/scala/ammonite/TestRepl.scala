@@ -5,7 +5,8 @@ import java.io.PrintStream
 import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
 import ammonite.main.Defaults
 import ammonite.repl._
-import ammonite.runtime.{Frame, History, Storage}
+import ammonite.repl.api.{FrontEnd, History, ReplLoad}
+import ammonite.runtime.{Frame, Storage}
 import ammonite.util.Util.normalizeNewlines
 import ammonite.util._
 import pprint.{TPrint, TPrintColors}
@@ -50,7 +51,14 @@ class TestRepl {
     x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
-  val frames = Ref(List(Frame.createInitial()))
+  val loader = {
+    val cl = classOf[ammonite.TestReplApi].getClassLoader
+    // requiring class loader isolation - if it's enabled, cl is only a *parent*
+    // of the context class loader.
+    assert(cl != Thread.currentThread().getContextClassLoader)
+    cl
+  }
+  val frames = Ref(List(Frame.createInitial(loader)))
   val sess0 = new SessionApiImpl(frames)
 
   var currentLine = 0
@@ -130,12 +138,17 @@ class TestRepl {
                   tcolors: TPrintColors,
                   classTagT: ClassTag[T]
                 ): Iterator[String] =
-                  if (classTagT == scala.reflect.classTag[TestRepl.Nope])
+                  if (classTagT == scala.reflect.classTag[ammonite.Nope])
                     Iterator()
                   else
                     super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
               }
           }
+        ),
+        (
+          "ammonite.repl.api.FrontEndBridge",
+          "frontEnd",
+          new FrontEndAPIImpl {}
         )
       ),
       colors = Ref(Colors.BlackWhite),
@@ -368,11 +381,5 @@ class TestRepl {
       println("FAILURE TRACE" + Util.newLine + allOutput)
       throw e
     }
-
-}
-
-object TestRepl {
-
-  case class Nope(n: Int)
 
 }

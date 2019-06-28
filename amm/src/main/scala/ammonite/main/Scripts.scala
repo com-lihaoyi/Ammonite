@@ -4,7 +4,7 @@ import java.nio.file.NoSuchFileException
 
 import ammonite.main.Router.{ArgSig, EntryPoint}
 
-import ammonite.runtime.Evaluator.AmmoniteExit
+import ammonite.interp.api.AmmoniteExit
 import ammonite.util.Name.backtickWrap
 import ammonite.util.Util.CodeSource
 import ammonite.util.{Name, Res, Util}
@@ -321,10 +321,5 @@ object Scripts {
         Util.newLine + name + " // " + doc
     }.mkString
   }
-
-  /**
-    * Additional [[scopt.Read]] instance to teach it how to read Ammonite paths
-    */
-  implicit def pathScoptRead: scopt.Read[os.Path] = scopt.Read.stringRead.map(os.Path(_, os.pwd))
 
 }

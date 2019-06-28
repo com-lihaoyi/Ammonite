@@ -29,10 +29,11 @@ object Cli{
                     predefFile: Option[os.Path] = None,
                     help: Boolean = false,
                     colored: Option[Boolean] = None,
-                    classBased: Boolean = false)
+                    classBased: Boolean = false,
+                    thin: Boolean = false)
 
 
-  import ammonite.main.Scripts.pathScoptRead
+  import ammonite.repl.tools.Util.pathScoptRead
   val genericSignature = Seq(
     Arg[Config, String](
       "predef-code", None,
@@ -95,6 +96,14 @@ object Cli{
       "watch", Some('w'),
       "Watch and re-run your scripts when they change",
       (c, v) => c.copy(watch = true)
+    ),
+    Arg[Config, Unit](
+      "thin", None,
+      """Hide parts of the core of Ammonite and some of its dependencies. By default, the core of
+        |Ammonite and all of its dependencies can be seen by users from the Ammonite session. This
+        |option mitigates that via class loader isolation.
+        |""".stripMargin,
+      (c, v) => c.copy(thin=true)
     )
   )
   val replSignature = Seq(

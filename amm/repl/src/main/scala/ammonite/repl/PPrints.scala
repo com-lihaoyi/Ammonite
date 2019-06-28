@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import ammonite.ops.{CommandResult, LsSeq}
-import ammonite.runtime.History
+import ammonite.repl.api.History
 import ammonite.runtime.tools.GrepResult
 import ammonite.util.Util
 import pprint.Renderer

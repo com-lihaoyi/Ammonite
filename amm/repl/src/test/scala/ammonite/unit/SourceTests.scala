@@ -1,7 +1,8 @@
 package ammonite.unit
 
 
-import ammonite.repl.tools.Location
+import ammonite.repl.SourceAPIImpl
+import ammonite.repl.api.{Location, SourceBridge}
 import utest._
 import ammonite.repl.tools.source.load
 import ammonite.util.Util
@@ -9,6 +10,9 @@ import ammonite.util.Util
 import java.io.InputStream
 object SourceTests extends TestSuite{
   val tests = Tests{
+
+    if (SourceBridge.value0 == null)
+      SourceBridge.value0 = new SourceAPIImpl {}
 
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
 

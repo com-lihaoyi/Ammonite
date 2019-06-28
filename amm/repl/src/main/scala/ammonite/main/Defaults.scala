@@ -41,8 +41,8 @@ object Defaults{
     |}
     |import ammonite.runtime.tools._
     |import ammonite.repl.tools._
-    |import ammonite.runtime.tools.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.interp.InterpBridge.value.exit
+    |import ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}
+    |import ammonite.interp.api.InterpBridge.value.exit
     |""".stripMargin
 
   val replPredef = """

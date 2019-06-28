@@ -3,10 +3,10 @@ package ammonite
 import java.io.{InputStream, OutputStream, PrintStream}
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter, Preprocessor}
+import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter}
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.Repl
+import ammonite.repl.{FrontEndAPIImpl, Repl, SourceAPIImpl}
 import ammonite.util.Util.newLine
 import ammonite.util._
 
@@ -70,7 +70,8 @@ case class Main(predefCode: String = "",
                 scriptCodeWrapper: CodeWrapper = CodeWrapper,
                 alreadyLoadedDependencies: Seq[coursier.Dependency] =
                   Defaults.alreadyLoadedDependencies(),
-                importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults){
+                importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+                thin: Boolean = false){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -80,6 +81,22 @@ case class Main(predefCode: String = "",
       }
     case None => Right(None)
   }
+
+  def initialClassLoader: ClassLoader = {
+    val contextClassLoader = Thread.currentThread().getContextClassLoader
+    if (thin) {
+      val replApiClassLoader = classOf[ammonite.repl.api.ReplAPI].getClassLoader
+      if (replApiClassLoader == contextClassLoader) {
+        System.err.println(
+          s"Warning: --thin passed, but ReplAPI and the core of Ammonite seem to be loaded by " +
+            "the same class loader, which effectively disables --thin / class loader isolation."
+        )
+      }
+      replApiClassLoader
+    } else
+      contextClassLoader
+  }
+
   /**
     * Instantiates an ammonite.Repl using the configuration
     */
@@ -122,7 +139,8 @@ case class Main(predefCode: String = "",
         replCodeWrapper = replCodeWrapper,
         scriptCodeWrapper = scriptCodeWrapper,
         alreadyLoadedDependencies = alreadyLoadedDependencies,
-        importHooks = importHooks
+        importHooks = importHooks,
+        initialClassLoader = initialClassLoader
       )
     }
 
@@ -141,7 +159,7 @@ case class Main(predefCode: String = "",
         errorStream,
         verboseOutput
       )
-      val frame = Frame.createInitial()
+      val frame = Frame.createInitial(initialClassLoader)
 
       val interp: Interpreter = new Interpreter(
         printer,
@@ -152,7 +170,18 @@ case class Main(predefCode: String = "",
         predefFileInfoOpt.toSeq ++ Seq(
           PredefInfo(Name("CodePredef"), predefCode, false, None)
         ),
-        Vector.empty,
+        Seq(
+          (
+            "ammonite.repl.api.SourceBridge",
+            "source",
+            new SourceAPIImpl {}
+          ),
+          (
+            "ammonite.repl.api.FrontEndBridge",
+            "frontEnd",
+            new FrontEndAPIImpl {}
+          )
+        ),
         wd,
         colorsRef,
         verboseOutput,
@@ -315,7 +344,7 @@ object Main{
 
   val extraPredefString = s"""
     |import ammonite.main.Router.{doc, main}
-    |import ammonite.main.Scripts.pathScoptRead
+    |import ammonite.repl.tools.Util.pathScoptRead
     |""".stripMargin
 
 }
@@ -424,7 +453,8 @@ class MainRunner(cliConfig: Cli.Config,
       remoteLogging = cliConfig.remoteLogging,
       colors = colors,
       replCodeWrapper = codeWrapper,
-      scriptCodeWrapper = codeWrapper
+      scriptCodeWrapper = codeWrapper,
+      thin = cliConfig.thin
     )
 
   }

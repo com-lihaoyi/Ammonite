@@ -3,11 +3,11 @@ package ammonite.runtime
 import java.lang.reflect.InvocationTargetException
 
 import ammonite._
+import ammonite.interp.api.AmmoniteExit
 import util.Util.{ClassFiles, newLine}
 import ammonite.util._
 
 import scala.util.Try
-import scala.util.control.ControlThrowable
 
 /**
  * Evaluates already-compiled Bytecode.
@@ -40,10 +40,6 @@ trait Evaluator{
 }
 
 object Evaluator{
-  /**
-    * Thrown to exit the REPL cleanly
-    */
-  case class AmmoniteExit(value: Any) extends ControlThrowable
   type InvEx = InvocationTargetException
   type InitEx = ExceptionInInitializerError
 

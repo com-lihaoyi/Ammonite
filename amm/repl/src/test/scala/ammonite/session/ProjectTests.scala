@@ -156,7 +156,7 @@ object ProjectTests extends TestSuite{
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       if (scala2_12) check.session(s"""
-        @ import scalaparse.Scala._
+        @ import $$ivy.`com.lihaoyi::scalaparse:2.0.5`, scalaparse.Scala._
 
         @ 1
         res1: Int = 1
