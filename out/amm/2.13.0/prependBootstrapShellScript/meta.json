@@ -1,0 +1,5 @@
+{
+    "value": "@ 2>/dev/null # 2>nul & echo off & goto BOF\r\n:\nexec java -Xmx500m -XX:+UseG1GC $JAVA_OPTS -cp \"$0\" coursier.bootstrap.launcher.ResourcesLauncher \"$@\"\nexit\n\r\n:BOF\r\n@echo off\r\njava -Xmx500m -XX:+UseG1GC %JAVA_OPTS% -cp \"%~dpnx0\" coursier.bootstrap.launcher.ResourcesLauncher %*\r\nexit /B %errorlevel%\r\n",
+    "valueHash": 558567999,
+    "inputsHash": 1957657610
+}

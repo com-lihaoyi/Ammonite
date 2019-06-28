@@ -1,0 +1,21 @@
+{
+    "value": [
+        "ref:6e5345a1:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/api/ReplAPI.scala",
+        "ref:abf3ced9:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/api/FrontEnd.scala",
+        "ref:e0457b74:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/api/Frame.scala",
+        "ref:3ef92c89:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/api/FrontEndAPI.scala",
+        "ref:d2d20010:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/api/SourceAPI.scala",
+        "ref:9f763569:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/api/SessionChanged.scala",
+        "ref:df6d9878:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/FullReplAPI.scala",
+        "ref:b56adc28:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/tools/Util.scala",
+        "ref:8e6f8e6e:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/tools/source.scala",
+        "ref:a5ae6146:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/tools/Router.scala",
+        "ref:b1dede67:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/repl/tools/desugar.scala",
+        "ref:759c2033:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/runtime/tools/package.scala",
+        "ref:392fe5cf:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala/ammonite/runtime/tools/Tools.scala",
+        "ref:3ec52832:/home/travis/build/lihaoyi/Ammonite/amm/repl-api/src/main/scala-2.13/ammonite/repl/api/History.scala",
+        "ref:4d8f0619:/home/travis/build/lihaoyi/Ammonite/out/amm/repl-api/2.13.0/generatedSources/dest/Constants.scala"
+    ],
+    "valueHash": 670499268,
+    "inputsHash": -2112906240
+}

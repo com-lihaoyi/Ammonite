@@ -1,0 +1,15 @@
+{
+    "value": [
+        "ref:7ed6d21f:/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.0/jar/dest/out.jar",
+        "ref:98bbd537:/home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.0/jar/dest/out.jar",
+        "ref:ef4ad5f9:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.0/jar/dest/out.jar",
+        "ref:6cb03aac:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.0/jar/dest/out.jar",
+        "ref:e84ba77c:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.0/jar/dest/out.jar",
+        "ref:21e65c8b:/home/travis/build/lihaoyi/Ammonite/out/amm/interp-api/2.13.0/jar/dest/out.jar",
+        "ref:763e950e:/home/travis/build/lihaoyi/Ammonite/out/amm/repl-api/2.13.0/jar/dest/out.jar",
+        "ref:9d2de909:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.13.0/jar/dest/out.jar",
+        "ref:11e37357:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.13.0/jar/dest/out.jar"
+    ],
+    "valueHash": -1559253648,
+    "inputsHash": 1968300872
+}

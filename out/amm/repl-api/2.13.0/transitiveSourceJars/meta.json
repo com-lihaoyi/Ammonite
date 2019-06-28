@@ -1,0 +1,10 @@
+{
+    "value": [
+        "ref:b96172f8:/home/travis/build/lihaoyi/Ammonite/out/amm/repl-api/2.13.0/sourceJar/dest/out.jar",
+        "ref:d3692fdd:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.0/sourceJar/dest/out.jar",
+        "ref:199a6af7:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.0/sourceJar/dest/out.jar",
+        "ref:480a73f1:/home/travis/build/lihaoyi/Ammonite/out/amm/interp-api/2.13.0/sourceJar/dest/out.jar"
+    ],
+    "valueHash": -294682179,
+    "inputsHash": -1444743128
+}
