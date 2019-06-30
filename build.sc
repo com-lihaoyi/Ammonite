@@ -169,16 +169,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
 
-  object `test-api` extends Cross[TestApiModule](fullCrossScalaVersions:_*)
-  class TestApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-    def crossFullScalaVersion = true
-    def dependencyResourceFileName = "amm-test-dependencies.txt"
-    def moduleDeps = Seq(
-      `repl-api`()
-    )
-  }
-
-
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), `repl-api`())
@@ -224,9 +214,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
 
     object test extends Tests{
-      def moduleDeps = super.moduleDeps ++ Seq(
-        amm.`test-api`()
-      )
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def resources = T.sources {
         (super.resources() ++
