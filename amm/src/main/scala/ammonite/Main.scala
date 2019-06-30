@@ -72,7 +72,7 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[coursier.Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                classPathWhitelist: Seq[String] => Boolean){
+                classPathWhitelist: Seq[String] => Boolean = _ => true){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
