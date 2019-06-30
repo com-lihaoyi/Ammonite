@@ -3,7 +3,7 @@ package scala.tools.nsc
 import scala.tools.nsc.classpath.ClassPathEntries
 import scala.tools.nsc.util.ClassPath
 
-class FilterClassPath(aggregates: Seq[ClassPath], filter: Seq[String] => Boolean)
+class WhiteListClasspath(aggregates: Seq[ClassPath], filter: Seq[String] => Boolean)
   extends scala.tools.nsc.classpath.AggregateClassPath(aggregates) {
   override def findClassFile(name: String) = {
     val tokens = name.split('.')
