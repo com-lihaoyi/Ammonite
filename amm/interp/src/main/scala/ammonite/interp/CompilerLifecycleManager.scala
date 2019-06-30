@@ -24,7 +24,8 @@ class CompilerLifecycleManager(
   storage: Storage,
   headFrame: => Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-  classPathWhitelist: Seq[String] => Boolean
+  classPathWhitelist: Seq[String] => Boolean,
+  initialClassLoader: ClassLoader
 ){
 
 
@@ -81,14 +82,18 @@ class CompilerLifecycleManager(
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       onSettingsInit.foreach(_(settings))
 
+      val initialClassPath = Classpath.classpath(initialClassLoader, storage)
+      val headFrameClassPath = Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath
+
       Internal.compiler = Compiler(
-        Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
+        headFrameClassPath,
         dynamicClasspath,
         headFrame.classloader,
         headFrame.pluginClassloader,
         () => shutdownPressy(),
         settings,
-        classPathWhitelist
+        classPathWhitelist,
+        initialClassPath
       )
 
       onCompilerInit.foreach(_(compiler.compiler))
@@ -101,7 +106,8 @@ class CompilerLifecycleManager(
         headFrame.classloader,
         settings.copy(),
         dependencyCompleteOpt,
-        classPathWhitelist
+        classPathWhitelist,
+        Classpath.classpath(initialClassLoader, storage)
       )
 
       Internal.preConfiguredSettingsChanged = false

@@ -51,14 +51,8 @@ class TestRepl {
     x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
-  val loader = {
-    val cl = classOf[ammonite.TestReplApi].getClassLoader
-    // requiring class loader isolation - if it's enabled, cl is only a *parent*
-    // of the context class loader.
-    assert(cl != Thread.currentThread().getContextClassLoader)
-    cl
-  }
-  val frames = Ref(List(Frame.createInitial(loader)))
+  val initialClassLoader = Thread.currentThread().getContextClassLoader
+  val frames = Ref(List(Frame.createInitial(initialClassLoader)))
   val sess0 = new SessionApiImpl(frames)
 
   var currentLine = 0
@@ -154,6 +148,7 @@ class TestRepl {
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
+      initialClassLoader = initialClassLoader,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),

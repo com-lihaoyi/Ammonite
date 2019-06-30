@@ -130,6 +130,7 @@ class Repl(input: InputStream,
     verboseOutput = true,
     getFrame = () => frames().head,
     createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
+    initialClassLoader = initialClassLoader,
     replCodeWrapper = replCodeWrapper,
     scriptCodeWrapper = scriptCodeWrapper,
     alreadyLoadedDependencies = alreadyLoadedDependencies,
@@ -315,6 +316,11 @@ object Repl{
           .toSet
 
         def apply(s: Seq[String]) = {
+          if (s == Seq("scalatags")) {
+            println("DIE")
+//            new Exception().printStackTrace()
+            ???
+          }
           s.foreach(s => assert(!s.contains('/'), s))
           s.startsWith(Seq("java")) || set(s)
         }

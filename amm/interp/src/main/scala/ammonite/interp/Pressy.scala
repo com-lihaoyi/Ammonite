@@ -260,7 +260,8 @@ object Pressy {
             evalClassloader: => ClassLoader,
             settings: Settings,
             dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-            classPathWhitelist: Seq[String] => Boolean): Pressy = new Pressy {
+            classPathWhitelist: Seq[String] => Boolean,
+            initialClassPath: Seq[java.net.URL]): Pressy = new Pressy {
 
     @volatile var cachedPressy: nsc.interactive.Global = null
 
@@ -291,11 +292,12 @@ object Pressy {
           java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
       }
       val jcp = Compiler.initGlobalClasspath(
-        dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
+        dirDeps,
         jarDeps,
         dynamicClasspath,
         settings,
-        classPathWhitelist
+        classPathWhitelist,
+        initialClassPath
       )
       val reporter = makeReporter(_ => (), _ => (), _ => (), settings)
       initInteractiveGlobal(settings, reporter, jcp, evalClassloader)

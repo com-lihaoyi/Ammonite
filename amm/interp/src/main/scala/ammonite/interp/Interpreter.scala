@@ -41,6 +41,7 @@ class Interpreter(val printer: Printer,
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
+                  initialClassLoader: ClassLoader,
                   replCodeWrapper: CodeWrapper,
                   scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[coursier.Dependency],
@@ -77,7 +78,8 @@ class Interpreter(val printer: Printer,
     storage,
     headFrame,
     Some(dependencyComplete),
-    classPathWhitelist
+    classPathWhitelist,
+    initialClassLoader
   )
 
   val eval = Evaluator(headFrame)

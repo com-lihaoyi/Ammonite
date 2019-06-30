@@ -213,8 +213,27 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"com.github.scopt::scopt:3.7.1"
     )
 
-    object test extends Tests{
+    object test extends Tests with AmmDependenciesResourceFileModule {
       def crossScalaVersion = ReplModule.this.crossScalaVersion
+      def scalaVersion = ReplModule.this.crossScalaVersion
+      def dependencyResourceFileName = "amm-test-dependencies.txt"
+
+      def replApiCp: T[Seq[PathRef]] = T{
+        amm.`repl-api`().runClasspath() ++
+        amm.`repl-api`().externalSources() ++
+        amm.`repl-api`().transitiveJars() ++
+        amm.`repl-api`().transitiveSourceJars() ++
+        Seq(compile().classes) ++
+        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+      }
+
+      def thinWhitelist = T{
+        generateApiWhitelist(replApiCp())
+      }
+      def localClasspath = T{
+        super.localClasspath() ++ Agg(thinWhitelist())
+      }
+
       def resources = T.sources {
         (super.resources() ++
         ReplModule.this.sources() ++
@@ -227,7 +246,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
 }
-class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
+
+class MainModule(val crossScalaVersion: String)
+  extends AmmModule with AmmDependenciesResourceFileModule {
 
   def artifactName = "ammonite"
 
@@ -258,41 +279,6 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
 
   def dependencyResourceFileName = "amm-dependencies.txt"
 
-  def replApiCp = T{
-    amm.`repl-api`().runClasspath() ++
-    amm.`repl-api`().externalSources() ++
-    amm.`repl-api`().transitiveJars() ++
-    amm.`repl-api`().transitiveSourceJars()
-  }
-
-  def thinWhitelist = T{
-    val thinClasspathEntries = replApiCp().map(_.path).flatMap{ cpRoot =>
-      if (os.isFile(cpRoot) && cpRoot.ext == "jar") {
-        val zip = new java.util.zip.ZipFile(cpRoot.toIO)
-        import collection.JavaConverters._
-        for(e <- zip.entries().asScala) yield e.getName
-      }
-      else if (os.isDir(cpRoot)) {
-        for(sub <- os.walk(cpRoot)) yield sub.relativeTo(cpRoot).toString
-      }
-      else if (!os.exists(cpRoot)) Nil
-      else throw new Exception(cpRoot.toString)
-    }
-    os.write(
-      T.ctx().dest / "ammonite-api-whitelist.txt",
-      thinClasspathEntries
-        .flatMap(_.stripSuffix("/").split('/').inits)
-        .filter(_.nonEmpty)
-        .map(_.mkString("/"))
-        .distinct
-        .mkString("\n")
-    )
-    PathRef(T.ctx().dest)
-  }
-
-  def localClasspath = T{
-    super.localClasspath() ++ Agg(thinWhitelist())
-  }
   def prependShellScript = T{
     mill.modules.Jvm.launcherUniversalScript(
       mainClass().get,
@@ -302,12 +288,42 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
       Seq("-Xmx500m", "-XX:+UseG1GC")
     )
   }
+  def replApiCp = T{
+    amm.`repl-api`().runClasspath() ++
+    amm.`repl-api`().externalSources() ++
+    amm.`repl-api`().transitiveJars() ++
+    amm.`repl-api`().transitiveSourceJars()
+  }
+
+  def thinWhitelist = T{
+    generateApiWhitelist(replApiCp())
+  }
+  def localClasspath = T{
+    super.localClasspath() ++ Agg(thinWhitelist())
+  }
 
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.chuusai::shapeless:2.3.3"
     )
+
+    def replApiCp = T{
+      amm.`repl-api`().runClasspath() ++
+      amm.`repl-api`().externalSources() ++
+      amm.`repl-api`().transitiveJars() ++
+      amm.`repl-api`().transitiveSourceJars() ++
+      Seq(amm.repl().test.compile().classes, compile().classes) ++
+      resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+    }
+
+    def thinWhitelist = T{
+      generateApiWhitelist(replApiCp())
+    }
+    def localClasspath = T{
+      super.localClasspath() ++ Agg(thinWhitelist())
+    }
+
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
       super.runClasspath() ++
@@ -323,6 +339,32 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
       externalSources()
 
   }
+}
+
+def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Dest) = {
+
+  val thinClasspathEntries = replApiCp.map(_.path).flatMap{ cpRoot =>
+    if (os.isFile(cpRoot) && cpRoot.ext == "jar") {
+      val zip = new java.util.zip.ZipFile(cpRoot.toIO)
+      import collection.JavaConverters._
+      for(e <- zip.entries().asScala) yield e.getName
+    }
+    else if (os.isDir(cpRoot)) {
+      for(sub <- os.walk(cpRoot)) yield sub.relativeTo(cpRoot).toString
+    }
+    else if (!os.exists(cpRoot)) Nil
+    else throw new Exception(cpRoot.toString)
+  }
+  os.write(
+    ctx.dest / "ammonite-api-whitelist.txt",
+    thinClasspathEntries
+      .flatMap(_.stripSuffix("/").split('/').inits)
+      .filter(_.nonEmpty)
+      .map(_.mkString("/"))
+      .distinct
+      .mkString("\n")
+  )
+  PathRef(ctx.dest)
 }
 
 object shell extends Cross[ShellModule](fullCrossScalaVersions:_*)

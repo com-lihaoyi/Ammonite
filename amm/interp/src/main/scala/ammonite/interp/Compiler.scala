@@ -162,7 +162,8 @@ object Compiler{
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
             settings: Settings,
-            classPathWhitelist: Seq[String] => Boolean): Compiler = new Compiler{
+            classPathWhitelist: Seq[String] => Boolean,
+            initialClassPath: Seq[java.net.URL]): Compiler = new Compiler{
 
     if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"
@@ -218,15 +219,16 @@ object Compiler{
 
       val (dirDeps, jarDeps) = classpath.partition { u =>
         u.getProtocol == "file" &&
-          java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+        java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
       }
 
       val jcp = initGlobalClasspath(
-        dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
+        dirDeps,
         jarDeps,
         dynamicClasspath,
         settings,
-        classPathWhitelist
+        classPathWhitelist,
+        initialClassPath
       )
       val vd = new io.VirtualDirectory("(memory)", None)
       if (Classpath.traceClasspathIssues) {
@@ -386,31 +388,44 @@ object Compiler{
     }
   }
 
+
+  def prepareJarCp(jarDeps: Seq[java.net.URL], settings: Settings) = {
+    jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
+      .map { x =>
+        if (x.getProtocol == "file") {
+          val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
+          CompilerCompatibility.createZipJarFactory(arc, settings)
+        } else {
+          val arc = new internal.CustomURLZipArchive(x)
+          CustomZipAndJarFileLookupFactory.create(arc, settings)
+        }
+      }
+      .toVector
+  }
+  def prepareDirCp(dirDeps: Seq[java.net.URL]) = {
+    dirDeps.map(x =>
+      new DirectoryClassPath(java.nio.file.Paths.get(x.toURI).toFile)
+    )
+  }
   /**
     * Code to initialize random bits and pieces that are needed
     * for the Scala compiler to function, common between the
     * normal and presentation compiler
     */
-  def initGlobalClasspath(dirDeps: Seq[java.io.File],
+  def initGlobalClasspath(dirDeps: Seq[java.net.URL],
                           jarDeps: Seq[java.net.URL],
                           dynamicClasspath: VirtualDirectory,
                           settings: Settings,
-                          classPathWhitelist: Seq[String] => Boolean) = {
+                          classPathWhitelist: Seq[String] => Boolean,
+                          initialClassPath: Seq[java.net.URL]) = {
 
-    val jarCP =
-      jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
-        .map { x =>
-          if (x.getProtocol == "file") {
-            val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
-            CompilerCompatibility.createZipJarFactory(arc, settings)
-          } else {
-            val arc = new internal.CustomURLZipArchive(x)
-            CustomZipAndJarFileLookupFactory.create(arc, settings)
-          }
-        }
-        .toVector
+    val (initialDirDeps, newDirDeps) = dirDeps.partition(initialClassPath.contains)
+    val (initialJarDeps, newJarDeps) = jarDeps.partition(initialClassPath.contains)
+    val newJarCp = prepareJarCp(newJarDeps, settings)
+    val initialJarCp = prepareJarCp(initialJarDeps, settings)
 
-    val dirCP = dirDeps.map(x => new DirectoryClassPath(x))
+    val newDirCp = prepareDirCp(newDirDeps)
+    val initialDirCp = prepareDirCp(initialDirDeps)
     val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath){
 
       override def getSubDir(packageDirName: String): Option[AbstractFile] = {
@@ -440,8 +455,8 @@ object Compiler{
 
     }
 
-    val staticCP = new scala.tools.nsc.WhiteListClasspath(jarCP ++ dirCP, classPathWhitelist)
-    val jcp = new AggregateClassPath(Seq(staticCP, dynamicCP))
+    val staticCP = new scala.tools.nsc.WhiteListClasspath(initialJarCp ++ initialDirCp, classPathWhitelist)
+    val jcp = new AggregateClassPath(Seq(staticCP, dynamicCP) ++ newJarCp ++ newDirCp)
 
 
     jcp

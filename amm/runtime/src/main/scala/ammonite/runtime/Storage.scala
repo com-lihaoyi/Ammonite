@@ -31,13 +31,6 @@ trait Storage{
                          tag: Tag): Unit
   def classFilesListLoad(filePathPrefix: os.RelPath, tag: Tag): Option[ScriptOutput]
   def getSessionId: Long
-
-  // Store classpathCache in-memory regardless of Storage impl
-  private var _classpathCache: Option[Vector[java.net.URL]] = None
-  val classpathCache = new StableRef[Option[Vector[java.net.URL]]]{
-    def apply() = _classpathCache
-    def update(value: Option[Vector[java.net.URL]]): Unit = _classpathCache = value
-  }
 }
 
 object Storage{
