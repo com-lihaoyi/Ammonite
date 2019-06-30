@@ -157,7 +157,8 @@ class TestRepl {
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
-      importHooks = ImportHook.defaults
+      importHooks = ImportHook.defaults,
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
 
   }catch{ case e: Throwable =>

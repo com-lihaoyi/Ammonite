@@ -12,6 +12,9 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.interactive.Response
 import scala.util.{Failure, Success, Try}
 import ammonite.util.Util.newLine
+import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
+import scala.tools.nsc.classpath.AggregateClassPath
+import scala.tools.nsc.reporters.AbstractReporter
 /**
  * Nice wrapper for the presentation compiler.
  */
@@ -256,7 +259,8 @@ object Pressy {
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
             settings: Settings,
-            dependencyCompleteOpt: => Option[String => (Int, Seq[String])]): Pressy = new Pressy {
+            dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
+            classPathWhitelist: Seq[String] => Boolean): Pressy = new Pressy {
 
     @volatile var cachedPressy: nsc.interactive.Global = null
 
@@ -264,20 +268,37 @@ object Pressy {
       if (cachedPressy == null) cachedPressy = initPressy
       cachedPressy
     }
+    def initInteractiveGlobal(settings: Settings,
+                              reporter: AbstractReporter,
+                              jcp: AggregateClassPath,
+                              evalClassloader: ClassLoader): InteractiveGlobal = {
+      new nsc.interactive.Global(settings, reporter) { g =>
+        // Actually jcp, avoiding a path-dependent type issue in 2.10 here
+        override def classPath = jcp
 
+        override lazy val platform: ThisPlatform = new GlobalPlatform {
+          override val global = g
+          override val settings = g.settings
+          override val classPath = jcp
+        }
+
+        override lazy val analyzer = CompilerCompatibility.interactiveAnalyzer(g, evalClassloader)
+      }
+    }
     def initPressy = {
       val (dirDeps, jarDeps) = classpath.partition { u =>
         u.getProtocol == "file" &&
           java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
       }
-      val jcp = GlobalInitCompat.initGlobalClasspath(
+      val jcp = Compiler.initGlobalClasspath(
         dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
         jarDeps,
         dynamicClasspath,
-        settings
+        settings,
+        classPathWhitelist
       )
       val reporter = makeReporter(_ => (), _ => (), _ => (), settings)
-      GlobalInitCompat.initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
+      initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
     }
 
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {

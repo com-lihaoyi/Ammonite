@@ -37,7 +37,8 @@ object TestUtils {
       replCodeWrapper = CodeWrapper,
       scriptCodeWrapper = CodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
-      importHooks = ImportHook.defaults
+      importHooks = ImportHook.defaults,
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
     interp.initializePredef()
     interp

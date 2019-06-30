@@ -13,7 +13,8 @@ import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
-import scala.tools.nsc.{Global, Settings}
+import scala.tools.nsc.classpath.{AggregateClassPath, DirectoryClassPath, FileUtils, VirtualDirectoryClassPath}
+import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
@@ -155,7 +156,8 @@ object Compiler{
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
-            settings: Settings): Compiler = new Compiler{
+            settings: Settings,
+            classPathWhitelist: Seq[String] => Boolean): Compiler = new Compiler{
 
     if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"
@@ -214,11 +216,12 @@ object Compiler{
           java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
       }
 
-      val jcp = GlobalInitCompat.initGlobalClasspath(
+      val jcp = initGlobalClasspath(
         dirDeps.map(u => java.nio.file.Paths.get(u.toURI).toFile),
         jarDeps,
         dynamicClasspath,
-        settings
+        settings,
+        classPathWhitelist
       )
       val vd = new io.VirtualDirectory("(memory)", None)
       if (Classpath.traceClasspathIssues) {
@@ -237,7 +240,7 @@ object Compiler{
 
       val reporter = makeReporter(errorLogger, warningLogger, infoLogger, settings)
 
-      val scalac = GlobalInitCompat.initGlobal(
+      val scalac = CompilerCompatibility.initGlobal(
         settings, reporter, jcp,
         evalClassloader,
         createPlugins = g => {
@@ -254,7 +257,7 @@ object Compiler{
               (name, cls) <- plugins0
               plugin = Plugin.instantiate(cls, g)
               initOk =
-              try CompilerCompatibility.pluginInit(plugin, Nil, g.globalError)
+              try plugin.init(Nil, g.globalError)
               catch { case ex: Exception =>
                 Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
                 false
@@ -264,7 +267,6 @@ object Compiler{
           }
         }
       )
-
 
       // Initialize scalac to the parser phase immediately, so we can start
       // using Compiler#parse even if we haven't compiled any compilation
@@ -371,11 +373,72 @@ object Compiler{
       warningLogger = warnings.append(_)
       infoLogger = infos.append(_)
       reporter.reset()
-      val parser = CompilerCompatibility.newUnitParser(compiler, line, fileName)
+      val parser = compiler.newUnitParser(line, fileName)
 
-      val trees = CompilerCompatibility.trees(compiler)(parser)
+      val trees = parser.parseStatsOrPackages()
       if (reporter.hasErrors) Left(errors.mkString(newLine))
       else Right(trees)
     }
+  }
+
+  /**
+    * Code to initialize random bits and pieces that are needed
+    * for the Scala compiler to function, common between the
+    * normal and presentation compiler
+    */
+  def initGlobalClasspath(dirDeps: Seq[java.io.File],
+                          jarDeps: Seq[java.net.URL],
+                          dynamicClasspath: VirtualDirectory,
+                          settings: Settings,
+                          classPathWhitelist: Seq[String] => Boolean) = {
+
+    val jarCP =
+      jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
+        .map { x =>
+          if (x.getProtocol == "file") {
+            val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
+            CompilerCompatibility.createZipJarFactory(arc, settings)
+          } else {
+            val arc = new internal.CustomURLZipArchive(x)
+            CustomZipAndJarFileLookupFactory.create(arc, settings)
+          }
+        }
+        .toVector
+
+    val dirCP = dirDeps.map(x => new DirectoryClassPath(x))
+    val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath){
+
+      override def getSubDir(packageDirName: String): Option[AbstractFile] = {
+        val pathParts = packageDirName.split('/')
+        var file: AbstractFile = dir
+        for (dirPart <- pathParts) {
+          file = file.lookupName(dirPart, directory = true)
+          if (file == null) return None
+        }
+        Some(file)
+
+      }
+      override def findClassFile(className: String): Option[AbstractFile] = {
+        val relativePath = FileUtils.dirPath(className)
+        val pathParts = relativePath.split('/')
+        var file: AbstractFile = dir
+        for (dirPart <- pathParts.init) {
+          file = file.lookupName(dirPart, directory = true)
+          if (file == null) return None
+        }
+
+        file.lookupName(pathParts.last + ".class", directory = false) match {
+          case null => None
+          case file => Some(file)
+        }
+      }
+
+    }
+
+    val staticCP = new scala.tools.nsc.FilterClassPath(jarCP ++ dirCP, classPathWhitelist)
+    val jcp = new AggregateClassPath(Seq(staticCP, dynamicCP))
+
+
+    jcp
   }
 }

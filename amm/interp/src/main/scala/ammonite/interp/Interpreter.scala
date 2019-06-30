@@ -44,7 +44,8 @@ class Interpreter(val printer: Printer,
                   replCodeWrapper: CodeWrapper,
                   scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[coursier.Dependency],
-                  importHooks: Map[Seq[String], ImportHook])
+                  importHooks: Map[Seq[String], ImportHook],
+                  classPathWhitelist: Seq[String] => Boolean)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -75,7 +76,8 @@ class Interpreter(val printer: Printer,
   val compilerManager = new CompilerLifecycleManager(
     storage,
     headFrame,
-    Some(dependencyComplete)
+    Some(dependencyComplete),
+    classPathWhitelist
   )
 
   val eval = Evaluator(headFrame)

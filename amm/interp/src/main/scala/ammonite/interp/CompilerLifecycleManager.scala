@@ -23,7 +23,8 @@ import scala.tools.nsc.Settings
 class CompilerLifecycleManager(
   storage: Storage,
   headFrame: => Frame,
-  dependencyCompleteOpt: => Option[String => (Int, Seq[String])]
+  dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
+  classPathWhitelist: Seq[String] => Boolean
 ){
 
 
@@ -79,13 +80,15 @@ class CompilerLifecycleManager(
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       onSettingsInit.foreach(_(settings))
+
       Internal.compiler = Compiler(
         Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
         headFrame.pluginClassloader,
         () => shutdownPressy(),
-        settings
+        settings,
+        classPathWhitelist
       )
 
       onCompilerInit.foreach(_(compiler.compiler))
@@ -96,9 +99,9 @@ class CompilerLifecycleManager(
         Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
         dynamicClasspath,
         headFrame.classloader,
-
         settings.copy(),
-        dependencyCompleteOpt
+        dependencyCompleteOpt,
+        classPathWhitelist
       )
 
       Internal.preConfiguredSettingsChanged = false

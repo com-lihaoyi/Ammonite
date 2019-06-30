@@ -1,6 +1,7 @@
 package ammonite
 
 import java.io.{InputStream, OutputStream, PrintStream}
+import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
 import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter}
@@ -71,7 +72,7 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[coursier.Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                thin: Boolean = false){
+                classPathWhitelist: Seq[String] => Boolean){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -84,17 +85,7 @@ case class Main(predefCode: String = "",
 
   def initialClassLoader: ClassLoader = {
     val contextClassLoader = Thread.currentThread().getContextClassLoader
-    if (thin) {
-      val replApiClassLoader = classOf[ammonite.repl.api.ReplAPI].getClassLoader
-      if (replApiClassLoader == contextClassLoader) {
-        System.err.println(
-          s"Warning: --thin passed, but ReplAPI and the core of Ammonite seem to be loaded by " +
-            "the same class loader, which effectively disables --thin / class loader isolation."
-        )
-      }
-      replApiClassLoader
-    } else
-      contextClassLoader
+    new Main.WhiteListClassLoader(classPathWhitelist, contextClassLoader)
   }
 
   /**
@@ -140,7 +131,8 @@ case class Main(predefCode: String = "",
         scriptCodeWrapper = scriptCodeWrapper,
         alreadyLoadedDependencies = alreadyLoadedDependencies,
         importHooks = importHooks,
-        initialClassLoader = initialClassLoader
+        initialClassLoader = initialClassLoader,
+        classPathWhitelist = classPathWhitelist
       )
     }
 
@@ -190,7 +182,8 @@ case class Main(predefCode: String = "",
         replCodeWrapper,
         scriptCodeWrapper,
         alreadyLoadedDependencies = alreadyLoadedDependencies,
-        importHooks = importHooks
+        importHooks = importHooks,
+        classPathWhitelist = classPathWhitelist
       )
       interp.initializePredef() match{
         case None => Right(interp)
@@ -347,6 +340,19 @@ object Main{
     |import ammonite.repl.tools.Util.pathScoptRead
     |""".stripMargin
 
+
+  class WhiteListClassLoader(whitelist: Seq[String] => Boolean, parent: ClassLoader) extends URLClassLoader(Array(), parent){
+    override def loadClass(name: String, resolve: Boolean) = {
+      val tokens = name.split('.')
+      if (whitelist(tokens.init ++ Seq(tokens.last + ".class"))) super.loadClass(name, resolve)
+      else throw new ClassNotFoundException(name)
+
+    }
+    override def getResource(name: String) = {
+      if (whitelist(name.split('/'))) super.getResource(name)
+      else null
+    }
+  }
 }
 
 /**
@@ -423,7 +429,6 @@ class MainRunner(cliConfig: Cli.Config,
     success
   }
 
-
   def initMain(isRepl: Boolean) = {
     val storage = if (!cliConfig.homePredef) {
       new Storage.Folder(cliConfig.home, isRepl) {
@@ -454,8 +459,10 @@ class MainRunner(cliConfig: Cli.Config,
       colors = colors,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
-      thin = cliConfig.thin
-    )
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.thin)
 
+    )
   }
+
+
 }
