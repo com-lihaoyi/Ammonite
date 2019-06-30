@@ -341,7 +341,8 @@ object Main{
     |""".stripMargin
 
 
-  class WhiteListClassLoader(whitelist: Seq[String] => Boolean, parent: ClassLoader) extends URLClassLoader(Array(), parent){
+  class WhiteListClassLoader(whitelist: Seq[String] => Boolean, parent: ClassLoader)
+    extends URLClassLoader(Array(), parent){
     override def loadClass(name: String, resolve: Boolean) = {
       val tokens = name.split('.')
       if (whitelist(tokens.init ++ Seq(tokens.last + ".class"))) super.loadClass(name, resolve)

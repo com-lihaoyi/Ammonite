@@ -308,7 +308,11 @@ object Repl{
     if (!thin) (_ => true)
     else {
       new Function1[Seq[String], Boolean] {
-        val set = os.read.lines(os.resource / "ammonite-api-whitelist.txt").map(_.split('/').toSeq).toSet
+        val set = os
+          .read
+          .lines(os.resource / "ammonite-api-whitelist.txt")
+          .map(_.split('/').toSeq)
+          .toSet
 
         def apply(s: Seq[String]) = {
           s.foreach(s => assert(!s.contains('/'), s))

@@ -13,7 +13,12 @@ import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
-import scala.tools.nsc.classpath.{AggregateClassPath, DirectoryClassPath, FileUtils, VirtualDirectoryClassPath}
+import scala.tools.nsc.classpath.{
+  AggregateClassPath,
+  DirectoryClassPath,
+  FileUtils,
+  VirtualDirectoryClassPath
+}
 import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin

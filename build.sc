@@ -17,7 +17,7 @@ val commitsSinceTaggedVersion = {
 
 val binCrossScalaVersions = Seq("2.12.8", "2.13.0")
 val fullCrossScalaVersions = Seq(
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
   "2.13.0"
 )
 
@@ -40,39 +40,10 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
     def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.7.1")
     def testFrameworks = Seq("utest.runner.Framework")
     def forkArgs = Seq("-XX:MaxPermSize=2g", "-Xmx4g", "-Dfile.encoding=UTF8")
-    def sources = T.sources{
-      val is211 = crossScalaVersion.startsWith("2.11.")
-      val is212 = crossScalaVersion.startsWith("2.12.")
-      val shared211_212 =
-        if (is211 || is212)
-          Seq(PathRef(millSourcePath / 'src / 'test / "scala-2.11_2.12"))
-        else
-          Seq()
-      super.sources() ++
-        shared211_212
-    }
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
-  }
-  def sources = T.sources{
-    val is211 = crossScalaVersion.startsWith("2.11.")
-    val is212 = crossScalaVersion.startsWith("2.12.")
-    val is213 = crossScalaVersion.startsWith("2.13.")
-    val shared211_212 =
-      if (is211 || is212)
-        Seq(PathRef(millSourcePath / 'src / 'main / "scala-2.11_2.12"))
-      else
-        Seq()
-    val shared212_213 =
-      if (is212 || is213)
-        Seq(PathRef(millSourcePath / 'src / 'main / "scala-2.12_2.13"))
-      else
-        Seq()
-    super.sources() ++
-      shared211_212 ++
-      shared212_213
   }
 }
 trait AmmModule extends AmmInternalModule with PublishModule{
