@@ -167,11 +167,18 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def generatedSources = T{
       Seq(PathRef(generateConstantsFile(buildVersion)))
     }
+
+    def exposedClassPath = T{
+      amm.`repl-api`().runClasspath() ++
+      amm.`repl-api`().externalSources() ++
+      amm.`repl-api`().transitiveJars() ++
+      amm.`repl-api`().transitiveSourceJars()
+    }
   }
 
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), `repl-api`())
+    def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), amm.`repl-api`())
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:0.7.5",
       ivy"com.lihaoyi::requests:0.2.0"
@@ -218,18 +225,14 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def scalaVersion = ReplModule.this.crossScalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
 
-      def replApiCp: T[Seq[PathRef]] = T{
-        amm.`repl-api`().runClasspath() ++
-        amm.`repl-api`().externalSources() ++
-        amm.`repl-api`().transitiveJars() ++
-        amm.`repl-api`().transitiveSourceJars() ++
-        Seq(compile().classes) ++
-        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+      def thinWhitelist = T{
+        generateApiWhitelist(
+          amm.`repl-api`().exposedClassPath() ++
+          Seq(compile().classes) ++
+          resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+        )
       }
 
-      def thinWhitelist = T{
-        generateApiWhitelist(replApiCp())
-      }
       def localClasspath = T{
         super.localClasspath() ++ Agg(thinWhitelist())
       }
@@ -288,15 +291,11 @@ class MainModule(val crossScalaVersion: String)
       Seq("-Xmx500m", "-XX:+UseG1GC")
     )
   }
-  def replApiCp = T{
-    amm.`repl-api`().runClasspath() ++
-    amm.`repl-api`().externalSources() ++
-    amm.`repl-api`().transitiveJars() ++
-    amm.`repl-api`().transitiveSourceJars()
-  }
 
   def thinWhitelist = T{
-    generateApiWhitelist(replApiCp())
+    generateApiWhitelist(
+      amm.`repl-api`().exposedClassPath()
+    )
   }
   def localClasspath = T{
     super.localClasspath() ++ Agg(thinWhitelist())
@@ -308,18 +307,15 @@ class MainModule(val crossScalaVersion: String)
       ivy"com.chuusai::shapeless:2.3.3"
     )
 
-    def replApiCp = T{
-      amm.`repl-api`().runClasspath() ++
-      amm.`repl-api`().externalSources() ++
-      amm.`repl-api`().transitiveJars() ++
-      amm.`repl-api`().transitiveSourceJars() ++
-      Seq(amm.repl().test.compile().classes, compile().classes) ++
-      resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
-    }
 
     def thinWhitelist = T{
-      generateApiWhitelist(replApiCp())
+      generateApiWhitelist(
+        amm.`repl-api`().exposedClassPath() ++
+        Seq(amm.repl().test.compile().classes, compile().classes) ++
+        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+      )
     }
+
     def localClasspath = T{
       super.localClasspath() ++ Agg(thinWhitelist())
     }
@@ -373,6 +369,17 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
   def crossFullScalaVersion = true
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
+    def thinWhitelist = T{
+      generateApiWhitelist(
+        amm.`repl-api`().exposedClassPath() ++
+        Seq(amm.repl().test.compile().classes, compile().classes) ++
+        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+      )
+    }
+
+    def localClasspath = T{
+      super.localClasspath() ++ Agg(thinWhitelist())
+    }
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,
       "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
