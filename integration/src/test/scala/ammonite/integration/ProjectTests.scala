@@ -54,7 +54,7 @@ object ProjectTests extends TestSuite{
 
     test("httpApi"){
       test("addPost"){
-        val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text")
+        val res = execNonThin('basic / "HttpApi.sc", "addPost", "title", "some text")
         assert(res.out.trim.contains("101"))
       }
       test("comments"){
