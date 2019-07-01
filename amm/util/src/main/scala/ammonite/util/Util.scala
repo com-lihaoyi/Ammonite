@@ -9,6 +9,13 @@ import java.security.MessageDigest
 
 
 object Util{
+  def lookupWhiteList(whitelist: Set[Seq[String]], tokens: Seq[String]): Boolean = {
+    if (whitelist.isEmpty) true
+    else {
+      tokens.foreach(s => assert(!s.contains('/'), s))
+      tokens.startsWith(Seq("java")) || tokens.startsWith(Seq("jdk")) || whitelist(tokens)
+    }
+  }
   def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T) = {
     val oldClassloader = Thread.currentThread().getContextClassLoader
     try{

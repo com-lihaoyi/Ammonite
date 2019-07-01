@@ -72,7 +72,7 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[coursier.Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                classPathWhitelist: Seq[String] => Boolean = _ => true){
+                classPathWhitelist: Set[Seq[String]] = Set.empty){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -342,16 +342,20 @@ object Main{
     |""".stripMargin
 
 
-  class WhiteListClassLoader(whitelist: Seq[String] => Boolean, parent: ClassLoader)
+  class WhiteListClassLoader(whitelist: Set[Seq[String]], parent: ClassLoader)
     extends URLClassLoader(Array(), parent){
     override def loadClass(name: String, resolve: Boolean) = {
       val tokens = name.split('.')
-      if (whitelist(tokens.init ++ Seq(tokens.last + ".class"))) super.loadClass(name, resolve)
-      else throw new ClassNotFoundException(name)
+      if (Util.lookupWhiteList(whitelist, tokens.init ++ Seq(tokens.last + ".class"))) {
+        super.loadClass(name, resolve)
+      }
+      else {
+        throw new ClassNotFoundException(name)
+      }
 
     }
     override def getResource(name: String) = {
-      if (whitelist(name.split('/'))) super.getResource(name)
+      if (Util.lookupWhiteList(whitelist, name.split('/'))) super.getResource(name)
       else null
     }
   }
@@ -461,6 +465,7 @@ class MainRunner(cliConfig: Cli.Config,
       colors = colors,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
+      alreadyLoadedDependencies = if(cliConfig.thin) Nil else Defaults.alreadyLoadedDependencies(),
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.thin)
 
     )

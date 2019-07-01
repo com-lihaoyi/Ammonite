@@ -260,7 +260,7 @@ object Pressy {
             evalClassloader: => ClassLoader,
             settings: Settings,
             dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-            classPathWhitelist: Seq[String] => Boolean,
+            classPathWhitelist: Set[Seq[String]],
             initialClassPath: Seq[java.net.URL]): Pressy = new Pressy {
 
     @volatile var cachedPressy: nsc.interactive.Global = null

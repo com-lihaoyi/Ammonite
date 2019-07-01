@@ -27,7 +27,7 @@ class Repl(input: InputStream,
            importHooks: Map[Seq[String], ImportHook],
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
-           classPathWhitelist: Seq[String] => Boolean) { repl =>
+           classPathWhitelist: Set[Seq[String]]) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -305,26 +305,13 @@ object Repl{
     traces.mkString(newLine)
   }
 
-  def getClassPathWhitelist(thin: Boolean): Seq[String] => Boolean = {
-    if (!thin) (_ => true)
+  def getClassPathWhitelist(thin: Boolean): Set[Seq[String]] = {
+    if (!thin) Set.empty
     else {
-      new Function1[Seq[String], Boolean] {
-        val set = os
-          .read
-          .lines(os.resource / "ammonite-api-whitelist.txt")
-          .map(_.split('/').toSeq)
-          .toSet
-
-        def apply(s: Seq[String]) = {
-          if (s == Seq("scalatags")) {
-            println("DIE")
-//            new Exception().printStackTrace()
-            ???
-          }
-          s.foreach(s => assert(!s.contains('/'), s))
-          s.startsWith(Seq("java")) || s.startsWith(Seq("jdk")) || set(s)
-        }
-      }
+      os.read
+        .lines(os.resource / "ammonite-api-whitelist.txt")
+        .map(_.split('/').toSeq)
+        .toSet
     }
   }
 }

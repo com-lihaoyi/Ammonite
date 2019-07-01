@@ -46,7 +46,7 @@ class Interpreter(val printer: Printer,
                   scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[coursier.Dependency],
                   importHooks: Map[Seq[String], ImportHook],
-                  classPathWhitelist: Seq[String] => Boolean)
+                  classPathWhitelist: Set[Seq[String]])
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -295,7 +295,7 @@ class Interpreter(val printer: Printer,
         silent,
         evalClassloader
       )
-    } yield (res, Tag("", ""))
+    } yield (res, Tag("", "", classPathWhitelist.hashCode().toString))
   }
 
 
@@ -309,7 +309,8 @@ class Interpreter(val printer: Printer,
 
     val tag = Tag(
       Interpreter.cacheTag(processed.code.getBytes),
-      Interpreter.cacheTag(evalClassloader.classpathHash(codeSource0.path))
+      Interpreter.cacheTag(evalClassloader.classpathHash(codeSource0.path)),
+      classPathWhitelist.hashCode().toString
     )
 
     for {
@@ -356,7 +357,8 @@ class Interpreter(val printer: Printer,
           Interpreter.cacheTag(
             if (hardcoded) Array.empty[Byte]
             else evalClassloader.classpathHash(codeSource.path)
-          )
+          ),
+          classPathWhitelist.hashCode().toString
         )
 
 

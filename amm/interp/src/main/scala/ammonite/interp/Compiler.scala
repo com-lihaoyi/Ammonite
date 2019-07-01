@@ -162,7 +162,7 @@ object Compiler{
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
             settings: Settings,
-            classPathWhitelist: Seq[String] => Boolean,
+            classPathWhitelist: Set[Seq[String]],
             initialClassPath: Seq[java.net.URL]): Compiler = new Compiler{
 
     if(sys.env.contains("DIE"))???
@@ -416,7 +416,7 @@ object Compiler{
                           jarDeps: Seq[java.net.URL],
                           dynamicClasspath: VirtualDirectory,
                           settings: Settings,
-                          classPathWhitelist: Seq[String] => Boolean,
+                          classPathWhitelist: Set[Seq[String]],
                           initialClassPath: Seq[java.net.URL]) = {
 
     val (initialDirDeps, newDirDeps) = dirDeps.partition(initialClassPath.contains)

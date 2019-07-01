@@ -186,7 +186,8 @@ object Storage{
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            tag: Tag): Unit = {
 
-      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env
+      val codeCacheDir =
+        cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env/tag.classPathWhitelistHash
 
       os.makeDir.all(codeCacheDir)
       try {
@@ -212,7 +213,8 @@ object Storage{
     def classFilesListLoad(filePathPrefix: os.RelPath,
                            tag: Tag): Option[ScriptOutput] = {
 
-      val codeCacheDir = cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env
+      val codeCacheDir =
+        cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env/tag.classPathWhitelistHash
 
       if(!os.exists(codeCacheDir)) None
       else {
@@ -233,7 +235,9 @@ object Storage{
     }
 
     def compileCacheSave(path: String, tag: Tag, data: CompileCache): Unit = {
-      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.code/tag.env
+      val tagCacheDir = {
+        compileCacheDir/path.split('.').map(encode)/tag.code/tag.env/tag.classPathWhitelistHash
+      }
 
       os.makeDir.all(tagCacheDir)
       val metadata = upickle.default.write((tag, data.imports), indent = 4)
@@ -245,7 +249,9 @@ object Storage{
     }
 
     def compileCacheLoad(path: String, tag: Tag): Option[CompileCache] = {
-      val tagCacheDir = compileCacheDir/path.split('.').map(encode)/tag.code/tag.env
+      val tagCacheDir = {
+        compileCacheDir/path.split('.').map(encode)/tag.code/tag.env/tag.classPathWhitelistHash
+      }
       if(!os.exists(tagCacheDir)) None
       else for{
         (loadedTag, metadata) <- readJson[(Tag, Imports)](tagCacheDir/metadataFile)

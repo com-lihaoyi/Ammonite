@@ -24,7 +24,7 @@ class CompilerLifecycleManager(
   storage: Storage,
   headFrame: => Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-  classPathWhitelist: Seq[String] => Boolean,
+  classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader
 ){
 
