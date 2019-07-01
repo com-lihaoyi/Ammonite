@@ -13,9 +13,8 @@ object TestUtils {
   def scala2_12 = scala.util.Properties.versionNumberString.contains("2.12")
 
   def createTestInterp(storage: Storage, predef: String = "") = {
-    val startFrame = Frame.createInitial(
-      classOf[ammonite.interp.api.InterpAPI].getClassLoader
-    )
+    val initialClassLoader = Thread.currentThread().getContextClassLoader
+    val startFrame = Frame.createInitial(initialClassLoader)
     val printStream = new PrintStream(System.out)
     val interp = new Interpreter(
 
@@ -34,10 +33,12 @@ object TestUtils {
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
+      initialClassLoader = initialClassLoader,
       replCodeWrapper = CodeWrapper,
       scriptCodeWrapper = CodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
-      importHooks = ImportHook.defaults
+      importHooks = ImportHook.defaults,
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
     interp.initializePredef()
     interp

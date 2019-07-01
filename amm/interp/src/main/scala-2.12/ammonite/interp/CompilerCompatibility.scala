@@ -1,21 +1,20 @@
 package ammonite.interp
 
-import scala.tools.nsc.Global
-import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
+import scala.reflect.io.FileZipArchive
+import scala.tools.nsc
+import scala.tools.nsc.{Global, Settings}
+import scala.tools.nsc.classpath.{AggregateClassPath, ZipAndJarClassPathFactory}
+import scala.tools.nsc.interactive.{InteractiveAnalyzer, Global => InteractiveGlobal}
 import scala.tools.nsc.plugins.Plugin
+import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.typechecker.Analyzer
 
-object CompilerCompatibility extends ExtraCompilerCompatibility {
-  def newUnitParser(compiler: Global, line: String, fileName: String) = {
-    compiler.newUnitParser(line, fileName)
-  }
+object CompilerCompatibility {
   def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } = {
     new { val global: g.type = g } with Analyzer {
       override def findMacroClassLoader() = cl
     }
   }
-
-  type InteractiveAnalyzer = scala.tools.nsc.interactive.InteractiveAnalyzer
 
   def interactiveAnalyzer(g: InteractiveGlobal,
                           cl: ClassLoader): InteractiveAnalyzer { val global: g.type } = {
@@ -23,12 +22,34 @@ object CompilerCompatibility extends ExtraCompilerCompatibility {
       override def findMacroClassLoader() = cl
     }
   }
+  def importInfo(g: Global)(t: g.Import) =
+    new g.analyzer.ImportInfo(t, 0)
 
-  def trees(g: Global)(parser: g.syntaxAnalyzer.UnitParser): Seq[Global#Tree] = {
-    parser.parseStatsOrPackages()
+
+
+  def initGlobal(settings: Settings,
+                 reporter: AbstractReporter,
+                 jcp: AggregateClassPath,
+                 evalClassloader: ClassLoader,
+                 createPlugins: Global => List[Plugin]): Global = {
+
+    new nsc.Global(settings, reporter) { g =>
+      override lazy val plugins = createPlugins(g)
+
+      // Actually jcp, avoiding a path-dependent type issue in 2.10 here
+      override def classPath = jcp
+
+      override lazy val platform: ThisPlatform = new GlobalPlatform {
+        override val global = g
+        override val settings = g.settings
+        override val classPath = jcp
+      }
+
+      override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
+    }
   }
 
-  def pluginInit(plugin: Plugin, options: List[String], error: String => Unit): Boolean = {
-    plugin.init(options, error)
+  def createZipJarFactory(arc: FileZipArchive, settings: Settings) = {
+    ZipAndJarClassPathFactory.create(arc, settings)
   }
 }

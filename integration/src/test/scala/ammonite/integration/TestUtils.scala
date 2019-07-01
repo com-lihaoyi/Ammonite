@@ -18,21 +18,31 @@ object TestUtils {
   val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.sc"
 
   //we use an empty predef file here to isolate the tests from external forces.
-  def execBase(name: RelPath, extraAmmArgs: Seq[String], home: os.Path, args: Seq[String]) = {
-    %%bash(
+  def execBase(name: RelPath,
+               extraAmmArgs: Seq[String],
+               home: os.Path,
+               args: Seq[String],
+               thin: Boolean) = {
+    os.proc(
+      "bash",
       executable,
       extraAmmArgs,
-      "--thin",
+      if (thin) Seq("--thin") else Nil,
       "--no-remote-logging",
       "--home",
       home,
       replStandaloneResources / name,
       args
-    )
+    ).call()
   }
-  def exec(name: RelPath, args: String*) = execBase(name, Nil, tmp.dir(), args)
-  def execWithHome(home: os.Path, name: RelPath, args: String*) = execBase(name, Nil, home, args)
-  def execSilent(name: RelPath, args: String*) = execBase(name, Seq("-s"), tmp.dir(), args)
+  def exec(name: RelPath, args: String*) =
+    execBase(name, Nil, tmp.dir(), args, thin = true)
+  def execNonThin(name: RelPath, args: String*) =
+    execBase(name, Nil, tmp.dir(), args, thin = false)
+  def execWithHome(home: os.Path, name: RelPath, args: String*) =
+    execBase(name, Nil, home, args, thin = true)
+  def execSilent(name: RelPath, args: String*) =
+    execBase(name, Seq("-s"), tmp.dir(), args, thin = true)
 
   /**
     *Counts number of non-overlapping occurrences of `subs` in `s`

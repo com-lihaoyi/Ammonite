@@ -26,8 +26,6 @@ object Classpath {
    * want to do something.
    */
   def classpath(classLoader: ClassLoader, storage: Storage): Vector[URL] = {
-    val cache = storage.classpathCache()
-    if (cache.isDefined) return cache.get
     def rtCacheDir(storage: Storage): Option[os.Path] = storage match {
       case storage: Storage.Folder =>
         // no need to cache if the storage is in tmpdir
@@ -82,9 +80,7 @@ object Classpath {
         }
       }
     }
-    val r = files.toVector
-    storage.classpathCache.update(Some(r))
-    r
+    files.toVector
   }
 
   def canBeOpenedAsJar(url: URL): Boolean = {

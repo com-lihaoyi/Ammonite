@@ -1,8 +1,6 @@
 package ammonite.integration
 
 import utest._
-import ammonite.ops._
-import ammonite.ops.ImplicitWd._
 import ammonite.util.Util
 import TestUtils._
 /**
@@ -20,18 +18,18 @@ object BasicTests extends TestSuite{
   val tests = Tests {
     println("Running BasicTest")
 
-    def execWithJavaOptsSet(name: RelPath, home: Path) = %%bash(
+    def execWithJavaOptsSet(name: os.RelPath, home: os.Path) = os.proc(
+      "bash",
       executable,
       "--thin",
       "--no-remote-logging",
       "-h",
       home,
       replStandaloneResources/name,
-      JAVA_OPTS = "-verbose:class"
-    )
+    ).call(env = Map("JAVA_OPTS" -> "-verbose:class"))
 
     test("hello"){
-      val evaled = exec('basic/"Hello.sc")
+      val evaled = exec(os.rel / 'basic/"Hello.sc")
       assert(evaled.out.trim == "Hello World")
     }
 
@@ -39,30 +37,31 @@ object BasicTests extends TestSuite{
     test("scriptWithSymbols"){
       if (!Util.windowsPlatform){
         val dirAddr =
-          pwd/'target/'test/'resources/'ammonite/'integration/'basic
+          os.pwd/'target/'test/'resources/'ammonite/'integration/'basic
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
-        rm(scriptAddr)
-        write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
-        val evaled = %%bash(
+        os.remove.all(scriptAddr)
+        os.write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
+        val evaled = os.proc(
+          "bash",
           executable,
           "--thin",
           "-s",
           scriptAddr,
           // Somehow this is being set of travis and causing weird errors/warnings
-          _JAVA_OPTIONS = null
-        )
+
+        ).call(env = Map("_JAVA_OPTIONS" -> null))
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }
     }
     test("scalacNotLoadedByCachedScripts"){
-      val tmpDir = tmp.dir()
+      val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
-        'basic/"Print.sc",
+        os.rel/'basic/"Print.sc",
         tmpDir
       )
       val evaled2 = execWithJavaOptsSet(
-       'basic/"Print.sc",
+        os.rel/'basic/"Print.sc",
         tmpDir
       )
       val count1 = substrCount(evaled1.out.trim, "scala.tools.nsc")
@@ -73,15 +72,15 @@ object BasicTests extends TestSuite{
       assert(count2 < 5)
     }
     test("fastparseNotLoadedByCachedScritps"){
-      val tmpDir = tmp.dir()
+      val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
-        'basic/"Print.sc",
+        os.rel/'basic/"Print.sc",
         tmpDir
       )
       assert(evaled1.out.trim.contains("fastparse"))
 
       val evaled2 = execWithJavaOptsSet(
-        'basic/"Print.sc",
+        os.rel/'basic/"Print.sc",
         tmpDir
         )
       assert(!evaled2.out.trim.contains("fastparse"))
@@ -89,21 +88,22 @@ object BasicTests extends TestSuite{
 
 
     test("scriptInSomeOtherDir"){
-      val scriptAddr = tmp.dir()/"script.sc"
-      rm(scriptAddr)
-      write(scriptAddr, """println("Worked!!")""")
-      val evaled = %% bash(
+      val scriptAddr = os.temp.dir()/"script.sc"
+      os.remove.all(scriptAddr)
+      os.write(scriptAddr, """println("Worked!!")""")
+      val evaled = os.proc(
+        "bash",
         executable,
         "--thin",
         scriptAddr
-        )
+      ).call()
       assert(evaled.out.trim == "Worked!!" )
     }
 
     test("complex"){
       // Spire not published for 2.12
       if (scala.util.Properties.versionNumberString.contains("2.11")) {
-        val evaled = exec('basic / "Complex.sc")
+        val evaled = exec(os.rel / 'basic / "Complex.sc")
         assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
       }
     }
@@ -112,7 +112,8 @@ object BasicTests extends TestSuite{
     test("shell"){
       // make sure you can load the example-predef.sc, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
-      val res = %%bash(
+      val res = os.proc(
+        "bash",
         executable,
         "--thin",
         "--no-home-predef",
@@ -125,7 +126,7 @@ object BasicTests extends TestSuite{
         |@
         |println(wd relativeTo x)""".stripMargin,
         "-s"
-      )
+      ).call()
 
       val output = res.out.trim
       assert(output == "amm/src")
@@ -143,7 +144,8 @@ object BasicTests extends TestSuite{
       //
       // Also disabled on Java 9 due to unavailability of Java lib sources
       if (!Util.windowsPlatform && !Util.java9OrAbove) {
-        %%bash(
+        os.proc(
+          "bash",
           executable,
           "--thin",
           "-c",
@@ -155,39 +157,39 @@ object BasicTests extends TestSuite{
             |
             |assert(snip.contains("public String substring(int beginIndex)"))
           """.stripMargin
-        )
+        ).call()
       }
     }
 
     // Ensure we can load the source code of external libraries, which needs to
     // get pulled down together with the library code when you `import $ivy`
     test("sourceExternal"){
-      exec('basic / "SourceDownload.sc")
+      exec(os.rel/'basic / "SourceDownload.sc")
     }
 
     test("classloaders"){
-      val evaled = exec('basic / "Resources.sc")
+      val evaled = exec(os.rel / 'basic / "Resources.sc")
       assert(evaled.out.string.contains("1745"))
     }
     test("testSilentScriptRunning"){
-      val evaled1 = exec('basic/"Hello.sc")
+      val evaled1 = exec(os.rel / 'basic/"Hello.sc")
       // check Compiling Script is being printed
 
       assert(evaled1.err.string.contains("Compiling"))
-      val evaled2 = execSilent('basic/"Hello.sc")
+      val evaled2 = execSilent(os.rel / 'basic/"Hello.sc")
       // make sure with `-s` flag script running is silent
       assert(!evaled2.err.string.contains("Compiling"))
     }
     test("testSilentRunningWithExceptions"){
-      val errorMsg = intercept[ShelloutException]{
-        exec('basic/"Failure.sc")
+      val errorMsg = intercept[os.SubprocessException]{
+        exec(os.rel / 'basic/"Failure.sc")
       }.result.err.string
 
       assert(errorMsg.contains("not found: value x"))
     }
     test("testSilentIvyExceptions"){
-      val errorMsg = intercept[ShelloutException]{
-        exec('basic/"wrongIvyCordinates.sc")
+      val errorMsg = intercept[os.SubprocessException]{
+        exec(os.rel / 'basic/"wrongIvyCordinates.sc")
       }.result.err.string
 
 
@@ -197,11 +199,11 @@ object BasicTests extends TestSuite{
 
       // test disabled on windows because sbt not available
       if (!Util.windowsPlatform) {
-        val buildRoot = pwd/'target/"some-dummy-library"
-        cp.over(intTestResources/"some-dummy-library", buildRoot)
+        val buildRoot = os.pwd/'target/"some-dummy-library"
+        os.copy.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
         // using the same home to share the ivymap cache across runs
-        val home = tmp.dir()
+        val home = os.temp.dir()
 
         val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
         val previous = os.home / ".ivy2" / "local" / "com.lihaoyi" / ("some-dummy-library_" + sbv)
@@ -214,7 +216,7 @@ object BasicTests extends TestSuite{
           firstRun: Boolean = false
         ): Unit = {
           // 1. edit code
-          write.over(
+          os.write.over(
             dummyScala,
             s"""package dummy
               object Dummy{def thing="$theThing"}
@@ -223,19 +225,17 @@ object BasicTests extends TestSuite{
           )
 
           // 2. build & publish code locally
-          %.extend(
-            Nil,
-            Seq(
+          os.proc("sbt", "-batch", "-no-colors", "publishLocal").call(
+            env = Map(
               "SCALA_VERSION" -> scala.util.Properties.versionNumberString,
               "FIRST_RUN" -> s"$firstRun",
               "VERSION" -> version
-            )
-          )(
-            "sbt", "-batch", "-no-colors", "publishLocal"
-          )(buildRoot)
+            ),
+            cwd = buildRoot
+          )
 
           // 3. use published artifact in a script
-          val evaled = execWithHome(home, 'basic/script)
+          val evaled = execWithHome(home, os.rel / 'basic / script)
           assert(evaled.out.string.contains(theThing))
         }
 
@@ -255,13 +255,13 @@ object BasicTests extends TestSuite{
     // to make sure things work end-to-end
     test("multiMain"){
       test("positiveArgs"){
-        val evaled = exec('basic/"MultiMain.sc", "functionB", "2", "foo")
+        val evaled = exec(os.rel / 'basic/"MultiMain.sc", "functionB", "2", "foo")
 
         val out = evaled.out.string
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
       test("specifyMain"){
-        val evaled = intercept[ShelloutException](exec('basic/"MultiMain.sc"))
+        val evaled = intercept[os.SubprocessException](exec(os.rel / 'basic/"MultiMain.sc"))
 
         val out = evaled.result.err.string
         val expected = Util.normalizeNewlines(
@@ -274,7 +274,7 @@ object BasicTests extends TestSuite{
              |  functionB
              |    --i     Int
              |    --s     String
-             |    --path  ammonite.ops.Path (default""".stripMargin
+             |    --path  os.Path (default""".stripMargin
         )
         assert(out.contains(expected))
       }

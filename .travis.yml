@@ -9,59 +9,59 @@ matrix:
   include:
 
   - stage: build
-    env: CI_SCRIPT="mill -i unitTest"
+    env: CI_SCRIPT="./mill -i unitTest"
     jdk: openjdk11
     scala: 2.12.8
 
   - stage: build
-    env: CI_SCRIPT="mill -i unitTest"
+    env: CI_SCRIPT="./mill -i unitTest"
     jdk: oraclejdk8
     scala: 2.12.8
 
   - stage: build
-    env: CI_SCRIPT="mill -i unitTest"
+    env: CI_SCRIPT="./mill -i unitTest"
     jdk: oraclejdk8
     scala: 2.13.0
 
   - stage: build
-    env: CI_SCRIPT="mill -i integrationTest"
+    env: CI_SCRIPT="./mill -i integrationTest"
     jdk: openjdk11
     scala: 2.12.8
 
   - stage: build
-    env: CI_SCRIPT="mill -i integrationTest"
+    env: CI_SCRIPT="./mill -i integrationTest"
     jdk: oraclejdk8
     scala: 2.12.8
 
   - stage: build
-    env: CI_SCRIPT="mill -i integrationTest"
+    env: CI_SCRIPT="./mill -i integrationTest"
     jdk: oraclejdk8
     scala: 2.13.0
 
 
   # Everything worked, *then* kick off a release
   - stage: release
-    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 1 3"
+    env: CI_SCRIPT="./mill -i publishSonatype __.publishArtifacts 1 3"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 2 3"
+    env: CI_SCRIPT="./mill -i publishSonatype __.publishArtifacts 2 3"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill -i publishSonatype __.publishArtifacts 3 3"
+    env: CI_SCRIPT="./mill -i publishSonatype __.publishArtifacts 3 3"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill -i publishDocs"
+    env: CI_SCRIPT="./mill -i publishDocs"
     jdk: oraclejdk8
     scala: 2.11.12
 
   - stage: release
-    env: CI_SCRIPT="mill -i publishExecutable"
+    env: CI_SCRIPT="./mill -i publishExecutable"
     jdk: oraclejdk8
     scala: 2.11.12
 
@@ -69,10 +69,7 @@ script:
 - unset _JAVA_OPTIONS
 - unset JVM_OPTS
 - unset SBT_OPTS
-- export PATH=~/bin/amm:~/bin/mill:$PATH
-- mkdir -p ~/bin
 # We use 2.11 since we need to run tests on Java 7
-- if [ ! -f ~/bin/mill-0.4.1 ]; then sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.4.1/0.4.1) > ~/bin/mill-0.4.1 && chmod +x ~/bin/mill-0.4.1 && ( cd ~/bin && rm -f mill && ln -s mill-0.4.1 mill)'; fi
 - JAVAOPTS="-Xmx2048m" $CI_SCRIPT
 
 notifications:
@@ -82,14 +79,3 @@ notifications:
 sudo: true
 
 
-# Stolen from https://github.com/typelevel/cats/blob/master/.travis.yml
-cache:
-  directories:
-  - $HOME/.coursier
-  - $HOME/bin
-
-before_cache:
-  - du -h -d 1 $HOME/.ivy2/cache
-  - du -h -d 2 $HOME/.sbt/
-  - find $HOME/.sbt -name "*.lock" -type f -delete
-  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete

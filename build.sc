@@ -8,25 +8,29 @@ val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 
-val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
+val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
 val commitsSinceTaggedVersion = {
-  %%('git, "rev-list", 'master, "--not", latestTaggedVersion, "--count").out.trim.toInt
+  os.proc('git, "rev-list", 'master, "--not", latestTaggedVersion, "--count")
+    .call()
+    .out
+    .trim
+    .toInt
 }
 
 
 val binCrossScalaVersions = Seq("2.12.8", "2.13.0")
 val fullCrossScalaVersions = Seq(
-  "2.12.0", "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
   "2.13.0"
 )
 
-val latestAssemblies = binCrossScalaVersions.map(amm(_).bootstrap)
+val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
 val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
   case Some(v) if v != "" => (v, false)
   case _ =>
-    val gitHash = %%("git", "rev-parse", "--short", "HEAD").out.trim
+    val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
     (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${gitHash}", true)
 }
 
@@ -39,40 +43,11 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   trait Tests extends super.Tests{
     def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.7.1")
     def testFrameworks = Seq("utest.runner.Framework")
-    def forkArgs = Seq("-XX:MaxPermSize=2g", "-Xmx4g", "-Dfile.encoding=UTF8")
-    def sources = T.sources{
-      val is211 = crossScalaVersion.startsWith("2.11.")
-      val is212 = crossScalaVersion.startsWith("2.12.")
-      val shared211_212 =
-        if (is211 || is212)
-          Seq(PathRef(millSourcePath / 'src / 'test / "scala-2.11_2.12"))
-        else
-          Seq()
-      super.sources() ++
-        shared211_212
-    }
+    def forkArgs = Seq("-Xmx4g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
-  }
-  def sources = T.sources{
-    val is211 = crossScalaVersion.startsWith("2.11.")
-    val is212 = crossScalaVersion.startsWith("2.12.")
-    val is213 = crossScalaVersion.startsWith("2.13.")
-    val shared211_212 =
-      if (is211 || is212)
-        Seq(PathRef(millSourcePath / 'src / 'main / "scala-2.11_2.12"))
-      else
-        Seq()
-    val shared212_213 =
-      if (is212 || is213)
-        Seq(PathRef(millSourcePath / 'src / 'main / "scala-2.12_2.13"))
-      else
-        Seq()
-    super.sources() ++
-      shared211_212 ++
-      shared212_213
   }
 }
 trait AmmModule extends AmmInternalModule with PublishModule{
@@ -87,50 +62,6 @@ trait AmmModule extends AmmInternalModule with PublishModule{
       Developer("lihaoyi", "Li Haoyi","https://github.com/lihaoyi")
     )
   )
-
-  trait CustomRunnerTests extends super.Tests {
-    def forkArgs = T {
-      val testBaseCp = amm.`test-api`().runClasspath() ++
-        amm.`test-api`().sources() ++
-        amm.`test-api`().transitiveSources() ++
-        amm.`test-api`().externalSources()
-      super.forkArgs() ++ Seq(
-        "-Dtest.base.classpath=" +
-          testBaseCp
-            .map(_.path.toIO.getAbsolutePath)
-            .mkString(java.io.File.pathSeparator)
-      )
-    }
-
-    def test(args: String*) = T.command{
-      val outputPath = T.ctx().dest/"out.json"
-
-      mill.modules.Jvm.runSubprocess(
-        mainClass = "ammonite.TestRunner",
-        classPath = amm.`test-runner`.runClasspath().map(_.path),
-        jvmArgs = forkArgs(),
-        envArgs = forkEnv(),
-        mainArgs =
-          Seq(testFrameworks().length.toString) ++
-            testFrameworks() ++
-            Seq(runClasspath().length.toString) ++
-            runClasspath().map(_.path.toString) ++
-            Seq(args.length.toString) ++
-            args ++
-            Seq(outputPath.toString, T.ctx().log.colored.toString, compile().classes.path.toString, T.ctx().home.toString),
-        workingDir = forkWorkingDir()
-      )
-
-      try {
-        val jsonOutput = ujson.read(outputPath.toIO)
-        val (doneMsg, results) = upickle.default.read[(String, Seq[TestRunner.Result])](jsonOutput)
-        TestModule.handleResults(doneMsg, results)
-      } catch {
-        case e: Throwable =>
-          mill.eval.Result.Failure("Test reporting failed: " + e)
-      }
-    }
-  }
 
   def transitiveSources: T[Seq[PathRef]] = T{
     mill.define.Task.traverse(this +: moduleDeps)(m =>
@@ -154,8 +85,7 @@ trait AmmModule extends AmmInternalModule with PublishModule{
 trait AmmDependenciesResourceFileModule extends JavaModule{
   def crossScalaVersion: String
   def dependencyResourceFileName: String
-  def resources = T.sources {
-
+  def dependencyFileResources = T{
     val deps0 = T.task{compileIvyDeps() ++ transitiveIvyDeps()}()
     val (_, res) = mill.modules.Jvm.resolveDependenciesMetadata(
       repositories,
@@ -164,12 +94,16 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
       mapDependencies = Some(mapDependencies())
     )
 
-    super.resources() ++
+
     Seq(PathRef(generateDependenciesFile(
       crossScalaVersion,
       dependencyResourceFileName,
       res.minDependencies.toSeq
     )))
+  }
+
+  def resources = T.sources {
+    super.resources() ++ dependencyFileResources()
   }
 }
 
@@ -211,7 +145,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 
 
-  object `interp-api` extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
+  object interpApi extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
   class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util())
     def crossFullScalaVersion = true
@@ -222,13 +156,13 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object `repl-api` extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
+  object replApi extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
   class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
     def crossFullScalaVersion = true
     def dependencyResourceFileName = "amm-dependencies.txt"
     def moduleDeps = Seq(
       ops(), amm.util(),
-      `interp-api`()
+      interpApi()
     )
     def ivyDeps = Agg(
       ivy"com.github.scopt::scopt:3.7.1"
@@ -237,21 +171,18 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def generatedSources = T{
       Seq(PathRef(generateConstantsFile(buildVersion)))
     }
-  }
 
-  object `test-api` extends Cross[TestApiModule](fullCrossScalaVersions:_*)
-  class TestApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-    def crossFullScalaVersion = true
-    def dependencyResourceFileName = "amm-test-dependencies.txt"
-    def moduleDeps = Seq(
-      `repl-api`()
-    )
+    def exposedClassPath = T{
+      amm.replApi().runClasspath() ++
+      amm.replApi().externalSources() ++
+      amm.replApi().transitiveJars() ++
+      amm.replApi().transitiveSourceJars()
+    }
   }
-
 
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), `repl-api`())
+    def moduleDeps = Seq(ops(), amm.util(), interpApi(), amm.replApi())
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:0.7.5",
       ivy"com.lihaoyi::requests:0.2.0"
@@ -293,11 +224,23 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"com.github.scopt::scopt:3.7.1"
     )
 
-    object test extends CustomRunnerTests{
-      def moduleDeps = super.moduleDeps ++ Seq(
-        amm.`test-api`()
-      )
+    object test extends Tests with AmmDependenciesResourceFileModule {
       def crossScalaVersion = ReplModule.this.crossScalaVersion
+      def scalaVersion = ReplModule.this.crossScalaVersion
+      def dependencyResourceFileName = "amm-test-dependencies.txt"
+
+      def thinWhitelist = T{
+        generateApiWhitelist(
+          amm.replApi().exposedClassPath() ++
+          Seq(compile().classes) ++
+          resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+        )
+      }
+
+      def localClasspath = T{
+        super.localClasspath() ++ Agg(thinWhitelist())
+      }
+
       def resources = T.sources {
         (super.resources() ++
         ReplModule.this.sources() ++
@@ -310,7 +253,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
 }
-class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
+
+class MainModule(val crossScalaVersion: String)
+  extends AmmModule with AmmDependenciesResourceFileModule {
 
   def artifactName = "ammonite"
 
@@ -321,8 +266,8 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
   def moduleDeps = Seq(
     terminal(), ops(),
     amm.util(), amm.runtime(),
-    amm.`interp-api`(),
-    amm.`repl-api`(),
+    amm.interpApi(),
+    amm.replApi(),
     amm.interp(), amm.repl()
   )
 
@@ -332,18 +277,18 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     terminal().sources() ++
     amm.util().sources() ++
     amm.runtime().sources() ++
-    amm.`interp-api`().sources() ++
-    amm.`repl-api`().sources() ++
+    amm.interpApi().sources() ++
+    amm.replApi().sources() ++
     amm.interp().sources() ++
     amm.repl().sources() ++
     sources() ++
     externalSources()
 
+  def dependencyResourceFileName = "amm-dependencies.txt"
 
-
-  def prependShellScriptFor(mainClass: String) = {
+  def prependShellScript = T{
     mill.modules.Jvm.launcherUniversalScript(
-      mainClass,
+      mainClass().get,
       Agg("$0"),
       Agg("%~dpnx0"),
       // G1 Garbage Collector is awesome https://github.com/lihaoyi/Ammonite/issues/216
@@ -351,93 +296,34 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
     )
   }
 
-  def prependShellScript = T{
-    prependShellScriptFor(mainClass().get)
-  }
-
-  def prependBootstrapShellScript = T{
-    prependShellScriptFor("coursier.bootstrap.launcher.ResourcesLauncher")
-  }
-
-  def dependencyResourceFileName = "amm-dependencies.txt"
-
-  def bootstrap = T{
-    import coursier.bootstrap.{Bootstrap, ClassLoaderContent, ClasspathEntry}
-
-    def pathRefEntry(p: os.Path) =
-      if (!p.toIO.exists() || !p.isFile)
-        Nil
-      else {
-        val b = os.read.bytes(p)
-        Seq(ClasspathEntry.Resource(p.last, 0L, b))
-      }
-
-    val replApiCp = {
-      amm.`repl-api`().runClasspath() ++
-      amm.`repl-api`().externalSources() ++
-      amm.`repl-api`().transitiveJars() ++
-      amm.`repl-api`().transitiveSourceJars()
-    }
-
-    val ammCp = runClasspath() ++ transitiveJars() ++ transitiveSourceJars()
-
-    val content = Seq(
-      ClassLoaderContent(
-        replApiCp.distinct.flatMap(r => pathRefEntry(r.path))
-      ),
-      ClassLoaderContent(
-        ammCp.filterNot(replApiCp.toSet).distinct.flatMap(r => pathRefEntry(r.path))
-      )
+  def thinWhitelist = T{
+    generateApiWhitelist(
+      amm.replApi().exposedClassPath()
     )
-
-    val dest = T.ctx().dest / "bootstrap-no-preamble.jar"
-
-    val thread = Thread.currentThread()
-    val previousCl = thread.getContextClassLoader
-    val coursierCl = Bootstrap.getClass.getClassLoader
-    try {
-      thread.setContextClassLoader(coursierCl)
-      Bootstrap.create(
-        content,
-        mainClass().get,
-        dest.toNIO,
-        withPreamble = false,
-        deterministic = true,
-        hybridAssembly = true
-      )
-    } finally {
-      thread.setContextClassLoader(previousCl)
-    }
-
-    val finalDest = (T.ctx().dest / "bootstrap.jar")
-
-    os.write(
-      finalDest,
-      Seq[os.Source](
-        prependBootstrapShellScript(),
-        os.read.inputStream(dest)
-      )
-    )
-
-    if (!scala.util.Properties.isWin) {
-      import java.nio.file.attribute.PosixFilePermission
-      os.perms.set(
-        finalDest,
-        os.perms(finalDest)
-          + PosixFilePermission.GROUP_EXECUTE
-          + PosixFilePermission.OWNER_EXECUTE
-          + PosixFilePermission.OTHERS_EXECUTE
-      )
-}
-
-    PathRef(finalDest)
+  }
+  def localClasspath = T{
+    super.localClasspath() ++ Agg(thinWhitelist())
   }
 
-  object test extends CustomRunnerTests{
+  object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.chuusai::shapeless:2.3.3"
     )
+
+
+    def thinWhitelist = T{
+      generateApiWhitelist(
+        amm.replApi().exposedClassPath() ++
+        Seq(amm.repl().test.compile().classes, compile().classes) ++
+        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+      )
+    }
+
+    def localClasspath = T{
+      super.localClasspath() ++ Agg(thinWhitelist())
+    }
+
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
       super.runClasspath() ++
@@ -445,8 +331,8 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
       terminal().sources() ++
       amm.util().sources() ++
       amm.runtime().sources() ++
-      amm.`interp-api`().sources() ++
-      amm.`repl-api`().sources() ++
+      amm.interpApi().sources() ++
+      amm.replApi().sources() ++
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++
@@ -455,15 +341,52 @@ class MainModule(val crossScalaVersion: String) extends AmmModule with AmmDepend
   }
 }
 
+def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Dest) = {
+
+  val thinClasspathEntries = replApiCp.map(_.path).flatMap{ cpRoot =>
+    if (os.isFile(cpRoot) && cpRoot.ext == "jar") {
+      val zip = new java.util.zip.ZipFile(cpRoot.toIO)
+      import collection.JavaConverters._
+      for(e <- zip.entries().asScala) yield e.getName
+    }
+    else if (os.isDir(cpRoot)) {
+      for(sub <- os.walk(cpRoot)) yield sub.relativeTo(cpRoot).toString
+    }
+    else if (!os.exists(cpRoot)) Nil
+    else throw new Exception(cpRoot.toString)
+  }
+  os.write(
+    ctx.dest / "ammonite-api-whitelist.txt",
+    thinClasspathEntries
+      .flatMap(_.stripSuffix("/").split('/').inits)
+      .filter(_.nonEmpty)
+      .map(_.mkString("/"))
+      .distinct
+      .mkString("\n")
+  )
+  PathRef(ctx.dest)
+}
+
 object shell extends Cross[ShellModule](fullCrossScalaVersions:_*)
 class ShellModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
   def crossFullScalaVersion = true
-  object test extends CustomRunnerTests{
+  object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
+    def thinWhitelist = T{
+      generateApiWhitelist(
+        amm.replApi().exposedClassPath() ++
+        Seq(amm.repl().test.compile().classes, compile().classes) ++
+        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
+      )
+    }
+
+    def localClasspath = T{
+      super.localClasspath() ++ Agg(thinWhitelist())
+    }
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,
-      "AMMONITE_ASSEMBLY" -> amm().bootstrap().path.toString
+      "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
     )
   }
 }
@@ -473,7 +396,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,
-      "AMMONITE_ASSEMBLY" -> amm().bootstrap().path.toString
+      "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
     )
   }
 }
@@ -611,7 +534,7 @@ def publishDocs() = {
     %sbt(
       "readme/run",
       AMMONITE_SHELL=shell("2.13.0").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.0").bootstrap().path,
+      AMMONITE_ASSEMBLY=amm("2.13.0").assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
@@ -656,7 +579,7 @@ def publishDocs() = {
     %sbt(
       "readme/run",
       AMMONITE_SHELL=shell("2.13.0").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.0").bootstrap().path,
+      AMMONITE_ASSEMBLY=amm("2.13.0").assembly().path,
       CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")

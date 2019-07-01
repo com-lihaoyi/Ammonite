@@ -26,7 +26,8 @@ class Repl(input: InputStream,
            alreadyLoadedDependencies: Seq[coursier.Dependency],
            importHooks: Map[Seq[String], ImportHook],
            initialClassLoader: ClassLoader =
-             classOf[ammonite.repl.api.ReplAPI].getClassLoader) { repl =>
+             classOf[ammonite.repl.api.ReplAPI].getClassLoader,
+           classPathWhitelist: Set[Seq[String]]) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -129,10 +130,12 @@ class Repl(input: InputStream,
     verboseOutput = true,
     getFrame = () => frames().head,
     createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
+    initialClassLoader = initialClassLoader,
     replCodeWrapper = replCodeWrapper,
     scriptCodeWrapper = scriptCodeWrapper,
     alreadyLoadedDependencies = alreadyLoadedDependencies,
-    importHooks
+    importHooks,
+    classPathWhitelist = classPathWhitelist
   )
 
   def initializePredef() = interp.initializePredef()
@@ -300,5 +303,15 @@ object Repl{
           .mkString(newLine))
     )
     traces.mkString(newLine)
+  }
+
+  def getClassPathWhitelist(thin: Boolean): Set[Seq[String]] = {
+    if (!thin) Set.empty
+    else {
+      os.read
+        .lines(os.resource / "ammonite-api-whitelist.txt")
+        .map(_.split('/').toSeq)
+        .toSet
+    }
   }
 }

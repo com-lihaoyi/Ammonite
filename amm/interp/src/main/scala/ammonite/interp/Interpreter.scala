@@ -41,10 +41,12 @@ class Interpreter(val printer: Printer,
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
+                  initialClassLoader: ClassLoader,
                   replCodeWrapper: CodeWrapper,
                   scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[coursier.Dependency],
-                  importHooks: Map[Seq[String], ImportHook])
+                  importHooks: Map[Seq[String], ImportHook],
+                  classPathWhitelist: Set[Seq[String]])
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -75,7 +77,9 @@ class Interpreter(val printer: Printer,
   val compilerManager = new CompilerLifecycleManager(
     storage,
     headFrame,
-    Some(dependencyComplete)
+    Some(dependencyComplete),
+    classPathWhitelist,
+    initialClassLoader
   )
 
   val eval = Evaluator(headFrame)
@@ -291,7 +295,7 @@ class Interpreter(val printer: Printer,
         silent,
         evalClassloader
       )
-    } yield (res, Tag("", ""))
+    } yield (res, Tag("", "", classPathWhitelist.hashCode().toString))
   }
 
 
@@ -305,7 +309,8 @@ class Interpreter(val printer: Printer,
 
     val tag = Tag(
       Interpreter.cacheTag(processed.code.getBytes),
-      Interpreter.cacheTag(evalClassloader.classpathHash(codeSource0.path))
+      Interpreter.cacheTag(evalClassloader.classpathHash(codeSource0.path)),
+      classPathWhitelist.hashCode().toString
     )
 
     for {
@@ -352,7 +357,8 @@ class Interpreter(val printer: Printer,
           Interpreter.cacheTag(
             if (hardcoded) Array.empty[Byte]
             else evalClassloader.classpathHash(codeSource.path)
-          )
+          ),
+          classPathWhitelist.hashCode().toString
         )
 
 
@@ -605,7 +611,10 @@ class Interpreter(val printer: Printer,
     .toSet
 
   def loadIvy(coordinates: coursier.Dependency*) = synchronized{
-    val cacheKey = (interpApi.repositories().hashCode.toString, coordinates)
+    val cacheKey = (
+      interpApi.repositories().hashCode.toString + classPathWhitelist.hashCode().toString,
+      coordinates,
+    )
 
     storage.ivyCache().get(cacheKey) match{
       case Some(res) => Right(res.map(new java.io.File(_)))

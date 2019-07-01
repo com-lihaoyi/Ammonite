@@ -31,10 +31,7 @@ class CompilationError(message: String) extends Exception(message)
   * separately, so you can e.g. compare the [[env]] hash even if you don't have
   * the code available
   */
-case class Tag(code: String, env: String){
-  def combined = code + env
-}
-
+case class Tag(code: String, env: String, classPathWhitelistHash: String)
 
 /**
   * Represents a single identifier in Scala source code, e.g. "scala" or
