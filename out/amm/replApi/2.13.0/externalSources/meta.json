@@ -1,0 +1,24 @@
+{
+    "value": [
+        "qref:071d93ef:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.0.0/scala-collection-compat_2.13-2.0.0-sources.jar",
+        "qref:2d57f03b:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/1.2.0/scala-xml_2.13-1.2.0-sources.jar",
+        "qref:0210b191:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/argonaut/argonaut_2.13/6.2.3/argonaut_2.13-6.2.3-sources.jar",
+        "qref:7e29d441:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.2.7/fansi_2.13-0.2.7-sources.jar",
+        "qref:1927f26e:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-core_2.13/2.0.0-RC2/coursier-core_2.13-2.0.0-RC2-sources.jar",
+        "qref:3c5e7de7:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/alexarchambault/argonaut-shapeless_6.2_2.13/1.2.0-M11/argonaut-shapeless_6.2_2.13-1.2.0-M11-sources.jar",
+        "qref:bb5f754f:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.1.7/sourcecode_2.13-0.1.7-sources.jar",
+        "qref:9b562920:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/scopt/scopt_2.13/3.7.1/scopt_2.13-3.7.1-sources.jar",
+        "qref:d987f257:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.1.8/geny_2.13-0.1.8-sources.jar",
+        "qref:5e9f2b78:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/chuusai/shapeless_2.13/2.3.3/shapeless_2.13-2.3.3-sources.jar",
+        "qref:08725225:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier_2.13/2.0.0-RC2/coursier_2.13-2.0.0-RC2-sources.jar",
+        "qref:fe83cd50:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.3.0/os-lib_2.13-0.3.0-sources.jar",
+        "qref:59e1e4a4:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.5.5/pprint_2.13-0.5.5-sources.jar",
+        "qref:37ce616a:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.0/scala-library-2.13.0-sources.jar",
+        "qref:4309bcb7:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/jline/jline/2.14.6/jline-2.14.6-sources.jar",
+        "qref:0b5fb88f:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-cache_2.13/2.0.0-RC2/coursier-cache_2.13-2.0.0-RC2-sources.jar",
+        "qref:01c3e0d2:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.0/scala-reflect-2.13.0-sources.jar",
+        "qref:ed6311e5:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.0/scala-compiler-2.13.0-sources.jar"
+    ],
+    "valueHash": 1867121679,
+    "inputsHash": -111937908
+}

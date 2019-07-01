@@ -1,0 +1,119 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "org.scala-lang"
+                    },
+                    "name": {
+                        "value": "scala-compiler"
+                    },
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.13.0",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "org.scala-lang"
+                    },
+                    "name": {
+                        "value": "scala-reflect"
+                    },
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.13.0",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "io.get-coursier"
+                    },
+                    "name": {
+                        "value": "coursier"
+                    },
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "2.0.0-RC2",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "exclusions": [
+                    
+                ],
+                "attributes": {
+                    "type": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 1442709213,
+    "inputsHash": -130238587
+}
