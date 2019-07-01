@@ -123,6 +123,12 @@
 
 
   @sect{Changelog}
+    @sect{1.6.9}
+      @ul
+        @li
+          Added a `--thin` flag, providing user code with a cleaner classpath
+          without all of Ammonite's own dependencies (@issue(984), @issue(941))
+
     @sect{1.6.8}
       @ul
         @li

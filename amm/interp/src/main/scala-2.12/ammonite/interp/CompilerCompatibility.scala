@@ -22,7 +22,7 @@ object CompilerCompatibility {
       override def findMacroClassLoader() = cl
     }
   }
-  def importInfo(g: Global)(t: g.Import) =
+  def importInfo(g: Global)(t:j g.Import) =
     new g.analyzer.ImportInfo(t, 0)
 
 
