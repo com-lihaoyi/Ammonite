@@ -16,7 +16,7 @@ object ErrorTruncationTests extends TestSuite{
   def checkErrorMessage(file: RelPath, expected: String): Unit = {
     val e = fansi.Str(
       Util.normalizeNewlines(
-        intercept[ShelloutException]{ exec(file) }
+        intercept[os.SubprocessException]{ exec(file) }
           .result
           .err
           .string
