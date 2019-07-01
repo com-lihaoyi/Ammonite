@@ -83,7 +83,9 @@ class CompilerLifecycleManager(
       onSettingsInit.foreach(_(settings))
 
       val initialClassPath = Classpath.classpath(initialClassLoader, storage)
-      val headFrameClassPath = Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath
+      val headFrameClassPath =
+        Classpath.classpath(headFrame.classloader, storage) ++
+        headFrame.classpath
 
       Internal.compiler = Compiler(
         headFrameClassPath,

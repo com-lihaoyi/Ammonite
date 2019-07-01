@@ -455,7 +455,10 @@ object Compiler{
 
     }
 
-    val staticCP = new scala.tools.nsc.WhiteListClasspath(initialJarCp ++ initialDirCp, classPathWhitelist)
+    val staticCP = new scala.tools.nsc.WhiteListClasspath(
+      initialJarCp ++ initialDirCp,
+      classPathWhitelist
+    )
     val jcp = new AggregateClassPath(Seq(staticCP, dynamicCP) ++ newJarCp ++ newDirCp)
 
 
