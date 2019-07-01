@@ -35,13 +35,14 @@ object TestUtils {
       args
     ).call()
   }
-  def exec(name: RelPath, args: String*) = execBase(name, Nil, tmp.dir(), args, thin = false)
+  def exec(name: RelPath, args: String*) =
+    execBase(name, Nil, tmp.dir(), args, thin = true)
   def execNonThin(name: RelPath, args: String*) =
     execBase(name, Nil, tmp.dir(), args, thin = false)
   def execWithHome(home: os.Path, name: RelPath, args: String*) =
-    execBase(name, Nil, home, args, thin = false)
+    execBase(name, Nil, home, args, thin = true)
   def execSilent(name: RelPath, args: String*) =
-    execBase(name, Seq("-s"), tmp.dir(), args, thin = false)
+    execBase(name, Seq("-s"), tmp.dir(), args, thin = true)
 
   /**
     *Counts number of non-overlapping occurrences of `subs` in `s`
