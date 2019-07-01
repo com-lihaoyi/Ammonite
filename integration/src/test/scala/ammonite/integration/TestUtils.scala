@@ -27,7 +27,7 @@ object TestUtils {
       "bash",
       executable,
       extraAmmArgs,
-      if (thin) Some("--thin") else None,
+      if (thin) Seq("--thin") else Nil,
       "--no-remote-logging",
       "--home",
       home,

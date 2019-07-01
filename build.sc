@@ -43,7 +43,7 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   trait Tests extends super.Tests{
     def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.7.1")
     def testFrameworks = Seq("utest.runner.Framework")
-    def forkArgs = Seq("-XX:MaxPermSize=2g", "-Xmx4g", "-Dfile.encoding=UTF8")
+    def forkArgs = Seq("-Xmx4g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
   def externalSources = T{

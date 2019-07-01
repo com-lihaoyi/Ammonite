@@ -66,9 +66,9 @@ Although most features should be unit tested, it's still useful to fire up a REP
   lets you test all terminal interactions without all the complexity of the
   Scala compiler, classloaders, etc. that comes in `repl/`
   
-- `mill -i -w amm[2.12.6].test.run` brings up the Ammonite-REPL using the source
-  code in the repository, and automatically restarts it on-exit if you have made
-  a change to the code. Useful for manual testing both of `amm/` as well as
+- `mill -i -w amm[2.12.6].run` brings up the Ammonite-REPL using the source code
+  in the repository, and automatically restarts it on-exit if you have made a
+  change to the code. Useful for manual testing both of `amm/` as well as
   `ops/`, since you can just `import ammonite.ops._` and start using them. Note
   that this does not bring in filesystem utilities like the `wd` variable, `cd!`
   command. You can also pass in the path to a `.sc` file to run it using
