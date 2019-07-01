@@ -33,7 +33,7 @@ object TestUtils {
       home,
       replStandaloneResources / name,
       args
-    ).call(stdout = os.Inherit, stderr = os.Inherit)
+    ).call()
   }
   def exec(name: RelPath, args: String*) = execBase(name, Nil, tmp.dir(), args, thin = false)
   def execNonThin(name: RelPath, args: String*) =
