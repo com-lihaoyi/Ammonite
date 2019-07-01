@@ -8,10 +8,14 @@ val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 
-val latestTaggedVersion = %%('git, 'describe, "--abbrev=0", "--tags").out.trim
+val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
 val commitsSinceTaggedVersion = {
-  %%('git, "rev-list", 'master, "--not", latestTaggedVersion, "--count").out.trim.toInt
+  os.proc('git, "rev-list", 'master, "--not", latestTaggedVersion, "--count")
+    .call()
+    .out
+    .trim
+    .toInt
 }
 
 
@@ -26,7 +30,7 @@ val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
   case Some(v) if v != "" => (v, false)
   case _ =>
-    val gitHash = %%("git", "rev-parse", "--short", "HEAD").out.trim
+    val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
     (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${gitHash}", true)
 }
 
@@ -141,7 +145,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 
 
-  object `interp-api` extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
+  object interpApi extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
   class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util())
     def crossFullScalaVersion = true
@@ -152,13 +156,13 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object `repl-api` extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
+  object replApi extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
   class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
     def crossFullScalaVersion = true
     def dependencyResourceFileName = "amm-dependencies.txt"
     def moduleDeps = Seq(
       ops(), amm.util(),
-      `interp-api`()
+      interpApi()
     )
     def ivyDeps = Agg(
       ivy"com.github.scopt::scopt:3.7.1"
@@ -169,16 +173,16 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
 
     def exposedClassPath = T{
-      amm.`repl-api`().runClasspath() ++
-      amm.`repl-api`().externalSources() ++
-      amm.`repl-api`().transitiveJars() ++
-      amm.`repl-api`().transitiveSourceJars()
+      amm.replApi().runClasspath() ++
+      amm.replApi().externalSources() ++
+      amm.replApi().transitiveJars() ++
+      amm.replApi().transitiveSourceJars()
     }
   }
 
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), `interp-api`(), amm.`repl-api`())
+    def moduleDeps = Seq(ops(), amm.util(), interpApi(), amm.replApi())
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:0.7.5",
       ivy"com.lihaoyi::requests:0.2.0"
@@ -227,7 +231,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
       def thinWhitelist = T{
         generateApiWhitelist(
-          amm.`repl-api`().exposedClassPath() ++
+          amm.replApi().exposedClassPath() ++
           Seq(compile().classes) ++
           resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
         )
@@ -262,8 +266,8 @@ class MainModule(val crossScalaVersion: String)
   def moduleDeps = Seq(
     terminal(), ops(),
     amm.util(), amm.runtime(),
-    amm.`interp-api`(),
-    amm.`repl-api`(),
+    amm.interpApi(),
+    amm.replApi(),
     amm.interp(), amm.repl()
   )
 
@@ -273,8 +277,8 @@ class MainModule(val crossScalaVersion: String)
     terminal().sources() ++
     amm.util().sources() ++
     amm.runtime().sources() ++
-    amm.`interp-api`().sources() ++
-    amm.`repl-api`().sources() ++
+    amm.interpApi().sources() ++
+    amm.replApi().sources() ++
     amm.interp().sources() ++
     amm.repl().sources() ++
     sources() ++
@@ -294,7 +298,7 @@ class MainModule(val crossScalaVersion: String)
 
   def thinWhitelist = T{
     generateApiWhitelist(
-      amm.`repl-api`().exposedClassPath()
+      amm.replApi().exposedClassPath()
     )
   }
   def localClasspath = T{
@@ -310,7 +314,7 @@ class MainModule(val crossScalaVersion: String)
 
     def thinWhitelist = T{
       generateApiWhitelist(
-        amm.`repl-api`().exposedClassPath() ++
+        amm.replApi().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
@@ -327,8 +331,8 @@ class MainModule(val crossScalaVersion: String)
       terminal().sources() ++
       amm.util().sources() ++
       amm.runtime().sources() ++
-      amm.`interp-api`().sources() ++
-      amm.`repl-api`().sources() ++
+      amm.interpApi().sources() ++
+      amm.replApi().sources() ++
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++
@@ -371,7 +375,7 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def thinWhitelist = T{
       generateApiWhitelist(
-        amm.`repl-api`().exposedClassPath() ++
+        amm.replApi().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
