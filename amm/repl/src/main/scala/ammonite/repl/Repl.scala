@@ -322,7 +322,7 @@ object Repl{
             ???
           }
           s.foreach(s => assert(!s.contains('/'), s))
-          s.startsWith(Seq("java")) || set(s)
+          s.startsWith(Seq("java")) || s.startsWith(Seq("jdk")) || set(s)
         }
       }
     }

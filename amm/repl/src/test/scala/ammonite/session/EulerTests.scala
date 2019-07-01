@@ -546,7 +546,7 @@ object EulerTests extends TestSuite{
 //    }
 
     test("p24"){
-      // What is the millionth lexicographic permutation of the digits
+      // What is the thousanth lexicographic permutation of the digits
       // 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?*
       check.session("""
         @ def ps(s: String): Iterator[String] = {
@@ -554,8 +554,8 @@ object EulerTests extends TestSuite{
         @   else s.toIterator.flatMap(c => ps(s.filter(c != _)).map(c + _))
         @ }
 
-        @ val r = ps("0123456789").drop(999999).next().toLong
-        r: Long = 2783915460L
+        @ val r = ps("0123456789").drop(999).next().toLong
+        r: Long = 124658793L
       """)
     }
     test("p25"){
