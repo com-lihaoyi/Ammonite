@@ -20,7 +20,9 @@ object source{
 
     val res = breakUp(c)(f) match{
       case None =>
-        q"${prefix(c)}.failLoudly(${prefix(c)}.loadObjectInfo($f))"
+        val x = q"${prefix(c)}.failLoudly(${prefix(c)}.loadObjectInfo($f))"
+        println(x)
+        x
       case Some((classThingy, symbolName, lhs, returnClass, argClasses)) =>
         q"""
         ${prefix(c)}.failLoudly(
@@ -34,6 +36,7 @@ object source{
         )
         """
     }
+
 
     c.Expr[Location](res)
   }
