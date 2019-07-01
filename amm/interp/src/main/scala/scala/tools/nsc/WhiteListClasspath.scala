@@ -19,7 +19,7 @@ class WhiteListClasspath(aggregates: Seq[ClassPath], whitelist: Set[Seq[String]]
     ClassPathEntries(
       superList.packages.filter{ p => Util.lookupWhiteList(whitelist, p.name.split('.')) },
       superList.classesAndSources.filter{ t =>
-        Util.lookupWhiteList(whitelist, inPackage.split('.') ++ Seq(t.name + ".class")),
+        Util.lookupWhiteList(whitelist, inPackage.split('.') ++ Seq(t.name + ".class"))
       }
     )
   }
