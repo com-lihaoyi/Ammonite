@@ -468,7 +468,7 @@
         like the @code{repl.prompt}, @code{repl.history}, and other things
         that only really make sense in the interactive REPL.
 
-      @hl.ref('amm/"interpApi"/'src/'main/'scala/'ammonite/'interp/'api/"InterpAPI.scala", "trait InterpAPI")
+      @hl.ref('amm/"interp"/"api"/'src/'main/'scala/'ammonite/'interp/'api/"InterpAPI.scala", "trait InterpAPI")
 
     @sect{Script Predef}
       @p
