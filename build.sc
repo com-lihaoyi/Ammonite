@@ -141,55 +141,29 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
     )
-
-  }
-
-
-  object interpApi extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
-  class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util())
-    def crossFullScalaVersion = true
-    def ivyDeps = Agg(
-      ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
-      ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"io.get-coursier::coursier:2.0.0-RC2"
-    )
-  }
-
-  object replApi extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
-  class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-    def crossFullScalaVersion = true
-    def dependencyResourceFileName = "amm-dependencies.txt"
-    def moduleDeps = Seq(
-      ops(), amm.util(),
-      interpApi()
-    )
-    def ivyDeps = Agg(
-      ivy"com.github.scopt::scopt:3.7.1"
-    )
-
-    def generatedSources = T{
-      Seq(PathRef(generateConstantsFile(buildVersion)))
-    }
-
-    def exposedClassPath = T{
-      amm.replApi().runClasspath() ++
-      amm.replApi().externalSources() ++
-      amm.replApi().transitiveJars() ++
-      amm.replApi().transitiveSourceJars()
-    }
   }
 
   object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), interpApi(), amm.replApi())
+    def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:0.7.5",
       ivy"com.lihaoyi::requests:0.2.0"
     )
   }
 
-  object interp extends Cross[InterpModule](fullCrossScalaVersions:_*)
+  object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
+    object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
+    class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
+      def moduleDeps = Seq(ops(), amm.util())
+      def crossFullScalaVersion = true
+      def ivyDeps = Agg(
+        ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+        ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
+        ivy"io.get-coursier::coursier:2.0.0-RC2"
+      )
+    }
+  }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
     def crossFullScalaVersion = true
@@ -208,7 +182,33 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object repl extends Cross[ReplModule](fullCrossScalaVersions:_*)
+  object repl extends Cross[ReplModule](fullCrossScalaVersions:_*){
+
+    object api extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
+    class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
+      def crossFullScalaVersion = true
+      def dependencyResourceFileName = "amm-dependencies.txt"
+      def moduleDeps = Seq(
+        ops(), amm.util(),
+        interp.api()
+      )
+      def ivyDeps = Agg(
+        ivy"com.github.scopt::scopt:3.7.1"
+      )
+
+      def generatedSources = T{
+        Seq(PathRef(generateConstantsFile(buildVersion)))
+      }
+
+      def exposedClassPath = T{
+        amm.repl.api().runClasspath() ++
+          amm.repl.api().externalSources() ++
+          amm.repl.api().transitiveJars() ++
+          amm.repl.api().transitiveSourceJars()
+      }
+    }
+
+  }
   class ReplModule(val crossScalaVersion: String) extends AmmModule{
     def crossFullScalaVersion = true
     def moduleDeps = Seq(
@@ -231,7 +231,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
       def thinWhitelist = T{
         generateApiWhitelist(
-          amm.replApi().exposedClassPath() ++
+          amm.repl.api().exposedClassPath() ++
           Seq(compile().classes) ++
           resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
         )
@@ -266,8 +266,8 @@ class MainModule(val crossScalaVersion: String)
   def moduleDeps = Seq(
     terminal(), ops(),
     amm.util(), amm.runtime(),
-    amm.interpApi(),
-    amm.replApi(),
+    amm.interp.api(),
+    amm.repl.api(),
     amm.interp(), amm.repl()
   )
 
@@ -277,8 +277,8 @@ class MainModule(val crossScalaVersion: String)
     terminal().sources() ++
     amm.util().sources() ++
     amm.runtime().sources() ++
-    amm.interpApi().sources() ++
-    amm.replApi().sources() ++
+    amm.interp.api().sources() ++
+    amm.repl.api().sources() ++
     amm.interp().sources() ++
     amm.repl().sources() ++
     sources() ++
@@ -298,7 +298,7 @@ class MainModule(val crossScalaVersion: String)
 
   def thinWhitelist = T{
     generateApiWhitelist(
-      amm.replApi().exposedClassPath()
+      amm.repl.api().exposedClassPath()
     )
   }
   def localClasspath = T{
@@ -314,7 +314,7 @@ class MainModule(val crossScalaVersion: String)
 
     def thinWhitelist = T{
       generateApiWhitelist(
-        amm.replApi().exposedClassPath() ++
+        amm.repl.api().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
@@ -331,8 +331,8 @@ class MainModule(val crossScalaVersion: String)
       terminal().sources() ++
       amm.util().sources() ++
       amm.runtime().sources() ++
-      amm.interpApi().sources() ++
-      amm.replApi().sources() ++
+      amm.interp.api().sources() ++
+      amm.repl.api().sources() ++
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++
@@ -375,7 +375,7 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def thinWhitelist = T{
       generateApiWhitelist(
-        amm.replApi().exposedClassPath() ++
+        amm.repl.api().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )

@@ -537,7 +537,7 @@
           @code{repl.history}, @code{repl.width}, @code{repl.frontEnd()} to
           change the front-end terminal implementation, etc.:
 
-        @hl.ref('amm/"replApi"/'src/'main/'scala/'ammonite/'repl/'api/"ReplAPI.scala", "trait ReplAPI")
+        @hl.ref('amm/"repl"/"api"/'src/'main/'scala/'ammonite/'repl/'api/"ReplAPI.scala", "trait ReplAPI")
 
         @p
           All of these are available as part of the @hl.scala{repl} object
@@ -545,7 +545,7 @@
           functionality available under the @code{interp} object, which is also
           available in scripts:
 
-        @hl.ref('amm/"interpApi"/'src/'main/'scala/'ammonite/'interp/'api/"InterpAPI.scala", "trait InterpAPI")
+        @hl.ref('amm/"interp"/"api"/'src/'main/'scala/'ammonite/'interp/'api/"InterpAPI.scala", "trait InterpAPI")
 
       @sect{Utilities}
         @p
