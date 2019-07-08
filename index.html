@@ -250,9 +250,9 @@ span.hljs-tag, span.hljs-symbol{
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.6.9-3-480a38b:
+    1.6.9-4-b1a8a5e:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-3-480a38b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-4-b1a8a5e) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     Alternatively, on macOS you can install Ammonite via brew:
@@ -317,9 +317,9 @@ sourceGenerators in Test += Def.task {
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.6.9-3-480a38b:
+    1.6.9-4-b1a8a5e:
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.9-3-480a38b&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.9-4-b1a8a5e&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
   <p>
     After that, simply hit
@@ -1147,7 +1147,7 @@ trait Clipboard{
     * @param data New contents for the clipboard.
     */
   def write(data: Internals.Writable): Unit
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/replApi/src/main/scala/ammonite/repl/api/ReplAPI.scala#L10-L224" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/repl/api/src/main/scala/ammonite/repl/api/ReplAPI.scala#L10-L224" target="_blank"><i class="fa fa-link "></i></a></pre>
 
         <p>
           All of these are available as part of the <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">repl</code> object
@@ -1241,7 +1241,7 @@ trait InterpLoad extends LoadJar{
 
   def plugin: LoadJar
 
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/interpApi/src/main/scala/ammonite/interp/api/InterpAPI.scala#L11-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/interp/api/src/main/scala/ammonite/interp/api/InterpAPI.scala#L11-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
 
       <h3 id="Utilities" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Utilities" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Utilities</h3>
         <p>
@@ -1368,7 +1368,7 @@ sys	0m0.000s</pre><pre><span style="color: #2980b9;">Compiling (synthetic)/ammon
 </span><span style="color: #2980b9;">Compiling (synthetic)/ammonite/predef/DefaultPredef.sc</span><span>
 </span><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc</span><span>
 </span><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2</span><span>
-Welcome to the Ammonite Repl 1.6.9-3-480a38b
+Welcome to the Ammonite Repl 1.6.9-4-b1a8a5e
 (Scala 2.13.0 Java 1.8.0_151)
 If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #8e44ad;">@ </span><span>time{ls!} 
@@ -1381,7 +1381,7 @@ If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">&quot;fail.txt&quot;</span><span>          </span><span style="color: #27ae60;">'project</span><span>            </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">&quot;appveyor.yml&quot;</span><span>      </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">'readme</span><span>
 ,
-  21428694 nanoseconds
+  29466358 nanoseconds
 )
 </span></pre></div>
 
@@ -2159,9 +2159,9 @@ replServer.start()
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.6.9-3-480a38b:
+    1.6.9-4-b1a8a5e:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-3-480a38b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-4-b1a8a5e) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     And read on to learn about how Scala scripts work.
@@ -2748,7 +2748,7 @@ trait InterpLoad extends LoadJar{
 
   def plugin: LoadJar
 
-}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/interpApi/src/main/scala/ammonite/interp/api/InterpAPI.scala#L11-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
+}</code><a class=" scalatex-site-Styles-headerLink" style="position: absolute;right: 0.5em;top: 0.5em;display: block;font-size: 24px;" href="https://github.com/lihaoyi/ammonite/tree/master/amm/interp/api/src/main/scala/ammonite/interp/api/InterpAPI.scala#L11-L98" target="_blank"><i class="fa fa-link "></i></a></pre>
 
     <h2 id="ScriptPredef" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#ScriptPredef" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Script Predef</h2>
       <p>
@@ -4088,16 +4088,16 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (HEAD detached at 480a38b)
+* (HEAD detached at b1a8a5e)
   master</pre><pre><span style="color: #8e44ad;">@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (HEAD detached at 480a38b)
+* (HEAD detached at b1a8a5e)
   master
 
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Mon Jul  8 09:49:09 UTC 2019</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
-Mon Jul  8 09:49:16 UTC 2019
+Mon Jul  8 14:06:09 UTC 2019</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
+Mon Jul  8 14:06:16 UTC 2019
 
 </span></pre></div>
 
@@ -4335,7 +4335,7 @@ Hello from Java!
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 
 </span><span style="color: #8e44ad;">@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Mon Jul 08 09:51:00 UTC 2019
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Mon Jul 08 14:08:09 UTC 2019
 
 </span><span style="color: #8e44ad;">@ </span><span>date.getDay() 
 </span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">1</span><span>
@@ -4359,12 +4359,12 @@ Downloading https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/gu
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom.sha1
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom.sha1
-Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar.sha1
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar.sha1
+Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar.sha1
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar
-Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar.sha1
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar.sha1
+Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar.sha1
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                             // Load from Maven Central</span><span>
@@ -4394,8 +4394,8 @@ Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar.sha1
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar.sha1
-Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar.sha1
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar.sha1
+Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar.sha1
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">$ivy.$                          </span><span>
@@ -6436,10 +6436,10 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>1.6.9</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>1.6.9-3-480a38b</code> and is available for direct
+      <code>1.6.9-4-b1a8a5e</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-3-480a38b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-4-b1a8a5e) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
     <p>
       On Cygwin, run the following after the above:
@@ -6450,12 +6450,12 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The latest build can also be run as Windows batch; just save the following as amm.bat:
 </p>
     <p>
-      <a href="https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-3-480a38b">https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-3-480a38b</a>
+      <a href="https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-4-b1a8a5e">https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.13-1.6.9-4-b1a8a5e</a>
 </p>
     <p>
       For usage in a SBT project:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.9-3-480a38b&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.6.9-4-b1a8a5e&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
     <p>
       Ammonite also provides standalone unstable executables for older versions
@@ -6463,9 +6463,9 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </p>
     
       <b>
-        Scala 1.6.9/2.12-1.6.9-3-480a38b
+        Scala 1.6.9/2.12-1.6.9-4-b1a8a5e
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.12-1.6.9-3-480a38b) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.6.9/2.12-1.6.9-4-b1a8a5e) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
