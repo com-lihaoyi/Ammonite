@@ -225,7 +225,7 @@ object BasicTests extends TestSuite{
           )
 
           // 2. build & publish code locally
-          os.proc("sbt", "-batch", "-no-colors", "publishLocal").call(
+          os.proc("sbt", "-J-Xmx1g", "-batch", "-no-colors", "publishLocal").call(
             env = Map(
               "SCALA_VERSION" -> scala.util.Properties.versionNumberString,
               "FIRST_RUN" -> s"$firstRun",

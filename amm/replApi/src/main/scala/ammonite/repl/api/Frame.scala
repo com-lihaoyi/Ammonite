@@ -3,8 +3,8 @@ package ammonite.repl.api
 import java.net.URL
 
 trait Frame {
-  def classloader: ClassLoader
-  def pluginClassloader: ClassLoader
+  def classloader: ReplClassLoader
+  def pluginClassloader: ReplClassLoader
 
   def classpath: Seq[URL]
 }
