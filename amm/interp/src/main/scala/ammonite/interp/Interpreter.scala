@@ -41,12 +41,12 @@ class Interpreter(val printer: Printer,
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
-                  initialClassLoader: ClassLoader,
+                  initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
                   scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[coursier.Dependency],
-                  importHooks: Map[Seq[String], ImportHook],
-                  classPathWhitelist: Set[Seq[String]])
+                  importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+                  classPathWhitelist: Set[Seq[String]] = Set.empty)
   extends ImportHook.InterpreterInterface{ interp =>
 
 
@@ -79,7 +79,7 @@ class Interpreter(val printer: Printer,
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
-    initialClassLoader
+    Option(initialClassLoader).getOrElse(headFrame.classloader)
   )
 
   val eval = Evaluator(headFrame)
