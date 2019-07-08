@@ -204,7 +204,7 @@ class SpecialClassLoader(parent: ClassLoader,
                          parentSignature: Seq[(Either[String, java.net.URL], Long)],
                          var specialLocalClasses: Set[String],
                          urls: URL*)
-  extends URLClassLoader(urls.toArray, parent){
+  extends ammonite.repl.api.ReplClassLoader(urls.toArray, parent){
 
   /**
     * Files which have been compiled, stored so that our special
@@ -323,5 +323,8 @@ class SpecialClassLoader(parent: ClassLoader,
 
      clone
   }
+
+  def inMemoryClasses: Map[String, Array[Byte]] =
+    newFileDict.toMap
 
 }

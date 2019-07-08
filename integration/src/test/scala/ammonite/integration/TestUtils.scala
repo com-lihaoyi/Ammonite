@@ -33,7 +33,7 @@ object TestUtils {
       home,
       replStandaloneResources / name,
       args
-    ).call()
+    ).call(env = Map("JAVA_OPTS" -> null))
   }
   def exec(name: RelPath, args: String*) =
     execBase(name, Nil, tmp.dir(), args, thin = true)

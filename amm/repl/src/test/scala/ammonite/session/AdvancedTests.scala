@@ -520,5 +520,28 @@ object AdvancedTests extends TestSuite{
         @ assert(t.endsWith(".List"))
       """)
     }
+
+    test("accessInMemoryClassMap"){
+      check.session("""
+        @ class Foo
+        defined class Foo
+
+        @ val classes = {
+        @   implicitly[ammonite.repl.api.ReplAPI]
+        @     .sess
+        @     .frames
+        @     .head
+        @     .classloader
+        @     .inMemoryClasses
+        @ }
+        classes: Map[String, Array[Byte]] = ?
+
+        @ val name = classOf[Foo].getName
+        name: String = ?
+
+        @ val found = classes.contains(name)
+        found: Boolean = true
+      """)
+    }
   }
 }
