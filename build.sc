@@ -2,8 +2,6 @@ import mill._, scalalib._, publish._
 import ammonite.ops._, ImplicitWd._
 import $file.ci.upload
 
-import $ivy.`io.get-coursier::coursier-bootstrap:2.0.0-RC2-4+5-6ccc572b`
-
 val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
