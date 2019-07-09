@@ -6,7 +6,7 @@ import java.net.URI
 import ammonite.interp.api.IvyConstructor
 import ammonite.util.Util.CodeSource
 import ammonite.util._
-import coursier.core.{ModuleName, Organization}
+import coursierapi.Dependency
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
@@ -51,7 +51,7 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface{
-    def loadIvy(coordinates: coursier.Dependency*): Either[String, Set[File]]
+    def loadIvy(coordinates: Dependency*): Either[String, Set[File]]
     def watch(p: os.Path): Unit
   }
 
@@ -167,27 +167,11 @@ object ImportHook{
       val splitted = for (signature <- signatures) yield {
         signature.split(':') match{
           case Array(a, b, c) =>
-            Right(coursier.Dependency(coursier.Module(Organization(a), ModuleName(b)), c))
+            Right(Dependency.of(a, b, c))
           case Array(a, "", b, c) =>
-            Right(
-              coursier.Dependency(
-                coursier.Module(
-                  Organization(a),
-                  ModuleName(b + "_" + IvyConstructor.scalaBinaryVersion)
-                ),
-                c
-              )
-            )
+            Right(Dependency.of(a, b + "_" + IvyConstructor.scalaBinaryVersion, c))
           case Array(a, "", "", b, c) =>
-            Right(
-              coursier.Dependency(
-                coursier.Module(
-                  Organization(a),
-                  ModuleName(b + "_" + IvyConstructor.scalaFullBinaryVersion)
-                ),
-                c
-              )
-            )
+            Right(Dependency.of(a, b + "_" + IvyConstructor.scalaFullBinaryVersion, c))
           case _ => Left(signature)
         }
       }

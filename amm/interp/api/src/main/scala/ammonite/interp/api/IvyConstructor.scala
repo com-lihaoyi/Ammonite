@@ -1,6 +1,6 @@
 package ammonite.interp.api
 
-import coursier.core.{ModuleName, Organization}
+import coursierapi.{Dependency, Module}
 
 object IvyConstructor extends IvyConstructor {
 
@@ -19,13 +19,13 @@ object IvyConstructor extends IvyConstructor {
 }
 trait IvyConstructor{
   implicit class GroupIdExt(groupId: String){
-    def %(artifactId: String) = coursier.Module(Organization(groupId), ModuleName(artifactId))
-    def %%(artifactId: String) = coursier.Module(
-      Organization(groupId),
-      ModuleName(artifactId + "_" + IvyConstructor.scalaBinaryVersion)
+    def %(artifactId: String) = Module.of(groupId, artifactId)
+    def %%(artifactId: String) = Module.of(
+      groupId,
+      artifactId + "_" + IvyConstructor.scalaBinaryVersion
     )
   }
-  implicit class ArtifactIdExt(t: coursier.Module){
-    def %(version: String) = coursier.Dependency(t, version)
+  implicit class ArtifactIdExt(t: Module){
+    def %(version: String) = Dependency.of(t, version)
   }
 }

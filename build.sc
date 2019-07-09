@@ -158,7 +158,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def ivyDeps = Agg(
         ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
         ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-        ivy"io.get-coursier::coursier:2.0.0-RC2"
+        ivy"io.get-coursier:interface:0.0.8"
       )
     }
   }
@@ -169,7 +169,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.1.3",
-      ivy"org.javassist:javassist:3.21.0-GA"
+      ivy"org.javassist:javassist:3.21.0-GA",
+      ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
   }
 

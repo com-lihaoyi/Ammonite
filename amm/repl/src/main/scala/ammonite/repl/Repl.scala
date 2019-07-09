@@ -8,6 +8,7 @@ import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
 import ammonite.interp.{CodeWrapper, Interpreter, Parsers, Preprocessor}
+import coursierapi.Dependency
 
 import scala.annotation.tailrec
 
@@ -23,7 +24,7 @@ class Repl(input: InputStream,
            initialColors: Colors = Colors.Default,
            replCodeWrapper: CodeWrapper,
            scriptCodeWrapper: CodeWrapper,
-           alreadyLoadedDependencies: Seq[coursier.Dependency],
+           alreadyLoadedDependencies: Seq[Dependency],
            importHooks: Map[Seq[String], ImportHook],
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,

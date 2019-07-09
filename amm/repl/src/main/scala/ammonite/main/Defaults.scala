@@ -4,7 +4,7 @@ package ammonite.main
 import java.io.InputStream
 
 import ammonite.util.Util
-import coursier.core.{ModuleName, Organization}
+import coursierapi.Dependency
 
 import scala.io.Codec
 
@@ -58,7 +58,7 @@ object Defaults{
 
   def alreadyLoadedDependencies(
     resourceName: String = "amm-dependencies.txt"
-  ): Seq[coursier.Dependency] = {
+  ): Seq[Dependency] = {
 
     var is: InputStream = null
 
@@ -72,7 +72,7 @@ object Defaults{
         .filter(_.nonEmpty)
         .map(l => l.split(':') match {
           case Array(org, name, ver) =>
-            coursier.Dependency(coursier.Module(Organization(org), ModuleName(name)), ver)
+            Dependency.of(org, name, ver)
           case other =>
             throw new Exception(s"Cannot parse line '$other' from resource $resourceName")
         })

@@ -2,57 +2,60 @@ package ammonite.runtime.tools
 
 import java.io.PrintStream
 
-import coursier.util.Task
-import coursier.LocalRepositories
-import coursier.cache.{CacheLogger, FileCache}
-import coursier.cache.loggers.RefreshLogger
-import coursier.core.{Classifier, ModuleName, Organization}
+import coursierapi.{Cache, Dependency, Fetch, Logger, Repository}
+
+import scala.collection.JavaConverters._
+import scala.util.Try
 
 
 object IvyThing{
   def completer(
-    repositories: Seq[coursier.Repository],
+    repositories: Seq[Repository],
     verbose: Boolean
   ): String => (Int, Seq[String]) = {
-    val cache = FileCache()
-      .withLogger(if (verbose) RefreshLogger.create() else CacheLogger.nop)
-    val complete = coursier.complete.Complete(cache)
-      .withScalaVersion(scala.util.Properties.versionNumberString)
+    val cache = Cache.create()
+      .withLogger(if (verbose) Logger.progressBars() else Logger.nop)
+    val sv = scala.util.Properties.versionNumberString
 
     s =>
-      complete.withInput(s).complete().unsafeRun()(cache.ec)
+      val res = coursierapi.Complete.create()
+        .withCache(cache)
+        .withScalaVersion(sv)
+        .withInput(s)
+        .complete()
+      (res.getFrom, res.getCompletions.asScala.toVector)
   }
-  def resolveArtifact(repositories: Seq[coursier.Repository],
-                      dependencies: Seq[coursier.Dependency],
+  def resolveArtifact(repositories: Seq[Repository],
+                      dependencies: Seq[Dependency],
                       verbose: Boolean,
                       output: PrintStream,
-                      hooks: Seq[coursier.Fetch[Task] => coursier.Fetch[Task]]) = synchronized {
-    val fetch = coursier.Fetch()
+                      hooks: Seq[Fetch => Fetch]) = synchronized {
+    val fetch = Fetch.create()
       .addDependencies(dependencies: _*)
-      .withRepositories(repositories)
+      .withRepositories(repositories: _*)
       .withCache(
-        FileCache()
-          .withLogger(if (verbose) RefreshLogger.create() else CacheLogger.nop)
+        Cache.create()
+          .withLogger(if (verbose) Logger.progressBars(output) else Logger.nop)
       )
       .withMainArtifacts()
-      .addClassifiers(Classifier.sources)
+      .addClassifiers("sources")
 
-    Function.chain(hooks)(fetch).eitherResult() match {
+    val finalFetch = Function.chain(hooks)(fetch)
+    Try(finalFetch.fetchResult()).toEither match {
       case Left(err) => Left("Failed to resolve ivy dependencies:" + err.getMessage)
-      case Right(result) =>
-        val noChangingArtifact = result.artifacts.forall(!_._1.changing)
-        def noVersionInterval = dependencies.map(_.version).forall { v =>
-          coursier.core.Parse.versionConstraint(v).interval == coursier.core.VersionInterval.zero
+      case Right(res) =>
+        val noChangingArtifact = res.getArtifacts.asScala.forall(!_.getKey.isChanging)
+        def noVersionInterval = dependencies.map(_.getVersion).forall { v =>
+          !v.startsWith("latest.") &&
+            !v.exists(Set('[', ']', '(', ')')) &&
+            !v.endsWith("+")
         }
-        val files = result.artifacts.map(_._2)
+        val files = res.getFiles.asScala.toList
         Right((noChangingArtifact && noVersionInterval, files))
     }
   }
 
-  val defaultRepositories = List[coursier.Repository](
-    LocalRepositories.ivy2Local,
-    coursier.MavenRepository("https://repo1.maven.org/maven2")
-  )
+  val defaultRepositories = Repository.defaults().asScala.toList
 
 }
 

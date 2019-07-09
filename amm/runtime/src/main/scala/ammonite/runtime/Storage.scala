@@ -3,10 +3,10 @@ package ammonite.runtime
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.{Files, Paths}
 
-
 import ammonite.repl.api.History
 import ammonite.util._
 import ammonite.util.Util._
+import coursierapi.{Dependency, Module}
 
 import scala.util.Try
 import scala.collection.mutable
@@ -35,20 +35,56 @@ trait Storage{
 
 object Storage{
   case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
-  type IvyMap = Map[(String, Seq[coursier.Dependency]), Set[String]]
-  implicit def orgRW: upickle.default.ReadWriter[coursier.core.Organization] =
-    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Organization(_))
-  implicit def modNameRW: upickle.default.ReadWriter[coursier.core.ModuleName] =
-    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.ModuleName(_))
-  implicit def configRW: upickle.default.ReadWriter[coursier.core.Configuration] =
-    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Configuration(_))
-  implicit def typeRW: upickle.default.ReadWriter[coursier.core.Type] =
-    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Type(_))
-  implicit def classifierRW: upickle.default.ReadWriter[coursier.core.Classifier] =
-    implicitly[upickle.default.ReadWriter[String]].bimap(_.value, coursier.core.Classifier(_))
-  implicit def depRW: upickle.default.ReadWriter[coursier.Dependency] = upickle.default.macroRW
-  implicit def modRW: upickle.default.ReadWriter[coursier.Module] = upickle.default.macroRW
-  implicit def attrRW: upickle.default.ReadWriter[coursier.Attributes] = upickle.default.macroRW
+  type IvyMap = Map[(String, Seq[Dependency]), Set[String]]
+
+  private final case class DependencyLike(
+    module: DependencyLike.ModuleLike,
+    version: String,
+    exclusions: Set[(String, String)],
+    configuration: String,
+    `type`: String,
+    classifier: String,
+    transitive: Boolean
+  ) {
+    def dependency: Dependency = {
+      val dep = Dependency.of(module.module, version)
+        .withConfiguration(configuration)
+        .withType(`type`)
+        .withClassifier(classifier)
+        .withTransitive(transitive)
+      for ((o, n) <- exclusions)
+        dep.addExclusion(o, n)
+      dep
+    }
+  }
+  private object DependencyLike {
+    import scala.collection.JavaConverters._
+    final case class ModuleLike(org: String, name: String, attributes: Map[String, String]) {
+      def module: Module =
+        Module.of(org, name, attributes.asJava)
+    }
+    def apply(dependency: Dependency): DependencyLike =
+      DependencyLike(
+        ModuleLike(
+          dependency.getModule.getOrganization,
+          dependency.getModule.getName,
+          dependency.getModule.getAttributes.asScala.toMap
+        ),
+        dependency.getVersion,
+        dependency.getExclusions.asScala.map(e => (e.getKey, e.getValue)).toSet,
+        dependency.getConfiguration,
+        dependency.getType,
+        dependency.getClassifier,
+        dependency.isTransitive
+      )
+  }
+
+  implicit def depRW: upickle.default.ReadWriter[Dependency] = {
+    implicit def moduleLike: upickle.default.ReadWriter[DependencyLike.ModuleLike] =
+      upickle.default.macroRW
+    def helper: upickle.default.ReadWriter[DependencyLike] = upickle.default.macroRW
+    helper.bimap(DependencyLike.apply(_), _.dependency)
+  }
   implicit def tagRW: upickle.default.ReadWriter[Tag] = upickle.default.macroRW
   /**
     * Read/write [[Name]]s as unboxed strings, in order to save verbosity

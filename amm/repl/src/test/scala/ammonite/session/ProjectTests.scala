@@ -72,9 +72,8 @@ object ProjectTests extends TestSuite{
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
               error: Failed to resolve ivy dependencies
 
-              @ interp.repositories() ++= Seq(coursier.ivy.IvyRepository.fromPattern(
-              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/" +:
-              @   coursier.ivy.Pattern.default
+              @ interp.repositories() ++= Seq(coursierapi.IvyRepository.of(
+              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]"
               @ ))
 
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
@@ -290,7 +289,7 @@ object ProjectTests extends TestSuite{
       check.session(
         """
         @ interp.repositories() ++= Seq(
-        @     coursier.maven.MavenRepository("https://jitpack.io")
+        @     coursierapi.MavenRepository.of("https://jitpack.io")
         @ )
 
         @ import $ivy.`com.github.vidstige:jadb:v1.0.1`
@@ -377,7 +376,7 @@ object ProjectTests extends TestSuite{
             @ interp.resolutionHooks += { fetch =>
             @   fetch.withResolutionParams(
             @     fetch
-            @       .resolutionParams
+            @       .getResolutionParams
             @       .addProfile("hadoop-3.1")
             @   )
             @ }
