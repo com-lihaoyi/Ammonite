@@ -35,7 +35,7 @@ val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
 }
 
 trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
-  def artifactName = "ammonite-" + millOuterCtx.segments.parts.last
+  def artifactName = "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   def testFramework = "utest.runner.Framework"
   def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
