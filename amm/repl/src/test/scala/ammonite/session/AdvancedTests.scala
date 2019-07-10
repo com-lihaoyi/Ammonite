@@ -342,7 +342,7 @@ object AdvancedTests extends TestSuite{
     }
     test("macroParadiseWorks"){
       // no more macroparadise in 2.13
-      if (scala2_11 || scala2_12) {
+      if (scala2_12) {
         val scalaVersion: String = scala.util.Properties.versionNumberString
         val c1: DualTestRepl = new DualTestRepl()
         c1.session(s"""

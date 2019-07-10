@@ -112,7 +112,7 @@ object ImportHookTests extends TestSuite{
 
         test("inlineFull"){
           // no more macroparadise in 2.13
-          if (scala2_11 || scala2_12) check.session("""
+          if (scala2_12) check.session("""
             @ import org.scalamacros.paradise.Settings._
             error: object scalamacros is not a member of package org
 

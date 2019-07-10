@@ -263,7 +263,7 @@ object ProjectTests extends TestSuite{
 
     test("deeplearning"){
       // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.13
-      if (scala2_11 || scala2_12) check.session(
+      if (scala2_12) check.session(
         """
         @ import $ivy.`com.thoughtworks.deeplearning::plugins-builtins:2.0.0-RC0`
         import $ivy.$
@@ -339,7 +339,7 @@ object ProjectTests extends TestSuite{
     test("profiles"){
       val testCore =
         """
-            @ import $ivy.`org.apache.spark::spark-sql:1.6.2`
+            @ import $ivy.`org.apache.spark::spark-sql:2.4.3`
 
             @ import scala.collection.JavaConverters._
 
@@ -358,36 +358,34 @@ object ProjectTests extends TestSuite{
             @ )
         """
       test("default"){
-        // should load hadoop 2.2 stuff by default
-        if (scala2_11)
+        // should load hadoop 2.6 stuff by default
+        if (scala2_12)
           check.session(
             s"""
             $testCore
 
             @ val hadoopVersion = p.getProperty("version")
-            hadoopVersion: String = "2.2.0"
+            hadoopVersion: String = "2.6.5"
             """
           )
       }
       test("withProfile"){
-        // with the right profile, should load hadoop 2.6 stuff
-        if (scala2_11)
+        // with the right profile, should load hadoop 3.1 stuff
+        if (scala2_12)
           check.session(
             s"""
             @ interp.resolutionHooks += { fetch =>
             @   fetch.withResolutionParams(
-            @     // With coursier > 1.1.0-M13-1, replace with
-            @     //   fetch.resolutionParams
-            @     //     .addProfile("hadoop-2.6")
-            @     coursier.params.ResolutionParams()
-            @       .withProfiles(Set("hadoop-2.6"))
+            @     fetch
+            @       .resolutionParams
+            @       .addProfile("hadoop-3.1")
             @   )
             @ }
 
             $testCore
 
             @ val hadoopVersion = p.getProperty("version")
-            hadoopVersion: String = "2.6.0"
+            hadoopVersion: String = "3.1.0"
             """
           )
       }
