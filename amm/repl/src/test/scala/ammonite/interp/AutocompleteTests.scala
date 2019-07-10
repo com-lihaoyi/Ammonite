@@ -132,7 +132,7 @@ object AutocompleteTests extends TestSuite{
         )
 
         val extra =
-          if (scala2_11 || scala2_12) Set()
+          if (scala2_12) Set()
           else Set("unless", "when")
         complete( """scala.Option.<caret>""",
           (anyCompletion ++ Set("apply", "empty") ++ extra) ^ _

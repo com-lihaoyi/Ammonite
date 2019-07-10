@@ -94,7 +94,7 @@ object BuiltinTests extends TestSuite{
       // not sure why that one doesn't pass in 2.13
       // even disabling the noimports and imports settings instead of setting noimports to false
       // doesn't seem to reinstate imports
-      if (TestUtils.scala2_11 || TestUtils.scala2_12) check.session(s"""
+      if (TestUtils.scala2_12) check.session(s"""
         @ // Disabling default Scala imports
 
         @ List(1, 2, 3) + "lol"
