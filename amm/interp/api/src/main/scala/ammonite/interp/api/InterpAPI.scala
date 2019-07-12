@@ -2,7 +2,7 @@ package ammonite.interp.api
 
 
 import ammonite.util.{Colors, Ref}
-import coursier.util.Task
+import coursierapi.{Dependency, Fetch, Repository}
 
 import scala.collection.mutable
 
@@ -31,14 +31,14 @@ trait InterpAPI {
   /**
    * resolvers to use when loading jars
    */
-  def repositories: Ref[List[coursier.Repository]]
+  def repositories: Ref[List[Repository]]
 
   /**
     * Functions that will be chained and called on the coursier
     * Fetch object right before they are run
     */
   val resolutionHooks: mutable.Buffer[
-    coursier.Fetch[Task] => coursier.Fetch[Task]
+    Fetch => Fetch
   ]
 
   /**
@@ -86,7 +86,7 @@ trait LoadJar {
   /**
    * Load a library from its maven/ivy coordinates
    */
-  def ivy(coordinates: coursier.Dependency*): Unit
+  def ivy(coordinates: Dependency*): Unit
 }
 
 trait InterpLoad extends LoadJar{

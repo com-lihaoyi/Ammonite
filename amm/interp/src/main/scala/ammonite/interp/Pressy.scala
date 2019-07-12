@@ -46,6 +46,8 @@ object Pressy {
             allCode: String,
             index: Int){
 
+    val blacklistedPackages = Set("shaded")
+
     /**
      * Dumb things that turn up in the autocomplete that nobody needs or wants
      */
@@ -118,12 +120,16 @@ object Pressy {
      */
     def deepCompletion(name: String) = {
       def rec(t: pressy.Symbol): Seq[pressy.Symbol] = {
-        val children =
-          if (t.hasPackageFlag || t.isPackageObject) {
-            pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
-          } else Nil
+        if (blacklistedPackages(t.nameString))
+          Nil
+        else {
+          val children =
+            if (t.hasPackageFlag || t.isPackageObject) {
+              pressy.ask(() => t.typeSignature.members.filter(_ != t).flatMap(rec))
+            } else Nil
 
-        t +: children.toSeq
+          t +: children.toSeq
+        }
       }
 
       for {

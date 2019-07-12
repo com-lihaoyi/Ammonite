@@ -16,7 +16,7 @@ import ammonite.runtime.tools.IvyThing
 import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
-import coursier.util.Task
+import coursierapi.{Dependency, Fetch}
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -44,7 +44,7 @@ class Interpreter(val printer: Printer,
                   initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
                   scriptCodeWrapper: CodeWrapper,
-                  alreadyLoadedDependencies: Seq[coursier.Dependency],
+                  alreadyLoadedDependencies: Seq[Dependency],
                   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
                   classPathWhitelist: Set[Seq[String]] = Set.empty)
   extends ImportHook.InterpreterInterface{ interp =>
@@ -52,7 +52,7 @@ class Interpreter(val printer: Printer,
 
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
-  val resolutionHooks = mutable.Buffer.empty[coursier.Fetch[Task] => coursier.Fetch[Task]]
+  val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
 
   headFrame.classloader.specialLocalClasses ++= Seq(
     "ammonite.interp.api.InterpBridge",
@@ -607,10 +607,10 @@ class Interpreter(val printer: Printer,
 
 
   private val alwaysExclude = alreadyLoadedDependencies
-    .map(dep => (dep.module.organization, dep.module.name))
+    .map(dep => (dep.getModule.getOrganization, dep.getModule.getName))
     .toSet
 
-  def loadIvy(coordinates: coursier.Dependency*) = synchronized{
+  def loadIvy(coordinates: Dependency*) = synchronized{
     val cacheKey = (
       interpApi.repositories().hashCode.toString + classPathWhitelist.hashCode().toString,
       coordinates
@@ -622,10 +622,10 @@ class Interpreter(val printer: Printer,
         ammonite.runtime.tools.IvyThing.resolveArtifact(
           interpApi.repositories(),
           coordinates
-            .filter(dep => !alwaysExclude((dep.module.organization, dep.module.name)))
+            .filter(dep => !alwaysExclude((dep.getModule.getOrganization, dep.getModule.getName)))
             .map { dep =>
-              dep.copy(
-                exclusions = dep.exclusions ++ alwaysExclude
+              alwaysExclude.iterator.foldLeft(dep)((dep, excl) =>
+                dep.addExclusion(excl._1, excl._2)
               )
             },
           verbose = verboseOutput,
@@ -657,7 +657,7 @@ class Interpreter(val printer: Printer,
     def cp(jar: java.net.URL): Unit = {
       handleClasspath(jar)
     }
-    def ivy(coordinates: coursier.Dependency*): Unit = {
+    def ivy(coordinates: Dependency*): Unit = {
       loadIvy(coordinates:_*) match{
         case Left(failureMsg) =>
           throw new Exception(failureMsg)
