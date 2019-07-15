@@ -410,6 +410,53 @@ object ProjectTests extends TestSuite{
       )
     }
 
+    test("no sources"){
+      val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+
+      val core =
+        s"""
+            @ import $$ivy.`com.github.alexarchambault::case-app:2.0.0-M9`
+
+            @ val cp = {
+            @   repl.sess
+            @     .frames
+            @     .flatMap(_.classpath)
+            @     .map(_.toString)
+            @ }
+            cp: List[String] = ?
+
+            @ val found = cp.exists(_.endsWith("/case-app_$sbv-2.0.0-M9.jar"))
+            found: Boolean = true
+        """
+
+      test("default"){
+        check.session(
+          s"""
+            $core
+
+            @ val sourcesFound = cp.exists(_.endsWith("/case-app_$sbv-2.0.0-M9-sources.jar"))
+            sourcesFound: Boolean = true
+           """
+        )
+      }
+
+      test("disabled"){
+        check.session(
+          s"""
+            @ interp.resolutionHooks += { fetch =>
+            @   import scala.collection.JavaConverters._
+            @   fetch.withClassifiers(fetch.getClassifiers.asScala.filter(_ != "sources").asJava)
+            @ }
+
+            $core
+
+            @ val sourcesFound = cp.exists(_.endsWith("/case-app_$sbv-2.0.0-M9-sources.jar"))
+            sourcesFound: Boolean = false
+           """
+        )
+      }
+    }
+
   }
 }
 
