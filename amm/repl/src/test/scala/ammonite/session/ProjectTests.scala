@@ -457,6 +457,50 @@ object ProjectTests extends TestSuite{
       }
     }
 
+    test("extra artifact types"){
+      val core =
+        """
+            @ import $ivy.`com.almworks.sqlite4java:libsqlite4java-linux-amd64:1.0.392`
+
+            @ val cp = {
+            @   repl.sess
+            @     .frames
+            @     .flatMap(_.classpath)
+            @     .map(_.toString)
+            @ }
+            cp: List[String] = ?
+
+            @ def soFound() = cp.exists(_.endsWith("/libsqlite4java-linux-amd64-1.0.392.so"))
+            defined function soFound
+        """
+
+      test("default"){
+        check.session(
+          s"""
+            $core
+
+            @ val soFound0 = soFound()
+            soFound0: Boolean = false
+           """
+        )
+      }
+
+      test("with so"){
+        check.session(
+          s"""
+            @ interp.resolutionHooks += { fetch =>
+            @   fetch.addArtifactTypes("so")
+            @ }
+
+            $core
+
+            @ val soFound0 = soFound()
+            soFound0: Boolean = true
+           """
+        )
+      }
+    }
+
   }
 }
 
