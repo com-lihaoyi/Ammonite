@@ -254,7 +254,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 }
 
 class MainModule(val crossScalaVersion: String)
-  extends AmmModule with AmmDependenciesResourceFileModule {
+  extends AmmModule {
 
   def artifactName = "ammonite"
 
@@ -282,8 +282,6 @@ class MainModule(val crossScalaVersion: String)
     amm.repl().sources() ++
     sources() ++
     externalSources()
-
-  def dependencyResourceFileName = "amm-dependencies.txt"
 
   def prependShellScript = T{
     mill.modules.Jvm.launcherUniversalScript(

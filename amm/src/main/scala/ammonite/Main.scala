@@ -467,7 +467,7 @@ class MainRunner(cliConfig: Cli.Config,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies =
-        if(cliConfig.thin) Nil else Defaults.alreadyLoadedDependencies(),
+        Defaults.alreadyLoadedDependencies(),
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.thin)
 
     )
