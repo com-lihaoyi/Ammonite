@@ -44,14 +44,16 @@ object IvyThing{
     Try(finalFetch.fetchResult()).toEither match {
       case Left(err) => Left("Failed to resolve ivy dependencies:" + err.getMessage)
       case Right(res) =>
-        val noChangingArtifact = res.getArtifacts.asScala.forall(!_.getKey.isChanging)
+        // should really be fetch != finalFetch, but coursierapi.Fetch is mutable for now
+        val customParams = hooks.nonEmpty
+        def noChangingArtifact = res.getArtifacts.asScala.forall(!_.getKey.isChanging)
         def noVersionInterval = dependencies.map(_.getVersion).forall { v =>
           !v.startsWith("latest.") &&
             !v.exists(Set('[', ']', '(', ')')) &&
             !v.endsWith("+")
         }
         val files = res.getFiles.asScala.toList
-        Right((noChangingArtifact && noVersionInterval, files))
+        Right((!customParams && noChangingArtifact && noVersionInterval, files))
     }
   }
 
