@@ -9,7 +9,7 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.typechecker.Analyzer
 
-object CompilerCompatibility {
+object CompilerCompatibility extends ExtraCompilerCompatibility {
   def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } = {
     new { val global: g.type = g } with Analyzer {
       override def findMacroClassLoader() = cl
@@ -47,9 +47,5 @@ object CompilerCompatibility {
 
       override lazy val analyzer = CompilerCompatibility.analyzer(g, evalClassloader)
     }
-  }
-
-  def createZipJarFactory(arc: FileZipArchive, settings: Settings) = {
-    ZipAndJarClassPathFactory.create(arc, settings)
   }
 }
