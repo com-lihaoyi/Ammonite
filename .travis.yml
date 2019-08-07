@@ -1,4 +1,5 @@
 language: scala
+dist: trusty
 
 # Not sure why this is necessary, but sometime before this commit the master
 # branch and other branches/tags stopped getting cloned down by travis automatically
