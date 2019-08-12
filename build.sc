@@ -17,9 +17,9 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.8", "2.13.0")
+val binCrossScalaVersions = Seq("2.12.9", "2.13.0")
 val fullCrossScalaVersions = Seq(
-  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9",
   "2.13.0"
 )
 
@@ -44,6 +44,21 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
+  def sources = T.sources{
+    val sv = scalaVersion()
+    val extraDir =
+      if (sv.startsWith("2.12.")) {
+        val patch = sv.stripPrefix("2.12.").takeWhile(_.isDigit).toInt
+        val dirName =
+          if (patch <= 8)
+            "scala-2.12.0_8"
+          else
+            "scala-2.12.9+"
+        Seq(PathRef(millSourcePath / "src" / "main" / dirName))
+      } else
+        Nil
+    super.sources() ++ extraDir
+  }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
   }
