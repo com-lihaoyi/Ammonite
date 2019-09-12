@@ -58,10 +58,8 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
       } else
         Nil
     val extraDir2 =
-      if (sv == "2.12.10")
-        Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.12.10"))
-      else
-        Seq(PathRef(millSourcePath / "src" / "main" / "scala-not-2.12.10"))
+      if (sv == "2.12.10") Nil
+      else Seq(PathRef(millSourcePath / "src" / "main" / "scala-not-2.12.10"))
     super.sources() ++ extraDir ++ extraDir2
   }
   def externalSources = T{
