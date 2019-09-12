@@ -30,7 +30,7 @@ object CustomZipAndJarFileLookupFactory {
 
     private val archive = new CustomURLZipArchive(zipUrl)
 
-    override private[nsc] def packages(inPackage: String): Seq[PackageEntry] = {
+    override def packages(inPackage: String): Seq[PackageEntry] = {
       val prefix = PackageNameUtils.packagePrefix(inPackage)
       for {
         dirEntry <- findDirEntry(inPackage).toSeq
@@ -53,7 +53,7 @@ object CustomZipAndJarFileLookupFactory {
 
     def hasPackage(pkg: String) = findDirEntry(pkg).isDefined
 
-    override private[nsc] def list(inPackage: String): ClassPathEntries = {
+    override def list(inPackage: String): ClassPathEntries = {
       val foundDirEntry = findDirEntry(inPackage)
 
       foundDirEntry map { dirEntry =>
@@ -85,7 +85,7 @@ object CustomZipAndJarFileLookupFactory {
       file(pkg, simpleClassName + ".class")
     }
 
-    override private[nsc] def classes(inPackage: String): Seq[ClassFileEntry] =
+    override def classes(inPackage: String): Seq[ClassFileEntry] =
       files(inPackage)
 
     protected def createFileEntry(file: CustomURLZipArchive#Entry): ClassFileEntryImpl =
