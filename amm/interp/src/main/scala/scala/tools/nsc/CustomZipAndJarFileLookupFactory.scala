@@ -1,16 +1,14 @@
 package scala.tools.nsc
 
 import java.io.File
-
-import scala.reflect.io.{AbstractFile, FileZipArchive}
-import scala.tools.nsc.classpath.{ClassPathEntries, _}
-import scala.tools.nsc.util.{ClassPath, ClassRepresentation}
-import java.io.File
 import java.net.URL
 
 import ammonite.interp.internal.CustomURLZipArchive
 
-import FileUtils.AbstractFileOps
+import scala.reflect.io.AbstractFile
+import scala.tools.nsc.classpath.FileUtils.AbstractFileOps
+import scala.tools.nsc.classpath.{ClassPathEntries, _}
+import scala.tools.nsc.util.{ClassPath, ClassRepresentation}
 
 // Originally based on
 // https://github.com/scala/scala/blob/329deac9ab4f39e5e766ec3ab3f3f4cddbc44aa1
@@ -20,7 +18,8 @@ import FileUtils.AbstractFileOps
 
 object CustomZipAndJarFileLookupFactory {
 
-  private final class ZipArchiveClassPath(val zipUrl: URL) extends ClassPath with NoSourcePaths {
+  private final class ZipArchiveClassPath(val zipUrl: URL)
+    extends ClassPath with NoSourcePaths with AmmClassPath{
 
     def zipFile: File = null
 
@@ -30,7 +29,7 @@ object CustomZipAndJarFileLookupFactory {
 
     private val archive = new CustomURLZipArchive(zipUrl)
 
-    override def packages(inPackage: String): Seq[PackageEntry] = {
+    override def ammPackages(inPackage: String): Seq[PackageEntry] = {
       val prefix = PackageNameUtils.packagePrefix(inPackage)
       for {
         dirEntry <- findDirEntry(inPackage).toSeq
@@ -51,9 +50,11 @@ object CustomZipAndJarFileLookupFactory {
         if isRequiredFileType(entry)
       } yield createFileEntry(entry)
 
-    def hasPackage(pkg: String) = findDirEntry(pkg).isDefined
+    def ammHasPackage(pkg: String) = {
+      findDirEntry(pkg).isDefined
+    }
 
-    override def list(inPackage: String): ClassPathEntries = {
+    override def ammList(inPackage: String): ClassPathEntries = {
       val foundDirEntry = findDirEntry(inPackage)
 
       foundDirEntry map { dirEntry =>
@@ -85,7 +86,7 @@ object CustomZipAndJarFileLookupFactory {
       file(pkg, simpleClassName + ".class")
     }
 
-    override def classes(inPackage: String): Seq[ClassFileEntry] =
+    override def ammClasses(inPackage: String): Seq[ClassFileEntry] =
       files(inPackage)
 
     protected def createFileEntry(file: CustomURLZipArchive#Entry): ClassFileEntryImpl =
