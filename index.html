@@ -85,7 +85,7 @@ span.hljs-tag, span.hljs-symbol{
 <div style="margin: 0px;color: #333;text-align: center;padding: 2.5em 2em 0;border-bottom: 1px solid #eee;display: block;" id="Ammonite" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><h1 style="margin: 0.2em 0;font-size: 3em;font-weight: 300;">Ammonite<a class=" scalatex-site-Styles-headerLink" href="#Ammonite" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a></h1><br /><h2 style="font-weight: 300;color: #ccc;padding: 0px;margin-top: 0px;">Scala Scripting</h2></div><div class=" scalatex-site-Styles-content">
 
   <div style="display: flex;align-items: center;flex-direction: column;">
-    <i>Version 1.7.0</i>
+    <i>Version 1.7.1</i>
     <div>
       <a href="https://gitter.im/lihaoyi/Ammonite"><img src="https://badges.gitter.im/Join%20Chat.svg" /></a>
       <span> </span>
@@ -215,7 +215,7 @@ span.hljs-tag, span.hljs-symbol{
 </li></ul>
   <p>
     The bulk of this page describes the latest stable release of Ammonite,
-    <code>1.7.0</code>. If you're willing to live on the edge,
+    <code>1.7.1</code>. If you're willing to live on the edge,
     we also publish <a href="#UnstableVersions">Unstable Versions</a> from any commits that get pushed
     or pull-requests that land in the master branch:
 </p>
@@ -242,17 +242,17 @@ span.hljs-tag, span.hljs-symbol{
 </p>
   <p>
     If you want to use Ammonite as a plain Scala shell, download the standalone
-    Ammonite 1.7.0 executable for Scala 2.12 (also
+    Ammonite 1.7.1 executable for Scala 2.12 (also
     available for <a href="#OlderScalaVersions">Older Scala Versions</a>):
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.7.0-2-a89e6c8:
+    1.7.1-0-cb9da16:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0-2-a89e6c8) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1-0-cb9da16) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     Alternatively, on macOS you can install Ammonite via brew:
@@ -284,13 +284,13 @@ span.hljs-tag, span.hljs-symbol{
 
 </p>
   <p>
-    You can also try out Ammonite 1.7.0 in an existing
+    You can also try out Ammonite 1.7.1 in an existing
     SBT project. To do so, add the following to your <code>build.sbt</code>
 </p>
   <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += {
   val version = scalaBinaryVersion.value match {
     case &quot;2.10&quot; =&gt; &quot;1.0.3&quot;
-    case _ ⇒ &quot;1.7.0&quot;
+    case _ ⇒ &quot;1.7.1&quot;
   }
   &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % version % &quot;test&quot; cross CrossVersion.full
 }
@@ -317,9 +317,9 @@ sourceGenerators in Test += Def.task {
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.7.0-2-a89e6c8:
+    1.7.1-0-cb9da16:
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.0-2-a89e6c8&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.1-0-cb9da16&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
   <p>
     After that, simply hit
@@ -1367,7 +1367,7 @@ sys	0m0.000s</pre><pre><span style="color: #2980b9;">Compiling (synthetic)/ammon
 </span><span style="color: #2980b9;">Compiling (synthetic)/ammonite/predef/DefaultPredef.sc</span><span>
 </span><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc</span><span>
 </span><span style="color: #2980b9;">Compiling /home/travis/build/lihaoyi/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2</span><span>
-Welcome to the Ammonite Repl 1.7.0-2-a89e6c8
+Welcome to the Ammonite Repl 1.7.1-0-cb9da16
 (Scala 2.13.0 Java 1.8.0_151)
 If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #8e44ad;">@ </span><span>time{ls!} 
@@ -1380,7 +1380,7 @@ If you like Ammonite, please support our development at www.patreon.com/lihaoyi
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">&quot;fail.txt&quot;</span><span>          </span><span style="color: #27ae60;">'project</span><span>            </span><span style="color: #27ae60;">'terminal</span><span>
 </span><span style="color: #27ae60;">&quot;appveyor.yml&quot;</span><span>      </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">'readme</span><span>
 ,
-  25901614 nanoseconds
+  22079182 nanoseconds
 )
 </span></pre></div>
 
@@ -1958,7 +1958,7 @@ res10: Boolean = false</code><a class=" scalatex-site-Styles-headerLink" style="
         To use Ammonite inside an existing Scala program, you need to first add
         it to your dependencies:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.0&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.1&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Then instantiate it with this code anywhere within your program:
@@ -1991,7 +1991,7 @@ object TestMain {
         To do so, first add Ammonite to your classpath, e.g. through this SBT
         snippet:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.0&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.1&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Note that unlike the snippet given <a href="#Ammonite-REPL">above</a>, we
@@ -2064,7 +2064,7 @@ object TestMain {
       <p>
         To do this, add ammonite-sshd to your classpath, for example with SBT:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;1.7.0&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite-sshd&quot; % &quot;1.7.1&quot; cross CrossVersion.full
 </code></pre>
       <p>
         Now add repl server to your application:
@@ -2149,18 +2149,18 @@ replServer.start()
     files, without the hassle of setting up a heavyweight SBT project.
 </p>
   <p>
-    To begin with, download the Ammonite 1.7.0
+    To begin with, download the Ammonite 1.7.1
     script-runner for Scala 2.12 (also available for
     <a href="#OlderScalaVersions">Older Scala Versions</a>):
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    1.7.0-2-a89e6c8:
+    1.7.1-0-cb9da16:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0-2-a89e6c8) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1-0-cb9da16) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     And read on to learn about how Scala scripts work.
@@ -2770,7 +2770,7 @@ trait InterpLoad extends LoadJar{
         (e.g. bash):
 
 </p>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
       <pre><code class="scala scalatex-site-Styles-highlightMe">$ amm path/to/script.sc
 </code></pre>
@@ -3007,9 +3007,9 @@ object Qux{
         into an ammonite <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">Main</code> class.
 </p>
       <p>
-        Add the ammonite 1.7.0 dependency to <code>build.sbt</code>:
+        Add the ammonite 1.7.1 dependency to <code>build.sbt</code>:
 </p>
-      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.0&quot; % &quot;test&quot; cross CrossVersion.full
+      <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.1&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
       <p>
         In your test directory, create a class like:
@@ -3041,7 +3041,7 @@ object AmmoniteBridge {
   <p>
     To get started with Ammonite-Ops, add this to your <code>build.sbt</code>:
 </p>
-  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;1.7.0&quot;</code>
+  <code class="scala scalatex-site-Styles-highlightMe" style="display: inline;padding: 0px;margin: 0px;">libraryDependencies += &quot;com.lihaoyi&quot; %% &quot;ammonite-ops&quot; % &quot;1.7.1&quot;</code>
 
   <p>
     And you're all set! Here's an example of some common operations you can do with Ammonite-Ops
@@ -3781,7 +3781,7 @@ val res2 = %ls</code><a class=" scalatex-site-Styles-headerLink" style="position
     To begin using Ammonite-Shell, simply  download the default <code>predef.sc</code> to configure your REPL to be a usable systems shell before downloading the <a href="#Ammonite-REPL">Ammonite-REPL</a> executable (below):
 </p>
   <pre><code class="bash scalatex-site-Styles-highlightMe">$ mkdir -p ~/.ammonite &amp;&amp; curl -L -o ~/.ammonite/predef.sc https://git.io/vHaKQ</code></pre>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     If you're on <a href="https://www.freebsd.org/">FreeBSD</a> then you can simply install the package by <code>pkg install ammonite</code> or compile it from the <code>shells/ammonite</code> ports directory. Be sure to setup your <code>predef.sc</code> correctly though.
@@ -4087,16 +4087,16 @@ HELLO
 </p>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>git branch
-* (HEAD detached at a89e6c8)
+* (HEAD detached at cb9da16)
   master</pre><pre><span style="color: #8e44ad;">@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
-* (HEAD detached at a89e6c8)
+* (HEAD detached at cb9da16)
   master
 
 </span></pre></div>
       <div><pre><span style="color: #8e44ad;">
 bash$ </span>date
-Thu Sep 12 05:51:41 UTC 2019</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
-Thu Sep 12 05:51:49 UTC 2019
+Thu Sep 12 06:48:23 UTC 2019</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
+Thu Sep 12 06:48:31 UTC 2019
 
 </span></pre></div>
 
@@ -4334,7 +4334,7 @@ Hello from Java!
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 
 </span><span style="color: #8e44ad;">@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Thu Sep 12 05:53:52 UTC 2019
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Thu Sep 12 06:50:27 UTC 2019
 
 </span><span style="color: #8e44ad;">@ </span><span>date.getDay() 
 </span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">4</span><span>
@@ -4356,8 +4356,8 @@ Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.pom.sha1
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom.sha1
-Downloaded https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom
 Downloaded https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom.sha1
+Downloaded https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar.sha1
 Downloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar
@@ -4385,14 +4385,14 @@ Downloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0
         Or Joda Time:
 </p>
       <pre><span style="color: #8e44ad;">@ </span><span style="color: #f39c12;">import</span><span> $ivy.`joda-time:joda-time:2.8.2` 
-Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom.sha1
+Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom.sha1
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar.sha1
-Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar
 Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar.sha1
+Downloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar.sha1
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar.sha1
 Downloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar
@@ -4929,9 +4929,9 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </p>
     
       <b>
-        Scala 1.7.0/2.12-1.7.0
+        Scala 1.7.1/2.12-1.7.1
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.12-1.7.0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.12-1.7.1) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
     <p>
       Ammonite can also be used in old versions of Scala, embedded in an SBT
@@ -5014,7 +5014,7 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 
 </p>
   <h1 id="Changelog" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#Changelog" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Changelog</h1>
-    <h2 id="1.7.0" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#1.7.0" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>1.7.0</h2>
+    <h2 id="1.7.1" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#1.7.1" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>1.7.1</h2>
       <ul>
         <li>
           Support for Scala 2.12.9, 2.12.10</li></ul>
@@ -6437,12 +6437,12 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
   <h1 id="UnstableVersions" style="display: block;" class=" scalatex-site-Styles-hoverContainer scalatex-site-Styles-headerTag"><a class=" scalatex-site-Styles-headerLink" href="#UnstableVersions" style="position: absolute;right: 0px;"><i class="fa fa-link"></i></a>Unstable Versions</h1>
     <p>
       The page above contains the documentation for the latest stable version
-      of Ammonite, <code>1.7.0</code>. Ammonite also publishes
+      of Ammonite, <code>1.7.1</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>1.7.0-2-a89e6c8</code> and is available for direct
+      <code>1.7.1-0-cb9da16</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0-2-a89e6c8) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1-0-cb9da16) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
     <p>
       On Cygwin, run the following after the above:
@@ -6453,12 +6453,12 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The latest build can also be run as Windows batch; just save the following as amm.bat:
 </p>
     <p>
-      <a href="https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0-2-a89e6c8">https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.13-1.7.0-2-a89e6c8</a>
+      <a href="https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1-0-cb9da16">https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.13-1.7.1-0-cb9da16</a>
 </p>
     <p>
       For usage in a SBT project:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.0-2-a89e6c8&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;1.7.1-0-cb9da16&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
     <p>
       Ammonite also provides standalone unstable executables for older versions
@@ -6466,9 +6466,9 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </p>
     
       <b>
-        Scala 1.7.0/2.12-1.7.0-2-a89e6c8
+        Scala 1.7.1/2.12-1.7.1-0-cb9da16
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.0/2.12-1.7.0-2-a89e6c8) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/lihaoyi/Ammonite/releases/download/1.7.1/2.12-1.7.1-0-cb9da16) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
@@ -6488,7 +6488,7 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </div>
 </div><script>
     scalatex.scrollspy.Controller().main(
-      [{"value":"Ammonite","children":[{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Pretty-printed output","children":[{"value":"Configurable Truncation","children":[]}]},{"value":"Editing","children":[{"value":"Syntax Highlighting","children":[]},{"value":"Multi-line editing","children":[]},{"value":"Desktop key-bindings","children":[]},{"value":"Console key-bindings","children":[]},{"value":"History Search","children":[]},{"value":"Block Input","children":[]},{"value":"Undo & Redo","children":[]}]},{"value":"Magic Imports","children":[{"value":"import $file","children":[{"value":"Imported Scripts are Re-used","children":[]},{"value":"Cannot directly import from inside a Script","children":[]},{"value":"Renamed-scripts and multiple-scripts","children":[]}]},{"value":"import $exec","children":[]},{"value":"import $ivy","children":[]}]},{"value":"Builtins","children":[{"value":"Repl API","children":[]},{"value":"Utilities","children":[{"value":"source","children":[]},{"value":"time","children":[]},{"value":"grep","children":[]},{"value":"browse","children":[]},{"value":"desugar","children":[]}]}]},{"value":"Save/Load Session","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Configuration","children":[{"value":"Refs","children":[]},{"value":"Compiler Flags","children":[]},{"value":"JVM Flags","children":[]}]},{"value":"Embedding","children":[{"value":"Instantiating Ammonite","children":[]},{"value":"Debugging","children":[]},{"value":"Remote REPL","children":[]}]}]},{"value":"Scala Scripts","children":[{"value":"Script Files","children":[{"value":"Script Imports","children":[{"value":"Other Scripts","children":[]},{"value":"Ivy Dependencies","children":[]}]},{"value":"Multi-stage Scripts","children":[]},{"value":"Script Arguments","children":[]},{"value":"Ammonite Arguments in Scripts","children":[]},{"value":"Multiple Main Methods","children":[]},{"value":"Script Usage Docs","children":[]},{"value":"Bundled Libraries","children":[]},{"value":"Script Builtins","children":[]},{"value":"Script Predef","children":[]}]},{"value":"Running Scripts","children":[{"value":"From Bash","children":[]},{"value":"Watch and Reload","children":[]},{"value":"Script Debug REPL","children":[]},{"value":"From the REPL","children":[]},{"value":"Execution Model","children":[]},{"value":"SBT Integration","children":[]}]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Constructing Paths","children":[]}]},{"value":"Operations","children":[{"value":"Operator Reference","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]},{"value":"Callable","children":[]}]},{"value":"Chaining","children":[]},{"value":"Reading Resources","children":[]},{"value":"Spawning Subprocesses","children":[{"value":"Environment Variables","children":[]},{"value":"Invoking Files","children":[]},{"value":"Current Working Directory","children":[]}]}]}]},{"value":"Ammonite-Shell","children":[{"value":"Shell Basics","children":[{"value":"Working Directory","children":[]},{"value":"Listing Files","children":[]},{"value":"Filesystem Operations","children":[]},{"value":"Piping","children":[]},{"value":"Subprocesses","children":[]}]},{"value":"Scripting","children":[{"value":"Scala Scripting","children":[]},{"value":"Typed Values","children":[]},{"value":"Scala/Java APIs","children":[]},{"value":"Writing/Loading Scripts","children":[]}]},{"value":"Design Decisions & Tradeoffs","children":[{"value":"Scala as the Language","children":[]},{"value":"Running on the JVM","children":[]},{"value":"Goals of Ammonite-Shell","children":[]}]}]},{"value":"Ammonite Cookbook","children":[{"value":"HTTP Requests","children":[]},{"value":"Scraping HTML","children":[]},{"value":"GUI Applications","children":[]},{"value":"Office Automation","children":[]},{"value":"Image Processing","children":[]},{"value":"Machine Learning","children":[]},{"value":"Play Framework Server","children":[]},{"value":"SQL Database","children":[]}]},{"value":"Reference","children":[{"value":"Community","children":[]},{"value":"Older Scala Versions","children":[]},{"value":"Talks","children":[]},{"value":"In the Wild","children":[]},{"value":"Scaladoc","children":[]},{"value":"Changelog","children":[{"value":"1.7.0","children":[]},{"value":"1.6.9","children":[]},{"value":"1.6.8","children":[]},{"value":"1.6.7","children":[]},{"value":"1.6.6","children":[]},{"value":"1.6.5","children":[]},{"value":"1.6.4","children":[]},{"value":"1.6.3","children":[]},{"value":"1.6.2","children":[]},{"value":"1.6.1","children":[]},{"value":"1.6.0","children":[]},{"value":"1.5.0","children":[]},{"value":"1.4.4","children":[]},{"value":"1.4.3","children":[]},{"value":"1.4.2","children":[]},{"value":"1.3.3","children":[]},{"value":"1.3.2","children":[]},{"value":"1.2.1","children":[]},{"value":"1.1.2","children":[]},{"value":"1.1.1","children":[]},{"value":"1.1.0","children":[]},{"value":"1.0.5","children":[]},{"value":"1.0.3","children":[]},{"value":"1.0.2","children":[]},{"value":"1.0.1","children":[]},{"value":"1.0.0","children":[]},{"value":"0.9.9","children":[]},{"value":"0.9.8","children":[]},{"value":"0.9.7","children":[]},{"value":"0.9.6","children":[]},{"value":"0.9.5","children":[]},{"value":"0.9.4","children":[]},{"value":"0.9.3","children":[]},{"value":"0.9.2","children":[]},{"value":"0.9.1","children":[]},{"value":"0.9.0","children":[]},{"value":"0.8.x","children":[{"value":"0.8.5","children":[]},{"value":"0.8.4","children":[]},{"value":"0.8.3","children":[]},{"value":"0.8.2","children":[]},{"value":"0.8.1","children":[]},{"value":"0.8.0","children":[]}]},{"value":"0.7.x","children":[{"value":"0.7.9","children":[]},{"value":"0.7.8","children":[]},{"value":"0.7.7","children":[]},{"value":"0.7.6","children":[]},{"value":"0.7.5","children":[]},{"value":"0.7.4","children":[]},{"value":"0.7.3","children":[]},{"value":"0.7.2","children":[]},{"value":"0.7.0","children":[]}]},{"value":"0.6.x","children":[{"value":"0.6.2","children":[]},{"value":"0.6.1","children":[]},{"value":"0.6.0","children":[]}]},{"value":"0.5.x","children":[{"value":"0.5.9","children":[]},{"value":"0.5.8","children":[]},{"value":"0.5.7","children":[]},{"value":"0.5.6","children":[]},{"value":"0.5.5","children":[]},{"value":"0.5.4","children":[]},{"value":"0.5.3","children":[]},{"value":"0.5.2","children":[]},{"value":"0.5.1","children":[]},{"value":"0.5.0","children":[]}]},{"value":"0.4.x","children":[{"value":"0.4.9","children":[]},{"value":"0.4.8","children":[]},{"value":"0.4.7","children":[]},{"value":"0.4.6","children":[]},{"value":"0.4.5","children":[]},{"value":"0.4.4","children":[]},{"value":"0.4.3","children":[]},{"value":"0.4.2","children":[]},{"value":"0.4.1","children":[]},{"value":"0.4.0","children":[]}]},{"value":"0.3.x","children":[{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]}]},{"value":"0.2.x","children":[{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]},{"value":"Unstable Versions","children":[{"value":"Unstable Changelog","children":[]}]}]}]}]
+      [{"value":"Ammonite","children":[{"value":"Ammonite-REPL","children":[{"value":"Features","children":[{"value":"Pretty-printed output","children":[{"value":"Configurable Truncation","children":[]}]},{"value":"Editing","children":[{"value":"Syntax Highlighting","children":[]},{"value":"Multi-line editing","children":[]},{"value":"Desktop key-bindings","children":[]},{"value":"Console key-bindings","children":[]},{"value":"History Search","children":[]},{"value":"Block Input","children":[]},{"value":"Undo & Redo","children":[]}]},{"value":"Magic Imports","children":[{"value":"import $file","children":[{"value":"Imported Scripts are Re-used","children":[]},{"value":"Cannot directly import from inside a Script","children":[]},{"value":"Renamed-scripts and multiple-scripts","children":[]}]},{"value":"import $exec","children":[]},{"value":"import $ivy","children":[]}]},{"value":"Builtins","children":[{"value":"Repl API","children":[]},{"value":"Utilities","children":[{"value":"source","children":[]},{"value":"time","children":[]},{"value":"grep","children":[]},{"value":"browse","children":[]},{"value":"desugar","children":[]}]}]},{"value":"Save/Load Session","children":[]},{"value":"Superior Autocomplete","children":[]},{"value":"Interrupting run-away execution with Ctrl-C","children":[]},{"value":"Compiler-crash Robustness","children":[]},{"value":"Other Fixes","children":[]}]},{"value":"Configuration","children":[{"value":"Refs","children":[]},{"value":"Compiler Flags","children":[]},{"value":"JVM Flags","children":[]}]},{"value":"Embedding","children":[{"value":"Instantiating Ammonite","children":[]},{"value":"Debugging","children":[]},{"value":"Remote REPL","children":[]}]}]},{"value":"Scala Scripts","children":[{"value":"Script Files","children":[{"value":"Script Imports","children":[{"value":"Other Scripts","children":[]},{"value":"Ivy Dependencies","children":[]}]},{"value":"Multi-stage Scripts","children":[]},{"value":"Script Arguments","children":[]},{"value":"Ammonite Arguments in Scripts","children":[]},{"value":"Multiple Main Methods","children":[]},{"value":"Script Usage Docs","children":[]},{"value":"Bundled Libraries","children":[]},{"value":"Script Builtins","children":[]},{"value":"Script Predef","children":[]}]},{"value":"Running Scripts","children":[{"value":"From Bash","children":[]},{"value":"Watch and Reload","children":[]},{"value":"Script Debug REPL","children":[]},{"value":"From the REPL","children":[]},{"value":"Execution Model","children":[]},{"value":"SBT Integration","children":[]}]}]},{"value":"Ammonite-Ops","children":[{"value":"Paths","children":[{"value":"RelPaths","children":[]},{"value":"Path Operations","children":[]},{"value":"Constructing Paths","children":[]}]},{"value":"Operations","children":[{"value":"Operator Reference","children":[]},{"value":"Extensions","children":[{"value":"Traversable","children":[]},{"value":"Pipeable","children":[]},{"value":"Callable","children":[]}]},{"value":"Chaining","children":[]},{"value":"Reading Resources","children":[]},{"value":"Spawning Subprocesses","children":[{"value":"Environment Variables","children":[]},{"value":"Invoking Files","children":[]},{"value":"Current Working Directory","children":[]}]}]}]},{"value":"Ammonite-Shell","children":[{"value":"Shell Basics","children":[{"value":"Working Directory","children":[]},{"value":"Listing Files","children":[]},{"value":"Filesystem Operations","children":[]},{"value":"Piping","children":[]},{"value":"Subprocesses","children":[]}]},{"value":"Scripting","children":[{"value":"Scala Scripting","children":[]},{"value":"Typed Values","children":[]},{"value":"Scala/Java APIs","children":[]},{"value":"Writing/Loading Scripts","children":[]}]},{"value":"Design Decisions & Tradeoffs","children":[{"value":"Scala as the Language","children":[]},{"value":"Running on the JVM","children":[]},{"value":"Goals of Ammonite-Shell","children":[]}]}]},{"value":"Ammonite Cookbook","children":[{"value":"HTTP Requests","children":[]},{"value":"Scraping HTML","children":[]},{"value":"GUI Applications","children":[]},{"value":"Office Automation","children":[]},{"value":"Image Processing","children":[]},{"value":"Machine Learning","children":[]},{"value":"Play Framework Server","children":[]},{"value":"SQL Database","children":[]}]},{"value":"Reference","children":[{"value":"Community","children":[]},{"value":"Older Scala Versions","children":[]},{"value":"Talks","children":[]},{"value":"In the Wild","children":[]},{"value":"Scaladoc","children":[]},{"value":"Changelog","children":[{"value":"1.7.1","children":[]},{"value":"1.6.9","children":[]},{"value":"1.6.8","children":[]},{"value":"1.6.7","children":[]},{"value":"1.6.6","children":[]},{"value":"1.6.5","children":[]},{"value":"1.6.4","children":[]},{"value":"1.6.3","children":[]},{"value":"1.6.2","children":[]},{"value":"1.6.1","children":[]},{"value":"1.6.0","children":[]},{"value":"1.5.0","children":[]},{"value":"1.4.4","children":[]},{"value":"1.4.3","children":[]},{"value":"1.4.2","children":[]},{"value":"1.3.3","children":[]},{"value":"1.3.2","children":[]},{"value":"1.2.1","children":[]},{"value":"1.1.2","children":[]},{"value":"1.1.1","children":[]},{"value":"1.1.0","children":[]},{"value":"1.0.5","children":[]},{"value":"1.0.3","children":[]},{"value":"1.0.2","children":[]},{"value":"1.0.1","children":[]},{"value":"1.0.0","children":[]},{"value":"0.9.9","children":[]},{"value":"0.9.8","children":[]},{"value":"0.9.7","children":[]},{"value":"0.9.6","children":[]},{"value":"0.9.5","children":[]},{"value":"0.9.4","children":[]},{"value":"0.9.3","children":[]},{"value":"0.9.2","children":[]},{"value":"0.9.1","children":[]},{"value":"0.9.0","children":[]},{"value":"0.8.x","children":[{"value":"0.8.5","children":[]},{"value":"0.8.4","children":[]},{"value":"0.8.3","children":[]},{"value":"0.8.2","children":[]},{"value":"0.8.1","children":[]},{"value":"0.8.0","children":[]}]},{"value":"0.7.x","children":[{"value":"0.7.9","children":[]},{"value":"0.7.8","children":[]},{"value":"0.7.7","children":[]},{"value":"0.7.6","children":[]},{"value":"0.7.5","children":[]},{"value":"0.7.4","children":[]},{"value":"0.7.3","children":[]},{"value":"0.7.2","children":[]},{"value":"0.7.0","children":[]}]},{"value":"0.6.x","children":[{"value":"0.6.2","children":[]},{"value":"0.6.1","children":[]},{"value":"0.6.0","children":[]}]},{"value":"0.5.x","children":[{"value":"0.5.9","children":[]},{"value":"0.5.8","children":[]},{"value":"0.5.7","children":[]},{"value":"0.5.6","children":[]},{"value":"0.5.5","children":[]},{"value":"0.5.4","children":[]},{"value":"0.5.3","children":[]},{"value":"0.5.2","children":[]},{"value":"0.5.1","children":[]},{"value":"0.5.0","children":[]}]},{"value":"0.4.x","children":[{"value":"0.4.9","children":[]},{"value":"0.4.8","children":[]},{"value":"0.4.7","children":[]},{"value":"0.4.6","children":[]},{"value":"0.4.5","children":[]},{"value":"0.4.4","children":[]},{"value":"0.4.3","children":[]},{"value":"0.4.2","children":[]},{"value":"0.4.1","children":[]},{"value":"0.4.0","children":[]}]},{"value":"0.3.x","children":[{"value":"0.3.2","children":[]},{"value":"0.3.1","children":[]},{"value":"0.3.0","children":[]}]},{"value":"0.2.x","children":[{"value":"0.2.9","children":[]},{"value":"0.2.8","children":[]}]}]},{"value":"Unstable Versions","children":[{"value":"Unstable Changelog","children":[]}]}]}]}]
   )</script><script>
     ['DOMContentLoaded', 'load'].forEach(function(ev){
       addEventListener(ev, function(){
