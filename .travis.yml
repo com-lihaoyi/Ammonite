@@ -12,12 +12,12 @@ matrix:
   - stage: build
     env: CI_SCRIPT="./mill -i unitTest"
     jdk: openjdk11
-    scala: 2.12.9
+    scala: 2.12.10
 
   - stage: build
     env: CI_SCRIPT="./mill -i unitTest"
     jdk: oraclejdk8
-    scala: 2.12.9
+    scala: 2.12.10
 
   - stage: build
     env: CI_SCRIPT="./mill -i unitTest"
@@ -27,12 +27,12 @@ matrix:
   - stage: build
     env: CI_SCRIPT="./mill -i integrationTest"
     jdk: openjdk11
-    scala: 2.12.9
+    scala: 2.12.10
 
   - stage: build
     env: CI_SCRIPT="./mill -i integrationTest"
     jdk: oraclejdk8
-    scala: 2.12.9
+    scala: 2.12.10
 
   - stage: build
     env: CI_SCRIPT="./mill -i integrationTest"
