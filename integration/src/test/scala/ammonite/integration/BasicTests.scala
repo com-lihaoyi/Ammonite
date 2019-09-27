@@ -25,7 +25,7 @@ object BasicTests extends TestSuite{
       "--no-remote-logging",
       "-h",
       home,
-      replStandaloneResources/name,
+      replStandaloneResources/name
     ).call(env = Map("JAVA_OPTS" -> "-verbose:class"))
 
     test("hello"){
@@ -47,9 +47,8 @@ object BasicTests extends TestSuite{
           executable,
           "--thin",
           "-s",
-          scriptAddr,
+          scriptAddr
           // Somehow this is being set of travis and causing weird errors/warnings
-
         ).call(env = Map("_JAVA_OPTIONS" -> null))
         assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
       }

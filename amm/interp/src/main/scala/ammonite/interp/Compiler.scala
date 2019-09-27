@@ -22,7 +22,6 @@ import scala.tools.nsc.classpath.{
 import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
-import scala.tools.nsc.reporters.AbstractReporter
 import scala.util.Try
 
 
@@ -132,30 +131,6 @@ object Compiler{
 
 
 
-  def makeReporter(errorLogger: => String => Unit,
-                   warningLogger: => String => Unit,
-                   infoLogger: => String => Unit,
-                   outerSettings: Settings) = {
-    new AbstractReporter {
-      def displayPrompt(): Unit = ???
-
-      def display(pos: Position, msg: String, severity: Severity) = {
-        severity match{
-          case ERROR =>
-            Classpath.traceClasspathProblem(s"ERROR: $msg")
-            errorLogger(Position.formatMessage(pos, msg, false))
-          case WARNING =>
-            warningLogger(Position.formatMessage(pos, msg, false))
-          case INFO =>
-            infoLogger(Position.formatMessage(pos, msg, false))
-        }
-      }
-
-      val settings = outerSettings
-    }
-  }
-
-
   def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
             evalClassloader: => ClassLoader,
@@ -245,7 +220,7 @@ object Compiler{
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"
 
-      val reporter = makeReporter(errorLogger, warningLogger, infoLogger, settings)
+      val reporter = MakeReporter.makeReporter(errorLogger, warningLogger, infoLogger, settings)
 
       val scalac = CompilerCompatibility.initGlobal(
         settings, reporter, jcp,

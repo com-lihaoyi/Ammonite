@@ -17,10 +17,10 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.10", "2.13.0")
+val binCrossScalaVersions = Seq("2.12.10", "2.13.1")
 val fullCrossScalaVersions = Seq(
   "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10",
-  "2.13.0"
+  "2.13.0", "2.13.1"
 )
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
@@ -35,7 +35,7 @@ val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
 trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   def testFramework = "utest.runner.Framework"
-  def scalacOptions = Seq("-P:acyclic:force", "-target:jvm-1.7")
+  def scalacOptions = Seq("-P:acyclic:force")
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
   def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
   trait Tests extends super.Tests{
@@ -57,10 +57,16 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
         Seq(PathRef(millSourcePath / "src" / "main" / dirName))
       } else
         Nil
-    val extraDir2 =
-      if (sv == "2.12.10") Nil
-      else Seq(PathRef(millSourcePath / "src" / "main" / "scala-not-2.12.10"))
-    super.sources() ++ extraDir ++ extraDir2
+
+    val extraDir2 = PathRef(
+      if (sv == "2.12.10" || sv == "2.13.1") millSourcePath / "src" / "main" / "scala-2.12.10-2.13.1+"
+      else millSourcePath / "src" / "main" / "scala-not-2.12.10-2.13.1+"
+    )
+    val extraDir3 =
+      if (sv == "2.13.1") Nil
+      else Seq(PathRef(millSourcePath / "src" / "main" / "scala-not-2.13.1"))
+
+    super.sources() ++ extraDir ++ Seq(extraDir2) ++ extraDir3
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
@@ -549,8 +555,8 @@ def publishDocs() = {
     println("MISC COMMIT: Building readme for verification")
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.13.0").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.0").assembly().path,
+      AMMONITE_SHELL=shell("2.13.1").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.13.1").assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
@@ -594,8 +600,8 @@ def publishDocs() = {
 
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.13.0").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.0").assembly().path,
+      AMMONITE_SHELL=shell("2.13.1").jar().path,
+      AMMONITE_ASSEMBLY=amm("2.13.1").assembly().path,
       CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")

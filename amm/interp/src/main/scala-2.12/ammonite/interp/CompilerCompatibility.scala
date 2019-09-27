@@ -1,5 +1,8 @@
 package ammonite.interp
 
+import ammonite.runtime.Classpath
+
+import scala.reflect.internal.util.Position
 import scala.reflect.io.FileZipArchive
 import scala.tools.nsc
 import scala.tools.nsc.{Global, Settings}
