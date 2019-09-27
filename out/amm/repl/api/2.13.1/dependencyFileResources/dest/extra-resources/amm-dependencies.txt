@@ -1,0 +1,14 @@
+com.github.scopt:scopt_2.13:3.7.1
+com.lihaoyi:acyclic_2.13:0.2.0
+com.lihaoyi:fansi_2.13:0.2.7
+com.lihaoyi:geny_2.13:0.1.8
+com.lihaoyi:os-lib_2.13:0.3.0
+com.lihaoyi:pprint_2.13:0.5.5
+com.lihaoyi:sourcecode_2.13:0.1.7
+io.get-coursier:interface:0.0.8
+jline:jline:2.14.6
+org.fusesource.jansi:jansi:1.12
+org.scala-lang:scala-compiler:2.13.1
+org.scala-lang:scala-library:2.13.1
+org.scala-lang:scala-reflect:2.13.1
+org.scala-lang.modules:scala-collection-compat_2.13:2.0.0

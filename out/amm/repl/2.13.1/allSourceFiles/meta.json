@@ -1,0 +1,18 @@
+{
+    "value": [
+        "ref:a33419b4:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/main/Defaults.scala",
+        "ref:547a0b02:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/ApiImpls.scala",
+        "ref:04f92032:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Repl.scala",
+        "ref:bb13debb:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/package.scala",
+        "ref:a3f47f9d:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/AmmoniteFrontEnd.scala",
+        "ref:8c27b1c0:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Highlighter.scala",
+        "ref:6bcfc0d1:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/PPrints.scala",
+        "ref:981b68f8:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEndUtils.scala",
+        "ref:d419124d:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/Signaller.scala",
+        "ref:5114e93c:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/SourceRuntime.scala",
+        "ref:753c8a90:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/tools/HighlightJava.scala",
+        "ref:11016d5f:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEnds.scala"
+    ],
+    "valueHash": -2009395266,
+    "inputsHash": 1703330269
+}

@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ref:acd6888d:/home/travis/build/lihaoyi/Ammonite/shell/src/main/scala/ammonite/shell/PathComplete.scala",
+        "ref:ebb69a43:/home/travis/build/lihaoyi/Ammonite/shell/src/main/scala/ammonite/shell/ShellSession.scala",
+        "ref:e3532d60:/home/travis/build/lihaoyi/Ammonite/shell/src/main/scala/ammonite/shell/Configure.scala"
+    ],
+    "valueHash": -1381999649,
+    "inputsHash": 817181350
+}

@@ -1,0 +1,26 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "ref:c1c24948:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/src/main/resources",
+        "ref:1d87a8da:/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.1/compile/dest/classes",
+        "ref:a1f90e58:/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.1/thinWhitelist/dest",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/terminal/src/main/resources",
+        "ref:4d80bb0f:/home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+        "ref:031bc693:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/resources",
+        "ref:eb8301b5:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/interp/api/src/main/resources",
+        "ref:27eb776c:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/resources",
+        "ref:bb387014:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/dependencyFileResources/dest/extra-resources",
+        "ref:20a726a7:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/resources",
+        "ref:a93a0224:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/repl/src/main/resources",
+        "ref:987da337:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.13.1/compile/dest/classes"
+    ],
+    "valueHash": 412191035,
+    "inputsHash": -1528251581
+}

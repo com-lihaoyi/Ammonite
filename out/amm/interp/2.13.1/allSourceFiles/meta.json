@@ -1,0 +1,24 @@
+{
+    "value": [
+        "ref:19c13a01:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/PredefInitialization.scala",
+        "ref:f8578651:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/DefaultPreprocessor.scala",
+        "ref:abff6ed0:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/AmmonitePlugin.scala",
+        "ref:dc1635bf:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Pressy.scala",
+        "ref:8802c745:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Interpreter.scala",
+        "ref:ac6dfc60:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Preprocessor.scala",
+        "ref:af14e90e:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Parsers.scala",
+        "ref:b122c49a:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CodeWrapper.scala",
+        "ref:81ef23df:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/IvyThing.scala",
+        "ref:a9c27464:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CodeClassWrapper.scala",
+        "ref:bf18af6b:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/internal/CustomURLZipArchive.scala",
+        "ref:416aa8c0:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/CompilerLifecycleManager.scala",
+        "ref:d1297428:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/ammonite/interp/Compiler.scala",
+        "ref:11513757:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala/scala/tools/nsc/CustomZipAndJarFileLookupFactory.scala",
+        "ref:159a5326:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.13.1/ammonite/interp/MakeReporter.scala",
+        "ref:b34e2408:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.13/ammonite/interp/CompilerCompatibility.scala",
+        "ref:a7b8837f:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.12.10-2.13.1+/scala/tools/nsc/AmmClassPath.scala",
+        "ref:6af69064:/home/travis/build/lihaoyi/Ammonite/amm/interp/src/main/scala-2.12.10-2.13.1+/scala/tools/nsc/WhiteListClasspath.scala"
+    ],
+    "valueHash": 742252657,
+    "inputsHash": -695836828
+}

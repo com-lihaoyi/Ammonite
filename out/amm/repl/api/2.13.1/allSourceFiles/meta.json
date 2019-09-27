@@ -1,0 +1,22 @@
+{
+    "value": [
+        "ref:2734365a:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/ReplAPI.scala",
+        "ref:837e2f08:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/ReplClassLoader.scala",
+        "ref:f9bceb0d:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/FrontEnd.scala",
+        "ref:b9bc3a07:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/Frame.scala",
+        "ref:39f02a48:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/FrontEndAPI.scala",
+        "ref:5069efe3:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/SourceAPI.scala",
+        "ref:a6cef57d:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/SessionChanged.scala",
+        "ref:93cf6b8b:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/FullReplAPI.scala",
+        "ref:979b9eeb:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/Util.scala",
+        "ref:1ed9708e:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/source.scala",
+        "ref:0ae3a07c:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/Router.scala",
+        "ref:aaa3a50d:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/desugar.scala",
+        "ref:f0b0ea03:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/runtime/tools/package.scala",
+        "ref:9377ed30:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/runtime/tools/Tools.scala",
+        "ref:1c0a99ad:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala-2.13/ammonite/repl/api/History.scala",
+        "ref:4c210752:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/generatedSources/dest/Constants.scala"
+    ],
+    "valueHash": 1287317980,
+    "inputsHash": 1586061633
+}

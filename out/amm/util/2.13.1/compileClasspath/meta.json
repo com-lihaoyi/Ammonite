@@ -1,0 +1,17 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "ref:c1c24948:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+        "qref:f38ecd66:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.0.0/scala-collection-compat_2.13-2.0.0.jar",
+        "qref:42e0b610:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.1/scala-reflect-2.13.1.jar",
+        "qref:1e0be465:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.2.7/fansi_2.13-0.2.7.jar",
+        "qref:ddfc3a1a:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.1.7/sourcecode_2.13-0.1.7.jar",
+        "qref:b09a59fa:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.1.8/geny_2.13-0.1.8.jar",
+        "qref:9d03f8ab:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.3.0/os-lib_2.13-0.3.0.jar",
+        "qref:3a5f3db3:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.1/scala-library-2.13.1.jar",
+        "qref:88ffd81e:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.5.5/pprint_2.13-0.5.5.jar"
+    ],
+    "valueHash": -1740559101,
+    "inputsHash": 784517620
+}

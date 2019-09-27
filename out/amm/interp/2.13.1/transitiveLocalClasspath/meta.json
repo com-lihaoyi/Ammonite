@@ -1,0 +1,17 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/resources",
+        "ref:c1c24948:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/resources",
+        "ref:031bc693:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/resources",
+        "ref:eb8301b5:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/interp/api/src/main/resources",
+        "ref:27eb776c:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/resources",
+        "ref:bb387014:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/dependencyFileResources/dest/extra-resources",
+        "ref:20a726a7:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes"
+    ],
+    "valueHash": -1547387137,
+    "inputsHash": -1171656096
+}

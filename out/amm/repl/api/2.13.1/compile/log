@@ -1,0 +1,10 @@
+[0m[[0m[0minfo[0m] [0m[0mCompiling 16 Scala sources to /home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/travis/build/lihaoyi/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/Router.scala:314:43: abstract type Router.this.c.universe.Literal is unchecked since it is eliminated by erasure[0m
+[0m[[0m[33mwarn[0m] [0m[0m        if doc.scalaArgs.head.isInstanceOf[Literal][0m
+[0m[[0m[33mwarn[0m] [0m[0m                                          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 13 deprecation warnings (since 2.11.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 7 deprecation warnings (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 20 deprecation warnings in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 5 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m5 warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m

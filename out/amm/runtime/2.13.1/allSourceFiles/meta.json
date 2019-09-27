@@ -1,0 +1,14 @@
+{
+    "value": [
+        "ref:7ef6a9c9:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/package.scala",
+        "ref:c2675b6f:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ClassLoaders.scala",
+        "ref:40ad692c:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ImportHook.scala",
+        "ref:d96518d7:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Evaluator.scala",
+        "ref:0aad505e:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Storage.scala",
+        "ref:695a0011:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Classpath.scala",
+        "ref:7bd637cb:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/java/io/github/retronym/java9rtexport/Export.java",
+        "ref:ffe3464a:/home/travis/build/lihaoyi/Ammonite/amm/runtime/src/main/java/io/github/retronym/java9rtexport/Copy.java"
+    ],
+    "valueHash": -899305257,
+    "inputsHash": -1918843683
+}

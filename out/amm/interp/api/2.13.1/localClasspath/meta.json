@@ -1,0 +1,8 @@
+{
+    "value": [
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/amm/interp/api/src/main/resources",
+        "ref:27eb776c:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes"
+    ],
+    "valueHash": 1065333481,
+    "inputsHash": -927642977
+}

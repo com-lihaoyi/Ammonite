@@ -1,0 +1,34 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/zinc",
+            "classes": "ref:c1c24948:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.1/compile/dest/zinc",
+            "classes": "ref:031bc693:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.1/compile/dest/zinc",
+            "classes": "ref:eb8301b5:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/zinc",
+            "classes": "ref:27eb776c:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/zinc",
+            "classes": "ref:20a726a7:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.13.1/compile/dest/zinc",
+            "classes": "ref:a93a0224:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.1/compile/dest/zinc",
+            "classes": "ref:4d80bb0f:/home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.1/compile/dest/classes"
+        }
+    ],
+    "valueHash": -989226352,
+    "inputsHash": -2114600166
+}

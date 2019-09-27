@@ -1,0 +1,42 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/zinc",
+            "classes": "ref:c1c24948:/home/travis/build/lihaoyi/Ammonite/out/ops/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.1/compile/dest/zinc",
+            "classes": "ref:1d87a8da:/home/travis/build/lihaoyi/Ammonite/out/amm/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.1/compile/dest/zinc",
+            "classes": "ref:4d80bb0f:/home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.1/compile/dest/zinc",
+            "classes": "ref:031bc693:/home/travis/build/lihaoyi/Ammonite/out/amm/util/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.1/compile/dest/zinc",
+            "classes": "ref:eb8301b5:/home/travis/build/lihaoyi/Ammonite/out/amm/runtime/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/zinc",
+            "classes": "ref:27eb776c:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/zinc",
+            "classes": "ref:20a726a7:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.13.1/compile/dest/zinc",
+            "classes": "ref:a93a0224:/home/travis/build/lihaoyi/Ammonite/out/amm/interp/2.13.1/compile/dest/classes"
+        },
+        {
+            "analysisFile": "/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.13.1/compile/dest/zinc",
+            "classes": "ref:987da337:/home/travis/build/lihaoyi/Ammonite/out/amm/repl/2.13.1/compile/dest/classes"
+        }
+    ],
+    "valueHash": -1110878772,
+    "inputsHash": -552890007
+}

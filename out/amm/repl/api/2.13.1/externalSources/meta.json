@@ -1,0 +1,19 @@
+{
+    "value": [
+        "qref:30204de0:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.1/scala-compiler-2.13.1-sources.jar",
+        "qref:071d93ef:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.0.0/scala-collection-compat_2.13-2.0.0-sources.jar",
+        "qref:fff99a4b:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.1/scala-reflect-2.13.1-sources.jar",
+        "qref:7e29d441:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.2.7/fansi_2.13-0.2.7-sources.jar",
+        "qref:bb5f754f:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.1.7/sourcecode_2.13-0.1.7-sources.jar",
+        "qref:9b562920:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/scopt/scopt_2.13/3.7.1/scopt_2.13-3.7.1-sources.jar",
+        "qref:d987f257:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.1.8/geny_2.13-0.1.8-sources.jar",
+        "qref:1e1a64e0:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.12/jansi-1.12-sources.jar",
+        "qref:fe83cd50:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.3.0/os-lib_2.13-0.3.0-sources.jar",
+        "qref:8919e704:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.1/scala-library-2.13.1-sources.jar",
+        "qref:59e1e4a4:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.5.5/pprint_2.13-0.5.5-sources.jar",
+        "qref:4309bcb7:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/jline/jline/2.14.6/jline-2.14.6-sources.jar",
+        "qref:019835c7:/home/travis/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/0.0.8/interface-0.0.8-sources.jar"
+    ],
+    "valueHash": 702206327,
+    "inputsHash": 2090133377
+}
