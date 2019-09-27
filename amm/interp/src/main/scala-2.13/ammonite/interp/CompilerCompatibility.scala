@@ -1,15 +1,19 @@
 package ammonite.interp
 
+import ammonite.runtime.Classpath
+
+import scala.reflect.internal.util.Position
 import scala.reflect.io.FileZipArchive
 import scala.tools.nsc
 import scala.tools.nsc.classpath.{AggregateClassPath, ZipAndJarClassPathFactory}
 import scala.tools.nsc.{Global, Settings}
 import scala.tools.nsc.interactive.{InteractiveAnalyzer, Global => InteractiveGlobal}
 import scala.tools.nsc.plugins.Plugin
-import scala.tools.nsc.reporters.AbstractReporter
+import scala.tools.nsc.reporters.Reporter
 import scala.tools.nsc.typechecker.Analyzer
 
 object CompilerCompatibility {
+
   def analyzer(g: Global, cl: ClassLoader): Analyzer { val global: g.type } = {
     new { val global: g.type = g } with Analyzer {
       override def defaultMacroClassloader = global.findMacroClassLoader
@@ -26,7 +30,7 @@ object CompilerCompatibility {
     new g.analyzer.ImportInfo(t, 0, false)
 
   def initGlobal(settings: Settings,
-                 reporter: AbstractReporter,
+                 reporter: Reporter,
                  jcp: AggregateClassPath,
                  evalClassloader: ClassLoader,
                  createPlugins: Global => List[Plugin]): Global = {

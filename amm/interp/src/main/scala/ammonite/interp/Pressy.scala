@@ -2,7 +2,7 @@ package ammonite.interp
 
 import java.io.{OutputStream, PrintWriter}
 
-import ammonite.interp.Compiler.makeReporter
+import ammonite.interp.MakeReporter.makeReporter
 import ammonite.util.Name
 
 import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition, Position}
@@ -14,7 +14,7 @@ import scala.util.{Failure, Success, Try}
 import ammonite.util.Util.newLine
 import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
 import scala.tools.nsc.classpath.AggregateClassPath
-import scala.tools.nsc.reporters.AbstractReporter
+import scala.tools.nsc.reporters.Reporter
 /**
  * Nice wrapper for the presentation compiler.
  */
@@ -276,7 +276,7 @@ object Pressy {
       cachedPressy
     }
     def initInteractiveGlobal(settings: Settings,
-                              reporter: AbstractReporter,
+                              reporter: Reporter,
                               jcp: AggregateClassPath,
                               evalClassloader: ClassLoader): InteractiveGlobal = {
       new nsc.interactive.Global(settings, reporter) { g =>
