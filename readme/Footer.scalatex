@@ -123,6 +123,14 @@
 
 
   @sect{Changelog}
+    @sect{1.7.2}
+      @ul
+        @li
+          Bump uPickle to 0.8.0
+
+        @li
+          Support for Scala 2.13.1
+
     @sect{1.7.1}
       @ul
         @li
