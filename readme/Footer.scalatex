@@ -123,7 +123,7 @@
 
 
   @sect{Changelog}
-    @sect{1.7.2}
+    @sect{1.7.3}
       @ul
         @li
           Bump uPickle to 0.8.0
