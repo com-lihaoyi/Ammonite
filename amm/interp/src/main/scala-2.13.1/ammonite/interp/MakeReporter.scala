@@ -22,7 +22,7 @@ object MakeReporter {
       def doReport(pos: scala.reflect.internal.util.Position,
                    msg: String,
                    severity: Severity): Unit = {
-        info0(pos, msg, severity, false)
+        display(pos, msg, severity)
       }
       def display(pos: Position, msg: String, severity: Severity) = {
         severity match{
