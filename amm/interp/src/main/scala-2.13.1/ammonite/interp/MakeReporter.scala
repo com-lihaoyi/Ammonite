@@ -19,7 +19,9 @@ object MakeReporter {
                    outerSettings: Settings) = {
     new FilteringReporter {
       def displayPrompt(): Unit = ???
-      def doReport(pos: scala.reflect.internal.util.Position, msg: String, severity: Severity): Unit = {
+      def doReport(pos: scala.reflect.internal.util.Position,
+                   msg: String,
+                   severity: Severity): Unit = {
         info0(pos, msg, severity, false)
       }
       def display(pos: Position, msg: String, severity: Severity) = {
