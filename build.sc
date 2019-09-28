@@ -657,8 +657,8 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
       Option(sys.env("SONATYPE_PGP_PASSWORD")),
       None,
       true,
-      60000,
-      60000,
+      120000,
+      120000,
       T.ctx().log,
       120000
     ).publishAll(
