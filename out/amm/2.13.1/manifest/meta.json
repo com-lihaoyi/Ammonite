@@ -1,0 +1,11 @@
+{
+    "value": {
+        "main": {
+            "Manifest-Version": "1.0",
+            "Created-By": "Scala mill",
+            "Main-Class": "ammonite.Main"
+        }
+    },
+    "valueHash": -737166493,
+    "inputsHash": -865830422
+}
