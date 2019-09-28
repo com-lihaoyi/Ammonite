@@ -659,7 +659,8 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
       true,
       60000,
       60000,
-      T.ctx().log
+      T.ctx().log,
+      120000
     ).publishAll(
       true,
       x:_*
