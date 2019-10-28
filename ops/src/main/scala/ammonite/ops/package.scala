@@ -31,7 +31,7 @@ package object ops extends Extensions {
   object stat extends Function1[Path, os.StatInfo]{
     def apply(s: Path, followLinks: Boolean = true) = os.stat(s, followLinks)
     def apply(s: Path) = os.stat(s)
-    val full = os.stat.full
+    val posix = os.stat.posix
   }
   implicit def SymPath(s: Symbol): RelPath = StringPath(s.name)
   implicit def StringPath(s: String): RelPath = {
@@ -114,7 +114,8 @@ package object ops extends Extensions {
     * normally access through [[stat]]-ing it by [[stat]]-ing the file for you
     * when necessary.
     */
-  implicit def fileData(p: Path): os.FullStatInfo = stat.full(p)
+  implicit def statFileData(p: Path): os.StatInfo = stat(p)
+  implicit def posixFileData(p: Path): os.PosixStatInfo = stat.posix(p)
 
   /**
     * Used to spawn a subprocess interactively; any output gets printed to the

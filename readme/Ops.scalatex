@@ -194,7 +194,7 @@
         @li
           @hl.scala{stat! path}, @a("[doc]", href := (docBase+ "stat$"))
         @li
-          @hl.scala{stat.full! path}, @a("[doc]", href := (docBase+ "stat$$full$"))
+          @hl.scala{stat.posix! path}, @a("[doc]", href := (docBase+ "stat$$posix$"))
         @li
           @hl.scala{ln(src, dest)}, @a("[doc]", href := (docBase+ "ln$"))
         @li

@@ -185,9 +185,9 @@ object SessionTests extends TestSuite{
 
         @ assert(!stat('test132).isDir && !stat('test132).isSymLink && stat('test130).isDir)
 
-        @ assert(!stat.full('test132).isDir && !stat.full('test132).isSymLink)
+        @ assert(!stat('test132).isDir && !stat('test132).isSymLink)
 
-        @ assert(stat.full('test130).isDir)
+        @ assert(stat('test130).isDir)
 
         @ assert(ls.rec(wd).length == 5)
 
@@ -217,11 +217,11 @@ object SessionTests extends TestSuite{
 
         @ assert(!stat(t/'test132).isDir && !stat(t/'test132).isSymLink)
 
-        @ assert(!stat.full(t/'test132).isDir && !stat.full(t/'test132).isSymLink)
+        @ assert(!stat(t/'test132).isDir && !stat(t/'test132).isSymLink)
 
         @ assert(stat(t/'test130).isDir && stat(t, followLinks = false).isSymLink)
 
-        @ assert(stat.full(t/'test130).isDir && stat.full(t, followLinks = false).isSymLink)
+        @ assert(stat(t/'test130).isDir && stat(t, followLinks = false).isSymLink)
 
         @ rm! tmpdir
       """)

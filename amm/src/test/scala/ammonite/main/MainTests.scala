@@ -10,8 +10,8 @@ import utest._
   * and the associated error behavior if the caller messes up.
  */
 object MainTests extends TestSuite{
-  def exec(p: os.RelPath, args: String*) =
-    new InProcessMainMethodRunner(os.rel / 'mains/p, Nil, args)
+  def exec(p: String, args: String*) =
+    new InProcessMainMethodRunner(os.rel / 'mains / p, Nil, args)
 
   def stripInvisibleMargin(s: String): String = {
     val lines = Predef.augmentString(s).lines.toArray
