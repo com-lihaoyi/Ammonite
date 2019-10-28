@@ -26,7 +26,10 @@ object BasicTests extends TestSuite{
       "-h",
       home,
       replStandaloneResources/name
-    ).call(env = Map("JAVA_OPTS" -> "-verbose:class"))
+    ).call(
+      env = Map("JAVA_OPTS" -> "-verbose:class"),
+      stderr = os.Pipe
+    )
 
     test("hello"){
       val evaled = exec(os.rel / 'basic/"Hello.sc")
