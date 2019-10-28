@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{1.8.1}
+      @ul
+        @li
+          Bump PPrint to 0.5.6
     @sect{1.8.0}
       @ul
         @li
