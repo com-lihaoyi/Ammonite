@@ -123,6 +123,11 @@
 
 
   @sect{Changelog}
+    @sect{1.8.0}
+      @ul
+        @li
+          Bump OS-Lib to 0.4.2
+
     @sect{1.7.4}
       @ul
         @li
