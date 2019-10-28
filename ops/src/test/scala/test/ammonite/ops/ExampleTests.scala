@@ -102,12 +102,6 @@ object ExampleTests extends TestSuite{
       // Ammonite provides an implicit conversion from `Path` to
       // `stat`, so you can use these attributes directly
       (wd/"file1.txt").size ==> 20
-
-      // You can also use `stat.posix` which provides more information
-      val posixInfo  = stat.posix(wd/"file1.txt")
-      posixInfo.ctime: FileTime
-      posixInfo.atime: FileTime
-      posixInfo.group: GroupPrincipal
       ()
     }
     test("longExample"){
