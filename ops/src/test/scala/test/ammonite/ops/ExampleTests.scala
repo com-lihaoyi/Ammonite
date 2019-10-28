@@ -103,11 +103,11 @@ object ExampleTests extends TestSuite{
       // `stat`, so you can use these attributes directly
       (wd/"file1.txt").size ==> 20
 
-      // You can also use `stat.full` which provides more information
-      val fullInfo = stat.full(wd/"file1.txt")
-      fullInfo.ctime: FileTime
-      fullInfo.atime: FileTime
-      fullInfo.group: GroupPrincipal
+      // You can also use `stat.posix` which provides more information
+      val posixInfo  = stat.posix(wd/"file1.txt")
+      posixInfo.ctime: FileTime
+      posixInfo.atime: FileTime
+      posixInfo.group: GroupPrincipal
       ()
     }
     test("longExample"){
