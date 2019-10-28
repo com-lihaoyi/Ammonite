@@ -7,5 +7,5 @@ package ammonite.ops
 case class LsSeq(base: Path, listed: RelPath*) extends Seq[Path]{
   def length = listed.length
   def apply(idx: Int) = base/listed.apply(idx)
-  def iterator = listed.iterator.map(base/)
+  def iterator = listed.iterator.map(base / _)
 }

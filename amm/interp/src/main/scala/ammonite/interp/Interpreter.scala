@@ -362,7 +362,10 @@ class Interpreter(val printer: Printer,
         )
 
 
-        val cachedScriptData = storage.classFilesListLoad(codeSource.filePathPrefix, tag)
+        val cachedScriptData = storage.classFilesListLoad(
+          os.sub / codeSource.filePathPrefix,
+          tag
+        )
 
 
         // Lazy, because we may not always need this if the script is already cached
@@ -398,7 +401,7 @@ class Interpreter(val printer: Printer,
           )
         } yield {
           storage.classFilesListSave(
-            codeSource.filePathPrefix,
+            os.sub / codeSource.filePathPrefix,
             metadata.blockInfo,
             tag
           )

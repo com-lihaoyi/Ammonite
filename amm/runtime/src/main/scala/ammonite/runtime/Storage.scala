@@ -26,10 +26,10 @@ trait Storage{
 
   def compileCacheSave(path: String, tag: Tag, data: Storage.CompileCache): Unit
   def compileCacheLoad(path: String, tag: Tag): Option[Storage.CompileCache]
-  def classFilesListSave(filePathPrefix: os.RelPath,
+  def classFilesListSave(filePathPrefix: os.SubPath,
                          perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                          tag: Tag): Unit
-  def classFilesListLoad(filePathPrefix: os.RelPath, tag: Tag): Option[ScriptOutput]
+  def classFilesListLoad(filePathPrefix: os.SubPath, tag: Tag): Option[ScriptOutput]
   def getSessionId: Long
 }
 
@@ -160,14 +160,14 @@ object Storage{
       } yield data
     }
 
-    def classFilesListSave(filePathPrefix: os.RelPath,
+    def classFilesListSave(filePathPrefix: os.SubPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            tag: Tag): Unit = {
 
       classFilesListcache(filePathPrefix.toString) = (tag, perBlockMetadata)
     }
 
-    def classFilesListLoad(filePathPrefix: os.RelPath,
+    def classFilesListLoad(filePathPrefix: os.SubPath,
                            cacheTag: Tag): Option[ScriptOutput] = {
 
       classFilesListcache.get(filePathPrefix.toString) match{
@@ -218,7 +218,7 @@ object Storage{
     }
 
 
-    def classFilesListSave(filePathPrefix: os.RelPath,
+    def classFilesListSave(filePathPrefix: os.SubPath,
                            perBlockMetadata: Seq[ScriptOutput.BlockMetadata],
                            tag: Tag): Unit = {
 
@@ -246,7 +246,7 @@ object Storage{
       catch{ case e: Throwable => None }
     }
 
-    def classFilesListLoad(filePathPrefix: os.RelPath,
+    def classFilesListLoad(filePathPrefix: os.SubPath,
                            tag: Tag): Option[ScriptOutput] = {
 
       val codeCacheDir =
