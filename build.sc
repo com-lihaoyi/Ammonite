@@ -544,6 +544,15 @@ def publishExecutable() = {
         s"$scalaBinaryVersion-$buildVersion",
         sys.env("AMMONITE_BOT_AUTH_TOKEN")
       )
+      upload(
+        os.temp(
+          os.read(os.pwd / "amm-template.sh")
+            .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
+        ),
+        latestTaggedVersion,
+        s"$scalaBinaryVersion-$buildVersion-bootstrap",
+        sys.env("AMMONITE_BOT_AUTH_TOKEN")
+      )
     }
   }
 }

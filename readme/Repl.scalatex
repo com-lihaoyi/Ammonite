@@ -57,6 +57,16 @@
     $ brew install ammonite-repl  
 
   @p
+    You can also download a bootstrap script, that can be downloaded and committed
+    to version control as a file `amm`:
+
+  @hl.sh
+    curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-boostrap > amm && chmod +x amm
+
+  @p
+    You can then run Ammonite via the `./amm` command.
+
+  @p
     This will give you access to the Ammonite-REPL:
 
   @img(src:="GettingStarted.png", width:="100%")

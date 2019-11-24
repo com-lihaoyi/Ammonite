@@ -123,6 +123,12 @@
 
 
   @sect{Changelog}
+    @sect{1.8.2}
+      @ul
+        @li
+          Started publishing bootstrap scripts, that can be easily committed to version
+          control and download/launch Ammonite via `./amm`
+
     @sect{1.8.1}
       @ul
         @li
