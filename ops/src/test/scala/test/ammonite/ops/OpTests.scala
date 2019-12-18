@@ -242,7 +242,7 @@ object OpTests extends TestSuite{
         test("concatenating"){
           write(d/'concat1, Seq("a", "b", "c"))
           assert(read(d/'concat1) == "abc")
-          write(d/'concat2, Array(Array[Byte](1, 2), Array[Byte](3, 4)))
+          write(d/'concat2, Seq(Array[Byte](1, 2), Array[Byte](3, 4)))
           assert(read.bytes(d/'concat2).toSeq == Array[Byte](1, 2, 3, 4).toSeq)
         }
         test("writeAppend"){
