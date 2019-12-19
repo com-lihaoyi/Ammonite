@@ -9,10 +9,10 @@ import pprint.Renderer
 object PPrints{
   val replPPrintHandlers: PartialFunction[Any, pprint.Tree] = {
     case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x)
-    case x: os.Path => PPrints.pathRepr(x)
-    case x: os.RelPath => PPrints.relPathRepr(x)
-    case x: ammonite.ops.Path => PPrints.pathRepr(os.Path(x.toString))
-    case x: ammonite.ops.RelPath => PPrints.relPathRepr(os.RelPath(x.toString))
+//    case x: os.Path => PPrints.pathRepr(x)
+//    case x: os.RelPath => PPrints.relPathRepr(x)
+//    case x: ammonite.ops.Path => PPrints.pathRepr(os.Path(x.toString))
+//    case x: ammonite.ops.RelPath => PPrints.relPathRepr(os.RelPath(x.toString))
     case x: ammonite.ops.CommandResult => PPrints.commandResultRepr(x)
     case t: History => pprint.Tree.Lazy(ctx => Iterator(t.mkString(Util.newLine)))
     case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
