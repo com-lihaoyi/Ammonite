@@ -43,7 +43,7 @@ class Interpreter(val printer: Printer,
                   val createFrame: () => Frame,
                   initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
-                  scriptCodeWrapper: CodeWrapper,
+                  val scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[Dependency],
                   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
                   classPathWhitelist: Set[Seq[String]] = Set.empty)

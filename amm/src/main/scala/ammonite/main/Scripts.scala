@@ -74,20 +74,35 @@ object Scripts {
           .evalClassloader
           .loadClass(processed.blockInfo.last.id.wrapperPath + "$")
 
-      routesCls =
-        interp
-          .evalClassloader
-          .loadClass(routeClsName + "$$routes$")
-
-      scriptMains =
-        routesCls
+      scriptMains = interp.scriptCodeWrapper match{
+        case ammonite.interp.CodeWrapper =>
+          interp
+            .evalClassloader
+            .loadClass(routeClsName + "$$routes$")
             .getField("MODULE$")
             .get(null)
             .asInstanceOf[() => Seq[Router.EntryPoint[Any]]]
             .apply()
 
+        case ammonite.interp.CodeClassWrapper =>
+          val outer = interp
+            .evalClassloader
+            .loadClass(routeClsName)
+            .getMethod("instance")
+            .invoke(null)
 
-      mainObj = mainCls.getField("MODULE$").get(null)
+          outer.getClass.getMethod("$routes").invoke(outer)
+            .asInstanceOf[() => Seq[Router.EntryPoint[Any]]]
+            .apply()
+        case _ => Nil
+      }
+
+      mainObj = interp.scriptCodeWrapper match {
+        case ammonite.interp.CodeWrapper => mainCls.getField("MODULE$").get(null)
+        case ammonite.interp.CodeClassWrapper =>
+          mainCls.getMethod("instance").invoke(mainCls.getField("MODULE$").get(null))
+        case _ => ()
+      }
 
       res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {

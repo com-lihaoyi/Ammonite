@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{1.9.1}
+      @ul
+        @li
+          Fix @code{@@main} method handling in scripts run via @code{--class-based}
     @sect{1.9.0}
       @ul
         @li
