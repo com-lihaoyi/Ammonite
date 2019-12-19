@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{1.9.2}
+      @ul
+        @li
+          Bump FastParse to 2.2.0
     @sect{1.9.1}
       @ul
         @li
