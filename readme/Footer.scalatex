@@ -123,6 +123,12 @@
 
 
   @sect{Changelog}
+    @sect{1.9.0}
+      @ul
+        @li
+          Bump OS-Lib, uPickle and Requests-Scala versions, for compatibility
+          with the @lnk("geny.Writable", "https://github.com/lihaoyi/geny#writable")
+          interface
     @sect{1.8.2}
       @ul
         @li
