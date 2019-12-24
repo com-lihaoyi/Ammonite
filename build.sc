@@ -170,8 +170,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.9.1",
-      ivy"com.lihaoyi::requests:0.4.1"
+      ivy"com.lihaoyi::upickle:0.9.2",
+      ivy"com.lihaoyi::requests:0.4.4"
     )
   }
 
