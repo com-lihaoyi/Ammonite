@@ -170,7 +170,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.9.3",
+      ivy"com.lihaoyi::upickle:0.9.5",
       ivy"com.lihaoyi::requests:0.4.6"
     )
   }
@@ -193,7 +193,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.2.0",
+      ivy"com.lihaoyi::scalaparse:2.2.2",
       ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
@@ -418,7 +418,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,
-      "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
+      "AMMONITE_ASSEMBLY" -> amm().launcher().path.toString
     )
   }
 }

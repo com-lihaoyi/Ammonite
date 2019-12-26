@@ -1,5 +1,10 @@
 package ammonite.interp
 
+import ammonite.util.ImportTree
+import ammonite.util.Util.CodeSource
+
+import scala.collection.mutable
+
 object Parsers {
 
   import fastparse._
@@ -102,5 +107,30 @@ object Parsers {
       case Parsed.Success(v, _) =>  "'" + s
       case f: Parsed.Failure => stringWrap(s)
     }
+  }
+  def parseImportHooks(source: CodeSource, stmts: Seq[String]) = synchronized{
+    val hookedStmts = mutable.Buffer.empty[String]
+    val importTrees = mutable.Buffer.empty[ImportTree]
+    for(stmt <- stmts) {
+      // Call `fastparse.ParserInput.fromString` explicitly, to avoid generating a
+      // lambda in the class body and making the we-do-not-load-fastparse-on-cached-scripts
+      // test fail
+      parse(fastparse.ParserInput.fromString(stmt), Parsers.ImportSplitter(_)) match{
+        case f: Parsed.Failure => hookedStmts.append(stmt)
+        case Parsed.Success(parsedTrees, _) =>
+          var currentStmt = stmt
+          for(importTree <- parsedTrees){
+            if (importTree.prefix(0)(0) == '$') {
+              val length = importTree.end - importTree.start
+              currentStmt = currentStmt.patch(
+                importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
+              )
+              importTrees.append(importTree)
+            }
+          }
+          hookedStmts.append(currentStmt)
+      }
+    }
+    (hookedStmts.toSeq, importTrees.toSeq)
   }
 }

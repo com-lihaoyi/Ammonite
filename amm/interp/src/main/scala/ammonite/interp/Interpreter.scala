@@ -183,28 +183,7 @@ class Interpreter(val printer: Printer,
     } yield hookResults
   }
 
-  def parseImportHooks(source: CodeSource, stmts: Seq[String]) = synchronized{
-    val hookedStmts = mutable.Buffer.empty[String]
-    val importTrees = mutable.Buffer.empty[ImportTree]
-    for(stmt <- stmts) {
-      parse(stmt, Parsers.ImportSplitter(_)) match{
-        case f: Parsed.Failure => hookedStmts.append(stmt)
-        case Parsed.Success(parsedTrees, _) =>
-          var currentStmt = stmt
-          for(importTree <- parsedTrees){
-            if (importTree.prefix(0)(0) == '$') {
-              val length = importTree.end - importTree.start
-              currentStmt = currentStmt.patch(
-                importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
-              )
-              importTrees.append(importTree)
-            }
-          }
-          hookedStmts.append(currentStmt)
-      }
-    }
-    (hookedStmts.toSeq, importTrees.toSeq)
-  }
+
 
   def resolveImportHooks(importTrees: Seq[ImportTree],
                          hookedStmts: Seq[String],
@@ -238,7 +217,7 @@ class Interpreter(val printer: Printer,
       Seq(Name("ammonite"), Name("$sess")),
       Some(wd/"(console)")
     )
-    val (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -565,7 +544,7 @@ class Interpreter(val printer: Printer,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )

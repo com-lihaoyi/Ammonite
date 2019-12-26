@@ -123,14 +123,11 @@
 
 
   @sect{Changelog}
-    @sect{1.9.8}
+    @sect{1.9.9}
       @ul
         @li
-          Bump PPrint to 0.5.7
-    @sect{1.9.2}
-      @ul
-        @li
-          Bump FastParse to 2.2.0
+          Bump PPrint to 0.5.7, FastParse to 2.2.2, uPickle to 0.9.6
+
     @sect{1.9.1}
       @ul
         @li
