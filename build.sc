@@ -171,7 +171,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:0.9.6",
-      ivy"com.lihaoyi::requests:0.4.6"
+      ivy"com.lihaoyi::requests:0.4.7"
     )
   }
 
