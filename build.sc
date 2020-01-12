@@ -39,7 +39,7 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
   def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
   trait Tests extends super.Tests{
-    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.7.1")
+    def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.7.3")
     def testFrameworks = Seq("utest.runner.Framework")
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
@@ -132,7 +132,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::os-lib:0.6.2",
+    ivy"com.lihaoyi::os-lib:0.6.3",
     ivy"org.scala-lang.modules::scala-collection-compat:2.1.2"
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
@@ -142,8 +142,8 @@ class OpsModule(val crossScalaVersion: String) extends AmmModule{
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::sourcecode:0.1.8",
-    ivy"com.lihaoyi::fansi:0.2.7"
+    ivy"com.lihaoyi::sourcecode:0.2.0",
+    ivy"com.lihaoyi::fansi:0.2.8"
   )
   def compileIvyDeps = Agg(
     ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -157,8 +157,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::pprint:0.5.7",
-      ivy"com.lihaoyi::fansi:0.2.7",
+      ivy"com.lihaoyi::pprint:0.5.8",
+      ivy"com.lihaoyi::fansi:0.2.8",
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -170,8 +170,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.9.6",
-      ivy"com.lihaoyi::requests:0.4.7"
+      ivy"com.lihaoyi::upickle:0.9.7",
+      ivy"com.lihaoyi::requests:0.4.9"
     )
   }
 
@@ -193,7 +193,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.2.2",
+      ivy"com.lihaoyi::scalaparse:2.2.3",
       ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
