@@ -166,7 +166,7 @@
         @p
           If you need more detailed control over what you are importing, e.g.
           with attributes, classifiers or exclusions, you can fall back to
-          using the @hl.scala{interp.load.ivy(deps: coursier.Dependency*)}
+          using the @hl.scala{interp.load.ivy(deps: coursierapi.Dependency*)}
           function.
 
         @hl.ref(scriptTests, Seq("loadIvyAdvanced", "@"), "\"\"\"")
