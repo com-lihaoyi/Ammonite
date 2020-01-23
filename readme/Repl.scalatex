@@ -493,7 +493,7 @@
         @p
           Ammonite-REPL is configured with a set of default resolvers but you
           can add your own using
-          @lnk("Coursier's Repository Interface", "https://github.com/coursier/interface")
+          @lnk("Coursier's Repository API", "https://github.com/coursier/interface")
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolvers", "@"), "\"\"\"")
 
