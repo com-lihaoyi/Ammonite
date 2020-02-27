@@ -1,6 +1,7 @@
 package ammonite.integration
 
 import ammonite.ops._
+import ammonite.util.Util
 import ImplicitWd._
 
 /**
@@ -10,7 +11,13 @@ object TestUtils {
   val scalaVersion = scala.util.Properties.versionNumberString
   val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version
-  val executable = Path(sys.env("AMMONITE_ASSEMBLY"))
+  val executable = {
+    val p = System.getenv("AMMONITE_ASSEMBLY")
+    if (Util.windowsPlatform)
+      Seq(p)
+    else
+      Seq("bash", p)
+  }
   val intTestResources = pwd/'integration/'src/'test/'resources
   val replStandaloneResources = intTestResources/'ammonite/'integration
   val shellAmmoniteResources = pwd/'shell/'src/'main/'resources/'ammonite/'shell
@@ -24,7 +31,6 @@ object TestUtils {
                args: Seq[String],
                thin: Boolean) = {
     os.proc(
-      "bash",
       executable,
       extraAmmArgs,
       if (thin) Seq("--thin") else Nil,
