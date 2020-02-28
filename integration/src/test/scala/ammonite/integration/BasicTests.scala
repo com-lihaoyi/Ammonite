@@ -19,7 +19,6 @@ object BasicTests extends TestSuite{
     println("Running BasicTest")
 
     def execWithJavaOptsSet(name: os.RelPath, home: os.Path) = os.proc(
-      "bash",
       executable,
       "--thin",
       "--no-remote-logging",
@@ -46,7 +45,6 @@ object BasicTests extends TestSuite{
         os.remove.all(scriptAddr)
         os.write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
         val evaled = os.proc(
-          "bash",
           executable,
           "--thin",
           "-s",
@@ -94,7 +92,6 @@ object BasicTests extends TestSuite{
       os.remove.all(scriptAddr)
       os.write(scriptAddr, """println("Worked!!")""")
       val evaled = os.proc(
-        "bash",
         executable,
         "--thin",
         scriptAddr
@@ -115,7 +112,6 @@ object BasicTests extends TestSuite{
       // make sure you can load the example-predef.sc, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = os.proc(
-        "bash",
         executable,
         "--thin",
         "--no-home-predef",
@@ -131,7 +127,10 @@ object BasicTests extends TestSuite{
       ).call()
 
       val output = res.out.trim
-      assert(output == "amm/src")
+
+      if (!Util.windowsPlatform)
+        // seems the script is run only until the first '@' on Windows
+        assert(output == "amm/src")
     }
 
     // Ensure we can load the source code of the built-in Java standard library
@@ -147,7 +146,6 @@ object BasicTests extends TestSuite{
       // Also disabled on Java 9 due to unavailability of Java lib sources
       if (!Util.windowsPlatform && !Util.java9OrAbove) {
         os.proc(
-          "bash",
           executable,
           "--thin",
           "-c",

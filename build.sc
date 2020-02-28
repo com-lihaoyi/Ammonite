@@ -2,6 +2,8 @@ import mill._, scalalib._, publish._
 import ammonite.ops._, ImplicitWd._
 import $file.ci.upload
 
+import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
+
 val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
@@ -325,6 +327,40 @@ class MainModule(val crossScalaVersion: String)
   }
   def localClasspath = T{
     super.localClasspath() ++ Agg(thinWhitelist())
+  }
+
+  def launcher = {
+    val isWindows = scala.util.Properties.isWin
+    if (isWindows)
+      T{
+        val mainClass = finalMainClass()
+        val cp = runClasspath().map(_.path)
+        val jvmOpts = forkArgs()
+        val dest = T.ctx().dest / "run.bat"
+
+        import coursier.launcher.{BootstrapGenerator, ClassLoaderContent, Parameters, Preamble}
+        val classLoaderContent = ClassLoaderContent.fromUrls(cp.map(_.toNIO.toUri.toASCIIString))
+        val params = Parameters.Bootstrap(Seq(classLoaderContent), mainClass)
+          .withPreamble(
+            Preamble()
+              .withKind(Preamble.Kind.Bat)
+              .withJavaOpts(jvmOpts)
+          )
+        val thread = Thread.currentThread()
+        val cl = thread.getContextClassLoader
+        try {
+          thread.setContextClassLoader(BootstrapGenerator.getClass.getClassLoader)
+          BootstrapGenerator.generate(params, dest.toNIO)
+        } finally {
+          thread.setContextClassLoader(cl)
+        }
+
+        PathRef(dest)
+      }
+    else
+      T{
+        super.launcher()
+      }
   }
 
   object test extends Tests{
