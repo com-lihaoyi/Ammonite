@@ -126,6 +126,10 @@
     @sect{2.0.1}
       @ul
         @li
+          Support for Scala 2.12.11
+    @sect{2.0.1}
+      @ul
+        @li
           Bump PPrint to 0.5.7, FastParse to 2.2.2, uPickle to 0.9.6, Requests to 0.4.7
 
     @sect{1.9.1}

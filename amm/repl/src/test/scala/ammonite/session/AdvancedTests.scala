@@ -346,7 +346,7 @@ object AdvancedTests extends TestSuite{
         val scalaVersion: String = scala.util.Properties.versionNumberString
         val c1: DualTestRepl = new DualTestRepl()
         c1.session(s"""
-          @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.0")
+          @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.1")
         """)
         c1.session("""
           @ val x = 1

@@ -19,9 +19,10 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.10", "2.13.1")
+val binCrossScalaVersions = Seq("2.12.11", "2.13.1")
+val isScala2_12_10OrLater = Set("2.12.10") ++ binCrossScalaVersions
 val fullCrossScalaVersions = Seq(
-  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11",
   "2.13.0", "2.13.1"
 )
 
@@ -61,7 +62,7 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
         Nil
 
     val extraDir2 = PathRef(
-      if (sv == "2.12.10" || sv == "2.13.1") millSourcePath / "src" / "main" / "scala-2.12.10-2.13.1+"
+      if (isScala2_12_10OrLater(sv)) millSourcePath / "src" / "main" / "scala-2.12.10-2.13.1+"
       else millSourcePath / "src" / "main" / "scala-not-2.12.10-2.13.1+"
     )
     val extraDir3 =

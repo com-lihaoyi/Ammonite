@@ -9,8 +9,8 @@ import ammonite.util._
 import ammonite.runtime.ImportHook
 
 object TestUtils {
-  def scala2_11 = scala.util.Properties.versionNumberString.contains("2.11")
-  def scala2_12 = scala.util.Properties.versionNumberString.contains("2.12")
+  def scala2_11 = scala.util.Properties.versionNumberString.startsWith("2.11")
+  def scala2_12 = scala.util.Properties.versionNumberString.startsWith("2.12")
 
   def createTestInterp(storage: Storage, predef: String = "") = {
     val initialClassLoader = Thread.currentThread().getContextClassLoader
