@@ -30,7 +30,6 @@ class Interpreter(val printer: Printer,
                   verboseOutput: Boolean = true,
                   val getFrame: () => Frame,
                   val createFrame: () => Frame,
-                  initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
                   val scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[Dependency],
@@ -65,7 +64,7 @@ class Interpreter(val printer: Printer,
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
-    Option(initialClassLoader).getOrElse(headFrame.classloader)
+    headFrame.classloader
   )
 
   private var scriptImportCallback: Imports => Unit =
