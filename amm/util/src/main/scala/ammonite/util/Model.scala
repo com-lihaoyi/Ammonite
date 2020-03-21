@@ -255,7 +255,10 @@ case class Printer(outStream: PrintStream,
 case class ImportTree(prefix: Seq[String],
                       mappings: Option[ImportTree.ImportMapping],
                       start: Int,
-                      end: Int)
+                      end: Int) {
+  lazy val strippedPrefix: Seq[String] =
+    prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
+}
 
 object ImportTree{
   type ImportMapping = Seq[(String, Option[String])]
