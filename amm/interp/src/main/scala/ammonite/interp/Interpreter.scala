@@ -437,7 +437,7 @@ class Interpreter(val printer: Printer,
   }
 
 
-  type BlockData = Option[(ClassFiles, ScriptOutput.BlockMetadata)]
+  private type BlockData = Option[(ClassFiles, ScriptOutput.BlockMetadata)]
 
 
   private def processAllScriptBlocks(blocks: Seq[BlockData],
