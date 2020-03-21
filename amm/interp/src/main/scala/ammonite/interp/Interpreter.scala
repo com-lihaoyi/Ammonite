@@ -88,6 +88,13 @@ class Interpreter(val printer: Printer,
 
   def compilationCount = compilerManager.compilationCount
 
+  private val dependencyLoader = new DependencyLoader(
+    printer,
+    storage,
+    alreadyLoadedDependencies,
+    verboseOutput
+  )
+
 
   // Use a var and callbacks instead of a fold, because when running
   // `processModule` user code may end up calling `processModule` too which depends
@@ -602,44 +609,12 @@ class Interpreter(val printer: Printer,
     finally scriptImportCallback = outerScriptImportCallback
   }
 
-
-  private val alwaysExclude = alreadyLoadedDependencies
-    .map(dep => (dep.getModule.getOrganization, dep.getModule.getName))
-    .toSet
-
-  def loadIvy(coordinates: Dependency*) = synchronized{
-    val cacheKey = (
-      repositories().hashCode.toString,
-      coordinates
+  def loadIvy(coordinates: Dependency*) = synchronized {
+    dependencyLoader.load(
+      coordinates,
+      repositories(),
+      resolutionHooks.toSeq
     )
-
-    storage.ivyCache().get(cacheKey) match{
-      case Some(res) => Right(res.map(new java.io.File(_)))
-      case None =>
-        ammonite.runtime.tools.IvyThing.resolveArtifact(
-          repositories(),
-          coordinates
-            .filter(dep => !alwaysExclude((dep.getModule.getOrganization, dep.getModule.getName)))
-            .map { dep =>
-              alwaysExclude.iterator.foldLeft(dep)((dep, excl) =>
-                dep.addExclusion(excl._1, excl._2)
-              )
-            },
-          verbose = verboseOutput,
-          output = printer.errStream,
-          hooks = resolutionHooks.toSeq
-        )match{
-          case Right((canBeCached, loaded)) =>
-            val loadedSet = loaded.toSet
-            if (canBeCached)
-              storage.ivyCache() = storage.ivyCache().updated(
-                cacheKey, loadedSet.map(_.getAbsolutePath)
-              )
-            Right(loadedSet)
-          case Left(l) =>
-            Left(l)
-        }
-    }
   }
 
 }
