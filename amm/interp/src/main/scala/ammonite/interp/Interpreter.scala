@@ -26,7 +26,7 @@ import coursierapi.{Dependency, Fetch}
 class Interpreter(val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
-                  colors: Ref[Colors],
+                  private val colors: Ref[Colors],
                   verboseOutput: Boolean = true,
                   val getFrame: () => Frame,
                   val createFrame: () => Frame,
@@ -36,7 +36,7 @@ class Interpreter(val printer: Printer,
                   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
                   classPathWhitelist: Set[Seq[String]] = Set.empty,
                   evaluator: Evaluator = Evaluator())
-  extends ImportHook.InterpreterInterface{ interp =>
+  extends ImportHook.InterpreterInterface{
 
   def handleOutput(res: Res[Evaluated]): Unit =
     res match{
@@ -118,6 +118,7 @@ class Interpreter(val printer: Printer,
       .map(_._1)
       .flatMap(c => Seq(c, c + "$"))
 
+    val interpApi = Interpreter.interpApi(this)
 
     PredefInitialization.apply(
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
@@ -607,7 +608,7 @@ class Interpreter(val printer: Printer,
 
   def loadIvy(coordinates: Dependency*) = synchronized{
     val cacheKey = (
-      interpApi.repositories().hashCode.toString + classPathWhitelist.hashCode().toString,
+      repositories().hashCode.toString + classPathWhitelist.hashCode().toString,
       coordinates
     )
 
@@ -615,7 +616,7 @@ class Interpreter(val printer: Printer,
       case Some(res) => Right(res.map(new java.io.File(_)))
       case None =>
         ammonite.runtime.tools.IvyThing.resolveArtifact(
-          interpApi.repositories(),
+          repositories(),
           coordinates
             .filter(dep => !alwaysExclude((dep.getModule.getOrganization, dep.getModule.getName)))
             .map { dep =>
@@ -640,7 +641,11 @@ class Interpreter(val printer: Printer,
     }
   }
 
-  abstract class DefaultLoadJar extends LoadJar {
+}
+
+object Interpreter{
+
+  private abstract class DefaultLoadJar(interp: Interpreter) extends LoadJar {
     def handleClasspath(jar: java.net.URL): Unit
 
     def cp(jar: os.Path): Unit = {
@@ -653,7 +658,7 @@ class Interpreter(val printer: Printer,
       handleClasspath(jar)
     }
     def ivy(coordinates: Dependency*): Unit = {
-      loadIvy(coordinates:_*) match{
+      interp.loadIvy(coordinates:_*) match{
         case Left(failureMsg) =>
           throw new Exception(failureMsg)
         case Right(loaded) =>
@@ -666,18 +671,18 @@ class Interpreter(val printer: Printer,
   }
 
 
-  private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
+  private def interpApi(interp: Interpreter): InterpAPI = new InterpAPI{ outer =>
 
     val colors = interp.colors
 
     def watch(p: os.Path) = interp.watch(p)
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
-      compilerManager.configureCompiler(callback)
+      interp.compilerManager.configureCompiler(callback)
     }
 
     def preConfigureCompiler(callback: scala.tools.nsc.Settings => Unit) = {
-      compilerManager.preConfigureCompiler(callback)
+      interp.compilerManager.preConfigureCompiler(callback)
     }
 
     val beforeExitHooks = interp.beforeExitHooks
@@ -685,24 +690,24 @@ class Interpreter(val printer: Printer,
     val repositories = interp.repositories
     val resolutionHooks = interp.resolutionHooks
 
-    object load extends DefaultLoadJar with InterpLoad {
+    object load extends DefaultLoadJar(interp) with InterpLoad {
 
-      def handleClasspath(jar: java.net.URL) = headFrame.addClasspath(Seq(jar))
+      def handleClasspath(jar: java.net.URL) = interp.headFrame.addClasspath(Seq(jar))
 
 
       def module(file: os.Path) = {
         watch(file)
         val (pkg, wrapper) = ammonite.util.Util.pathToPackageWrapper(
           Seq(Name("dummy")),
-          file relativeTo wd
+          file relativeTo interp.wd
         )
-        processModule(
+        interp.processModule(
           normalizeNewlines(os.read(file)),
           CodeSource(
             wrapper,
             pkg,
             Seq(Name("ammonite"), Name("$file")),
-            Some(wd/"Main.sc")
+            Some(interp.wd/"Main.sc")
           ),
           autoImport = true,
           extraCode = "",
@@ -714,16 +719,12 @@ class Interpreter(val printer: Printer,
         }
       }
 
-      object plugin extends DefaultLoadJar {
-        def handleClasspath(jar: java.net.URL) = headFrame.addPluginClasspath(Seq(jar))
+      object plugin extends DefaultLoadJar(interp) {
+        def handleClasspath(jar: java.net.URL) = interp.headFrame.addPluginClasspath(Seq(jar))
       }
 
     }
   }
-
-}
-
-object Interpreter{
 
   private def evaluationResult(wrapperName: Seq[Name],
                        internalWrapperPath: Seq[Name],
