@@ -57,8 +57,6 @@ object PredefInitialization {
       customPredefs
     }
 
-    predefs.filter(_.code.nonEmpty)
-
 
     Res.fold((), predefs){(_, predefInfo) =>
       predefInfo.path.foreach(watch)
