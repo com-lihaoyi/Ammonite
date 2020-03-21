@@ -65,7 +65,7 @@ object ImportHook{
                       codeSource: CodeSource,
                       hookImports: Imports,
                       exec: Boolean) extends Result
-    case class ClassPath(file: os.Path, plugin: Boolean) extends Result
+    case class ClassPath(files: Seq[os.Path], plugin: Boolean) extends Result
   }
 
   object File extends SourceHook(false)
@@ -163,7 +163,10 @@ object ImportHook{
         case _ => Left("Invalid $ivy import " + tree)
       }
     }
-    def resolve(interp: InterpreterInterface, signatures: Seq[String]) = {
+    def resolve(
+      interp: InterpreterInterface,
+      signatures: Seq[String]
+    ): Either[String, (Seq[Dependency], Set[File])] = {
       val splitted = for (signature <- signatures) yield {
         signature.split(':') match{
           case Array(a, b, c) =>
@@ -180,17 +183,17 @@ object ImportHook{
       if (errors.nonEmpty)
         Left("Invalid $ivy imports: " + errors.map(Util.newLine + "  " + _).mkString)
       else
-        interp.loadIvy(successes: _*)
+        interp.loadIvy(successes: _*).map((successes, _))
     }
 
 
     def handle(source: CodeSource,
                tree: ImportTree,
                interp: InterpreterInterface,
-               wrapperPath: Seq[Name]) = for{
-      signatures <- splitImportTree(tree).right
-      resolved <- resolve(interp, signatures).right
-    } yield resolved.map(os.Path(_)).map(Result.ClassPath(_, plugin)).toSeq
+               wrapperPath: Seq[Name]): Either[String, Seq[Result.ClassPath]] = for{
+      signatures <- splitImportTree(tree)
+      resolved <- resolve(interp, signatures)
+    } yield Seq(Result.ClassPath(resolved._2.map(os.Path(_)).toSeq, plugin))
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
@@ -198,7 +201,7 @@ object ImportHook{
     def handle(source: CodeSource,
                tree: ImportTree,
                interp: InterpreterInterface,
-               wrapperPath: Seq[Name]) = {
+               wrapperPath: Seq[Name]): Either[String, Seq[Result]] = {
       source.path match{
         case None => Left("Cannot resolve $cp import in code without source")
         case Some(currentScriptPath) =>
@@ -206,11 +209,10 @@ object ImportHook{
             tree, currentScriptPath, Seq(".jar", "")
           )
 
-          if (missing.nonEmpty) Left("Cannot resolve $cp import: " + missing.mkString(", "))
-          else Right(
-            for(((relativeModule, rename), filePath) <- relativeModules.zip(files))
-              yield Result.ClassPath(filePath, plugin)
-          )
+          if (missing.nonEmpty)
+            Left("Cannot resolve $cp import: " + missing.mkString(", "))
+          else
+            Right(Seq(Result.ClassPath(files, plugin)))
       }
 
     }

@@ -185,8 +185,8 @@ class Interpreter(val printer: Printer,
           }
         case res: ImportHook.Result.ClassPath =>
 
-          if (res.plugin) headFrame.addPluginClasspath(Seq(res.file.toNIO.toUri.toURL))
-          else headFrame.addClasspath(Seq(res.file.toNIO.toUri.toURL))
+          if (res.plugin) headFrame.addPluginClasspath(res.files.map(_.toNIO.toUri.toURL))
+          else headFrame.addClasspath(res.files.map(_.toNIO.toUri.toURL))
 
           Res.Success(Imports())
       }
