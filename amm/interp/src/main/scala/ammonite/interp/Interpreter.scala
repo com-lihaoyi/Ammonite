@@ -26,7 +26,6 @@ import coursierapi.{Dependency, Fetch}
 class Interpreter(val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
-                  private val colors: Ref[Colors],
                   verboseOutput: Boolean = true,
                   val getFrame: () => Frame,
                   val createFrame: () => Frame,
@@ -96,6 +95,7 @@ class Interpreter(val printer: Printer,
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
   def initializePredef(
+    colors: Ref[Colors],
     basePredefs: Seq[PredefInfo],
     customPredefs: Seq[PredefInfo],
     // Allows you to set up additional "bridges" between the REPL
@@ -118,7 +118,7 @@ class Interpreter(val printer: Printer,
       .map(_._1)
       .flatMap(c => Seq(c, c + "$"))
 
-    val interpApi = Interpreter.interpApi(this)
+    val interpApi = Interpreter.interpApi(this, colors)
 
     PredefInitialization.apply(
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
@@ -671,9 +671,12 @@ object Interpreter{
   }
 
 
-  private def interpApi(interp: Interpreter): InterpAPI = new InterpAPI{ outer =>
+  private def interpApi(
+    interp: Interpreter,
+    colors0: Ref[Colors]
+  ): InterpAPI = new InterpAPI{ outer =>
 
-    val colors = interp.colors
+    val colors = colors0
 
     def watch(p: os.Path) = interp.watch(p)
 

@@ -164,7 +164,6 @@ case class Main(predefCode: String = "",
         printer,
         storageBackend,
         wd,
-        colorsRef,
         verboseOutput,
         () => frame,
         () => throw new Exception("session loading / saving not possible here"),
@@ -186,7 +185,7 @@ case class Main(predefCode: String = "",
           new FrontEndAPIImpl {}
         )
       )
-      interp.initializePredef(basePredefs, customPredefs, bridges) match{
+      interp.initializePredef(colorsRef, basePredefs, customPredefs, bridges) match{
         case None => Right(interp)
         case Some(problems) => Left(problems)
       }

@@ -75,7 +75,6 @@ class Repl(input: InputStream,
     printer,
     storage,
     wd,
-    colors,
     verboseOutput = true,
     getFrame = () => frames().head,
     createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
@@ -139,7 +138,7 @@ class Repl(input: InputStream,
     )
   )
 
-  def initializePredef() = interp.initializePredef(basePredefs, customPredefs, bridges)
+  def initializePredef() = interp.initializePredef(colors, basePredefs, customPredefs, bridges)
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or

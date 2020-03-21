@@ -72,7 +72,6 @@ class TestRepl {
       printer0,
       storage = storage,
       wd = os.pwd,
-      colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
       replCodeWrapper = codeWrapper,
@@ -90,6 +89,8 @@ class TestRepl {
     println(errorBuffer.mkString)
     throw e
   }
+
+  val colors0 = Ref(Colors.BlackWhite)
 
   val extraBridges = Seq(
     (
@@ -112,7 +113,7 @@ class TestRepl {
         def lastException: Throwable = null
         def fullHistory = storage.fullHistory()
         def history = new History(Vector())
-        val colors = Ref(Colors.BlackWhite)
+        val colors = colors0
         def newCompiler() = interp.compilerManager.init(force = true)
         def compiler = interp.compilerManager.compiler.compiler
         def interactiveCompiler = interp.compilerManager.pressy.compiler
@@ -166,7 +167,7 @@ class TestRepl {
     )
   )
 
-  for ((error, _) <- interp.initializePredef(basePredefs, customPredefs, extraBridges)) {
+  for ((error, _) <- interp.initializePredef(colors0, basePredefs, customPredefs, extraBridges)) {
     val (msgOpt, causeOpt) = error match {
       case r: Res.Exception => (Some(r.msg), Some(r.t))
       case r: Res.Failure => (Some(r.msg), None)
