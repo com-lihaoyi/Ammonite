@@ -380,7 +380,7 @@ class Interpreter(val printer: Printer,
 
         for{
           blocks <- cachedScriptData match {
-            case None => splittedScript.map(_.map(_ => None))
+            case None => Res(splittedScript).map(_.map(_ => None))
             case Some(scriptOutput) =>
               Res.Success(
                 scriptOutput.classFiles
@@ -393,7 +393,7 @@ class Interpreter(val printer: Printer,
 
           metadata <- processAllScriptBlocks(
             blocks,
-            splittedScript,
+            Res(splittedScript),
             predefImports,
             codeSource,
             processSingleBlock(_, codeSource, _),
@@ -418,7 +418,7 @@ class Interpreter(val printer: Printer,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName)
+      blocks <- Res(Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
