@@ -66,6 +66,11 @@ class TestRepl {
   )
   val customPredefs = Seq()
 
+  def createFrame(): Unit = {
+    val f = sess0.childFrame(frames().head)
+    frames() = f :: frames()
+  }
+
   var currentLine = 0
   val interp: Interpreter = try {
     new Interpreter(
@@ -73,7 +78,6 @@ class TestRepl {
       storage = storage,
       wd = os.pwd,
       getFrame = () => frames().head,
-      createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
@@ -338,7 +342,9 @@ class TestRepl {
 
       case _ =>
     }
-    interp.handleOutput(processed)
+    if (interp.handleOutput(processed))
+      createFrame()
+
     (
       processed,
       outString,

@@ -77,7 +77,6 @@ class Repl(input: InputStream,
     wd,
     verboseOutput = true,
     getFrame = () => frames().head,
-    createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
     replCodeWrapper = replCodeWrapper,
     scriptCodeWrapper = scriptCodeWrapper,
     alreadyLoadedDependencies = alreadyLoadedDependencies,
@@ -157,9 +156,14 @@ class Repl(input: InputStream,
     interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/)
   }
 
+  private def createFrame(): Unit = {
+    val f = sess0.childFrame(frames().head)
+    frames() = f :: frames()
+    f
+  }
 
   sess0.save()
-  interp.createFrame()
+  createFrame()
 
   val reader = new InputStreamReader(input)
 
@@ -205,7 +209,8 @@ class Repl(input: InputStream,
     welcomeBanner.foreach(printer.outStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
-      interp.handleOutput(actionResult)
+      if (interp.handleOutput(actionResult))
+        createFrame()
       Repl.handleRes(
         actionResult,
         printer.info,

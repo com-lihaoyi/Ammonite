@@ -25,7 +25,6 @@ object TestUtils {
       storage = storage,
       wd = os.pwd,
       getFrame = () => startFrame,
-      createFrame = () => throw new Exception("unsupported"),
       replCodeWrapper = CodeWrapper,
       scriptCodeWrapper = CodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),

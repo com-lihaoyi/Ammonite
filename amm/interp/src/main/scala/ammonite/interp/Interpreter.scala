@@ -28,7 +28,6 @@ class Interpreter(val printer: Printer,
                   val wd: os.Path,
                   verboseOutput: Boolean = true,
                   val getFrame: () => Frame,
-                  val createFrame: () => Frame,
                   replCodeWrapper: CodeWrapper,
                   val scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[Dependency],
@@ -37,15 +36,14 @@ class Interpreter(val printer: Printer,
                   evaluator: Evaluator = Evaluator())
   extends ImportHook.InterpreterInterface{
 
-  def handleOutput(res: Res[Evaluated]): Unit =
+  def handleOutput(res: Res[Evaluated]): Boolean =
     res match{
-      case Res.Skip => // do nothing
-      case Res.Exit(value) => compilerManager.shutdownPressy()
+      case Res.Skip => false // do nothing
+      case Res.Exit(value) => compilerManager.shutdownPressy(); false
       case Res.Success(ev) =>
         headFrame.addImports(ev.imports)
-        if (headFrame.frozen)
-          createFrame()
-      case _ => ()
+        headFrame.frozen
+      case _ => false
     }
 
   private def headFrame = getFrame()
