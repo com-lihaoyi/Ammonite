@@ -139,7 +139,7 @@ class Interpreter(val printer: Printer,
   // code to run, so let it pass it in a callback and we'll run it here
   def watch(p: os.Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
 
-  def resolveSingleImportHook(
+  private def resolveSingleImportHook(
     source: CodeSource,
     tree: ImportTree,
     wrapperPath: Seq[Name]
@@ -185,7 +185,7 @@ class Interpreter(val printer: Printer,
 
 
 
-  def resolveImportHooks(importTrees: Seq[ImportTree],
+  private def resolveImportHooks(importTrees: Seq[ImportTree],
                          hookedStmts: Seq[String],
                          source: CodeSource,
                          wrapperPath: Seq[Name]): Res[ImportHookInfo] = synchronized{
@@ -250,7 +250,7 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def evaluateLine(processed: Preprocessor.Output,
+  private def evaluateLine(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String,
                    indexedWrapperName: Name,
@@ -278,7 +278,7 @@ class Interpreter(val printer: Printer,
   }
 
 
-  def processSingleBlock(processed: Preprocessor.Output,
+  private def processSingleBlock(processed: Preprocessor.Output,
                          codeSource0: CodeSource,
                          indexedWrapperName: Name) = synchronized{
 
@@ -422,7 +422,7 @@ class Interpreter(val printer: Printer,
   type BlockData = Option[(ClassFiles, ScriptOutput.BlockMetadata)]
 
 
-  def processAllScriptBlocks(blocks: Seq[BlockData],
+  private def processAllScriptBlocks(blocks: Seq[BlockData],
                              splittedScript: => Res[IndexedSeq[(String, Seq[String])]],
                              startingImports: Imports,
                              codeSource: CodeSource,
