@@ -241,7 +241,7 @@ class Interpreter(val printer: Printer,
         codeWrapper = replCodeWrapper
       )
       (out, tag) <- evaluateLine(
-        processed, printer,
+        processed,
         wrapperName.encoded + ".sc", wrapperName,
         silent,
         incrementLine
@@ -251,7 +251,6 @@ class Interpreter(val printer: Printer,
 
 
   def evaluateLine(processed: Preprocessor.Output,
-                   printer: Printer,
                    fileName: String,
                    indexedWrapperName: Name,
                    silent: Boolean = false,
@@ -409,7 +408,7 @@ class Interpreter(val printer: Printer,
           Some(wd/"(console)")
         ),
         (processed, indexedWrapperName) =>
-          evaluateLine(processed, printer, fileName, indexedWrapperName, false, incrementLine),
+          evaluateLine(processed, fileName, indexedWrapperName, false, incrementLine),
         autoImport = true,
         ""
       )
