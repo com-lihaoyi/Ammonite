@@ -7,6 +7,7 @@ import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 import ammonite.interp.CodeWrapper
 
 import scala.collection.mutable
+import scala.reflect.io.VirtualDirectory
 
 import ammonite.runtime._
 import fastparse._
@@ -53,9 +54,12 @@ class Interpreter(val printer: Printer,
 
   val beforeExitHooks = mutable.Buffer.empty[Any => Any]
 
+  private val dynamicClasspath = new VirtualDirectory("(memory)", None)
+
   val compilerManager = new CompilerLifecycleManager(
     storage,
     headFrame,
+    dynamicClasspath,
     Some(dependencyComplete),
     classPathWhitelist
   )
@@ -548,7 +552,7 @@ class Interpreter(val printer: Printer,
           if (envHash != blockMetadata.id.tag.env) {
             compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
           } else{
-            compilerManager.addToClasspath(classFiles)
+            Compiler.addToClasspath(classFiles, dynamicClasspath)
             addClassFiles(classFiles)
 
             evaluator.evalMain(blockMetadata.id.wrapperPath, evalClassloader)

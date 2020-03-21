@@ -23,6 +23,7 @@ import scala.tools.nsc.Settings
 class CompilerLifecycleManager(
   storage: Storage,
   headFrame: => Frame,
+  dynamicClasspath: VirtualDirectory,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]]
 ){
@@ -30,7 +31,6 @@ class CompilerLifecycleManager(
 
 
   private[this] object Internal{
-    val dynamicClasspath = new VirtualDirectory("(memory)", None)
     var compiler: Compiler = null
     var pressyStale: Boolean = true
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
@@ -164,9 +164,6 @@ class CompilerLifecycleManager(
       preConfiguredSettingsChanged = true
     }
 
-  def addToClasspath(classFiles: ClassFiles) = synchronized {
-    Compiler.addToClasspath(classFiles, dynamicClasspath)
-  }
   // Not synchronized, since it's part of the exit sequence that needs to run
   // if the repl exits while the warmup code is compiling
   def shutdownPressy() = {
