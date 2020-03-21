@@ -74,6 +74,7 @@ class Interpreter(val printer: Printer,
 
   def evalClassloader = headFrame.classloader
   private def frameImports = headFrame.imports
+  def fullImports() = predefImports ++ headFrame.imports
 
   private def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories(), verbose = verboseOutput)
@@ -88,7 +89,7 @@ class Interpreter(val printer: Printer,
   // `processModule` user code may end up calling `processModule` too which depends
   // on `predefImports`, and we should be able to provide the "current" imports
   // to it even if it's half built
-  var predefImports = Imports()
+  private var predefImports = Imports()
 
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object

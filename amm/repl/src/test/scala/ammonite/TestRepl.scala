@@ -121,7 +121,7 @@ class TestRepl {
         def newCompiler() = interp.compilerManager.init(force = true)
         def compiler = interp.compilerManager.compiler.compiler
         def interactiveCompiler = interp.compilerManager.pressy.compiler
-        def fullImports = interp.predefImports ++ imports
+        def fullImports = interp.fullImports()
         def imports = frames().head.imports
         def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
         def width = 80

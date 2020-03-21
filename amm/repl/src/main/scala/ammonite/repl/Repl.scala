@@ -65,7 +65,7 @@ class Repl(input: InputStream,
   val sess0 = new SessionApiImpl(frames)
 
   def imports = frames().head.imports
-  def fullImports = interp.predefImports ++ imports
+  def fullImports = interp.fullImports()
 
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
