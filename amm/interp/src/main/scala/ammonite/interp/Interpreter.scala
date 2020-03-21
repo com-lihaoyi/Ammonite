@@ -130,10 +130,14 @@ class Interpreter(val printer: Printer,
 
     val interpApi = Interpreter.interpApi(this, colors)
 
-    PredefInitialization.apply(
+    val bridgeImports = PredefInitialization.initBridges(
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
+      evalClassloader
+    )
+    predefImports = predefImports ++ bridgeImports
+
+    PredefInitialization.apply(
       interpApi,
-      evalClassloader,
       storage,
       basePredefs,
       customPredefs,
