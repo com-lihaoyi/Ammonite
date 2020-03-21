@@ -618,7 +618,7 @@ class Interpreter(val printer: Printer,
       coordinates,
       repositories(),
       resolutionHooks.toSeq
-    )
+    ).map(_.toSet)
   }
 
 }

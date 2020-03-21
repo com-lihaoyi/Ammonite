@@ -21,7 +21,7 @@ final class DependencyLoader(
     coordinates: Seq[Dependency],
     repositories: => Seq[Repository],
     resolutionHooks: Seq[Fetch => Fetch]
-  ): Either[String, Set[File]] = {
+  ): Either[String, Seq[File]] = {
     val repositories0 = repositories
     val cacheKey = (
       repositories0.hashCode.toString,
@@ -46,12 +46,11 @@ final class DependencyLoader(
           hooks = resolutionHooks
         )match{
           case Right((canBeCached, loaded)) =>
-            val loadedSet = loaded.toSet
             if (canBeCached)
               storage.ivyCache() = storage.ivyCache().updated(
-                cacheKey, loadedSet.map(_.getAbsolutePath)
+                cacheKey, loaded.map(_.getAbsolutePath)
               )
-            Right(loadedSet)
+            Right(loaded)
           case Left(l) =>
             Left(l)
         }
