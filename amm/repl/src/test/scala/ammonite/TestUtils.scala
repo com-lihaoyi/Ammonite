@@ -24,7 +24,6 @@ object TestUtils {
       ),
       storage = storage,
       wd = os.pwd,
-      extraBridges = Seq(),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
@@ -36,7 +35,7 @@ object TestUtils {
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
     // Provide a custom predef so we can verify in tests that the predef gets cached
-    interp.initializePredef(Seq(), Seq(PredefInfo(Name("predef"), predef, false, None)))
+    interp.initializePredef(Seq(), Seq(PredefInfo(Name("predef"), predef, false, None)), Seq())
     interp
   }
 }

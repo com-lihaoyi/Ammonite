@@ -74,58 +74,6 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
-    Seq(
-      (
-        "ammonite.repl.ReplBridge",
-        "repl",
-        new ReplApiImpl {
-          def replArgs0 = repl.replArgs
-          def printer = repl.printer
-          val colors = repl.colors
-          def sess = repl.sess0
-          val prompt = repl.prompt
-          val frontEnd = repl.frontEnd
-
-          def lastException = repl.lastException
-          def fullHistory = storage.fullHistory()
-          def history = repl.history
-          def newCompiler() = interp.compilerManager.init(force = true)
-          def compiler = interp.compilerManager.compiler.compiler
-          def interactiveCompiler = interp.compilerManager.pressy.compiler
-          def fullImports = repl.fullImports
-          def imports = repl.imports
-          def usedEarlierDefinitions = repl.usedEarlierDefinitions
-          def width = frontEnd().width
-          def height = frontEnd().height
-
-          object load extends ReplLoad with (String => Unit){
-
-            def apply(line: String) = {
-              interp.processExec(line, currentLine, () => currentLine += 1) match{
-                case Res.Failure(s) => throw new CompilationError(s)
-                case Res.Exception(t, s) => throw t
-                case _ =>
-              }
-            }
-
-            def exec(file: os.Path): Unit = {
-              interp.watch(file)
-              apply(normalizeNewlines(os.read(file)))
-            }
-          }
-        }
-      ),
-      (
-        "ammonite.repl.api.SourceBridge",
-        "source",
-        new SourceAPIImpl {}
-      ),
-      (
-        "ammonite.repl.api.FrontEndBridge",
-        "frontEnd",
-        new FrontEndAPIImpl {}
-      )
-    ),
     wd,
     colors,
     verboseOutput = true,
@@ -139,7 +87,60 @@ class Repl(input: InputStream,
     classPathWhitelist = classPathWhitelist
   )
 
-  def initializePredef() = interp.initializePredef(basePredefs, customPredefs)
+  val bridges = Seq(
+    (
+      "ammonite.repl.ReplBridge",
+      "repl",
+      new ReplApiImpl {
+        def replArgs0 = repl.replArgs
+        def printer = repl.printer
+        val colors = repl.colors
+        def sess = repl.sess0
+        val prompt = repl.prompt
+        val frontEnd = repl.frontEnd
+
+        def lastException = repl.lastException
+        def fullHistory = storage.fullHistory()
+        def history = repl.history
+        def newCompiler() = interp.compilerManager.init(force = true)
+        def compiler = interp.compilerManager.compiler.compiler
+        def interactiveCompiler = interp.compilerManager.pressy.compiler
+        def fullImports = repl.fullImports
+        def imports = repl.imports
+        def usedEarlierDefinitions = repl.usedEarlierDefinitions
+        def width = frontEnd().width
+        def height = frontEnd().height
+
+        object load extends ReplLoad with (String => Unit){
+
+          def apply(line: String) = {
+            interp.processExec(line, currentLine, () => currentLine += 1) match{
+              case Res.Failure(s) => throw new CompilationError(s)
+              case Res.Exception(t, s) => throw t
+              case _ =>
+            }
+          }
+
+          def exec(file: os.Path): Unit = {
+            interp.watch(file)
+            apply(normalizeNewlines(os.read(file)))
+          }
+        }
+      }
+    ),
+    (
+      "ammonite.repl.api.SourceBridge",
+      "source",
+      new SourceAPIImpl {}
+    ),
+    (
+      "ammonite.repl.api.FrontEndBridge",
+      "frontEnd",
+      new FrontEndAPIImpl {}
+    )
+  )
+
+  def initializePredef() = interp.initializePredef(basePredefs, customPredefs, bridges)
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or

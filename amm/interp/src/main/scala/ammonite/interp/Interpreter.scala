@@ -25,15 +25,6 @@ import coursierapi.{Dependency, Fetch}
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  // Allows you to set up additional "bridges" between the REPL
-                  // world and the outside world, by passing in the full name
-                  // of the `APIHolder` object that will hold the bridge and
-                  // the object that will be placed there. Needs to be passed
-                  // in as a callback rather than run manually later as these
-                  // bridges need to be in place *before* the predef starts
-                  // running, so you can use them predef to e.g. configure
-                  // the REPL before it starts
-                  extraBridges: Seq[(String, String, AnyRef)],
                   val wd: os.Path,
                   colors: Ref[Colors],
                   verboseOutput: Boolean = true,
@@ -62,15 +53,6 @@ class Interpreter(val printer: Printer,
   private def headFrame = getFrame()
   private val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
   private val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
-
-  headFrame.classloader.specialLocalClasses ++= Seq(
-    "ammonite.interp.api.InterpBridge",
-    "ammonite.interp.api.InterpBridge$"
-  )
-
-  headFrame.classloader.specialLocalClasses ++= extraBridges
-    .map(_._1)
-    .flatMap(c => Seq(c, c + "$"))
 
   def evalClassloader = headFrame.classloader
   private def frameImports = headFrame.imports
@@ -116,8 +98,28 @@ class Interpreter(val printer: Printer,
   // ReplAPIs available in the predef need access to the Interpreter object
   def initializePredef(
     basePredefs: Seq[PredefInfo],
-    customPredefs: Seq[PredefInfo]
+    customPredefs: Seq[PredefInfo],
+    // Allows you to set up additional "bridges" between the REPL
+    // world and the outside world, by passing in the full name
+    // of the `APIHolder` object that will hold the bridge and
+    // the object that will be placed there. Needs to be passed
+    // in as a callback rather than run manually later as these
+    // bridges need to be in place *before* the predef starts
+    // running, so you can use them predef to e.g. configure
+    // the REPL before it starts
+    extraBridges: Seq[(String, String, AnyRef)]
   ): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
+
+    headFrame.classloader.specialLocalClasses ++= Seq(
+      "ammonite.interp.api.InterpBridge",
+      "ammonite.interp.api.InterpBridge$"
+    )
+
+    headFrame.classloader.specialLocalClasses ++= extraBridges
+      .map(_._1)
+      .flatMap(c => Seq(c, c + "$"))
+
+
     PredefInitialization.apply(
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
       interpApi,
