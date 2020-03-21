@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException
 
 import ammonite._
 import ammonite.interp.api.AmmoniteExit
-import util.Util.{ClassFiles, newLine}
+import util.Util.newLine
 import ammonite.util._
 
 import scala.util.Try
@@ -17,26 +17,12 @@ import scala.util.Try
   * to take the already-compile Scala bytecode and execute it in our process.
  */
 trait Evaluator{
-  def loadClass(wrapperName: String, classFiles: ClassFiles): Res[Class[_]]
-  def evalMain(cls: Class[_], contextClassloader: ClassLoader): Any
+  def evalMain(wrapperName: String, contextClassloader: SpecialClassLoader): Res[Unit]
 
-
-  def processLine(output: ClassFiles,
-                  newImports: Imports,
-                  usedEarlierDefinitions: Seq[String],
+  def processLine(wrapperName: String,
                   printer: Printer,
-                  indexedWrapperName: Name,
-                  wrapperPath: Seq[Name],
                   silent: Boolean,
-                  contextClassLoader: ClassLoader): Res[Evaluated]
-
-  def processScriptBlock(cls: Class[_],
-                         newImports: Imports,
-                         usedEarlierDefinitions: Seq[String],
-                         wrapperName: Name,
-                         wrapperPath: Seq[Name],
-                         pkgName: Seq[Name],
-                         contextClassLoader: ClassLoader): Res[Evaluated]
+                  contextClassLoader: SpecialClassLoader): Res[Unit]
 }
 
 object Evaluator{
@@ -69,24 +55,20 @@ object Evaluator{
     Res.Failure(newLine + "Interrupted! (`repl.lastException.printStackTrace` for details)")
   }
 
-  def apply(headFrame: => Frame): Evaluator = new Evaluator{ eval =>
+  def apply(): Evaluator = new Evaluator{
 
 
-    def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
+    def loadClass(fullName: String, classLoader: SpecialClassLoader): Res[Class[_]] = {
       Res[Class[_]](
         Try {
-          for ((name, bytes) <- classFiles.sortBy(_._1)) {
-            headFrame.classloader.addClassFile(name, bytes)
-          }
-
-          headFrame.classloader.findClass(fullName)
+          classLoader.findClass(fullName)
         },
         e =>"Failed to load compiled class " + e
       )
     }
 
 
-    def evalMain(cls: Class[_], contextClassloader: ClassLoader) =
+    def evalClass(cls: Class[_], contextClassloader: ClassLoader) =
       Util.withContextClassloader(contextClassloader){
 
         val (method, instance) =
@@ -108,97 +90,30 @@ object Evaluator{
         method.invoke(instance)
       }
 
-    def processLine(classFiles: Util.ClassFiles,
-                    newImports: Imports,
-                    usedEarlierDefinitions: Seq[String],
+    def evalMainResult(wrapperName: String, contextClassloader: SpecialClassLoader): Res[Any] =
+      loadClass(wrapperName, contextClassloader).flatMap { cls =>
+        try Res.Success(evalClass(cls, contextClassloader))
+        catch Evaluator.userCodeExceptionHandler
+      }
+
+    def evalMain(wrapperName: String, contextClassloader: SpecialClassLoader): Res[Unit] =
+      evalMainResult(wrapperName, contextClassloader).map(_ => ())
+
+    def processLine(wrapperName: String,
                     printer: Printer,
-                    indexedWrapperName: Name,
-                    wrapperPath: Seq[Name],
                     silent: Boolean,
-                    contextClassLoader: ClassLoader) = {
+                    contextClassLoader: SpecialClassLoader) = {
       for {
-        cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
+        obj <- evalMainResult(wrapperName, contextClassLoader)
         _ <- Catching{userCodeExceptionHandler}
       } yield {
-        headFrame.usedEarlierDefinitions = usedEarlierDefinitions
-
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
-        val iter = evalMain(cls, contextClassLoader).asInstanceOf[Iterator[String]]
+        val iter = obj.asInstanceOf[Iterator[String]]
 
         if (!silent) evaluatorRunPrinter(iter.foreach(printer.resultStream.print))
         else evaluatorRunPrinter(iter.foreach(_ => ()))
-
-        // "" Empty string as cache tag of repl code
-        evaluationResult(
-          Seq(Name("ammonite"), Name("$sess"), indexedWrapperName),
-          wrapperPath,
-          newImports
-        )
       }
-    }
-
-
-    def processScriptBlock(cls: Class[_],
-                           newImports: Imports,
-                           usedEarlierDefinitions: Seq[String],
-                           wrapperName: Name,
-                           wrapperPath: Seq[Name],
-                           pkgName: Seq[Name],
-                           contextClassLoader: ClassLoader) = {
-      for {
-        _ <- Catching{userCodeExceptionHandler}
-      } yield {
-        headFrame.usedEarlierDefinitions = usedEarlierDefinitions
-        evalMain(cls, contextClassLoader)
-        val res = evaluationResult(pkgName :+ wrapperName, wrapperPath, newImports)
-        res
-      }
-    }
-
-    def evaluationResult(wrapperName: Seq[Name],
-                         internalWrapperPath: Seq[Name],
-                         imports: Imports) = {
-      Evaluated(
-        wrapperName,
-        Imports(
-          for(id <- imports.value) yield {
-            val filledPrefix =
-              if (internalWrapperPath.isEmpty) {
-                val filledPrefix =
-                  if (id.prefix.isEmpty) {
-                    // For some reason, for things not-in-packages you can't access
-                    // them off of `_root_`
-                    wrapperName
-                  } else {
-                    id.prefix
-                  }
-
-                if (filledPrefix.headOption.exists(_.backticked == "_root_")) filledPrefix
-                else Seq(Name("_root_")) ++ filledPrefix
-              } else if (id.prefix.isEmpty)
-                // For some reason, for things not-in-packages you can't access
-                // them off of `_root_`
-                Seq(Name("_root_")) ++ wrapperName ++ internalWrapperPath
-              else if (id.prefix.startsWith(wrapperName)) {
-                if (id.prefix.lift(wrapperName.length).contains(Name("Helper")))
-                  Seq(Name("_root_")) ++ wrapperName ++
-                    internalWrapperPath ++
-                    id.prefix.drop(wrapperName.length + 1)
-                else
-                  Seq(Name("_root_")) ++ wrapperName.init ++
-                    Seq(id.prefix.apply(wrapperName.length)) ++
-                    internalWrapperPath ++
-                    id.prefix.drop(wrapperName.length + 1)
-              } else if (id.prefix.headOption.exists(_.backticked == "_root_"))
-                id.prefix
-              else
-                Seq(Name("_root_")) ++ id.prefix
-
-            id.copy(prefix = filledPrefix)
-          }
-        )
-      )
     }
   }
 

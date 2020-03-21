@@ -46,7 +46,8 @@ class Interpreter(val printer: Printer,
                   val scriptCodeWrapper: CodeWrapper,
                   alreadyLoadedDependencies: Seq[Dependency],
                   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                  classPathWhitelist: Set[Seq[String]] = Set.empty)
+                  classPathWhitelist: Set[Seq[String]] = Set.empty,
+                  evaluator: Evaluator = Evaluator())
   extends ImportHook.InterpreterInterface{ interp =>
 
   def handleOutput(res: Res[Evaluated]): Unit =
@@ -86,8 +87,6 @@ class Interpreter(val printer: Printer,
     classPathWhitelist,
     Option(initialClassLoader).getOrElse(headFrame.classloader)
   )
-
-  private val eval = Evaluator(headFrame)
 
   private var scriptImportCallback: Imports => Unit =
     imports => headFrame.addImports(imports)
@@ -269,20 +268,30 @@ class Interpreter(val printer: Printer,
         printer,
         fileName
       )
-      _ = incrementLine()
-      res <- eval.processLine(
-        output.classFiles,
-        output.imports,
-        output.usedEarlierDefinitions.getOrElse(Nil),
+      _ = {
+        incrementLine()
+        addClassFiles(output.classFiles)
+        headFrame.usedEarlierDefinitions = output.usedEarlierDefinitions.getOrElse(Nil)
+      }
+      wrapperName = Seq(Name("ammonite"), Name("$sess"), indexedWrapperName)
+      _ <- evaluator.processLine(
+        wrapperName.map(_.backticked).mkString("."),
         printer,
-        indexedWrapperName,
-        replCodeWrapper.wrapperPath,
         silent,
         evalClassloader
+      )
+      res = Interpreter.evaluationResult(
+        wrapperName,
+        replCodeWrapper.wrapperPath,
+        output.imports
       )
     } yield (res, Tag("", "", classPathWhitelist.hashCode().toString))
   }
 
+  private def addClassFiles(classFiles: ClassFiles): Unit = {
+    for ((name, bytes) <- classFiles.sortBy(_._1))
+      headFrame.classloader.addClassFile(name, bytes)
+  }
 
   private def processSingleBlock(processed: Preprocessor.Output,
                          codeSource0: CodeSource,
@@ -303,15 +312,13 @@ class Interpreter(val printer: Printer,
       output <- compilerManager.compileClass(
         processed, printer, codeSource.fileName
       )
-      cls <- eval.loadClass(fullyQualifiedName, output.classFiles)
+      _ = {
+        addClassFiles(output.classFiles)
+        headFrame.usedEarlierDefinitions = output.usedEarlierDefinitions.getOrElse(Nil)
+      }
 
-      res <- eval.processScriptBlock(
-        cls,
-        output.imports,
-        output.usedEarlierDefinitions.getOrElse(Nil),
-        codeSource.wrapperName,
-        scriptCodeWrapper.wrapperPath,
-        codeSource.pkgName,
+      _ <- evaluator.evalMain(
+        fullyQualifiedName,
         evalClassloader
       )
     } yield {
@@ -319,6 +326,12 @@ class Interpreter(val printer: Printer,
         fullyQualifiedName,
         tag,
         Storage.CompileCache(output.classFiles, output.imports)
+      )
+
+      val res = Interpreter.evaluationResult(
+        codeSource.pkgName :+ codeSource.wrapperName,
+        scriptCodeWrapper.wrapperPath,
+        output.imports
       )
 
       (res, tag)
@@ -536,13 +549,10 @@ class Interpreter(val printer: Printer,
             compileRunBlock(blockMetadata.leadingSpaces, blockMetadata.hookInfo)
           } else{
             compilerManager.addToClasspath(classFiles)
+            addClassFiles(classFiles)
 
-            val cls = eval.loadClass(blockMetadata.id.wrapperPath, classFiles)
-            val evaluated =
-              try cls.map(eval.evalMain(_, evalClassloader))
-              catch Evaluator.userCodeExceptionHandler
-
-            evaluated.map(_ => blockMetadata)
+            evaluator.evalMain(blockMetadata.id.wrapperPath, evalClassloader)
+              .map(_ => blockMetadata)
           }
         }
 
@@ -713,6 +723,51 @@ class Interpreter(val printer: Printer,
 }
 
 object Interpreter{
+
+  private def evaluationResult(wrapperName: Seq[Name],
+                       internalWrapperPath: Seq[Name],
+                       imports: Imports) = {
+    Evaluated(
+      wrapperName,
+      Imports(
+        for(id <- imports.value) yield {
+          val filledPrefix =
+            if (internalWrapperPath.isEmpty) {
+              val filledPrefix =
+                if (id.prefix.isEmpty) {
+                  // For some reason, for things not-in-packages you can't access
+                  // them off of `_root_`
+                  wrapperName
+                } else {
+                  id.prefix
+                }
+
+              if (filledPrefix.headOption.exists(_.backticked == "_root_")) filledPrefix
+              else Seq(Name("_root_")) ++ filledPrefix
+            } else if (id.prefix.isEmpty)
+              // For some reason, for things not-in-packages you can't access
+              // them off of `_root_`
+              Seq(Name("_root_")) ++ wrapperName ++ internalWrapperPath
+            else if (id.prefix.startsWith(wrapperName)) {
+              if (id.prefix.lift(wrapperName.length).contains(Name("Helper")))
+                Seq(Name("_root_")) ++ wrapperName ++
+                  internalWrapperPath ++
+                  id.prefix.drop(wrapperName.length + 1)
+              else
+                Seq(Name("_root_")) ++ wrapperName.init ++
+                  Seq(id.prefix.apply(wrapperName.length)) ++
+                  internalWrapperPath ++
+                  id.prefix.drop(wrapperName.length + 1)
+            } else if (id.prefix.headOption.exists(_.backticked == "_root_"))
+              id.prefix
+            else
+              Seq(Name("_root_")) ++ id.prefix
+
+          id.copy(prefix = filledPrefix)
+        }
+      )
+    )
+  }
 
   def mtimeIfExists(p: os.Path) = if (os.exists(p)) os.mtime(p) else 0L
 
