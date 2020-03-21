@@ -33,7 +33,7 @@ class Interpreter(val printer: Printer,
                   alreadyLoadedDependencies: Seq[Dependency],
                   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
                   classPathWhitelist: Set[Seq[String]] = Set.empty,
-                  evaluator: Evaluator = Evaluator())
+                  evaluator: Evaluator = Evaluator.Default)
   extends ImportHook.InterpreterInterface{
 
   private val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)

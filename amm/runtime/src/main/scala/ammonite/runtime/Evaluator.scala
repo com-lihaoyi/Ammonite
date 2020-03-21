@@ -55,10 +55,10 @@ object Evaluator{
     Res.Failure(newLine + "Interrupted! (`repl.lastException.printStackTrace` for details)")
   }
 
-  def apply(): Evaluator = new Evaluator{
+  case object Default extends Evaluator{
 
 
-    def loadClass(fullName: String, classLoader: SpecialClassLoader): Res[Class[_]] = {
+    private def loadClass(fullName: String, classLoader: SpecialClassLoader): Res[Class[_]] = {
       Res[Class[_]](
         Try {
           classLoader.findClass(fullName)
@@ -68,7 +68,7 @@ object Evaluator{
     }
 
 
-    def evalClass(cls: Class[_], contextClassloader: ClassLoader) =
+    private def evalClass(cls: Class[_], contextClassloader: ClassLoader) =
       Util.withContextClassloader(contextClassloader){
 
         val (method, instance) =
@@ -90,7 +90,10 @@ object Evaluator{
         method.invoke(instance)
       }
 
-    def evalMainResult(wrapperName: String, contextClassloader: SpecialClassLoader): Res[Any] =
+    private def evalMainResult(
+      wrapperName: String,
+      contextClassloader: SpecialClassLoader
+    ): Res[Any] =
       loadClass(wrapperName, contextClassloader).flatMap { cls =>
         try Res.Success(evalClass(cls, contextClassloader))
         catch Evaluator.userCodeExceptionHandler
