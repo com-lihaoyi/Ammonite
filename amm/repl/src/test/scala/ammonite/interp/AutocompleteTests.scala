@@ -21,7 +21,7 @@ object AutocompleteTests extends TestSuite{
       for (interp <- check.interps) {
         val (index, completions, signatures) = interp.compilerManager.complete(
           cursor,
-          interp.frameImports.toString,
+          interp.getFrame().toString,
           buf
         )
         val left = cmp(completions.toSet)

@@ -74,7 +74,7 @@ class Interpreter(val printer: Printer,
     .flatMap(c => Seq(c, c + "$"))
 
   def evalClassloader = headFrame.classloader
-  def frameImports = headFrame.imports
+  private def frameImports = headFrame.imports
 
   private def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories(), verbose = verboseOutput)
