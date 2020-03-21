@@ -31,11 +31,14 @@ class CompilerLifecycleManager(
 
 
   private[this] object Internal{
-    var compiler: Compiler = null
+
+    var compiler: Compiler = _
+    var pressy: Pressy = _
+
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
     val onSettingsInit = mutable.Buffer.empty[scala.tools.nsc.Settings => Unit]
     var preConfiguredSettingsChanged: Boolean = false
-    var pressy: Pressy = _
+
     var compilationCount = 0
     var (lastFrame, lastFrameVersion) = (headFrame, headFrame.version)
   }
