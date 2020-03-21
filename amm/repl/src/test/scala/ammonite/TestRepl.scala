@@ -55,22 +55,23 @@ class TestRepl {
   val frames = Ref(List(Frame.createInitial(initialClassLoader)))
   val sess0 = new SessionApiImpl(frames)
 
+  val basePredefs = Seq(
+    PredefInfo(
+      Name("defaultPredef"),
+      ammonite.main.Defaults.replPredef + ammonite.main.Defaults.predefString,
+      true,
+      None
+    ),
+    PredefInfo(Name("testPredef"), predef._1, false, predef._2)
+  )
+  val customPredefs = Seq()
+
   var currentLine = 0
   val interp: Interpreter = try {
     new Interpreter(
       printer0,
       storage = storage,
       wd = os.pwd,
-      basePredefs = Seq(
-        PredefInfo(
-          Name("defaultPredef"),
-          ammonite.main.Defaults.replPredef + ammonite.main.Defaults.predefString,
-          true,
-          None
-        ),
-        PredefInfo(Name("testPredef"), predef._1, false, predef._2)
-      ),
-      customPredefs = Seq(),
       extraBridges = Seq(
         (
           "ammonite.TestReplBridge",
@@ -166,7 +167,7 @@ class TestRepl {
   }
 
 
-  for ((error, _) <- interp.initializePredef()) {
+  for ((error, _) <- interp.initializePredef(basePredefs, customPredefs)) {
     val (msgOpt, causeOpt) = error match {
       case r: Res.Exception => (Some(r.msg), Some(r.t))
       case r: Res.Failure => (Some(r.msg), None)

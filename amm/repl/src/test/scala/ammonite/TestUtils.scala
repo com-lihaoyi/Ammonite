@@ -24,11 +24,6 @@ object TestUtils {
       ),
       storage = storage,
       wd = os.pwd,
-      // Provide a custom predef so we can verify in tests that the predef gets cached
-      basePredefs = Seq(),
-      customPredefs = Seq(
-        PredefInfo(Name("predef"), predef, false, None)
-      ),
       extraBridges = Seq(),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
@@ -40,7 +35,8 @@ object TestUtils {
       importHooks = ImportHook.defaults,
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
-    interp.initializePredef()
+    // Provide a custom predef so we can verify in tests that the predef gets cached
+    interp.initializePredef(Seq(), Seq(PredefInfo(Name("predef"), predef, false, None)))
     interp
   }
 }

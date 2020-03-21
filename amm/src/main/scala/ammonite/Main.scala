@@ -154,15 +154,15 @@ case class Main(predefCode: String = "",
       )
       val frame = Frame.createInitial(initialClassLoader)
 
+      val basePredefs = Seq(
+        PredefInfo(Name("DefaultPredef"), augmentedPredef, false, None)
+      )
+      val customPredefs = predefFileInfoOpt.toSeq ++ Seq(
+        PredefInfo(Name("CodePredef"), predefCode, false, None)
+      )
       val interp: Interpreter = new Interpreter(
         printer,
         storageBackend,
-        basePredefs = Seq(
-          PredefInfo(Name("DefaultPredef"), augmentedPredef, false, None)
-        ),
-        predefFileInfoOpt.toSeq ++ Seq(
-          PredefInfo(Name("CodePredef"), predefCode, false, None)
-        ),
         Seq(
           (
             "ammonite.repl.api.SourceBridge",
@@ -187,7 +187,7 @@ case class Main(predefCode: String = "",
         importHooks = importHooks,
         classPathWhitelist = classPathWhitelist
       )
-      interp.initializePredef() match{
+      interp.initializePredef(basePredefs, customPredefs) match{
         case None => Right(interp)
         case Some(problems) => Left(problems)
       }
