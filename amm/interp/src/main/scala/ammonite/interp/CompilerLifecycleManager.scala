@@ -94,6 +94,7 @@ class CompilerLifecycleManager(
         headFrame.classloader,
         headFrame.pluginClassloader,
         () => shutdownPressy(),
+        None,
         settings,
         classPathWhitelist,
         initialClassPath
