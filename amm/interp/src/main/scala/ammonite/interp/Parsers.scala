@@ -98,6 +98,8 @@ object Parsers {
   def CompilationUnit[_: P] = P( WL.! ~ StatementBlock(Separator) ~ WL )
   def ScriptSplitter[_: P] = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = parse(code, ScriptSplitter(_))
+  def ScriptSplitterWithStart[_: P] = P( Start ~ (Index ~ CompilationUnit).repX(1, Separator) ~ End)
+  def splitScriptWithStart(code: String) = parse(code, ScriptSplitterWithStart(_))
 
   def stringWrap(s: String) = "\"" + pprint.Util.literalize(s) + "\""
   def stringSymWrap(s: String) = {
