@@ -26,15 +26,15 @@ trait Evaluator{
 }
 
 object Evaluator{
-  type InvEx = InvocationTargetException
-  type InitEx = ExceptionInInitializerError
+  private type InvEx = InvocationTargetException
+  private type InitEx = ExceptionInInitializerError
 
   /**
     * We unwrap many of the "common" cases where the user's actual
     * exception is wrapped in a bunch of InvocationTargetException
     * wrappers, since it's the users exception they probably care about
     */
-  val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
+  private val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
     // Exit
     case Ex(_: InvEx, _: InitEx, AmmoniteExit(value))  => Res.Exit(value)
 
@@ -122,7 +122,7 @@ object Evaluator{
    * so we can easily cut out the irrelevant part of the trace when
    * showing it to the user.
    */
-  def evaluatorRunPrinter(f: => Unit) = f
+  private def evaluatorRunPrinter(f: => Unit) = f
 
 
 
