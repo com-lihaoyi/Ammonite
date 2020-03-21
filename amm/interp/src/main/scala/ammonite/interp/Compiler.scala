@@ -68,9 +68,9 @@ object Compiler{
 
   }
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = path match {
+  private def writeDeep(d: VirtualDirectory,
+                        path: List[String],
+                        suffix: String): OutputStream = path match {
     case head :: Nil => d.fileNamed(path.head + suffix).output
     case head :: rest =>
       writeDeep(
