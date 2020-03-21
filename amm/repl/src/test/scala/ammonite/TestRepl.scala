@@ -337,7 +337,7 @@ class TestRepl {
 
       case _ =>
     }
-    Repl.handleOutput(interp, processed)
+    interp.handleOutput(processed)
     (
       processed,
       outString,

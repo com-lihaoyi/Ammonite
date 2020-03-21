@@ -39,7 +39,7 @@ class Interpreter(val printer: Printer,
                   val wd: os.Path,
                   colors: Ref[Colors],
                   verboseOutput: Boolean = true,
-                  getFrame: () => Frame,
+                  val getFrame: () => Frame,
                   val createFrame: () => Frame,
                   initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
@@ -49,6 +49,16 @@ class Interpreter(val printer: Printer,
                   classPathWhitelist: Set[Seq[String]] = Set.empty)
   extends ImportHook.InterpreterInterface{ interp =>
 
+  def handleOutput(res: Res[Evaluated]): Unit =
+    res match{
+      case Res.Skip => // do nothing
+      case Res.Exit(value) => compilerManager.shutdownPressy()
+      case Res.Success(ev) =>
+        headFrame.addImports(ev.imports)
+        if (headFrame.frozen)
+          createFrame()
+      case _ => ()
+    }
 
   def headFrame = getFrame()
   val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)

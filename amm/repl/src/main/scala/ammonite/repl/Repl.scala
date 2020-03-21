@@ -206,7 +206,7 @@ class Repl(input: InputStream,
     welcomeBanner.foreach(printer.outStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
-      Repl.handleOutput(interp, actionResult)
+      interp.handleOutput(actionResult)
       Repl.handleRes(
         actionResult,
         printer.info,
@@ -229,17 +229,6 @@ class Repl(input: InputStream,
 }
 
 object Repl{
-  def handleOutput(interp: Interpreter, res: Res[Evaluated]): Unit = {
-    res match{
-      case Res.Skip => // do nothing
-      case Res.Exit(value) => interp.compilerManager.shutdownPressy()
-      case Res.Success(ev) =>
-        interp.handleImports(ev.imports)
-        if (interp.headFrame.frozen)
-          interp.createFrame()
-      case _ => ()
-    }
-  }
   def handleRes(res: Res[Any],
                 printInfo: String => Unit,
                 printError: String => Unit,
