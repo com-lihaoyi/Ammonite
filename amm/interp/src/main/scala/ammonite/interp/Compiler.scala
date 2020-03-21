@@ -407,12 +407,14 @@ object Compiler{
                           classPathWhitelist: Set[Seq[String]],
                           initialClassPath: Seq[java.net.URL]) = {
 
-    val (initialDirDeps, newDirDeps) = dirDeps.partition(initialClassPath.contains)
-    val (initialJarDeps, newJarDeps) = jarDeps.partition(initialClassPath.contains)
-    val newJarCp = prepareJarCp(newJarDeps, settings)
+    val (initialDirDeps, initialJarDeps) = initialClassPath.partition { u =>
+      u.getProtocol == "file" &&
+        java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+    }
+    val newJarCp = prepareJarCp(jarDeps, settings)
     val initialJarCp = prepareJarCp(initialJarDeps, settings)
 
-    val newDirCp = prepareDirCp(newDirDeps)
+    val newDirCp = prepareDirCp(dirDeps)
     val initialDirCp = prepareDirCp(initialDirDeps)
     val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath){
 

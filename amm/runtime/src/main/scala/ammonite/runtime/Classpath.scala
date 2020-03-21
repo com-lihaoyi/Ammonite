@@ -25,7 +25,11 @@ object Classpath {
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-  def classpath(classLoader: ClassLoader, storage: Storage): Vector[URL] = {
+  def classpath(
+    classLoader: ClassLoader,
+    storage: Storage,
+    stopAt: ClassLoader = null
+  ): Vector[URL] = {
     def rtCacheDir(storage: Storage): Option[os.Path] = storage match {
       case storage: Storage.Folder =>
         // no need to cache if the storage is in tmpdir
@@ -40,7 +44,7 @@ object Classpath {
     var current = classLoader
     val files = collection.mutable.Buffer.empty[java.net.URL]
     val seenClassLoaders = collection.mutable.Buffer.empty[ClassLoader]
-    while(current != null){
+    while(current != null && current != stopAt){
       seenClassLoaders.append(current)
       current match{
         case t: java.net.URLClassLoader =>

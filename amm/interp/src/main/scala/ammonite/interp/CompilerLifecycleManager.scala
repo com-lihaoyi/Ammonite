@@ -61,7 +61,8 @@ class CompilerLifecycleManager(
   }
 
 
-  private val initialClassPath = Classpath.classpath(headFrame.classloader, storage)
+  private val initialClassLoader = headFrame.classloader.getParent
+  private val initialClassPath = Classpath.classpath(initialClassLoader, storage)
 
   // We lazily force the compiler to be re-initialized by setting the
   // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
@@ -86,7 +87,7 @@ class CompilerLifecycleManager(
       onSettingsInit.foreach(_(settings))
 
       val headFrameClassPath =
-        Classpath.classpath(headFrame.classloader, storage)
+        Classpath.classpath(headFrame.classloader, storage, stopAt = initialClassLoader)
 
       Internal.compiler = Compiler(
         headFrameClassPath,
@@ -105,7 +106,7 @@ class CompilerLifecycleManager(
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath(headFrame.classloader, storage),
+        Classpath.classpath(headFrame.classloader, storage, stopAt = initialClassLoader),
         dynamicClasspath,
         headFrame.classloader,
         settings.copy(),
