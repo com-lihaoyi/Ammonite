@@ -120,6 +120,16 @@ object Evaluator{
     }
   }
 
+  case object PassThrough extends Evaluator {
+    def evalMain(wrapperName: String, contextClassloader: SpecialClassLoader): Res[Unit] =
+      Res.Success(())
+    def processLine(wrapperName: String,
+                    printer: Printer,
+                    silent: Boolean,
+                    contextClassLoader: SpecialClassLoader): Res[Unit] =
+      Res.Success(())
+  }
+
   /**
    * Dummy function used to mark this method call in the stack trace,
    * so we can easily cut out the irrelevant part of the trace when
