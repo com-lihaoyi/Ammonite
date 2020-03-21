@@ -69,6 +69,8 @@ class Repl(input: InputStream,
 
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
+  val mainThread = Thread.currentThread()
+
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
@@ -191,8 +193,8 @@ class Repl(input: InputStream,
       // raises an error with the stack trace of *this interrupt thread*, rather
       // than the stack trace of *the mainThread*
       lastException = new ThreadDeath()
-      lastException.setStackTrace(Repl.truncateStackTrace(interp.mainThread.getStackTrace))
-      interp.mainThread.stop()
+      lastException.setStackTrace(Repl.truncateStackTrace(mainThread.getStackTrace))
+      mainThread.stop()
     }
     out <- interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
   } yield {

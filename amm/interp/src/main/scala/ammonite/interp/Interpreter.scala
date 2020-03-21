@@ -60,9 +60,9 @@ class Interpreter(val printer: Printer,
       case _ => ()
     }
 
-  def headFrame = getFrame()
-  val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
-  val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
+  private def headFrame = getFrame()
+  private val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
+  private val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
 
   headFrame.classloader.specialLocalClasses ++= Seq(
     "ammonite.interp.api.InterpBridge",
@@ -73,15 +73,10 @@ class Interpreter(val printer: Printer,
     .map(_._1)
     .flatMap(c => Seq(c, c + "$"))
 
-  val mainThread = Thread.currentThread()
-
   def evalClassloader = headFrame.classloader
-  def pluginClassloader = headFrame.pluginClassloader
-  def handleImports(i: Imports) = headFrame.addImports(i)
   def frameImports = headFrame.imports
-  def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
-  def dependencyComplete: String => (Int, Seq[String]) =
+  private def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories(), verbose = verboseOutput)
 
   val compilerManager = new CompilerLifecycleManager(
@@ -92,9 +87,10 @@ class Interpreter(val printer: Printer,
     Option(initialClassLoader).getOrElse(headFrame.classloader)
   )
 
-  val eval = Evaluator(headFrame)
+  private val eval = Evaluator(headFrame)
 
-  private var scriptImportCallback: Imports => Unit = handleImports
+  private var scriptImportCallback: Imports => Unit =
+    imports => headFrame.addImports(imports)
 
   val watchedFiles = mutable.Buffer.empty[(os.Path, Long)]
 
