@@ -36,35 +36,8 @@ class Interpreter(val printer: Printer,
                   evaluator: Evaluator = Evaluator())
   extends ImportHook.InterpreterInterface{
 
-  def handleOutput(res: Res[Evaluated]): Boolean =
-    res match{
-      case Res.Skip => false // do nothing
-      case Res.Exit(value) => compilerManager.shutdownPressy(); false
-      case Res.Success(ev) =>
-        headFrame.addImports(ev.imports)
-        headFrame.frozen
-      case _ => false
-    }
-
-  private def headFrame = getFrame()
   private val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
   private val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
-
-  def evalClassloader = headFrame.classloader
-  private def frameImports = headFrame.imports
-
-  private def dependencyComplete: String => (Int, Seq[String]) =
-    IvyThing.completer(repositories(), verbose = verboseOutput)
-
-  val compilerManager = new CompilerLifecycleManager(
-    storage,
-    headFrame,
-    Some(dependencyComplete),
-    classPathWhitelist
-  )
-
-  private var scriptImportCallback: Imports => Unit =
-    imports => headFrame.addImports(imports)
 
   val watchedFiles = mutable.Buffer.empty[(os.Path, Long)]
 
@@ -79,6 +52,34 @@ class Interpreter(val printer: Printer,
   val alreadyLoadedFiles = mutable.Map.empty[CodeSource, ScriptOutput.Metadata]
 
   val beforeExitHooks = mutable.Buffer.empty[Any => Any]
+
+  val compilerManager = new CompilerLifecycleManager(
+    storage,
+    headFrame,
+    Some(dependencyComplete),
+    classPathWhitelist
+  )
+
+  def handleOutput(res: Res[Evaluated]): Boolean =
+    res match{
+      case Res.Skip => false // do nothing
+      case Res.Exit(value) => compilerManager.shutdownPressy(); false
+      case Res.Success(ev) =>
+        headFrame.addImports(ev.imports)
+        headFrame.frozen
+      case _ => false
+    }
+
+  private def headFrame = getFrame()
+
+  def evalClassloader = headFrame.classloader
+  private def frameImports = headFrame.imports
+
+  private def dependencyComplete: String => (Int, Seq[String]) =
+    IvyThing.completer(repositories(), verbose = verboseOutput)
+
+  private var scriptImportCallback: Imports => Unit =
+    imports => headFrame.addImports(imports)
 
   def compilationCount = compilerManager.compilationCount
 
@@ -139,6 +140,10 @@ class Interpreter(val printer: Printer,
       case r @ Res.Exit(_) => Some((r, watchedFiles.toSeq))
     }
   }
+
+  private def addClassFiles(classFiles: ClassFiles): Unit =
+    for ((name, bytes) <- classFiles.sortBy(_._1))
+      headFrame.classloader.addClassFile(name, bytes)
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
@@ -285,11 +290,6 @@ class Interpreter(val printer: Printer,
         output.imports
       )
     } yield (res, Tag("", "", classPathWhitelist.hashCode().toString))
-  }
-
-  private def addClassFiles(classFiles: ClassFiles): Unit = {
-    for ((name, bytes) <- classFiles.sortBy(_._1))
-      headFrame.classloader.addClassFile(name, bytes)
   }
 
   private def processSingleBlock(processed: Preprocessor.Output,
