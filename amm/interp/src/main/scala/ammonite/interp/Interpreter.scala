@@ -60,8 +60,7 @@ class Interpreter(val printer: Printer,
     storage,
     headFrame,
     Some(dependencyComplete),
-    classPathWhitelist,
-    headFrame.classloader
+    classPathWhitelist
   )
 
   private var scriptImportCallback: Imports => Unit =
