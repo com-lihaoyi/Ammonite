@@ -32,7 +32,6 @@ class CompilerLifecycleManager(
 
   private[this] object Internal{
     var compiler: Compiler = null
-    var pressyStale: Boolean = true
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
     val onSettingsInit = mutable.Buffer.empty[scala.tools.nsc.Settings => Unit]
     var preConfiguredSettingsChanged: Boolean = false
