@@ -16,11 +16,13 @@ object IvyThing{
     val cache = Cache.create()
       .withLogger(if (verbose) Logger.progressBars() else Logger.nop)
     val sv = scala.util.Properties.versionNumberString
+    val sbv = sv.split('.').take(2).mkString(".")
 
     s =>
       val res = coursierapi.Complete.create()
         .withCache(cache)
         .withScalaVersion(sv)
+        .withScalaBinaryVersion(sbv)
         .withInput(s)
         .complete()
       (res.getFrom, res.getCompletions.asScala.toVector)
