@@ -25,8 +25,6 @@ import coursierapi.{Dependency, Fetch}
  */
 class Interpreter(val printer: Printer,
                   val storage: Storage,
-                  basePredefs: Seq[PredefInfo],
-                  customPredefs: Seq[PredefInfo],
                   // Allows you to set up additional "bridges" between the REPL
                   // world and the outside world, by passing in the full name
                   // of the `APIHolder` object that will hold the bridge and
@@ -111,7 +109,10 @@ class Interpreter(val printer: Printer,
 
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
-  def initializePredef(): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
+  def initializePredef(
+    basePredefs: Seq[PredefInfo],
+    customPredefs: Seq[PredefInfo]
+  ): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
 
     val bridgeImports = PredefInitialization.initBridges(
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,

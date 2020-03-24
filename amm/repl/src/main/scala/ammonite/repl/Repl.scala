@@ -72,8 +72,6 @@ class Repl(input: InputStream,
   val interp: Interpreter = new Interpreter(
     printer,
     storage,
-    basePredefs,
-    customPredefs,
     Seq(
       (
         "ammonite.repl.ReplBridge",
@@ -139,7 +137,7 @@ class Repl(input: InputStream,
     classPathWhitelist = classPathWhitelist
   )
 
-  def initializePredef() = interp.initializePredef()
+  def initializePredef() = interp.initializePredef(basePredefs, customPredefs)
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or
