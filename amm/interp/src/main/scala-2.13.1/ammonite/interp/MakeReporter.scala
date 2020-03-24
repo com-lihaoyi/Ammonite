@@ -13,18 +13,21 @@ import scala.tools.nsc.reporters.FilteringReporter
 import scala.tools.nsc.typechecker.Analyzer
 
 object MakeReporter {
+
+  type Reporter = scala.tools.nsc.reporters.Reporter
+
   def makeReporter(errorLogger: => String => Unit,
                    warningLogger: => String => Unit,
                    infoLogger: => String => Unit,
-                   outerSettings: Settings) = {
+                   outerSettings: Settings): FilteringReporter = {
     new FilteringReporter {
-      def displayPrompt(): Unit = ???
+
       def doReport(pos: scala.reflect.internal.util.Position,
                    msg: String,
-                   severity: Severity): Unit = {
+                   severity: Severity): Unit =
         display(pos, msg, severity)
-      }
-      def display(pos: Position, msg: String, severity: Severity) = {
+
+      def display(pos: Position, msg: String, severity: Severity) =
         severity match{
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
@@ -34,9 +37,8 @@ object MakeReporter {
           case INFO =>
             infoLogger(Position.formatMessage(pos, msg, false))
         }
-      }
 
-      val settings = outerSettings
+      def settings = outerSettings
     }
   }
 }

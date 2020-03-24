@@ -136,6 +136,7 @@ object Compiler{
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
+            reporterOpt: Option[MakeReporter.Reporter],
             settings: Settings,
             classPathWhitelist: Set[Seq[String]],
             initialClassPath: Seq[java.net.URL]): Compiler = new Compiler{
@@ -220,7 +221,9 @@ object Compiler{
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"
 
-      val reporter = MakeReporter.makeReporter(errorLogger, warningLogger, infoLogger, settings)
+      val reporter = reporterOpt.getOrElse {
+        MakeReporter.makeReporter(errorLogger, warningLogger, infoLogger, settings)
+      }
 
       val scalac = CompilerCompatibility.initGlobal(
         settings, reporter, jcp,

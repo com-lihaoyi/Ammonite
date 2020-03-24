@@ -14,10 +14,12 @@ import scala.tools.nsc.typechecker.Analyzer
 
 object MakeReporter{
 
+  type Reporter = AbstractReporter
+
   def makeReporter(errorLogger: => String => Unit,
                    warningLogger: => String => Unit,
                    infoLogger: => String => Unit,
-                   outerSettings: Settings) = {
+                   outerSettings: Settings): Reporter = {
     new AbstractReporter {
       def displayPrompt(): Unit = ???
 
