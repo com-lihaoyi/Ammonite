@@ -103,6 +103,24 @@ object Preprocessor{
     }
   }
 
+  def splitScriptWithStart(
+    rawCode: String,
+    fileName: String
+  ): Either[String, IndexedSeq[(Int, String, Seq[String])]] = {
+    Parsers.splitScriptWithStart(rawCode) match {
+      case f: Parsed.Failure =>
+        Left(formatFastparseError(fileName, rawCode, f))
+
+      case Parsed.Success(value, _) =>
+        val blocks = value.toVector.map {
+          case (startIdx, (comment, code)) =>
+            (startIdx, comment, code)
+        }
+        Right(blocks)
+    }
+  }
+
+
 
   def wrapCode(codeSource: CodeSource,
                indexedWrapperName: Name,
