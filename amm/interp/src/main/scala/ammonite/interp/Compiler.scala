@@ -235,11 +235,19 @@ object Compiler{
               importsLen
             )
           ) ++ {
+            val pluginSettings = settings.pluginOptions.value
+              .map(s => s.split(":", 2))
+              .collect {
+                case Array(k, v) => k -> v
+              }
+              .groupBy(_._1)
+              .map { case (k, l) => k -> l.map(_._2) }
+
             for {
               (name, cls) <- plugins0
               plugin = Plugin.instantiate(cls, g)
               initOk =
-              try plugin.init(Nil, g.globalError)
+              try plugin.init(pluginSettings.getOrElse(name, Nil), g.globalError)
               catch { case ex: Exception =>
                 Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
                 false
