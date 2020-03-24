@@ -108,7 +108,6 @@ object Compiler{
     * do that and assert to make sure it's only one path segment
     */
   def makeFile(src: Array[Byte], name: String) = {
-    assert(!name.contains('/'))
     val singleFile = new io.VirtualFile(name)
     val output = singleFile.output
     output.write(src)
