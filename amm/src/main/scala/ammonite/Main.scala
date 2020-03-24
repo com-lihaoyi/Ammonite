@@ -154,27 +154,15 @@ case class Main(predefCode: String = "",
       )
       val frame = Frame.createInitial(initialClassLoader)
 
-      val interp: Interpreter = new Interpreter(
+      val basePredefs = Seq(
+        PredefInfo(Name("DefaultPredef"), augmentedPredef, false, None)
+      )
+      val customPredefs = predefFileInfoOpt.toSeq ++ Seq(
+        PredefInfo(Name("CodePredef"), predefCode, false, None)
+      )
+      val interp = new Interpreter(
         printer,
         storageBackend,
-        basePredefs = Seq(
-          PredefInfo(Name("DefaultPredef"), augmentedPredef, false, None)
-        ),
-        predefFileInfoOpt.toSeq ++ Seq(
-          PredefInfo(Name("CodePredef"), predefCode, false, None)
-        ),
-        Seq(
-          (
-            "ammonite.repl.api.SourceBridge",
-            "source",
-            new SourceAPIImpl {}
-          ),
-          (
-            "ammonite.repl.api.FrontEndBridge",
-            "frontEnd",
-            new FrontEndAPIImpl {}
-          )
-        ),
         wd,
         colorsRef,
         verboseOutput,
@@ -187,7 +175,19 @@ case class Main(predefCode: String = "",
         importHooks = importHooks,
         classPathWhitelist = classPathWhitelist
       )
-      interp.initializePredef() match{
+      val bridges = Seq(
+        (
+          "ammonite.repl.api.SourceBridge",
+          "source",
+          new SourceAPIImpl {}
+        ),
+        (
+          "ammonite.repl.api.FrontEndBridge",
+          "frontEnd",
+          new FrontEndAPIImpl {}
+        )
+      )
+      interp.initializePredef(basePredefs, customPredefs, bridges) match{
         case None => Right(interp)
         case Some(problems) => Left(problems)
       }
