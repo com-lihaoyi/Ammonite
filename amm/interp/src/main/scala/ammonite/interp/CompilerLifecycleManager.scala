@@ -84,8 +84,7 @@ class CompilerLifecycleManager(
 
       val initialClassPath = Classpath.classpath(initialClassLoader, storage)
       val headFrameClassPath =
-        Classpath.classpath(headFrame.classloader, storage) ++
-        headFrame.classpath
+        Classpath.classpath(headFrame.classloader, storage)
 
       Internal.compiler = Compiler(
         headFrameClassPath,
@@ -103,7 +102,7 @@ class CompilerLifecycleManager(
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath(headFrame.classloader, storage) ++ headFrame.classpath,
+        Classpath.classpath(headFrame.classloader, storage),
         dynamicClasspath,
         headFrame.classloader,
         settings.copy(),
