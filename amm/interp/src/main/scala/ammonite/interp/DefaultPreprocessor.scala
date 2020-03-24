@@ -33,6 +33,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
                 printerTemplate: String => String,
                 extraCode: String,
                 skipEmpty: Boolean,
+                markScript: Boolean,
                 codeWrapper: CodeWrapper) = {
     // All code Ammonite compiles must be rooted in some package within
     // the `ammonite` top-level package
@@ -42,7 +43,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
       (wrappedCode, importsLength, userCodeNestingLevel) = Preprocessor.wrapCode(
         codeSource, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
-        imports, extraCode, codeWrapper
+        imports, extraCode, markScript, codeWrapper
       )
     } yield Preprocessor.Output(wrappedCode, importsLength, userCodeNestingLevel)
   }

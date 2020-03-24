@@ -250,6 +250,7 @@ class Interpreter(val printer: Printer,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = "",
         skipEmpty = true,
+        markScript = false,
         codeWrapper = replCodeWrapper
       )
       (out, tag) <- evaluateLine(
@@ -509,6 +510,7 @@ class Interpreter(val printer: Printer,
               _ => "scala.Iterator[String]()",
               extraCode = extraCode,
               skipEmpty = false,
+              markScript = false,
               codeWrapper = scriptCodeWrapper
             )
 

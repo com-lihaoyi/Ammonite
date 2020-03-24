@@ -34,6 +34,7 @@ trait Preprocessor{
                 printerTemplate: String => String,
                 extraCode: String,
                 skipEmpty: Boolean,
+                markScript: Boolean,
                 codeWrapper: CodeWrapper): Res[Preprocessor.Output]
 }
 
@@ -128,15 +129,22 @@ object Preprocessor{
                printCode: String,
                imports: Imports,
                extraCode: String,
+               markScript: Boolean,
                codeWrapper: CodeWrapper) = {
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
+    val extraCode0 =
+      if (markScript) extraCode + "/*</generated>*/"
+      else extraCode
     val (topWrapper, bottomWrapper, userCodeNestingLevel) =
-     codeWrapper(code, codeSource, imports, printCode, indexedWrapperName, extraCode)
-    val importsLen = topWrapper.length
+     codeWrapper(code, codeSource, imports, printCode, indexedWrapperName, extraCode0)
+    val (topWrapper0, bottomWrapper0) =
+      if (markScript) (topWrapper + "/*<script>*/", "/*</script>*/ /*<generated>*/" + bottomWrapper)
+      else (topWrapper, bottomWrapper)
+    val importsLen = topWrapper0.length
 
-    (topWrapper + code + bottomWrapper, importsLen, userCodeNestingLevel)
+    (topWrapper0 + code + bottomWrapper0, importsLen, userCodeNestingLevel)
   }
 
 
