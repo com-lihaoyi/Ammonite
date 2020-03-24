@@ -19,7 +19,8 @@ object DefaultPreprocessor {
     new DefaultPreprocessor(parse)
 }
 
-class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]]) extends Preprocessor{
+class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
+                          markGeneratedSections: Boolean = false) extends Preprocessor{
 
   import DefaultPreprocessor._
 
@@ -128,8 +129,13 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]]) exten
   val Expr = Processor{
     //Expressions are lifted to anon function applications so they will be JITed
     case (name, code, tree) =>
+      val expandedCode =
+        if (markGeneratedSections)
+          s"/*<amm>*/val $name = /*</amm>*/$code"
+        else
+          s"val $name = $code"
       Expanded(
-        s"val $name = $code",
+        expandedCode,
         if (isPrivate(tree)) Nil else Seq(pprint(name))
       )
   }
