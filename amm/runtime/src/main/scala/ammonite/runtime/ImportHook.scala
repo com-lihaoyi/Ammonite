@@ -65,7 +65,11 @@ object ImportHook{
                       codeSource: CodeSource,
                       hookImports: Imports,
                       exec: Boolean) extends Result
-    case class ClassPath(files: Seq[os.Path], plugin: Boolean) extends Result
+    case class ClassPath(
+      origin: Option[Seq[coursierapi.Dependency]],
+      files: Seq[os.Path],
+      plugin: Boolean
+    ) extends Result
   }
 
   object File extends SourceHook(false)
@@ -192,8 +196,9 @@ object ImportHook{
                interp: InterpreterInterface,
                wrapperPath: Seq[Name]): Either[String, Seq[Result.ClassPath]] = for{
       signatures <- splitImportTree(tree)
-      resolved <- resolve(interp, signatures)
-    } yield Seq(Result.ClassPath(resolved._2.map(os.Path(_)).toSeq, plugin))
+      depsResolved <- resolve(interp, signatures)
+      (deps, resolved) = depsResolved
+    } yield Seq(Result.ClassPath(Some(deps), resolved.map(os.Path(_)).toSeq, plugin))
   }
   object Classpath extends BaseClasspath(plugin = false)
   object PluginClasspath extends BaseClasspath(plugin = true)
@@ -212,7 +217,7 @@ object ImportHook{
           if (missing.nonEmpty)
             Left("Cannot resolve $cp import: " + missing.mkString(", "))
           else
-            Right(Seq(Result.ClassPath(files, plugin)))
+            Right(Seq(Result.ClassPath(None, files, plugin)))
       }
 
     }
