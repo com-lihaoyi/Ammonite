@@ -157,8 +157,7 @@ class Interpreter(val printer: Printer,
     tree: ImportTree,
     wrapperPath: Seq[Name]
   ) = synchronized{
-    val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
-    val hookOpt = importHooks.collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
+    val hookOpt = importHooks.find{case (k, v) => tree.strippedPrefix.startsWith(k)}
     for{
       (hookPrefix, hook) <- Res(hookOpt, s"Import Hook ${tree.prefix} could not be resolved")
       hooked <- Res(
