@@ -65,10 +65,13 @@ object Preprocessor{
     * is returned separately so we can later manipulate the statements e.g.
     * by adding `val res2 = ` without the whitespace getting in the way
     */
-  def splitScript(rawCode: String, fileName: String): Res[IndexedSeq[(String, Seq[String])]] = {
+  def splitScript(
+    rawCode: String,
+    fileName: String
+  ): Either[String, IndexedSeq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
-        Res.Failure(formatFastparseError(fileName, rawCode, f))
+        Left(formatFastparseError(fileName, rawCode, f))
 
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
 
@@ -96,7 +99,7 @@ object Preprocessor{
           blocks.append((ncomment, code))
         }
 
-        Res.Success(blocks.toIndexedSeq)
+        Right(blocks.toIndexedSeq)
     }
   }
 
