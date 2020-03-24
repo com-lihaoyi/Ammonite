@@ -139,7 +139,8 @@ object Compiler{
             reporterOpt: Option[MakeReporter.Reporter],
             settings: Settings,
             classPathWhitelist: Set[Seq[String]],
-            initialClassPath: Seq[java.net.URL]): Compiler = new Compiler{
+            initialClassPath: Seq[java.net.URL],
+            lineNumberModifier: Boolean = true): Compiler = new Compiler{
 
     if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"
@@ -241,7 +242,8 @@ object Compiler{
               lastImports = _,
               uses => usedEarlierDefinitions = Some(uses),
               userCodeNestingLevel,
-              importsLen
+              importsLen,
+              lineNumberModifier
             )
           ) ++ {
             val pluginSettings = settings.pluginOptions.value
