@@ -24,8 +24,7 @@ class CompilerLifecycleManager(
   storage: Storage,
   headFrame: => Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-  classPathWhitelist: Set[Seq[String]],
-  initialClassLoader: ClassLoader
+  classPathWhitelist: Set[Seq[String]]
 ){
 
 
@@ -59,6 +58,9 @@ class CompilerLifecycleManager(
   }
 
 
+  private val initialClassLoader = headFrame.classloader.getParent
+  private val initialClassPath = Classpath.classpath(initialClassLoader, storage)
+
   // We lazily force the compiler to be re-initialized by setting the
   // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
   // we end up sometimes re-initializing it multiple times unnecessarily before
@@ -81,7 +83,6 @@ class CompilerLifecycleManager(
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       onSettingsInit.foreach(_(settings))
 
-      val initialClassPath = Classpath.classpath(initialClassLoader, storage)
       val headFrameClassPath =
         Classpath.classpath(headFrame.classloader, storage)
 
@@ -108,7 +109,7 @@ class CompilerLifecycleManager(
         settings.copy(),
         dependencyCompleteOpt,
         classPathWhitelist,
-        Classpath.classpath(initialClassLoader, storage)
+        initialClassPath
       )
 
       Internal.preConfiguredSettingsChanged = false

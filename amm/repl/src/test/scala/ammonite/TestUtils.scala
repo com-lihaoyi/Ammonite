@@ -27,7 +27,6 @@ object TestUtils {
       colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
-      initialClassLoader = initialClassLoader,
       replCodeWrapper = CodeWrapper,
       scriptCodeWrapper = CodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),

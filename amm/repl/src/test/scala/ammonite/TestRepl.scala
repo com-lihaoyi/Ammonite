@@ -75,7 +75,6 @@ class TestRepl {
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
-      initialClassLoader = initialClassLoader,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
