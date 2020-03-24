@@ -35,7 +35,7 @@ trait Storage{
 
 object Storage{
   case class CompileCache(classFiles: Vector[(String, Array[Byte])], imports: Imports)
-  type IvyMap = Map[(String, Seq[Dependency]), Set[String]]
+  type IvyMap = Map[(String, Seq[Dependency]), Seq[String]]
 
   private final case class DependencyLike(
     module: DependencyLike.ModuleLike,

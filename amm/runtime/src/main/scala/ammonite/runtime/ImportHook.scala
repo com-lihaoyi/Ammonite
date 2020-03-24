@@ -51,7 +51,7 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface{
-    def loadIvy(coordinates: Dependency*): Either[String, Set[File]]
+    def loadIvy(coordinates: Dependency*): Either[String, Seq[File]]
     def watch(p: os.Path): Unit
   }
 
