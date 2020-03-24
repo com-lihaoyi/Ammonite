@@ -112,10 +112,15 @@ class Interpreter(val printer: Printer,
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
   def initializePredef(): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
-    PredefInitialization.apply(
+
+    val bridgeImports = PredefInitialization.initBridges(
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
+      evalClassloader
+    )
+    predefImports = predefImports ++ bridgeImports
+
+    PredefInitialization.apply(
       interpApi,
-      evalClassloader,
       storage,
       basePredefs,
       customPredefs,

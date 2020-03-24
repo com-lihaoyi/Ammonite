@@ -37,16 +37,16 @@ object CachingTests extends TestSuite{
         val interp = createTestInterp(storage)
         val n0 = storage.compileCache.size
 
-        assert(n0 == 1) // customLolz predef
+        assert(n0 == 0)
         Scripts.runScript(os.pwd, scriptPath/fileName, interp)
 
         val n = storage.compileCache.size
         assert(n == expected)
 
       }
-      test - check("OneBlock.sc", 2)
-      test - check("TwoBlocks.sc", 3)
-      test - check("ThreeBlocks.sc", 4)
+      test - check("OneBlock.sc", 1)
+      test - check("TwoBlocks.sc", 2)
+      test - check("ThreeBlocks.sc", 3)
     }
 
     test("processModuleCaching"){
@@ -127,7 +127,7 @@ object CachingTests extends TestSuite{
       Scripts.runScript(os.pwd, scriptPath/"OneBlock.sc", interp2)
       val n1 = interp1.compilationCount
       val n2 = interp2.compilationCount
-      assert(n1 == 2) // customLolz predef + OneBlock.sc
+      assert(n1 == 1) // OneBlock.sc
       assert(n2 == 0) // both should be cached
     }
     test("tags"){
@@ -139,7 +139,7 @@ object CachingTests extends TestSuite{
       interp.loadIvy("com.lihaoyi" %% "scalatags" % "0.7.0")
       Scripts.runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       val n = storage.compileCache.size
-      assert(n == 5) // customLolz predef + two blocks for each loaded file
+      assert(n == 4) // two blocks for each loaded file
     }
 
     test("compilerInit"){
@@ -245,8 +245,8 @@ object CachingTests extends TestSuite{
         )
 
 
-        // Upstream, downstream, and hardcoded predef
-        runScript(downstream, 3)
+        // Upstream, downstream
+        runScript(downstream, 2)
         runScript(downstream, 0)
         runScript(downstream, 0)
 
@@ -361,9 +361,9 @@ object CachingTests extends TestSuite{
         )
 
 
-        // predefs + upstream + middleA + middleB + downstream
+        // upstream + middleA + middleB + downstream
         // ensure we don't compile `upstream` twice when it's depended upon twice
-        runScript(downstream, 5)
+        runScript(downstream, 4)
         runScript(downstream, 0)
         runScript(downstream, 0)
 
