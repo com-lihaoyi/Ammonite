@@ -67,85 +67,11 @@ class TestRepl {
   val customPredefs = Seq()
 
   var currentLine = 0
-  val interp: Interpreter = try {
+  val interp = try {
     new Interpreter(
       printer0,
       storage = storage,
       wd = os.pwd,
-      extraBridges = Seq(
-        (
-          "ammonite.TestReplBridge",
-          "test",
-          new TestReplApi {
-            def message = "ba"
-          }
-        ),
-        (
-          "ammonite.repl.ReplBridge",
-          "repl",
-          new ReplApiImpl { replApi =>
-            def replArgs0 = Vector.empty[Bind[_]]
-            def printer = printer0
-
-            def sess = sess0
-            val prompt = Ref("@")
-            val frontEnd = Ref[FrontEnd](null)
-            def lastException: Throwable = null
-            def fullHistory = storage.fullHistory()
-            def history = new History(Vector())
-            val colors = Ref(Colors.BlackWhite)
-            def newCompiler() = interp.compilerManager.init(force = true)
-            def compiler = interp.compilerManager.compiler.compiler
-            def interactiveCompiler = interp.compilerManager.pressy.compiler
-            def fullImports = interp.predefImports ++ imports
-            def imports = interp.frameImports
-            def usedEarlierDefinitions = interp.frameUsedEarlierDefinitions
-            def width = 80
-            def height = 80
-
-            object load extends ReplLoad with (String => Unit){
-
-              def apply(line: String) = {
-                interp.processExec(line, currentLine, () => currentLine += 1) match{
-                  case Res.Failure(s) => throw new CompilationError(s)
-                  case Res.Exception(t, s) => throw t
-                  case _ =>
-                }
-              }
-
-              def exec(file: os.Path): Unit = {
-                interp.watch(file)
-                apply(normalizeNewlines(os.read(file)))
-              }
-            }
-
-            override protected[this] def internal0: FullReplAPI.Internal =
-              new FullReplAPI.Internal {
-                def pprinter = replApi.pprinter
-                def colors = replApi.colors
-                def replArgs: IndexedSeq[Bind[_]] = replArgs0
-
-                override def print[T: TPrint](
-                  value: => T,
-                  ident: String,
-                  custom: Option[String]
-                )(implicit
-                  tcolors: TPrintColors,
-                  classTagT: ClassTag[T]
-                ): Iterator[String] =
-                  if (classTagT == scala.reflect.classTag[ammonite.Nope])
-                    Iterator()
-                  else
-                    super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
-              }
-          }
-        ),
-        (
-          "ammonite.repl.api.FrontEndBridge",
-          "frontEnd",
-          new FrontEndAPIImpl {}
-        )
-      ),
       colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
@@ -166,8 +92,82 @@ class TestRepl {
     throw e
   }
 
+  val extraBridges = Seq(
+    (
+      "ammonite.TestReplBridge",
+      "test",
+      new TestReplApi {
+        def message = "ba"
+      }
+    ),
+    (
+      "ammonite.repl.ReplBridge",
+      "repl",
+      new ReplApiImpl { replApi =>
+        def replArgs0 = Vector.empty[Bind[_]]
+        def printer = printer0
 
-  for ((error, _) <- interp.initializePredef(basePredefs, customPredefs)) {
+        def sess = sess0
+        val prompt = Ref("@")
+        val frontEnd = Ref[FrontEnd](null)
+        def lastException: Throwable = null
+        def fullHistory = storage.fullHistory()
+        def history = new History(Vector())
+        val colors = Ref(Colors.BlackWhite)
+        def newCompiler() = interp.compilerManager.init(force = true)
+        def compiler = interp.compilerManager.compiler.compiler
+        def interactiveCompiler = interp.compilerManager.pressy.compiler
+        def fullImports = interp.predefImports ++ imports
+        def imports = frames().head.imports
+        def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
+        def width = 80
+        def height = 80
+
+        object load extends ReplLoad with (String => Unit){
+
+          def apply(line: String) = {
+            interp.processExec(line, currentLine, () => currentLine += 1) match{
+              case Res.Failure(s) => throw new CompilationError(s)
+              case Res.Exception(t, s) => throw t
+              case _ =>
+            }
+          }
+
+          def exec(file: os.Path): Unit = {
+            interp.watch(file)
+            apply(normalizeNewlines(os.read(file)))
+          }
+        }
+
+        override protected[this] def internal0: FullReplAPI.Internal =
+          new FullReplAPI.Internal {
+            def pprinter = replApi.pprinter
+            def colors = replApi.colors
+            def replArgs: IndexedSeq[Bind[_]] = replArgs0
+
+            override def print[T: TPrint](
+              value: => T,
+              ident: String,
+              custom: Option[String]
+            )(implicit
+              tcolors: TPrintColors,
+              classTagT: ClassTag[T]
+            ): Iterator[String] =
+              if (classTagT == scala.reflect.classTag[ammonite.Nope])
+                Iterator()
+              else
+                super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
+          }
+      }
+    ),
+    (
+      "ammonite.repl.api.FrontEndBridge",
+      "frontEnd",
+      new FrontEndAPIImpl {}
+    )
+  )
+
+  for ((error, _) <- interp.initializePredef(basePredefs, customPredefs, extraBridges)) {
     val (msgOpt, causeOpt) = error match {
       case r: Res.Exception => (Some(r.msg), Some(r.t))
       case r: Res.Failure => (Some(r.msg), None)
