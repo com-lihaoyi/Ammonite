@@ -222,7 +222,13 @@ object Compiler{
       settings.termConflict.value = "object"
 
       val reporter = reporterOpt.getOrElse {
-        MakeReporter.makeReporter(errorLogger, warningLogger, infoLogger, settings)
+        import scala.reflect.internal.util.Position
+        MakeReporter.makeReporter(
+          (pos, msg) => errorLogger(Position.formatMessage(pos, msg, false)),
+          (pos, msg) => warningLogger(Position.formatMessage(pos, msg, false)),
+          (pos, msg) => infoLogger(Position.formatMessage(pos, msg, false)),
+          settings
+        )
       }
 
       val scalac = CompilerCompatibility.initGlobal(

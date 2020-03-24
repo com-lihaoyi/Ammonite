@@ -16,10 +16,10 @@ object MakeReporter{
 
   type Reporter = AbstractReporter
 
-  def makeReporter(errorLogger: => String => Unit,
-                   warningLogger: => String => Unit,
-                   infoLogger: => String => Unit,
-                   outerSettings: Settings): Reporter = {
+  def makeReporter(errorLogger: (Position, String) => Unit,
+                   warningLogger: (Position, String) => Unit,
+                   infoLogger: (Position, String) => Unit,
+                   outerSettings: Settings): Reporter =
     new AbstractReporter {
       def displayPrompt(): Unit = ???
 
@@ -27,15 +27,14 @@ object MakeReporter{
         severity match{
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
-            errorLogger(Position.formatMessage(pos, msg, false))
+            errorLogger(pos, msg)
           case WARNING =>
-            warningLogger(Position.formatMessage(pos, msg, false))
+            warningLogger(pos, msg)
           case INFO =>
-            infoLogger(Position.formatMessage(pos, msg, false))
+            infoLogger(pos, msg)
         }
       }
 
       val settings = outerSettings
     }
-  }
 }

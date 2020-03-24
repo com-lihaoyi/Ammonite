@@ -305,7 +305,7 @@ object Pressy {
         classPathWhitelist,
         initialClassPath
       )
-      val reporter = makeReporter(_ => (), _ => (), _ => (), settings)
+      val reporter = makeReporter((_, _) => (), (_, _) => (), (_, _) => (), settings)
       initInteractiveGlobal(settings, reporter, jcp, evalClassloader)
     }
 
