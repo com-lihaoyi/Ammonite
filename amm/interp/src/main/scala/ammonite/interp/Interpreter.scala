@@ -594,7 +594,7 @@ class Interpreter(val printer: Printer,
 
   def loadIvy(coordinates: Dependency*) = synchronized{
     val cacheKey = (
-      interpApi.repositories().hashCode.toString + classPathWhitelist.hashCode().toString,
+      interpApi.repositories().hashCode.toString,
       coordinates
     )
 
