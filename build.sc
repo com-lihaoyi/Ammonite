@@ -35,6 +35,8 @@ val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
     (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${gitHash}", true)
 }
 
+val bspVersion = "2.0.0-M6"
+
 trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   def testFramework = "utest.runner.Framework"
@@ -180,9 +182,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
-    class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
+    class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
       def moduleDeps = Seq(ops(), amm.util())
       def crossFullScalaVersion = true
+      def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
         ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
         ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
@@ -194,6 +197,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
+      ivy"ch.epfl.scala:bsp4j:$bspVersion",
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.2.3",
@@ -224,7 +228,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       )
 
       def generatedSources = T{
-        Seq(PathRef(generateConstantsFile(buildVersion)))
+        Seq(PathRef(generateConstantsFile(buildVersion, bspVersion = bspVersion)))
       }
 
       def exposedClassPath = T{
@@ -494,6 +498,7 @@ def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.
 
 def generateConstantsFile(version: String = buildVersion,
                           unstableVersion: String = "<fill-me-in-in-Constants.scala>",
+                          bspVersion: String = "<fill-me-in-in-Constants.scala>",
                           curlUrl: String = "<fill-me-in-in-Constants.scala>",
                           unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
                           oldCurlUrls: Seq[(String, String)] = Nil,
@@ -504,6 +509,7 @@ def generateConstantsFile(version: String = buildVersion,
     object Constants{
       val version = "$version"
       val unstableVersion = "$unstableVersion"
+      val bspVersion = "$bspVersion"
       val curlUrl = "$curlUrl"
       val unstableCurlUrl = "$unstableCurlUrl"
       val oldCurlUrls = Seq[(String, String)](
@@ -636,6 +642,7 @@ def publishDocs() = {
     val constantsFile = generateConstantsFile(
       latestTaggedVersion,
       buildVersion,
+      bspVersion,
       s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey",
       s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey",
       for(k <- oldStableKeys)
