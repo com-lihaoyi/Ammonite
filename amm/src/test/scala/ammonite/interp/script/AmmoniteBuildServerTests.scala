@@ -135,6 +135,59 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
+    "semanticdb" - {
+      val scriptPath = os.RelPath("semdb/main.sc")
+      val runner = new BspScriptRunner(wd / scriptPath)
+
+      val expectedClassPath = List(
+        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+      ).map("https/repo1.maven.org/maven2/" + _)
+
+      for {
+        List(scalacOptionsItem) <- runner.init()
+
+        _ <- runner.compile(StatusCode.OK)
+
+        diagnostics = runner.diagnostics()
+        _ = assert(diagnostics.isEmpty)
+
+        _ = {
+          import scala.meta.internal.semanticdb._
+
+          val classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
+          val semanticDbPath = classDirectory /
+            "META-INF" /
+            "semanticdb" /
+            scriptPath.segments.init /
+            s"${scriptPath.segments.last}.semanticdb"
+          assert(os.isFile(semanticDbPath))
+
+          val docs = TextDocuments.parseFrom(os.read.bytes(semanticDbPath))
+          val doc = docs.documents match {
+            case Seq(doc0) => doc0
+            case _ =>
+              throw new Exception(
+                s"Invalid number of text documents in semanticdb: " +
+                  docs.documents.length
+              )
+          }
+
+          val scriptContent = os.read(wd / scriptPath)
+          assert(doc.text == scriptContent)
+
+          val quickRequestOccurrence = new SymbolOccurrence(
+            Some(new Range(3, 0, 3, 12)),
+            "sttp/client/SttpApi#quickRequest.",
+            SymbolOccurrence.Role.REFERENCE
+          )
+
+          assert(doc.occurrences.contains(quickRequestOccurrence))
+        }
+
+      } yield ()
+    }
+
   }
 
   class BspScriptRunner(script: os.Path*) {

@@ -23,7 +23,8 @@ final case class ScriptCompiler(
   initialImports: Imports,
   classPathWhitelist: Set[Seq[String]],
   wd: Option[os.Path],
-  target: Option[os.Path]
+  target: Option[os.Path],
+  generateSemanticDbs: Boolean
 ) {
 
   import ScriptProcessor.SeqOps
@@ -107,8 +108,44 @@ final case class ScriptCompiler(
       }
     }
 
+  private def updateSemanticDbs(
+    module: Script,
+    wd: Option[os.Path],
+    adjust: Int => (Int, Int) => Option[(Int, Int)]
+  ): Unit =
+    for {
+      target <- moduleTarget(module)
+      segments0 <- segments(module)
+    } {
+      // TODO Merge the semantic DBs of all the blocks rather than just pick the last one
+      val name = Interpreter.indexWrapperName(
+        module.codeSource.wrapperName,
+        module.blocks.length
+      )
+      val origRelPath = os.SubPath(
+        module
+          .codeSource
+          .pkgName
+          .map(_.encoded)
+          .toVector :+
+        s"${name.encoded}.scala"
+      )
+      val destRelPath = os.SubPath(segments0.toVector)
+
+      SemanticdbProcessor.postProcess(module, wd, adjust, target, origRelPath, destRelPath)
+    }
+
   def moduleSettings(module: Script): List[String] =
-    Nil
+    if (generateSemanticDbs)
+      List(
+        "-Yrangepos",
+        "-P:semanticdb:failures:warning",
+        "-P:semanticdb:synthetics:on"
+      ) ++
+        moduleSources(module).map(d => s"-P:semanticdb:sourceroot:${d.toNIO.toAbsolutePath}") ++
+        moduleTarget(module).map(d => s"-P:semanticdb:targetroot:${d.toNIO.toAbsolutePath}")
+    else
+      Nil
 
   private def settingsOrError(module: Script): Either[Seq[String], Settings] = {
 
@@ -335,6 +372,23 @@ final case class ScriptCompiler(
         Right(Nil)
       case Res.Success(output) =>
         writeByteCode(module, output.flatMap(_._3.classFiles))
+        if (generateSemanticDbs)
+          updateSemanticDbs(
+            module,
+            wd,
+            blockIdx => {
+              val startOffsetInSc = module.blocks(blockIdx - 1).startIdx
+              val startPosInSc = offsetToPosSc(startOffsetInSc)
+              assert(startPosInSc.char == 0, s"wrong startPosInSc $startPosInSc")
+
+              PositionOffsetConversion.scalaPosToScPos(
+                module.code,
+                startPosInSc.line,
+                output(blockIdx - 1)._2,
+                output(blockIdx - 1)._1
+              )
+            }
+          )
         Right(output.map(_._3))
       case Res.Exception(ex, msg) => ???
       case Res.Exit(_) => ???

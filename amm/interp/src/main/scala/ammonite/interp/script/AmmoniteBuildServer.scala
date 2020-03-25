@@ -60,7 +60,13 @@ class AmmoniteBuildServer(
       ScriptProcessor(
         dependencyLoader,
         defaultRepositories,
-        Nil,
+        Seq(
+          Dependency.of(
+            "org.scalameta",
+            "semanticdb-scalac_" + scala.util.Properties.versionNumberString,
+            "4.3.7"
+          )
+        ),
         root,
         codeWrapper,
         importHooks
@@ -81,7 +87,8 @@ class AmmoniteBuildServer(
             ".ammonite" /
             s"scala-${scala.util.Properties.versionNumberString}" /
             s"amm-${ammonite.Constants.version}"
-        )
+        ),
+        generateSemanticDbs = true
       )
     }
 

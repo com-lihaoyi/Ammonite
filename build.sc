@@ -198,6 +198,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
+      ivy"org.scalameta::trees:4.3.7",
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.2.3",
