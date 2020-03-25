@@ -371,7 +371,8 @@ class MainModule(val crossScalaVersion: String)
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.chuusai::shapeless:2.3.3"
+      ivy"com.chuusai::shapeless:2.3.3",
+      ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
     )
 
 
