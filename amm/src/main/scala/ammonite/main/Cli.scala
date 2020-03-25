@@ -24,6 +24,7 @@ object Cli{
                     verboseOutput: Boolean = true,
                     remoteLogging: Boolean = true,
                     watch: Boolean = false,
+                    bsp: Boolean = false,
                     code: Option[String] = None,
                     home: os.Path = Defaults.ammoniteHome,
                     predefFile: Option[os.Path] = None,
@@ -96,6 +97,11 @@ object Cli{
       "watch", Some('w'),
       "Watch and re-run your scripts when they change",
       (c, v) => c.copy(watch = true)
+    ),
+    Arg[Config, Unit](
+      "bsp", None,
+      "Run a BSP server against the passed scripts",
+      (c, v) => c.copy(bsp = true)
     ),
     Arg[Config, Unit](
       "thin", None,
