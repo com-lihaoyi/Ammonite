@@ -68,6 +68,15 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
 
     final class File(name: String, content: Array[Byte]) extends Entry(name) {
       override val toByteArray: Array[Byte] = content
+      private def initContent(): Unit = {
+        // this initializes VirtualFile.content (private field),
+        // which is required in 2.12.11, for the newly added AbstractFile.unsafeToByteArray
+        val os = output
+        os.write(content)
+        os.close()
+      }
+      if (CustomURLZipArchive.is2_12_11)
+        initContent()
       override def sizeOption = Some(toByteArray.length)
       // Seems we have to provide that one in 2.13
       override def input: InputStream =
@@ -171,4 +180,5 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
 
 object CustomURLZipArchive{
   def closeZipFile = false
+  private val is2_12_11 = scala.util.Properties.versionNumberString == "2.12.11"
 }
