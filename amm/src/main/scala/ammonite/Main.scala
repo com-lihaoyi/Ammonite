@@ -79,7 +79,10 @@ case class Main(predefCode: String = "",
     case Some(path) =>
       try Right(Some(PredefInfo(Name("FilePredef"), os.read(path), false, Some(path))))
       catch{case e: NoSuchFileException =>
-        Left((Res.Failure("Unable to load predef file " + path), Seq((() => Interpreter.pathSignature(path),  0L))))
+        Left((
+          Res.Failure("Unable to load predef file " + path),
+          Seq((() => Interpreter.pathSignature(path),  0L)))
+        )
       }
     case None => Right(None)
   }
