@@ -25,16 +25,19 @@ matrix:
     scala: 2.13.1
 
   - stage: build
+    before_script: source ci/jsonplaceholder.sh
     env: CI_SCRIPT="./mill -i integrationTest"
     jdk: openjdk11
     scala: 2.12.10
 
   - stage: build
+    before_script: source ci/jsonplaceholder.sh
     env: CI_SCRIPT="./mill -i integrationTest"
     jdk: oraclejdk8
     scala: 2.12.10
 
   - stage: build
+    before_script: source ci/jsonplaceholder.sh
     env: CI_SCRIPT="./mill -i integrationTest"
     jdk: oraclejdk8
     scala: 2.13.1
