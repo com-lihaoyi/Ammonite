@@ -88,7 +88,11 @@ final case class ScriptCompiler(
 
   private def writeSource(module: Script, clsName: Name, code: String): Option[Seq[String]] =
     for (dir <- moduleSources(module)) yield {
-      val relPath = module.codeSource.pkgName.map(_.encoded) :+ s"${clsName.encoded}.scala"
+      // Using Name.raw rather than Name.encoded, as all those names
+      // (except the ammonite.$file prefix) originate from file paths,
+      // and are thus safe to use as is in paths.
+      // BSP clients can also find those files themselves, without the encoding logic.
+      val relPath = module.codeSource.pkgName.map(_.raw) :+ s"${clsName.raw}.scala"
       val dest = dir / relPath
       os.write.over(dest, code, createFolders = true)
       relPath
@@ -122,13 +126,14 @@ final case class ScriptCompiler(
         module.codeSource.wrapperName,
         module.blocks.length
       )
+      // See comment above above in writeSource about the use of Name.raw rather than Name.encoded.
       val origRelPath = os.SubPath(
         module
           .codeSource
           .pkgName
-          .map(_.encoded)
+          .map(_.raw)
           .toVector :+
-        s"${name.encoded}.scala"
+        s"${name.raw}.scala"
       )
       val destRelPath = os.SubPath(segments0.toVector)
 

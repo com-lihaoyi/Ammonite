@@ -59,6 +59,33 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
+    "dash in name" - {
+      val runner = new BspScriptRunner(wd / "dash-1" / "main-1.sc")
+
+      for {
+        List(scalacOptionsItem) <- runner.init()
+
+        _ <- runner.compile(StatusCode.OK)
+
+        _ = {
+          val classDir = Paths.get(new URI(scalacOptionsItem.getClassDirectory))
+          val srcDir = os.Path(classDir.resolve("../src").normalize)
+          val relPath = os.Path(Paths.get(new URI(scalacOptionsItem.getTarget.getUri)))
+            .relativeTo(wd)
+          val expectedScalaFile = srcDir /
+            "ammonite" /
+            "$file" /
+            "dash-1" /
+            "main-1.scala"
+          assert(os.isFile(expectedScalaFile))
+        }
+
+        diagnostics = runner.diagnostics()
+        _ = assert(diagnostics.isEmpty)
+
+      } yield ()
+    }
+
     "errored" - {
       val runner = new BspScriptRunner(wd / "error" / "foo.sc")
 
