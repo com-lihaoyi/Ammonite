@@ -140,7 +140,7 @@
     You can also pass a string to the @code{Main} call containing any
     commands or imports you want executed at the start of every run, along
     with @lnk("other configuration",
-    "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.Main").
+    "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.repl.Main").
     If you want Ammonite to be available in all projects, simply add the
     above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
 
