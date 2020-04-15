@@ -160,8 +160,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::pprint:0.5.8",
-      ivy"com.lihaoyi::fansi:0.2.8",
+      ivy"com.lihaoyi::pprint:0.5.9",
+      ivy"com.lihaoyi::fansi:0.2.9",
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -173,8 +173,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.9.8",
-      ivy"com.lihaoyi::requests:0.5.0"
+      ivy"com.lihaoyi::upickle:1.0.0",
+      ivy"com.lihaoyi::requests:0.5.2"
     )
   }
 
@@ -196,7 +196,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.2.3",
+      ivy"com.lihaoyi::scalaparse:2.2.4",
       ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
