@@ -692,10 +692,6 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
   if (!isMasterCommit) T.command{()}
   else T.command{
 
-    write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
-    %("gpg", "--import", "gpg_key")
-    rm(pwd/"gpg_key")
-
     val x: Seq[(Seq[(Path, String)], Artifact)] = {
       mill.define.Task.sequence(partition(publishArtifacts, shard, divisionCount))().map{
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
