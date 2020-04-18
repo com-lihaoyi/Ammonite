@@ -452,6 +452,12 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
 class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
   def moduleDeps = Seq(ops(), amm())
+  def ivyDeps = T{
+    if (crossScalaVersion.startsWith("2.13."))
+      Agg(ivy"com.lihaoyi::cask:0.5.6")
+    else
+      Agg.empty
+  }
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,

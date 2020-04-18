@@ -51,17 +51,5 @@ object ProjectTests extends TestSuite{
         }
       }
     }
-
-    test("httpApi"){
-      test("addPost"){
-        val res = exec('basic / "HttpApi.sc", "addPost", "title", "some text")
-        assert(res.out.trim.contains("101"))
-      }
-      test("comments"){
-        val res = exec('basic / "HttpApi.sc", "comments", "40")
-        assert(res.out.trim.contains("totam vel saepe aut"))
-        assert(res.out.trim.contains("aperiam et omnis totam"))
-      }
-    }
   }
 }
