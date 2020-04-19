@@ -22,14 +22,10 @@ object PredefInitialization {
       .get
       .invoke(null, t)
   }
-  def initBridges(bridges: Seq[(String, String, AnyRef)],
-                  evalClassloader: SpecialClassLoader): Imports = {
-
-    for ((name, shortName, bridge) <- bridges)
-      initBridge(evalClassloader, name, bridge)
+  def initBridges(bridges: Seq[(String, String)]): Imports = {
 
     val allImports =
-      for ((name, shortName, _) <- bridges)
+      for ((name, shortName) <- bridges)
         yield Imports(
           Seq(ImportData(
             Name("value"),
@@ -41,6 +37,14 @@ object PredefInitialization {
         )
 
     allImports.foldLeft(Imports())(_ ++ _)
+  }
+  def initBridges(bridges: Seq[(String, String, AnyRef)],
+                  evalClassloader: SpecialClassLoader): Imports = {
+
+    for ((name, shortName, bridge) <- bridges)
+      initBridge(evalClassloader, name, bridge)
+
+    initBridges(bridges.map { case (name, shortName, _) => (name, shortName) })
   }
   def apply(interpApi: InterpAPI,
             storage: Storage,

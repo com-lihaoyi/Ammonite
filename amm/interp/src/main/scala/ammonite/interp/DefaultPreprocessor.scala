@@ -19,7 +19,8 @@ object DefaultPreprocessor {
     new DefaultPreprocessor(parse)
 }
 
-class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]]) extends Preprocessor{
+class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
+                          markGeneratedSections: Boolean = false) extends Preprocessor{
 
   import DefaultPreprocessor._
 
@@ -32,6 +33,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]]) exten
                 printerTemplate: String => String,
                 extraCode: String,
                 skipEmpty: Boolean,
+                markScript: Boolean,
                 codeWrapper: CodeWrapper) = {
     // All code Ammonite compiles must be rooted in some package within
     // the `ammonite` top-level package
@@ -41,7 +43,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]]) exten
       (wrappedCode, importsLength, userCodeNestingLevel) = Preprocessor.wrapCode(
         codeSource, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
-        imports, extraCode, codeWrapper
+        imports, extraCode, markScript, codeWrapper
       )
     } yield Preprocessor.Output(wrappedCode, importsLength, userCodeNestingLevel)
   }
@@ -128,8 +130,13 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]]) exten
   val Expr = Processor{
     //Expressions are lifted to anon function applications so they will be JITed
     case (name, code, tree) =>
+      val expandedCode =
+        if (markGeneratedSections)
+          s"/*<amm>*/val $name = /*</amm>*/$code"
+        else
+          s"val $name = $code"
       Expanded(
-        s"val $name = $code",
+        expandedCode,
         if (isPrivate(tree)) Nil else Seq(pprint(name))
       )
   }

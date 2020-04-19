@@ -108,7 +108,6 @@ object Compiler{
     * do that and assert to make sure it's only one path segment
     */
   def makeFile(src: Array[Byte], name: String) = {
-    assert(!name.contains('/'))
     val singleFile = new io.VirtualFile(name)
     val output = singleFile.output
     output.write(src)
@@ -136,9 +135,11 @@ object Compiler{
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
+            reporterOpt: Option[MakeReporter.Reporter],
             settings: Settings,
             classPathWhitelist: Set[Seq[String]],
-            initialClassPath: Seq[java.net.URL]): Compiler = new Compiler{
+            initialClassPath: Seq[java.net.URL],
+            lineNumberModifier: Boolean = true): Compiler = new Compiler{
 
     if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"
@@ -220,7 +221,15 @@ object Compiler{
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"
 
-      val reporter = MakeReporter.makeReporter(errorLogger, warningLogger, infoLogger, settings)
+      val reporter = reporterOpt.getOrElse {
+        import scala.reflect.internal.util.Position
+        MakeReporter.makeReporter(
+          (pos, msg) => errorLogger(Position.formatMessage(pos, msg, false)),
+          (pos, msg) => warningLogger(Position.formatMessage(pos, msg, false)),
+          (pos, msg) => infoLogger(Position.formatMessage(pos, msg, false)),
+          settings
+        )
+      }
 
       val scalac = CompilerCompatibility.initGlobal(
         settings, reporter, jcp,
@@ -232,7 +241,8 @@ object Compiler{
               lastImports = _,
               uses => usedEarlierDefinitions = Some(uses),
               userCodeNestingLevel,
-              importsLen
+              importsLen,
+              lineNumberModifier
             )
           ) ++ {
             val pluginSettings = settings.pluginOptions.value

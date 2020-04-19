@@ -4,7 +4,8 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter}
+import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter, PredefInitialization}
+import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
 import ammonite.repl.{FrontEndAPIImpl, Repl, SourceAPIImpl}
@@ -294,6 +295,20 @@ object Main{
       case Right((cliConfig, leftoverArgs)) =>
         if (cliConfig.help) {
           printOut.println(Cli.ammoniteHelp)
+          true
+        }else if (cliConfig.bsp) {
+          val buildServer = new AmmoniteBuildServer(
+            initialScripts = leftoverArgs.map(os.Path(_)),
+            initialImports = PredefInitialization.initBridges(
+              Seq("ammonite.interp.api.InterpBridge" -> "interp")
+            )
+          )
+          val launcher = AmmoniteBuildServer.start(buildServer)
+          printErr.println("Starting BSP server")
+          val f = launcher.startListening()
+          f.get()
+          printErr.println("BSP server done")
+          // FIXME Doesn't exit for now
           true
         }else{
 
