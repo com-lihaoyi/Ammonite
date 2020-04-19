@@ -80,7 +80,10 @@ case class Main(predefCode: String = "",
     case Some(path) =>
       try Right(Some(PredefInfo(Name("FilePredef"), os.read(path), false, Some(path))))
       catch{case e: NoSuchFileException =>
-        Left((Res.Failure("Unable to load predef file " + path), Seq(path -> 0L)))
+        Left((
+          Res.Failure("Unable to load predef file " + path),
+          Seq((() => Interpreter.pathSignature(path),  0L)))
+        )
       }
     case None => Right(None)
   }
@@ -204,7 +207,7 @@ case class Main(predefCode: String = "",
     * a sequence of paths that were watched as a result of this REPL run, in
     * case you wish to re-start the REPL when any of them change.
     */
-  def run(replArgs: Bind[_]*): (Res[Any], Seq[(os.Path, Long)]) = {
+  def run(replArgs: Bind[_]*): (Res[Any], Seq[(() => Long, Long)]) = {
 
 
     instantiateRepl(replArgs.toIndexedSeq) match{
@@ -223,7 +226,7 @@ case class Main(predefCode: String = "",
           warmupThread.start()
 
           val exitValue = Res.Success(repl.run())
-          (exitValue.map(repl.beforeExit), repl.interp.watchedFiles.toSeq)
+          (exitValue.map(repl.beforeExit), repl.interp.watchedValues.toSeq)
         }
     }
   }
@@ -234,12 +237,12 @@ case class Main(predefCode: String = "",
     */
   def runScript(path: os.Path,
                 scriptArgs: Seq[(String, Option[String])])
-                : (Res[Any], Seq[(os.Path, Long)]) = {
+                : (Res[Any], Seq[(() => Long, Long)]) = {
 
     instantiateInterpreter() match{
       case Right(interp) =>
         val result = main.Scripts.runScript(wd, path, interp, scriptArgs)
-        (result, interp.watchedFiles.toSeq)
+        (result, interp.watchedValues.toSeq)
       case Left(problems) => problems
     }
   }
@@ -251,7 +254,7 @@ case class Main(predefCode: String = "",
     instantiateInterpreter() match{
       case Right(interp) =>
         val res = interp.processExec(code, 0, () => ())
-        (res, interp.watchedFiles.toSeq)
+        (res, interp.watchedValues.toSeq)
       case Left(problems) => problems
     }
   }
@@ -400,7 +403,7 @@ class MainRunner(cliConfig: Cli.Config,
 
   @tailrec final def watchLoop[T](isRepl: Boolean,
                                   printing: Boolean,
-                                  run: Main => (Res[T], Seq[(os.Path, Long)])): Boolean = {
+                                  run: Main => (Res[T], Seq[(() => Long, Long)])): Boolean = {
     val (result, watched) = run(initMain(isRepl))
 
     val success = handleWatchRes(result, printing)
@@ -422,10 +425,10 @@ class MainRunner(cliConfig: Cli.Config,
 
   def runRepl(): Unit = watchLoop(isRepl = true, printing = false, _.run())
 
-  def watchAndWait(watched: Seq[(os.Path, Long)]) = {
+  def watchAndWait(watched: Seq[(() => Long, Long)]) = {
     printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
-    def statAll() = watched.forall{ case (file, lastMTime) =>
-      Interpreter.pathSignature(file) == lastMTime
+    def statAll() = watched.forall{ case (check, lastMTime) =>
+      check() == lastMTime
     }
 
     while(statAll()) Thread.sleep(100)

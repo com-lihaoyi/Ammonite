@@ -66,7 +66,7 @@ class Interpreter(val printer: Printer,
 
   private var scriptImportCallback: Imports => Unit = handleImports
 
-  val watchedFiles = mutable.Buffer.empty[(os.Path, Long)]
+  val watchedValues = mutable.Buffer.empty[(() => Long, Long)]
 
   // We keep an *in-memory* cache of scripts, in additional to the global
   // filesystem cache shared between processes. This is because the global
@@ -110,7 +110,7 @@ class Interpreter(val printer: Printer,
     // running, so you can use them predef to e.g. configure
     // the REPL before it starts
     extraBridges: Seq[(String, String, AnyRef)]
-  ): Option[(Res.Failing, Seq[(os.Path, Long)])] = {
+  ): Option[(Res.Failing, Seq[(() => Long, Long)])] = {
 
     headFrame.classloader.specialLocalClasses ++= Seq(
       "ammonite.interp.api.InterpBridge",
@@ -142,15 +142,18 @@ class Interpreter(val printer: Printer,
     ) match{
       case Res.Success(_) => None
       case Res.Skip => None
-      case r @ Res.Exception(t, s) => Some((r, watchedFiles.toSeq))
-      case r @ Res.Failure(s) => Some((r, watchedFiles.toSeq))
-      case r @ Res.Exit(_) => Some((r, watchedFiles.toSeq))
+      case r @ Res.Exception(t, s) => Some((r, watchedValues.toSeq))
+      case r @ Res.Failure(s) => Some((r, watchedValues.toSeq))
+      case r @ Res.Exit(_) => Some((r, watchedValues.toSeq))
     }
   }
 
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
-  def watch(p: os.Path) = watchedFiles.append(p -> Interpreter.pathSignature(p))
+  def watch(p: os.Path) = watchedValues.append(
+    (() => Interpreter.pathSignature(p), Interpreter.pathSignature(p))
+  )
+  def watchValue[T](v: => T) = watchedValues.append((() => v.hashCode, v.hashCode()))
 
   def resolveSingleImportHook(
     source: CodeSource,
@@ -639,6 +642,7 @@ class Interpreter(val printer: Printer,
     val colors = interp.colors
 
     def watch(p: os.Path) = interp.watch(p)
+    def watchValue[T](v: => T): T = {interp.watchValue(v); v}
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
       compilerManager.configureCompiler(callback)
