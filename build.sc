@@ -452,6 +452,12 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
 class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
   def moduleDeps = Seq(ops(), amm())
+  def ivyDeps = T{
+    if (crossScalaVersion.startsWith("2.13."))
+      Agg(ivy"com.lihaoyi::cask:0.5.6")
+    else
+      Agg.empty
+  }
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,
@@ -685,10 +691,6 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
                     divisionCount: Int) =
   if (!isMasterCommit) T.command{()}
   else T.command{
-
-    write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
-    %("gpg", "--import", "gpg_key")
-    rm(pwd/"gpg_key")
 
     val x: Seq[(Seq[(Path, String)], Artifact)] = {
       mill.define.Task.sequence(partition(publishArtifacts, shard, divisionCount))().map{
