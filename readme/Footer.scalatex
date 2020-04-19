@@ -123,6 +123,10 @@
 
 
   @sect{Changelog}
+    @sect{2.0.5}
+      @ul
+        @li
+          Support for Scala 2.12.11
     @sect{2.0.1}
       @ul
         @li

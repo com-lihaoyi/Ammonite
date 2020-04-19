@@ -6,11 +6,16 @@ import $ivy.{
   `com.lihaoyi::ujson:0.7.5`
 }
 
+lazy val jsonPlaceHolderBase =
+  Option(System.getenv("JSONPLACEHOLDER")).getOrElse {
+    "http://jsonplaceholder.typicode.com"
+  }
+
 @main
 def addPost(title: String, body: String) = {
   ujson.read(
     requests.get(
-      "http://jsonplaceholder.typicode.com/posts",
+      s"$jsonPlaceHolderBase/posts",
       data = Seq(
         "title"  -> title,
         "body"   -> body,
@@ -26,7 +31,7 @@ def addPost(title: String, body: String) = {
 def comments(postId: Int) = {
   val json = ujson.read(
     requests
-      .get(s"http://jsonplaceholder.typicode.com/comments?postId=$postId")
+      .get(s"$jsonPlaceHolderBase/comments?postId=$postId")
       .text()
   )
   val names = for{

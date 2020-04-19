@@ -16,46 +16,56 @@ class AmmonitePlugin(g: scala.tools.nsc.Global,
                      output: Seq[ImportData] => Unit,
                      usedEarlierDefinitions: Seq[String] => Unit,
                      userCodeNestingLevel: => Int,
-                     topWrapperLen: => Int) extends Plugin{
+                     topWrapperLen: => Int,
+                     lineNumberModifier: Boolean) extends Plugin{
   val name: String = "AmmonitePlugin"
   val global: Global = g
   val description: String = "Extracts the names in scope for the Ammonite REPL to use"
-  val components: List[PluginComponent] = List(
-    new PluginComponent {
-      val global = g
+  val components: List[PluginComponent] = {
 
-      val runsAfter = List("typer")
-      override val runsBefore = List("patmat")
-      val phaseName = "AmmonitePhase"
+    var components = List.empty[PluginComponent]
 
-      def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
-        def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = {
-          val things = global.currentRun.units.map(_.source.path).toList
-          AmmonitePlugin(g)(
-            unit, output, usedEarlierDefinitions, userCodeNestingLevel, topWrapperLen
-          )
+    if (lineNumberModifier) {
+      val modifier = new PluginComponent {
+        val global = g
+
+        val runsAfter = List("parser")
+        override val runsBefore = List("namer")
+        val phaseName = "FixLineNumbers"
+
+        def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
+
+          def name = phaseName
+          def apply(unit: g.CompilationUnit): Unit = {
+            val things = global.currentRun.units.map(_.source.path).toList
+            LineNumberModifier(g)(unit, topWrapperLen)
+          }
         }
       }
-    },
-
-    new PluginComponent {
-      val global = g
-
-      val runsAfter = List("parser")
-      override val runsBefore = List("namer")
-      val phaseName = "FixLineNumbers"
-
-      def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
-
-        def name = phaseName
-        def apply(unit: g.CompilationUnit): Unit = {
-          val things = global.currentRun.units.map(_.source.path).toList
-          LineNumberModifier(g)(unit, topWrapperLen)
-        }
-      }
+      components = modifier :: components
     }
-  )
+
+    val main =
+      new PluginComponent {
+        val global = g
+
+        val runsAfter = List("typer")
+        override val runsBefore = List("patmat")
+        val phaseName = "AmmonitePhase"
+
+        def newPhase(prev: Phase): Phase = new g.GlobalPhase(prev) {
+          def name = phaseName
+          def apply(unit: g.CompilationUnit): Unit = {
+            val things = global.currentRun.units.map(_.source.path).toList
+            AmmonitePlugin(g)(
+              unit, output, usedEarlierDefinitions, userCodeNestingLevel, topWrapperLen
+            )
+          }
+        }
+      }
+
+    main :: components
+  }
 }
 
 

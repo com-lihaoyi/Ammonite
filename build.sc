@@ -19,9 +19,10 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.10", "2.13.1")
+val binCrossScalaVersions = Seq("2.12.11", "2.13.1")
+val isScala2_12_10OrLater = Set("2.12.10") ++ binCrossScalaVersions
 val fullCrossScalaVersions = Seq(
-  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11",
   "2.13.0", "2.13.1"
 )
 
@@ -33,6 +34,8 @@ val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
     val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
     (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${gitHash}", true)
 }
+
+val bspVersion = "2.0.0-M6"
 
 trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
@@ -61,7 +64,7 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
         Nil
 
     val extraDir2 = PathRef(
-      if (sv == "2.12.10" || sv == "2.13.1") millSourcePath / "src" / "main" / "scala-2.12.10-2.13.1+"
+      if (isScala2_12_10OrLater(sv)) millSourcePath / "src" / "main" / "scala-2.12.10-2.13.1+"
       else millSourcePath / "src" / "main" / "scala-not-2.12.10-2.13.1+"
     )
     val extraDir3 =
@@ -134,7 +137,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::os-lib:0.6.3",
+    ivy"com.lihaoyi::os-lib:0.7.0",
     ivy"org.scala-lang.modules::scala-collection-compat:2.1.2"
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
@@ -159,8 +162,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::pprint:0.5.8",
-      ivy"com.lihaoyi::fansi:0.2.8",
+      ivy"com.lihaoyi::pprint:0.5.9",
+      ivy"com.lihaoyi::fansi:0.2.9",
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
@@ -172,16 +175,17 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:0.9.8",
-      ivy"com.lihaoyi::requests:0.5.0"
+      ivy"com.lihaoyi::upickle:1.1.0",
+      ivy"com.lihaoyi::requests:0.6.0"
     )
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
-    class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
+    class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
       def moduleDeps = Seq(ops(), amm.util())
       def crossFullScalaVersion = true
+      def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
         ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
         ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
@@ -193,20 +197,22 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
+      ivy"ch.epfl.scala:bsp4j:$bspVersion",
+      ivy"org.scalameta::trees:4.3.7",
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.2.3",
+      ivy"com.lihaoyi::scalaparse:2.3.0",
       ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
   }
 
-  object `test-runner` extends mill.scalalib.SbtModule {
-    def scalaVersion = "2.12.8"
-    def ivyDeps = Agg(
-      ivy"com.lihaoyi::mill-scalalib:${sys.props("MILL_VERSION")}"
-    )
-  }
+//  object `test-runner` extends mill.scalalib.SbtModule {
+//    def scalaVersion = "2.12.8"
+//    def ivyDeps = Agg(
+//      ivy"com.lihaoyi::mill-scalalib:${sys.props("MILL_VERSION")}"
+//    )
+//  }
 
   object repl extends Cross[ReplModule](fullCrossScalaVersions:_*){
 
@@ -223,7 +229,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       )
 
       def generatedSources = T{
-        Seq(PathRef(generateConstantsFile(buildVersion)))
+        Seq(PathRef(generateConstantsFile(buildVersion, bspVersion = bspVersion)))
       }
 
       def exposedClassPath = T{
@@ -366,7 +372,8 @@ class MainModule(val crossScalaVersion: String)
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.chuusai::shapeless:2.3.3"
+      ivy"com.chuusai::shapeless:2.3.3",
+      ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
     )
 
 
@@ -451,6 +458,12 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
 class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
   def moduleDeps = Seq(ops(), amm())
+  def ivyDeps = T{
+    if (crossScalaVersion.startsWith("2.13."))
+      Agg(ivy"com.lihaoyi::cask:0.6.0")
+    else
+      Agg.empty
+  }
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
       "AMMONITE_SHELL" -> shell().jar().path.toString,
@@ -493,6 +506,7 @@ def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.
 
 def generateConstantsFile(version: String = buildVersion,
                           unstableVersion: String = "<fill-me-in-in-Constants.scala>",
+                          bspVersion: String = "<fill-me-in-in-Constants.scala>",
                           curlUrl: String = "<fill-me-in-in-Constants.scala>",
                           unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
                           oldCurlUrls: Seq[(String, String)] = Nil,
@@ -503,6 +517,7 @@ def generateConstantsFile(version: String = buildVersion,
     object Constants{
       val version = "$version"
       val unstableVersion = "$unstableVersion"
+      val bspVersion = "$bspVersion"
       val curlUrl = "$curlUrl"
       val unstableCurlUrl = "$unstableCurlUrl"
       val oldCurlUrls = Seq[(String, String)](
@@ -635,6 +650,7 @@ def publishDocs() = {
     val constantsFile = generateConstantsFile(
       latestTaggedVersion,
       buildVersion,
+      bspVersion,
       s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey",
       s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey",
       for(k <- oldStableKeys)
@@ -684,10 +700,6 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
                     divisionCount: Int) =
   if (!isMasterCommit) T.command{()}
   else T.command{
-
-    write(pwd/"gpg_key", sys.env("SONATYPE_PGP_KEY_CONTENTS").replace("\\n", "\n"))
-    %("gpg", "--import", "gpg_key")
-    rm(pwd/"gpg_key")
 
     val x: Seq[(Seq[(Path, String)], Artifact)] = {
       mill.define.Task.sequence(partition(publishArtifacts, shard, divisionCount))().map{

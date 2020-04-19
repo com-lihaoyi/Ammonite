@@ -117,7 +117,7 @@ object ImportHookTests extends TestSuite{
             @ import org.scalamacros.paradise.Settings._
             error: object scalamacros is not a member of package org
 
-            @ import $ivy.`org.scalamacros:::paradise:2.1.0`, org.scalamacros.paradise.Settings._
+            @ import $ivy.`org.scalamacros:::paradise:2.1.1`, org.scalamacros.paradise.Settings._
 
             @ boolSetting("key").value
             res1: Boolean = false

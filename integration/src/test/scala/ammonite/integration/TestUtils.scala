@@ -29,7 +29,8 @@ object TestUtils {
                extraAmmArgs: Seq[String],
                home: os.Path,
                args: Seq[String],
-               thin: Boolean) = {
+               thin: Boolean,
+               extraEnv: Iterable[(String, String)]) = {
     os.proc(
       executable,
       extraAmmArgs,
@@ -40,18 +41,20 @@ object TestUtils {
       replStandaloneResources / name,
       args
     ).call(
-      env = Map("JAVA_OPTS" -> null),
+      env = Map("JAVA_OPTS" -> null) ++ extraEnv,
       stderr = os.Pipe
     )
   }
   def exec(name: RelPath, args: String*) =
-    execBase(name, Nil, tmp.dir(), args, thin = true)
+    execBase(name, Nil, tmp.dir(), args, thin = true, Nil)
+  def execWithEnv(env: Iterable[(String, String)], name: RelPath, args: String*) =
+    execBase(name, Nil, tmp.dir(), args, thin = true, env)
   def execNonThin(name: RelPath, args: String*) =
-    execBase(name, Nil, tmp.dir(), args, thin = false)
+    execBase(name, Nil, tmp.dir(), args, thin = false, Nil)
   def execWithHome(home: os.Path, name: RelPath, args: String*) =
-    execBase(name, Nil, home, args, thin = true)
+    execBase(name, Nil, home, args, thin = true, Nil)
   def execSilent(name: RelPath, args: String*) =
-    execBase(name, Seq("-s"), tmp.dir(), args, thin = true)
+    execBase(name, Seq("-s"), tmp.dir(), args, thin = true, Nil)
 
   /**
     *Counts number of non-overlapping occurrences of `subs` in `s`

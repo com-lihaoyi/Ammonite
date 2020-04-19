@@ -34,6 +34,7 @@ trait Preprocessor{
                 printerTemplate: String => String,
                 extraCode: String,
                 skipEmpty: Boolean,
+                markScript: Boolean,
                 codeWrapper: CodeWrapper): Res[Preprocessor.Output]
 }
 
@@ -65,10 +66,13 @@ object Preprocessor{
     * is returned separately so we can later manipulate the statements e.g.
     * by adding `val res2 = ` without the whitespace getting in the way
     */
-  def splitScript(rawCode: String, fileName: String): Res[IndexedSeq[(String, Seq[String])]] = {
+  def splitScript(
+    rawCode: String,
+    fileName: String
+  ): Either[String, IndexedSeq[(String, Seq[String])]] = {
     Parsers.splitScript(rawCode) match {
       case f: Parsed.Failure =>
-        Res.Failure(formatFastparseError(fileName, rawCode, f))
+        Left(formatFastparseError(fileName, rawCode, f))
 
       case s: Parsed.Success[Seq[(String, Seq[String])]] =>
 
@@ -96,9 +100,27 @@ object Preprocessor{
           blocks.append((ncomment, code))
         }
 
-        Res.Success(blocks.toIndexedSeq)
+        Right(blocks.toIndexedSeq)
     }
   }
+
+  def splitScriptWithStart(
+    rawCode: String,
+    fileName: String
+  ): Either[String, IndexedSeq[(Int, String, Seq[String])]] = {
+    Parsers.splitScriptWithStart(rawCode) match {
+      case f: Parsed.Failure =>
+        Left(formatFastparseError(fileName, rawCode, f))
+
+      case Parsed.Success(value, _) =>
+        val blocks = value.toVector.map {
+          case (startIdx, (comment, code)) =>
+            (startIdx, comment, code)
+        }
+        Right(blocks)
+    }
+  }
+
 
 
   def wrapCode(codeSource: CodeSource,
@@ -107,15 +129,22 @@ object Preprocessor{
                printCode: String,
                imports: Imports,
                extraCode: String,
+               markScript: Boolean,
                codeWrapper: CodeWrapper) = {
 
     //we need to normalize topWrapper and bottomWrapper in order to ensure
     //the snippets always use the platform-specific newLine
+    val extraCode0 =
+      if (markScript) extraCode + "/*</generated>*/"
+      else extraCode
     val (topWrapper, bottomWrapper, userCodeNestingLevel) =
-     codeWrapper(code, codeSource, imports, printCode, indexedWrapperName, extraCode)
-    val importsLen = topWrapper.length
+     codeWrapper(code, codeSource, imports, printCode, indexedWrapperName, extraCode0)
+    val (topWrapper0, bottomWrapper0) =
+      if (markScript) (topWrapper + "/*<script>*/", "/*</script>*/ /*<generated>*/" + bottomWrapper)
+      else (topWrapper, bottomWrapper)
+    val importsLen = topWrapper0.length
 
-    (topWrapper + code + bottomWrapper, importsLen, userCodeNestingLevel)
+    (topWrapper0 + code + bottomWrapper0, importsLen, userCodeNestingLevel)
   }
 
 

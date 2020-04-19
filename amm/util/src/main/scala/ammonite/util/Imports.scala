@@ -72,6 +72,12 @@ object ImportData{
   */
 class Imports private (val value: Seq[ImportData]){
   def ++(others: Imports) = Imports(this.value, others.value)
+  override def equals(obj: Any): Boolean =
+    obj match {
+      case other: Imports => value == other.value
+      case _ => false
+    }
+  override def hashCode(): Int = value.##
   override def toString() = {
     // Group the remaining imports into sliding groups according to their
     // prefix, while still maintaining their ordering

@@ -82,6 +82,13 @@ class Interpreter(val printer: Printer,
 
   def compilationCount = compilerManager.compilationCount
 
+  private val dependencyLoader = new DependencyLoader(
+    printer,
+    storage,
+    alreadyLoadedDependencies,
+    verboseOutput
+  )
+
 
   // Use a var and callbacks instead of a fold, because when running
   // `processModule0` user code may end up calling `processModule` which depends
@@ -153,8 +160,7 @@ class Interpreter(val printer: Printer,
     tree: ImportTree,
     wrapperPath: Seq[Name]
   ) = synchronized{
-    val strippedPrefix = tree.prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
-    val hookOpt = importHooks.collectFirst{case (k, v) if strippedPrefix.startsWith(k) => (k, v)}
+    val hookOpt = importHooks.find{case (k, v) => tree.strippedPrefix.startsWith(k)}
     for{
       (hookPrefix, hook) <- Res(hookOpt, s"Import Hook ${tree.prefix} could not be resolved")
       hooked <- Res(
@@ -184,8 +190,8 @@ class Interpreter(val printer: Printer,
           }
         case res: ImportHook.Result.ClassPath =>
 
-          if (res.plugin) headFrame.addPluginClasspath(Seq(res.file.toNIO.toUri.toURL))
-          else headFrame.addClasspath(Seq(res.file.toNIO.toUri.toURL))
+          if (res.plugin) headFrame.addPluginClasspath(res.files.map(_.toNIO.toUri.toURL))
+          else headFrame.addClasspath(res.files.map(_.toNIO.toUri.toURL))
 
           Res.Success(Imports())
       }
@@ -247,6 +253,7 @@ class Interpreter(val printer: Printer,
         prints => s"ammonite.repl.ReplBridge.value.Internal.combinePrints($prints)",
         extraCode = "",
         skipEmpty = true,
+        markScript = false,
         codeWrapper = replCodeWrapper
       )
       (out, tag) <- evaluateLine(
@@ -366,7 +373,7 @@ class Interpreter(val printer: Printer,
 
         for{
           blocks <- cachedScriptData match {
-            case None => splittedScript.map(_.map(_ => None))
+            case None => Res(splittedScript).map(_.map(_ => None))
             case Some(scriptOutput) =>
               Res.Success(
                 scriptOutput.classFiles
@@ -379,7 +386,7 @@ class Interpreter(val printer: Printer,
 
           metadata <- processAllScriptBlocks(
             blocks,
-            splittedScript,
+            Res(splittedScript),
             predefImports,
             codeSource,
             processSingleBlock(_, codeSource, _),
@@ -404,7 +411,7 @@ class Interpreter(val printer: Printer,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName)
+      blocks <- Res(Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -506,6 +513,7 @@ class Interpreter(val printer: Printer,
               _ => "scala.Iterator[String]()",
               extraCode = extraCode,
               skipEmpty = false,
+              markScript = false,
               codeWrapper = scriptCodeWrapper
             )
 
@@ -595,43 +603,12 @@ class Interpreter(val printer: Printer,
     } finally scriptImportCallback = outerScriptImportCallback
   }
 
-
-  private val alwaysExclude = alreadyLoadedDependencies
-    .map(dep => (dep.getModule.getOrganization, dep.getModule.getName))
-    .toSet
-
-  def loadIvy(coordinates: Dependency*) = synchronized{
-    val cacheKey = (
-      interpApi.repositories().hashCode.toString,
-      coordinates
+  def loadIvy(coordinates: Dependency*) = synchronized {
+    dependencyLoader.load(
+      coordinates,
+      repositories(),
+      resolutionHooks.toSeq
     )
-
-    storage.ivyCache().get(cacheKey) match{
-      case Some(res) => Right(res.map(new java.io.File(_)))
-      case None =>
-        ammonite.runtime.tools.IvyThing.resolveArtifact(
-          interpApi.repositories(),
-          coordinates
-            .filter(dep => !alwaysExclude((dep.getModule.getOrganization, dep.getModule.getName)))
-            .map { dep =>
-              alwaysExclude.iterator.foldLeft(dep)((dep, excl) =>
-                dep.addExclusion(excl._1, excl._2)
-              )
-            },
-          verbose = verboseOutput,
-          output = printer.errStream,
-          hooks = resolutionHooks.toSeq
-        )match{
-          case Right((canBeCached, loaded)) =>
-            if (canBeCached)
-              storage.ivyCache() = storage.ivyCache().updated(
-                cacheKey, loaded.map(_.getAbsolutePath)
-              )
-            Right(loaded)
-          case Left(l) =>
-            Left(l)
-        }
-    }
   }
 
   abstract class DefaultLoadJar extends LoadJar {
