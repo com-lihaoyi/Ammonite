@@ -135,7 +135,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::os-lib:0.6.3",
+    ivy"com.lihaoyi::os-lib:0.7.0",
     ivy"org.scala-lang.modules::scala-collection-compat:2.1.2"
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
@@ -173,8 +173,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::upickle:1.0.0",
-      ivy"com.lihaoyi::requests:0.5.2"
+      ivy"com.lihaoyi::upickle:1.1.0",
+      ivy"com.lihaoyi::requests:0.6.0"
     )
   }
 
@@ -196,18 +196,18 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.2.4",
+      ivy"com.lihaoyi::scalaparse:2.3.0",
       ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
   }
 
-  object `test-runner` extends mill.scalalib.SbtModule {
-    def scalaVersion = "2.12.8"
-    def ivyDeps = Agg(
-      ivy"com.lihaoyi::mill-scalalib:${sys.props("MILL_VERSION")}"
-    )
-  }
+//  object `test-runner` extends mill.scalalib.SbtModule {
+//    def scalaVersion = "2.12.8"
+//    def ivyDeps = Agg(
+//      ivy"com.lihaoyi::mill-scalalib:${sys.props("MILL_VERSION")}"
+//    )
+//  }
 
   object repl extends Cross[ReplModule](fullCrossScalaVersions:_*){
 
@@ -454,7 +454,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
   def moduleDeps = Seq(ops(), amm())
   def ivyDeps = T{
     if (crossScalaVersion.startsWith("2.13."))
-      Agg(ivy"com.lihaoyi::cask:0.5.6")
+      Agg(ivy"com.lihaoyi::cask:0.6.0")
     else
       Agg.empty
   }
