@@ -599,6 +599,7 @@ def publishExecutable() = {
         os.temp(
           os.read(os.pwd / "amm-template.sh")
             .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
+            .replace("SCALA_VERSION=", s"SCALA_VERSION=$scalaBinaryVersion")
         ),
         latestTaggedVersion,
         s"$scalaBinaryVersion-$buildVersion-bootstrap",
