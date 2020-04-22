@@ -100,7 +100,12 @@ final case class ScriptCompiler(
 
   private def clearByteCodeDir(module: Script): Unit =
     for (dest <- moduleTarget(module))
-      os.remove.all(dest)
+      try os.remove.all(dest)
+      catch {
+        case _: java.nio.file.DirectoryNotEmptyException =>
+          // Can happen on Windows, if any of the file we try to delete is opened by the BSP
+          // client.
+      }
 
   private def writeByteCode(module: Script, byteCode: Seq[(String, Array[Byte])]): Unit =
     for (dest <- moduleTarget(module)) {
@@ -108,7 +113,7 @@ final case class ScriptCompiler(
       for ((name, b) <- byteCode) {
         val parts = name.split('.').toSeq
         val dest0 = dest / parts.init / s"${parts.last}.class"
-        os.write(dest0, b, createFolders = true)
+        os.write.over(dest0, b, createFolders = true)
       }
     }
 
