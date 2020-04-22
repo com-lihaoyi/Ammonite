@@ -119,7 +119,7 @@ object SemanticdbProcessor {
             }
         }
       }
-      os.write(dest, updatedDocs.toByteArray, createFolders = true)
+      os.write.over(dest, updatedDocs.toByteArray, createFolders = true)
     } else
       System.err.println(s"Error: $orig not found (for $dest)")
   }
