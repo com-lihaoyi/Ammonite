@@ -4,7 +4,7 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.{CodeClassWrapper, CodeWrapper, Interpreter, PredefInitialization}
+import ammonite.interp.{Watchable, CodeClassWrapper, CodeWrapper, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
@@ -82,7 +82,7 @@ case class Main(predefCode: String = "",
       catch{case e: NoSuchFileException =>
         Left((
           Res.Failure("Unable to load predef file " + path),
-          Seq((() => Interpreter.pathSignature(path),  0L)))
+          Seq((Watchable.Path(path),  0L)))
         )
       }
     case None => Right(None)
@@ -207,7 +207,7 @@ case class Main(predefCode: String = "",
     * a sequence of paths that were watched as a result of this REPL run, in
     * case you wish to re-start the REPL when any of them change.
     */
-  def run(replArgs: Bind[_]*): (Res[Any], Seq[(() => Long, Long)]) = {
+  def run(replArgs: Bind[_]*): (Res[Any], Seq[(Watchable, Long)]) = {
 
 
     instantiateRepl(replArgs.toIndexedSeq) match{
@@ -237,7 +237,7 @@ case class Main(predefCode: String = "",
     */
   def runScript(path: os.Path,
                 scriptArgs: Seq[(String, Option[String])])
-                : (Res[Any], Seq[(() => Long, Long)]) = {
+                : (Res[Any], Seq[(Watchable, Long)]) = {
 
     instantiateInterpreter() match{
       case Right(interp) =>
@@ -403,7 +403,7 @@ class MainRunner(cliConfig: Cli.Config,
 
   @tailrec final def watchLoop[T](isRepl: Boolean,
                                   printing: Boolean,
-                                  run: Main => (Res[T], Seq[(() => Long, Long)])): Boolean = {
+                                  run: Main => (Res[T], Seq[(Watchable, Long)])): Boolean = {
     val (result, watched) = run(initMain(isRepl))
 
     val success = handleWatchRes(result, printing)
@@ -425,10 +425,10 @@ class MainRunner(cliConfig: Cli.Config,
 
   def runRepl(): Unit = watchLoop(isRepl = true, printing = false, _.run())
 
-  def watchAndWait(watched: Seq[(() => Long, Long)]) = {
+  def watchAndWait(watched: Seq[(Watchable, Long)]) = {
     printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
     def statAll() = watched.forall{ case (check, lastMTime) =>
-      check() == lastMTime
+      check.poll() == lastMTime
     }
 
     while(statAll()) Thread.sleep(100)

@@ -66,7 +66,7 @@ class Interpreter(val printer: Printer,
 
   private var scriptImportCallback: Imports => Unit = handleImports
 
-  val watchedValues = mutable.Buffer.empty[(() => Long, Long)]
+  val watchedValues = mutable.Buffer.empty[(Watchable, Long)]
 
   // We keep an *in-memory* cache of scripts, in additional to the global
   // filesystem cache shared between processes. This is because the global
@@ -110,7 +110,7 @@ class Interpreter(val printer: Printer,
     // running, so you can use them predef to e.g. configure
     // the REPL before it starts
     extraBridges: Seq[(String, String, AnyRef)]
-  ): Option[(Res.Failing, Seq[(() => Long, Long)])] = {
+  ): Option[(Res.Failing, Seq[(Watchable, Long)])] = {
 
     headFrame.classloader.specialLocalClasses ++= Seq(
       "ammonite.interp.api.InterpBridge",
@@ -151,7 +151,7 @@ class Interpreter(val printer: Printer,
   // The ReplAPI requires some special post-Interpreter-initialization
   // code to run, so let it pass it in a callback and we'll run it here
   def watch(p: os.Path) = watchedValues.append(
-    (() => Interpreter.pathSignature(p), Interpreter.pathSignature(p))
+    (Watchable.Path(p), Watchable.pathSignature(p))
   )
   def watchValue[T](v: => T) = watchedValues.append((() => v.hashCode, v.hashCode()))
 
@@ -697,24 +697,7 @@ class Interpreter(val printer: Printer,
 
 object Interpreter{
 
-  def mtimeIfExists(p: os.Path) = if (os.exists(p)) os.mtime(p) else 0L
 
-  /**
-    * Recursively mtimes things, with the sole purpose of providing a number
-    * that will change if that file changes or that folder's contents changes
-    *
-    * Ensure we include the file paths within a folder as part of the folder
-    * signature, as file moves often do not update the mtime but we want to
-    * trigger a "something changed" event anyway
-    */
-  def pathSignature(p: os.Path) =
-    if (!os.exists(p)) 0L
-    else try {
-      if (os.isDir(p)) os.walk(p).map(x => x.hashCode + mtimeIfExists(x)).sum
-      else os.mtime(p)
-    } catch { case e: java.nio.file.NoSuchFileException =>
-      0L
-    }
 
   val SheBang = "#!"
   val SheBangEndPattern = Pattern.compile(s"""((?m)^!#.*)$newLine""")
