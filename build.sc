@@ -43,6 +43,16 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def scalacOptions = Seq("-P:acyclic:force")
   def compileIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
   def scalacPluginIvyDeps = Agg(ivy"com.lihaoyi::acyclic:0.2.0")
+  def scalaLibraryIvyDeps = T{
+    super.scalaLibraryIvyDeps().map { dep =>
+      import coursier._
+      dep.copy(
+        dep = dep
+          .dep
+          .withExclusions(Set((org"jline", name"jline")))
+      )
+    }
+  }
   trait Tests extends super.Tests{
     def ivyDeps = Agg(ivy"com.lihaoyi::utest:0.7.3")
     def testFrameworks = Seq("utest.runner.Framework")
@@ -180,6 +190,16 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
+  private def scalaCompiler(crossScalaVersion: String) = {
+    import coursier.{ivyRepositoryString => _, _}
+    val dep = ivy"org.scala-lang:scala-compiler:$crossScalaVersion"
+    dep.copy(
+      dep = dep
+        .dep
+        .withExclusions(Set((org"jline", name"jline")))
+    )
+  }
+
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
     class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
@@ -187,7 +207,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
-        ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+        scalaCompiler(crossScalaVersion),
         ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
         ivy"io.get-coursier:interface:0.0.21"
       )
@@ -199,7 +219,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
       ivy"org.scalameta::trees:4.3.7",
-      ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+      scalaCompiler(crossScalaVersion),
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.3.0",
       ivy"org.javassist:javassist:3.21.0-GA",
@@ -249,9 +269,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       terminal()
     )
     def ivyDeps = Agg(
-      ivy"org.jline:jline-terminal:3.6.2",
-      ivy"org.jline:jline-terminal-jna:3.6.2",
-      ivy"org.jline:jline-reader:3.6.2",
+      ivy"org.jline:jline-terminal:3.14.1",
+      ivy"org.jline:jline-terminal-jna:3.14.1",
+      ivy"org.jline:jline-reader:3.14.1",
       ivy"com.github.javaparser:javaparser-core:3.2.5",
       ivy"com.github.scopt::scopt:3.7.1"
     )
