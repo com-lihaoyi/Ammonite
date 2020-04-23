@@ -7,12 +7,13 @@ import fastparse.Parsed
 import fastparse.ParserInput
 import org.jline.reader.{Highlighter => _, _}
 import org.jline.reader.impl.history.DefaultHistory
-import org.jline.reader.impl.DefaultParser.ArgumentList
+
 import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.repl.api.FrontEnd
 import ammonite.interp.{Parsers, Preprocessor}
+import org.jline.reader.impl.DefaultParser
 
 
 object FrontEnds {
@@ -55,7 +56,7 @@ object FrontEnds {
       def readCode(): Res[(String, Seq[String])] = {
         Option(reader.readLine(prompt)) match {
           case Some(code) =>
-            val pl = reader.getParser.parse(code, 0).asInstanceOf[AmmoniteParsedLine]
+            val pl = reader.getParser.parse(code, 0).asInstanceOf[AmmParser#AmmoniteParsedLine]
             Res.Success(code -> pl.stmts)
           case None => Res.Exit(())
         }
@@ -125,10 +126,14 @@ class AmmCompleter(highlighter: org.jline.reader.Highlighter) extends Completer 
 }
 
 class AmmParser extends Parser {
+  class AmmoniteParsedLine(line: String, words: java.util.List[String],
+                            wordIndex: Int, wordCursor: Int, cursor: Int,
+                            val stmts: Seq[String] = Seq.empty // needed for interpreter
+                          ) extends defaultParser.ArgumentList(line, words, wordIndex, wordCursor, cursor)
 
   var addHistory: String => Unit = x => ()
 
-  private val defaultParser = new org.jline.reader.impl.DefaultParser
+  val defaultParser = new org.jline.reader.impl.DefaultParser
 
   override def parse(line: String, cursor: Int, context: Parser.ParseContext): ParsedLine = {
     // let JLine's default parser to handle JLine words and indices
@@ -169,18 +174,13 @@ class AmmParser extends Parser {
   }
 }
 
-class AmmoniteParsedLine(
-  line: String, words: java.util.List[String],
-  wordIndex: Int, wordCursor: Int, cursor: Int,
-  val stmts: Seq[String] = Seq.empty // needed for interpreter
-) extends ArgumentList(line, words, wordIndex, wordCursor, cursor)
-
 class SyntaxError(val msg: String) extends RuntimeException
 
 class AmmHighlighter extends org.jline.reader.Highlighter {
 
   var colors: Colors = Colors.Default
-
+  def setErrorIndex(x$1: Int): Unit = ()
+  def setErrorPattern(x$1: java.util.regex.Pattern): Unit = ()
   override def highlight(reader: LineReader, buffer: String): AttributedString = {
     val hl = Highlighter.defaultHighlight(
       buffer.toVector,
