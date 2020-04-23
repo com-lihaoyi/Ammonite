@@ -20,7 +20,7 @@ val commitsSinceTaggedVersion = {
 
 
 val binCrossScalaVersions = Seq("2.12.11", "2.13.2")
-val isScala2_12_10OrLater = Set("2.12.10", "2.12.11", "2.13.0", "2.13.1", "2.13.2")
+val isScala2_12_10OrLater = Set("2.12.10", "2.12.11", "2.13.1", "2.13.2")
 val fullCrossScalaVersions = Seq(
   "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11",
   "2.13.0", "2.13.1", "2.13.2"
