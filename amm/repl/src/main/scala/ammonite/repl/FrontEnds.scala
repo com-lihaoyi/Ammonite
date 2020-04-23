@@ -129,7 +129,8 @@ class AmmParser extends Parser {
   class AmmoniteParsedLine(line: String, words: java.util.List[String],
                             wordIndex: Int, wordCursor: Int, cursor: Int,
                             val stmts: Seq[String] = Seq.empty // needed for interpreter
-                          ) extends defaultParser.ArgumentList(line, words, wordIndex, wordCursor, cursor)
+                          )
+    extends defaultParser.ArgumentList(line, words, wordIndex, wordCursor, cursor)
 
   var addHistory: String => Unit = x => ()
 
