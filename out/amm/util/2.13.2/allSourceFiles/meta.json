@@ -1,0 +1,10 @@
+{
+    "value": [
+        "ref:cad7c67c:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Util.scala",
+        "ref:7c6423a9:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Imports.scala",
+        "ref:eaf50378:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala",
+        "ref:cdfaae94:/home/travis/build/lihaoyi/Ammonite/amm/util/src/main/scala/ammonite/util/Model.scala"
+    ],
+    "valueHash": -103655714,
+    "inputsHash": 1892347496
+}

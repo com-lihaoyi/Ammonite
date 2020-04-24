@@ -1,0 +1,17 @@
+/home/travis/build/lihaoyi/Ammonite/out/mill/scalalib/ZincWorkerModule/worker/dest/2.13.2/unpacked/xsbt/DelegatingReporter.scala:166: warning: match may not be exhaustive.
+It would fail on the following inputs: ERROR, INFO, WARNING
+    sev match {
+    ^
+warning: 4 deprecations
+warning: 4 deprecations (since 2.12.0)
+warning: 4 deprecations (since 2.12.5)
+warning: 2 deprecations (since 2.13)
+warning: 6 deprecations (since 2.13.0)
+warning: 20 deprecations in total; re-run with -deprecation for details
+warning: 3 feature warnings; re-run with -feature for details
+8 warnings
+[0m[[0m[0minfo[0m] [0m[0mCompiling 6 Scala sources to /home/travis/build/lihaoyi/Ammonite/out/ops/2.13.2/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m8 deprecations (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m21 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
