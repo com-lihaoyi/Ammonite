@@ -169,11 +169,22 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
   }
 
 
-  def allDirsByDottedName: collection.Map[String, DirEntry] = {
-    dirs.map {
-      case (k, v) =>
-        k.mkString(".") -> v
-    }
+  lazy val allDirsByDottedName: collection.Map[String, DirEntry] = {
+    val springBootInfoPath = "BOOT-INF.classes"
+    val isSpringBootClassFile =
+      url.getFile != null && url.getFile.contains(springBootInfoPath.replace('.', '/'))
+
+    dirs
+      .map { case (k, v) => k.mkString(".") -> v }
+      .collect {
+        case (path, v) if isSpringBootClassFile &&
+          path.startsWith(springBootInfoPath) && path != springBootInfoPath => {
+          val newPath = path.substring(springBootInfoPath.length + 1)
+          newPath -> v
+        }
+        case (path, v) if !isSpringBootClassFile =>
+          path -> v
+      }
   }
 
 }

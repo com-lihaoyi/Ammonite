@@ -18,6 +18,8 @@ import scala.tools.nsc.util.{ClassPath, ClassRepresentation}
 
 object CustomZipAndJarFileLookupFactory {
 
+  private val cache = collection.mutable.HashMap[URL, ClassPath]()
+
   private final class ZipArchiveClassPath(val zipUrl: URL)
     extends ClassPath with NoSourcePaths with AmmClassPath{
 
@@ -97,6 +99,12 @@ object CustomZipAndJarFileLookupFactory {
   }
 
 
-  def create(zipFile: AbstractFile, settings: Settings): ClassPath =
-    new ZipArchiveClassPath(zipFile.toURL)
+  def create(zipFile: AbstractFile, settings: Settings): ClassPath = {
+    val url = zipFile.toURL
+    if (!cache.contains(url)) {
+      cache(url) = new ZipArchiveClassPath(zipFile.toURL)
+    }
+
+    cache(url)
+  }
 }
