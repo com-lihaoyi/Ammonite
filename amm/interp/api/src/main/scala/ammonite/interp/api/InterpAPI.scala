@@ -18,6 +18,12 @@ trait InterpAPI {
   def watch(p: os.Path): Unit
 
   /**
+   * A generalization of [[watch]], allows watching arbitrary values and not
+   * just the contents of file paths.
+   */
+  def watchValue[T](v: => T): T
+
+  /**
     * The colors that will be used to render the Ammonite REPL in the terminal,
     * or for rendering miscellaneous info messages when running scripts.
     */
