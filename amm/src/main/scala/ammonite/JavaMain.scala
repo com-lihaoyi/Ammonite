@@ -49,7 +49,7 @@ class JavaMain(val main: Main) { javaMain =>
   }
 
   class JavaMainRunner(binds: Seq[Bind[_]]) extends
-    MainRunner(Cli.Config(), printOut, printError, in, out, err) {
+    MainRunner(Cli.Config(watch = true), printOut, printError, in, out, err) {
     override def runRepl(): Unit = {
       watchLoop(isRepl = true, printing = false, _.run(binds: _*))
     }
