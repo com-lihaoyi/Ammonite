@@ -12,6 +12,7 @@ import ammonite.interp.{
 import ammonite.runtime.{Classpath, Storage}
 import ammonite.util.{Imports, Name, Printer}
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
@@ -159,8 +160,31 @@ final class ScriptCompiler(
     settings: Seq[String],
     script: Script,
     dependencies: Script.ResolvedDependencies
-  )
+  ) {
+    def stale: Boolean =
+      script.codeSource.path.exists { path =>
+        !os.isFile(path) || {
+          // short-circuit that by looking at the file size?
+          val content = os.read(path)
+          script.code != content
+        }
+      }
+  }
   private val cache = new ConcurrentHashMap[InMemoryCacheKey, ScriptCompileResult]
+
+  private def cleanUpCache(): Unit =
+    for {
+      (key, res) <- cache.asScala.toVector
+      if key.stale
+    } {
+      cache.remove(key, res)
+      for (dir <- moduleTarget(key.script).iterator ++ moduleSources(key.script).iterator)
+        try os.remove.all(dir)
+        catch {
+          case _: java.nio.file.DirectoryNotEmptyException =>
+            // Can happen on Windows, if any of the file we try to delete is opened elsewhere
+        }
+   }
 
   private def compileIfNeeded(
     settings0: Settings,
@@ -168,9 +192,10 @@ final class ScriptCompiler(
     script: Script,
     dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult =
-    if (inMemoryCache) {
+    if (inMemoryCache && script.codeSource.path.nonEmpty) {
       val key = InMemoryCacheKey(settingsArgs, script, dependencies)
       Option(cache.get(key)).getOrElse {
+        cleanUpCache()
         val res = doCompile(settings0, script, dependencies)
         Option(cache.putIfAbsent(key, res))
           .getOrElse(res)

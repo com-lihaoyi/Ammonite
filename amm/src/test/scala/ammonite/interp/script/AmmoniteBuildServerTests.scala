@@ -103,6 +103,82 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
+    "cache clean-up" - {
+
+      val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")
+
+      val script1 = tmpDir / "script1.sc"
+      val script2 = tmpDir / "script2.sc"
+      os.write(script1, "val value = 1")
+      os.write(script2, "val value = 2")
+
+      val script1Uri = script1.toNIO.toUri.toASCIIString
+      val script2Uri = script2.toNIO.toUri.toASCIIString
+
+      val runner = new BspScriptRunner(tmpDir, Seq(script1, script2))
+
+      val f = for {
+        scalacOptionsItems <- runner.init()
+
+        scalacOptionsItem1 = scalacOptionsItems
+          .find(_.getTarget.getUri == script1Uri)
+          .getOrElse(sys.error(s"scalac options item not found for $script1Uri"))
+        scalacOptionsItem2 = scalacOptionsItems
+          .find(_.getTarget.getUri == script2Uri)
+          .getOrElse(sys.error(s"scalac options item not found for $script2Uri"))
+
+        _ <- runner.compile(StatusCode.OK, script1Uri)
+        _ <- runner.compile(StatusCode.OK, script2Uri)
+
+        classDirectory1 = os.Path(Paths.get(new URI(scalacOptionsItem1.getClassDirectory)))
+        classDirectory2 = os.Path(Paths.get(new URI(scalacOptionsItem2.getClassDirectory)))
+
+        _ = {
+          val clsFile1 = classDirectory1 / "ammonite" / "$file" / "script1.class"
+          assert(os.isDir(classDirectory1))
+          assert(os.isFile(clsFile1))
+        }
+
+        _ = {
+          val clsFile2 = classDirectory2 / "ammonite" / "$file" / "script2.class"
+          assert(os.isDir(classDirectory2))
+          assert(os.isFile(clsFile2))
+        }
+
+        // Recompiling script1 with a cache miss.
+        // Should trigger a clean-up, removing the script2 stuff.
+        _ = {
+          os.remove(script2)
+          os.remove.all(classDirectory1)
+        }
+
+        _ = os.write.over(script1, "val value = 3")
+        _ <- runner.compile(StatusCode.OK, script1Uri)
+
+        _ = assert(os.isDir(classDirectory1))
+        _ = assert(!os.isDir(classDirectory2))
+
+        _ = {
+          // Write back script2, and update script1.
+          // script1 class directory should be wiped when compiling script2,
+          // as the content of script1 changed.
+          os.write(script2, "val value = 2")
+          os.write.over(script1, "val value = 4")
+        }
+
+        _ <- runner.compile(StatusCode.OK, script2Uri)
+
+        _ = assert(!os.isDir(classDirectory1))
+
+      } yield ()
+
+      f.onComplete { _ =>
+        os.remove.all(tmpDir)
+      }
+
+      f
+    }
+
     "dash in name" - {
       val runner = new BspScriptRunner(wd / "dash-1" / "main-1.sc")
 
@@ -261,7 +337,10 @@ object AmmoniteBuildServerTests extends TestSuite {
 
   }
 
-  class BspScriptRunner(script: os.Path*) {
+  class BspScriptRunner(wd: os.Path, script: Seq[os.Path]) {
+
+    def this(script: os.Path*) =
+      this(wd, script)
 
     val server = new AmmoniteBuildServer(initialScripts = script)
 
@@ -338,11 +417,15 @@ object AmmoniteBuildServerTests extends TestSuite {
 
       } yield scalacOptionsResp.getItems.asScala.toList
 
-    def compile(expectedStatusCode: StatusCode): Future[Unit] =
+    def compile(expectedStatusCode: StatusCode, scriptUri: String = null): Future[Unit] =
       for {
         compileResp <- server
           .buildTargetCompile(
-            new CompileParams(Seq(expectedBuildTargetId).asJava)
+            new CompileParams(Seq(
+              Option(scriptUri)
+                .map(new BuildTargetIdentifier(_))
+                .getOrElse(expectedBuildTargetId)
+            ).asJava)
           )
           .asScala
         _ = assert(compileResp.getStatusCode == expectedStatusCode)
