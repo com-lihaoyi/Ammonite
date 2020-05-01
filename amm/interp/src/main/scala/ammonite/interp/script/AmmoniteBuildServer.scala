@@ -11,7 +11,7 @@ import ammonite.interp.api.InterpAPI
 import ammonite.interp.{CodeWrapper, DependencyLoader}
 import ammonite.runtime.{Classpath, ImportHook, Storage}
 import ammonite.util.{Imports, Printer}
-import ch.epfl.scala.bsp4j.{Position => BPosition, _}
+import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher
 
@@ -274,7 +274,7 @@ class AmmoniteBuildServer(
           val finalDiagnostics = res match {
             case Left(err) if !diagnostics.contains(mod) =>
               val end = PositionOffsetConversion.offsetToPos(mod.code)(mod.code.length)
-              val extra = ("ERROR", Position(0, 0), end, err)
+              val extra = Diagnostic("ERROR", Position(0, 0), end, err)
               diagnostics + (mod -> Seq(extra))
             case _ => diagnostics
           }
@@ -287,8 +287,8 @@ class AmmoniteBuildServer(
             .iterator
             .flatMap(_._2)
             .foreach {
-              case ("WARNING", _, _, _) => warningCount += 1
-              case ("ERROR", _, _, _) => errorCount += 1
+              case warn if warn.severity == "WARNING" => warningCount += 1
+              case error if error.severity == "ERROR" => errorCount += 1
               case _ =>
             }
 
@@ -304,10 +304,10 @@ class AmmoniteBuildServer(
 
           for ((mod0, modDiagnostics) <- finalDiagnostics) {
             val modDiagnostics0 = modDiagnostics.map {
-              case (severity, start, end, msg) =>
+              case Diagnostic(severity, start, end, msg) =>
                 val start0 = new BPosition(start.line, start.char)
                 val end0 = new BPosition(end.line, end.char)
-                val diagnostic = new Diagnostic(new Range(start0, end0), msg)
+                val diagnostic = new BDiagnostic(new Range(start0, end0), msg)
                 diagnostic.setSeverity(
                   severity match {
                     case "INFO" => DiagnosticSeverity.INFORMATION

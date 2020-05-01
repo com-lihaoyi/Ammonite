@@ -33,11 +33,11 @@ final case class ScriptCompiler(
     module: Script,
     processor: ScriptProcessor
   ): (
-    Map[Script, Seq[(String, Position, Position, String)]],
+    Map[Script, Seq[Diagnostic]],
     Either[String, Seq[AmmCompiler.Output]]
   ) = {
 
-    val diagnostics = new mutable.HashMap[Script, Seq[(String, Position, Position, String)]]
+    val diagnostics = new mutable.HashMap[Script, Seq[Diagnostic]]
 
     val res = for {
       dependencies <- processor.dependencies(module)
@@ -237,7 +237,7 @@ final case class ScriptCompiler(
     module: Script,
     dependencies: Script.ResolvedDependencies
   ): (
-    Seq[(String, Position, Position, String)],
+    Seq[Diagnostic],
     Either[String, Seq[AmmCompiler.Output]]
   ) = {
 
@@ -253,14 +253,14 @@ final case class ScriptCompiler(
 
     AmmCompiler.addToClasspath(dependencies.byteCode, dynamicClasspath)
 
-    var messages = new mutable.ListBuffer[(String, Position, Position, String)]
+    var messages = new mutable.ListBuffer[Diagnostic]
     var newMessages = new mutable.ListBuffer[(String, Int, Int, String)]
     def flushMessages(indexToPos: Int => Position): Unit = {
       newMessages.foreach {
         case (severity, start, end, msg) =>
           val startPos = indexToPos(start)
           val endPos = indexToPos(end)
-          messages.append((severity, startPos, endPos, msg))
+          messages.append(Diagnostic(severity, startPos, endPos, msg))
       }
       newMessages.clear()
     }
@@ -411,7 +411,7 @@ final case class ScriptCompiler(
     module: Script,
     dependencies: Script.ResolvedDependencies
   ): (
-    Seq[(String, Position, Position, String)],
+    Seq[Diagnostic],
     Either[String, Seq[AmmCompiler.Output]]
   ) =
     settingsOrError(module) match {

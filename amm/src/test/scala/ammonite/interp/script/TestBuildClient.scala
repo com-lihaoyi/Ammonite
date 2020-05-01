@@ -2,7 +2,7 @@ package ammonite.interp.script
 
 import java.util.concurrent.ConcurrentHashMap
 
-import ch.epfl.scala.bsp4j._
+import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, _}
 
 import scala.collection.JavaConverters._
 
@@ -11,13 +11,13 @@ class TestBuildClient extends BuildClient {
   private val diagnostics0 =
     new ConcurrentHashMap[
       (BuildTargetIdentifier, TextDocumentIdentifier),
-      Seq[Diagnostic]
+      Seq[BDiagnostic]
     ]
 
   def diagnostics(
     targetId: BuildTargetIdentifier,
     document: TextDocumentIdentifier
-  ): Option[Seq[Diagnostic]] =
+  ): Option[Seq[BDiagnostic]] =
     Option(diagnostics0.get((targetId, document)))
 
   def onBuildPublishDiagnostics(params: PublishDiagnosticsParams): Unit =

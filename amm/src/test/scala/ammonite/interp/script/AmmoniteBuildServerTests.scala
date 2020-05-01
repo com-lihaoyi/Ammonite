@@ -4,7 +4,7 @@ import java.net.URI
 import java.nio.file.Paths
 import java.util.concurrent.CompletableFuture
 
-import ch.epfl.scala.bsp4j.{Position => BPosition, _}
+import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import utest._
 
 import scala.collection.JavaConverters._
@@ -90,11 +90,11 @@ object AmmoniteBuildServerTests extends TestSuite {
       val runner = new BspScriptRunner(wd / "error" / "foo.sc")
 
       val expectedDiagnostics = List(
-        new Diagnostic(
+        new BDiagnostic(
           new Range(new BPosition(0, 0), new BPosition(0, 2)),
           "not found: value aa"
         ),
-        new Diagnostic(
+        new BDiagnostic(
           new Range(new BPosition(3, 0), new BPosition(3, 2)),
           "not found: value zz"
         )
