@@ -26,6 +26,12 @@ final case class Script(
   lazy val options: Script.Options =
     Script.Options() // TODO Add $imports for that
 
+  def segments(wd: Option[os.Path]): Option[Seq[String]] =
+    for {
+      p <- codeSource.path
+      segments = wd.fold(p.segments.toVector)(wd0 => p.relativeTo(wd0).segments.toVector)
+    } yield segments
+
   def generatedScalaPath(clsName: Name): Seq[String] =
     codeSource.pkgName.map(_.encoded) :+ s"${clsName.encoded}.scala"
 }
