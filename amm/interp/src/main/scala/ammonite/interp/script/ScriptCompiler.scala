@@ -59,9 +59,9 @@ final case class ScriptCompiler(
       resolvedDeps = Script.ResolvedDependencies(jars, pluginJars, depsOutput.flatMap(_.classFiles))
 
       output <- {
-        val (moduleDiagnostics, moduleRes) = compile(module, resolvedDeps)
-        diagnostics += module -> moduleDiagnostics
-        moduleRes
+        val compileResult = compile(module, resolvedDeps)
+        diagnostics += module -> compileResult.diagnostics
+        compileResult.errorOrOutput
       }
     } yield output
 
@@ -236,10 +236,7 @@ final case class ScriptCompiler(
     settings0: Settings,
     module: Script,
     dependencies: Script.ResolvedDependencies
-  ): (
-    Seq[Diagnostic],
-    Either[String, Seq[AmmCompiler.Output]]
-  ) = {
+  ): ScriptCompileResult = {
 
     // TODO Cache compilation results
 
@@ -404,18 +401,15 @@ final case class ScriptCompiler(
       case Res.Exit(_) => ???
     }
 
-    (messages.toList, finalRes)
+    ScriptCompileResult(messages.toList, finalRes)
   }
 
   def compile(
     module: Script,
     dependencies: Script.ResolvedDependencies
-  ): (
-    Seq[Diagnostic],
-    Either[String, Seq[AmmCompiler.Output]]
-  ) =
+  ): ScriptCompileResult =
     settingsOrError(module) match {
-      case Left(errors) => (Nil, Left(errors.mkString(", ")))
+      case Left(errors) => ScriptCompileResult(Nil, Left(errors.mkString(", ")))
       case Right(settings) => doCompile(settings, module, dependencies)
     }
 }
