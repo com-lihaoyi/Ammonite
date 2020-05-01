@@ -1,5 +1,7 @@
 package ammonite.interp.script
 
+import java.util.concurrent.ConcurrentHashMap
+
 import ammonite.interp.{
   CodeWrapper,
   Compiler => AmmCompiler,
@@ -14,7 +16,7 @@ import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
 
-final case class ScriptCompiler(
+final class ScriptCompiler(
   storage: Storage,
   printer: Printer, // TODO Remove this
   codeWrapper: CodeWrapper,
@@ -23,7 +25,8 @@ final case class ScriptCompiler(
   classPathWhitelist: Set[Seq[String]],
   wd: Option[os.Path],
   outputDirectory: Option[os.Path],
-  generateSemanticDbs: Boolean
+  generateSemanticDbs: Boolean,
+  inMemoryCache: Boolean
 ) {
 
   import ScriptProcessor.SeqOps
@@ -81,7 +84,8 @@ final case class ScriptCompiler(
   ): ScriptCompileResult =
     settingsOrError(module) match {
       case Left(errors) => ScriptCompileResult(Nil, Left(errors.mkString(", ")))
-      case Right(settings) => doCompile(settings, module, dependencies)
+      case Right((settings, settingsArgs)) =>
+        compileIfNeeded(settings, settingsArgs, module, dependencies)
     }
 
   private def moduleOutput(module: Script): Option[os.Path] =
@@ -109,7 +113,7 @@ final case class ScriptCompiler(
     else
       Nil
 
-  private def settingsOrError(module: Script): Either[Seq[String], Settings] = {
+  private def settingsOrError(module: Script): Either[Seq[String], (Settings, Seq[String])] = {
 
     val args = moduleSettings(module)
 
@@ -120,7 +124,7 @@ final case class ScriptCompiler(
       errors += s"Unrecognized argument: $arg"
 
     if (errors.isEmpty)
-      Right(settings0)
+      Right((settings0, args))
     else
       Left(errors.toList)
   }
@@ -128,7 +132,9 @@ final case class ScriptCompiler(
   /** Writes on disk the source passed to scalac, corresponding to this script */
   def preCompile(module: Script): Unit = {
 
-    val settings = settingsOrError(module).getOrElse(new Settings(_ => ()))
+    val settings = settingsOrError(module)
+      .map(_._1)
+      .getOrElse(new Settings(_ => ()))
 
     val compiler = new SingleScriptCompiler(
       initialClassLoader,
@@ -148,6 +154,29 @@ final case class ScriptCompiler(
 
     compiler.writeSources()
   }
+
+  private final case class InMemoryCacheKey(
+    settings: Seq[String],
+    script: Script,
+    dependencies: Script.ResolvedDependencies
+  )
+  private val cache = new ConcurrentHashMap[InMemoryCacheKey, ScriptCompileResult]
+
+  private def compileIfNeeded(
+    settings0: Settings,
+    settingsArgs: Seq[String],
+    script: Script,
+    dependencies: Script.ResolvedDependencies
+  ): ScriptCompileResult =
+    if (inMemoryCache) {
+      val key = InMemoryCacheKey(settingsArgs, script, dependencies)
+      Option(cache.get(key)).getOrElse {
+        val res = doCompile(settings0, script, dependencies)
+        Option(cache.putIfAbsent(key, res))
+          .getOrElse(res)
+      }
+    } else
+      doCompile(settings0, script, dependencies)
 
   private def doCompile(
     settings0: Settings,

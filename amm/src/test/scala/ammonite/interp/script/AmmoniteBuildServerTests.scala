@@ -59,6 +59,50 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
+    "caching" - {
+      val runner = new BspScriptRunner(
+        Seq("main", "lib").map(name => wd / "import-file" / s"$name.sc"): _*
+      )
+
+      for {
+        scalacOptionsItems <- runner.init()
+        scalacOptionsItem = scalacOptionsItems
+          .find(_.getTarget == runner.expectedBuildTargetId)
+          .getOrElse(
+            throw new Exception(
+              "scalac options item not found for " +
+                runner.expectedBuildTargetId
+            )
+          )
+
+        _ <- runner.compile(StatusCode.OK)
+
+        classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
+
+        _ = {
+          val clsFile = classDirectory / "ammonite" / "$file" / "import$minusfile" / "main.class"
+          assert(os.isDir(classDirectory))
+          assert(os.isFile(clsFile))
+          os.remove.all(classDirectory)
+          assert(!os.exists(classDirectory))
+        }
+
+        _ <- runner.compile(StatusCode.OK)
+
+        _ = {
+          // Cache hit, nothing should be re-compiled / written to disk.
+          // We may be even more cautious in the future though, and re-compile
+          // and write things again if ever stuff is missing on disk. We'll
+          // have to evolve the logic in this test then.
+          assert(!os.exists(classDirectory))
+        }
+
+        diagnostics = runner.diagnostics()
+        _ = assert(diagnostics.isEmpty)
+
+      } yield ()
+    }
+
     "dash in name" - {
       val runner = new BspScriptRunner(wd / "dash-1" / "main-1.sc")
 

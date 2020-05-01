@@ -74,7 +74,7 @@ class AmmoniteBuildServer(
   }
   private lazy val compiler =
     withRoot { root =>
-      ScriptCompiler(
+      new ScriptCompiler(
         storage,
         printer,
         codeWrapper,
@@ -88,7 +88,8 @@ class AmmoniteBuildServer(
             s"scala-${scala.util.Properties.versionNumberString}" /
             s"amm-${ammonite.Constants.version}"
         ),
-        generateSemanticDbs = true
+        generateSemanticDbs = true,
+        inMemoryCache = true
       )
     }
 
