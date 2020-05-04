@@ -109,7 +109,8 @@ final case class ScriptProcessor(
               case Right(deps) =>
                 val filteredDeps = deps.filterNot(alreadySeen)
                 if (filteredDeps.isEmpty) {
-                  b += h
+                  if (h != module)
+                    b += h
                   helper(t, alreadySeen + h)
                 } else
                   helper(filteredDeps.toList ::: toAdd, alreadySeen)
@@ -121,7 +122,7 @@ final case class ScriptProcessor(
 
   def jarDependencies(module: Script): Either[String, Seq[os.Path]] =
     dependencies(module).flatMap { modules =>
-      val deps = ScriptProcessor.mergeClasspathDependencies(modules)
+      val deps = ScriptProcessor.mergeClasspathDependencies(module +: modules)
 
       dependencyLoader.load(deps.dependencies, defaultRepositories ++ deps.extraRepositories, Nil)
         .map(files => files.map(os.Path(_)) ++ deps.jarDependencies)
@@ -129,7 +130,7 @@ final case class ScriptProcessor(
 
   def jarPluginDependencies(module: Script): Either[String, Seq[os.Path]] =
     dependencies(module).flatMap { modules =>
-      val deps = ScriptProcessor.mergeClasspathDependencies(modules)
+      val deps = ScriptProcessor.mergeClasspathDependencies(module +: modules)
 
       dependencyLoader
         .load(

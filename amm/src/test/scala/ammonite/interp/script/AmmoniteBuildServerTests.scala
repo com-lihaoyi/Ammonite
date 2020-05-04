@@ -272,6 +272,19 @@ object AmmoniteBuildServerTests extends TestSuite {
           val classPath = scalacOptionsItem.getClasspath.asScala.toList
           for (p <- expectedClassPath)
             assert(classPath.exists(_.endsWith("/" + p)))
+
+          def classDir(name: String): String = {
+            val uri = (dir / s"$name.sc").toNIO.toUri.toASCIIString
+            val options = scalacOptionsItems
+              .find(_.getTarget.getUri == uri)
+              .getOrElse(sys.error(s"no scalac options found for $uri"))
+            options.getClassDirectory
+          }
+
+          val expectedDirsInClasspath = Seq("lib1", "lib2").map(classDir)
+          val wdUri = wd.toNIO.toUri.toASCIIString
+          for (p <- expectedDirsInClasspath)
+            assert(classPath.contains(p))
         }
 
         _ <- runner.compile(StatusCode.OK)

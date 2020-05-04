@@ -28,11 +28,22 @@ final class ScriptCache(proc: ScriptProcessor) {
 
     val cleanupChangedThings = cleanup()
 
-    val allModules = scripts
+    val scripts0 = scripts
       .filter(os.isFile(_))
       .flatMap { p =>
         // FIXME Blocking
-        proc.load(p).flatMap(proc.dependencies) match {
+        proc.load(p) match {
+          case Left(err) =>
+            // TODO Log error
+            Nil
+          case Right(script) =>
+            Seq(script)
+        }
+      }
+
+    val dependencies = scripts0
+      .flatMap { script =>
+        proc.dependencies(script) match {
           case Left(err) =>
             // TODO Log error
             Nil
@@ -40,7 +51,8 @@ final class ScriptCache(proc: ScriptProcessor) {
             modules
         }
       }
-      .distinct
+
+    val allModules = (scripts0 ++ dependencies).distinct
 
     for {
       mod <- allModules

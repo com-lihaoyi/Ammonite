@@ -403,17 +403,29 @@ class AmmoniteBuildServer(
     target: BuildTargetIdentifier
   ): ScalacOptionsItem = {
     val extra = initialClassPath.filter(!_.toASCIIString.endsWith("-sources.jar")) // meh
+    val scriptDependenciesTargets = proc.dependencies(script) match {
+      case Left(err) =>
+        // TODO Log error, or report via diagnostics?
+        Nil
+      case Right(scriptDeps) =>
+        scriptDeps
+          .flatMap(compiler.moduleTarget(_).toSeq)
+          .map(_.toNIO.toUri.toASCIIString)
+    }
     val jars = proc.jarDependencies(script) match {
       case Left(err) =>
         // TODO Log error, or report via diagnostics? Only fetch non-errored deps?
         Nil
-      case Right(jars0) => jars0.filter(!_.last.endsWith("-sources.jar")) // meh
+      case Right(jars0) =>
+        jars0
+          .filter(!_.last.endsWith("-sources.jar")) // meh
+          .map(_.toNIO.toUri.toASCIIString)
     }
     val classDirectory = compiler.moduleTarget(script).getOrElse(???)
     new ScalacOptionsItem(
       target,
       compiler.moduleSettings(script).asJava,
-      (jars.map(_.toNIO.toUri) ++ extra).map(_.toASCIIString).asJava,
+      (scriptDependenciesTargets ++ jars ++ extra.map(_.toASCIIString)).asJava,
       classDirectory.toNIO.toAbsolutePath.toUri.toASCIIString
     )
   }
