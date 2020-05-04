@@ -276,6 +276,27 @@ object AmmoniteBuildServerTests extends TestSuite {
 
         _ <- runner.compile(StatusCode.OK)
 
+        _ = {
+          val events = runner.client.taskEvents()
+          val messages = events.collect {
+            case TestBuildClient.TaskEvent.Start(params)
+                if params.getDataKind == TaskDataKind.COMPILE_TASK =>
+              params.getMessage
+            case TestBuildClient.TaskEvent.Finish(params)
+                if params.getDataKind == TaskDataKind.COMPILE_REPORT =>
+              params.getMessage
+          }
+          val expectedMessages = Seq(
+            "Compiling multi/lib1.sc",
+            "Compiled multi/lib1.sc",
+            "Compiling multi/lib2.sc",
+            "Compiled multi/lib2.sc",
+            "Compiling multi/main.sc",
+            "Compiled multi/main.sc"
+          )
+          assert(messages == expectedMessages)
+        }
+
         diagnostics = runner.diagnostics()
         _ = assert(diagnostics.isEmpty)
 

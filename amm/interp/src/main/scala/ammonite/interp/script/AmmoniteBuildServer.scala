@@ -314,7 +314,7 @@ class AmmoniteBuildServer(
     path: String,
     target: BuildTargetIdentifier,
     success: Boolean,
-    diagnostics: => Iterator[Diagnostic]
+    diagnostics: Iterable[Diagnostic]
   ): Unit =
     for (client <- clientOpt) {
 
@@ -337,35 +337,55 @@ class AmmoniteBuildServer(
       clientOpt.foreach(_.onBuildTaskFinish(finishParams))
     }
 
+  private def compileScript(
+    script: Script,
+    dependencies: Script.ResolvedDependencies
+  ): ScriptCompileResult = {
+
+    def actualDiagnostics(result: ScriptCompileResult) =
+      result.errorOrOutput match {
+        case Left(err) if result.diagnostics.isEmpty =>
+          val end = PositionOffsetConversion.offsetToPos(script.code)(script.code.length)
+          Seq(Diagnostic("ERROR", Position(0, 0), end, err))
+        case _ => result.diagnostics
+      }
+
+    val path = script.codeSource.path.getOrElse {
+      sys.error("Unexpected script with no path")
+    }
+    val target = buildTargetIdentifier(path)
+
+    val result = compiler
+      .compileFromCache(script, dependencies)
+      .getOrElse {
+        val name = rootOpt.fold(path.toString)(path.relativeTo(_).toString)
+        val taskId = startCompileTask(name, target)
+        val result0 = compiler.compile(script, dependencies)
+        finishCompiling(
+          taskId,
+          name,
+          target,
+          result0.errorOrOutput.isRight,
+          actualDiagnostics(result0)
+        )
+        result0
+      }
+
+    for (client <- clientOpt)
+      sendDiagnostics(client, script, target, actualDiagnostics(result))
+
+    result
+  }
+
   private def compileScript(script: Script, target: BuildTargetIdentifier): Boolean = {
 
-    val name = script.codeSource.path
-      .map(p => rootOpt.fold(p.toString)(p.relativeTo(_).toString))
-      .getOrElse("???")
+    val (_, res) = compiler.compile(
+      script,
+      proc,
+      doCompile = compileScript(_, _)
+    )
 
-    val taskId = startCompileTask(name, target)
-
-    // FIXME This actually compiles more scripts (the script dependencies are compiled too),
-    // but this isn't reported via BSP tasks.
-    val (diagnostics, res) = compiler.compile(script, proc)
-    val success = res.isRight
-
-    val finalDiagnostics = res match {
-      case Left(err) if !diagnostics.contains(script) =>
-        val end = PositionOffsetConversion.offsetToPos(script.code)(script.code.length)
-        val extra = Diagnostic("ERROR", Position(0, 0), end, err)
-        diagnostics + (script -> Seq(extra))
-      case _ => diagnostics
-    }
-
-    // FIXME Includes diagnostics for the current scripts AND its script dependencies
-    // (see comment above)
-    finishCompiling(taskId, name, target, success, finalDiagnostics.valuesIterator.flatten)
-
-    for (client <- clientOpt; (script0, scriptDiagnostics) <- finalDiagnostics)
-      sendDiagnostics(client, script0, target, scriptDiagnostics)
-
-    success
+    res.isRight
   }
 
   def buildTargetCompile(params: CompileParams): CompletableFuture[CompileResult] =

@@ -35,7 +35,8 @@ final class ScriptCompiler(
   /** Compiles a script, along with its dependencies */
   def compile(
     module: Script,
-    processor: ScriptProcessor
+    processor: ScriptProcessor,
+    doCompile: (Script, Script.ResolvedDependencies) => ScriptCompileResult = compile(_, _)
   ): (
     Map[Script, Seq[Diagnostic]],
     Either[String, Seq[AmmCompiler.Output]]
@@ -50,7 +51,7 @@ final class ScriptCompiler(
         .traverse { mod =>
           // recurses, beware
           // and not stack safe…
-          val (diagnostics0, res0) = compile(mod, processor)
+          val (diagnostics0, res0) = compile(mod, processor, doCompile)
           diagnostics ++= diagnostics0
           res0
         }
@@ -63,7 +64,7 @@ final class ScriptCompiler(
       resolvedDeps = Script.ResolvedDependencies(jars, pluginJars, depsOutput.flatMap(_.classFiles))
 
       output <- {
-        val compileResult = compile(module, resolvedDeps)
+        val compileResult = doCompile(module, resolvedDeps)
         diagnostics += module -> compileResult.diagnostics
         compileResult.errorOrOutput
       }
@@ -88,6 +89,17 @@ final class ScriptCompiler(
       case Right((settings, settingsArgs)) =>
         compileIfNeeded(settings, settingsArgs, module, dependencies)
     }
+
+  /**
+   * Reads compilation output from cache.
+   */
+  def compileFromCache(
+    script: Script,
+    dependencies: Script.ResolvedDependencies
+  ): Option[ScriptCompileResult] = {
+    val settingsArgs = moduleSettings(script)
+    compileFromCache(settingsArgs, script, dependencies)
+  }
 
   private def moduleOutput(module: Script): Option[os.Path] =
     for {
@@ -186,11 +198,23 @@ final class ScriptCompiler(
         }
    }
 
+  private def compileFromCache(
+    settingsArgs: Seq[String],
+    script: Script,
+    dependencies: Script.ResolvedDependencies,
+  ): Option[ScriptCompileResult] =
+    if (inMemoryCache && script.codeSource.path.nonEmpty) {
+      cleanUpCache()
+      val key = InMemoryCacheKey(settingsArgs, script, dependencies)
+      Option(cache.get(key))
+    } else
+      None
+
   private def compileIfNeeded(
     settings0: Settings,
     settingsArgs: Seq[String],
     script: Script,
-    dependencies: Script.ResolvedDependencies
+    dependencies: Script.ResolvedDependencies,
   ): ScriptCompileResult =
     if (inMemoryCache && script.codeSource.path.nonEmpty) {
       val key = InMemoryCacheKey(settingsArgs, script, dependencies)
