@@ -180,6 +180,55 @@ object AmmoniteBuildServerTests extends TestSuite {
       f
     }
 
+    "build changed notification" - {
+
+      val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")
+
+      val script = tmpDir / "script.sc"
+      os.write(script, "val value = 1")
+
+      val scriptUri = script.toNIO.toUri.toASCIIString
+
+      val runner = new BspScriptRunner(tmpDir, Seq(script))
+
+      val f = for {
+        scalacOptionsItems <- runner.init()
+
+        scalacOptionsItem = scalacOptionsItems
+          .find(_.getTarget.getUri == scriptUri)
+          .getOrElse(sys.error(s"scalac options item not found for $scriptUri"))
+
+        _ <- runner.compile(StatusCode.OK)
+        _ = runner.client.clearDidChangeNotifications()
+
+        _ = os.write.over(script, "val value = 3")
+        _ <- runner.compile(StatusCode.OK)
+
+        notifications0 = runner.client.didChangeNotifications()
+        _ = assert(notifications0.isEmpty)
+
+        _ = os.write.over(script, "import $ivy.`com.chuusai::shapeless:2.3.3`; val value = 3")
+        _ <- runner.compile(StatusCode.OK)
+      } yield {
+        val notifications = runner.client.didChangeNotifications()
+
+        val notification = notifications match {
+          case Seq() => sys.error("Got no notification")
+          case Seq(notif) => notif
+          case _ => sys.error(s"Got too many notifications: $notifications")
+        }
+
+        assert(notification.getKind == BuildTargetEventKind.CHANGED)
+        assert(notification.getTarget.getUri == scriptUri)
+      }
+
+      f.onComplete { _ =>
+        os.remove.all(tmpDir)
+      }
+
+      f
+    }
+
     "dash in name" - {
       val runner = new BspScriptRunner(wd / "dash-1" / "main-1.sc")
 

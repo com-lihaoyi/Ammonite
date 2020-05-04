@@ -157,8 +157,14 @@ class AmmoniteBuildServer(
       )
     }
 
-
-  private lazy val moduleCache = new ScriptCache(proc)
+  private lazy val moduleCache = new ScriptCache(
+    proc,
+    events =>
+      for (client <- clientOpt) {
+        val params = new DidChangeBuildTarget(events.asJava)
+        client.onBuildTargetDidChange(params)
+      }
+  )
 
   private def scriptBuildTarget(script: Script, path: os.Path): BuildTarget = {
     val scalaTarget = new ScalaBuildTarget(

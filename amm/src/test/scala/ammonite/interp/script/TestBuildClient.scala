@@ -17,6 +17,7 @@ class TestBuildClient extends BuildClient {
     ]
 
   private val taskEvents0 = new ConcurrentLinkedQueue[TaskEvent]
+  private val didChangeNotifications0 = new ConcurrentLinkedQueue[BuildTargetEvent]
 
   def diagnostics(
     targetId: BuildTargetIdentifier,
@@ -26,6 +27,10 @@ class TestBuildClient extends BuildClient {
 
   def taskEvents(): Seq[TaskEvent] =
     taskEvents0.iterator().asScala.toVector
+  def didChangeNotifications(): Seq[BuildTargetEvent] =
+    didChangeNotifications0.iterator().asScala.toVector
+  def clearDidChangeNotifications(): Unit =
+    didChangeNotifications0.clear()
 
   def onBuildPublishDiagnostics(params: PublishDiagnosticsParams): Unit =
     diagnostics0.put(
@@ -40,9 +45,11 @@ class TestBuildClient extends BuildClient {
   def onBuildTaskFinish(params: TaskFinishParams): Unit =
     taskEvents0.add(TaskEvent.Finish(params))
 
+  def onBuildTargetDidChange(params: DidChangeBuildTarget): Unit =
+    didChangeNotifications0.addAll(params.getChanges)
+
   def onBuildLogMessage(params: LogMessageParams): Unit = ()
   def onBuildShowMessage(params: ShowMessageParams): Unit = ()
-  def onBuildTargetDidChange(params: DidChangeBuildTarget): Unit = ()
 }
 
 object TestBuildClient {
