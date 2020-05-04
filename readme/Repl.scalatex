@@ -61,7 +61,7 @@
     to version control as a file `amm`:
 
   @hl.sh
-    curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-boostrap > amm && chmod +x amm
+    curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-bootstrap > amm && chmod +x amm
 
   @p
     You can then run Ammonite via the `./amm` command.
