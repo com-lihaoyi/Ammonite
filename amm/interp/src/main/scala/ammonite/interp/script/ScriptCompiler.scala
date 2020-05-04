@@ -184,6 +184,10 @@ final class ScriptCompiler(
   }
   private val cache = new ConcurrentHashMap[InMemoryCacheKey, ScriptCompileResult]
 
+  def clearCache(): Unit = {
+    cache.clear()
+  }
+
   private def cleanUpCache(): Unit =
     for {
       (key, res) <- cache.asScala.toVector

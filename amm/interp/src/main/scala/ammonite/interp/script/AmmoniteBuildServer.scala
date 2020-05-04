@@ -441,6 +441,12 @@ class AmmoniteBuildServer(
       new ScalacOptionsResult(items.asJava)
     }
 
+  def buildTargetCleanCache(params: CleanCacheParams): CompletableFuture[CleanCacheResult] =
+    on(compileEc) {
+      compiler.clearCache()
+      new CleanCacheResult("", true)
+    }
+
 }
 
 object AmmoniteBuildServer {
