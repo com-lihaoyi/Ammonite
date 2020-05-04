@@ -257,7 +257,7 @@ object ScriptTests extends TestSuite{
           val storage = new Storage.Folder(os.temp.dir(prefix = "ammonite-tester"))
           val interp2 = createTestInterp(
             storage,
-            Defaults.predefString + Main.extraPredefString
+            predefImports = Defaults.predefImports ++ Main.extraPredefImports
           )
 
           val Res.Failure(msg) =

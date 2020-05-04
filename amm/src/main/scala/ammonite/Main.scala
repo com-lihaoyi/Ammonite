@@ -100,10 +100,9 @@ case class Main(predefCode: String = "",
 
 
     loadedPredefFile.right.map{ predefFileInfoOpt =>
-      val augmentedPredef = Main.maybeDefaultPredef(
-        defaultPredef,
-        Defaults.replPredef + Defaults.predefString + Main.extraPredefString
-      )
+      val augmentedImports =
+        if (defaultPredef) Defaults.replImports ++ Defaults.predefImports ++ Main.extraPredefImports
+        else Imports()
 
       val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
         s"""
@@ -121,8 +120,8 @@ case class Main(predefCode: String = "",
       new Repl(
         inputStream, outputStream, errorStream,
         storage = storageBackend,
+        baseImports = augmentedImports,
         basePredefs = Seq(
-          PredefInfo(Name("DefaultPredef"), augmentedPredef, true, None),
           PredefInfo(Name("ArgsPredef"), argString, false, None)
         ),
         customPredefs = predefFileInfoOpt.toSeq ++ Seq(
@@ -145,10 +144,9 @@ case class Main(predefCode: String = "",
 
   def instantiateInterpreter() = {
     loadedPredefFile.right.flatMap { predefFileInfoOpt =>
-      val augmentedPredef = Main.maybeDefaultPredef(
-        defaultPredef,
-        Defaults.predefString + Main.extraPredefString
-      )
+      val augmentedImports =
+        if (defaultPredef) Defaults.predefImports ++ Main.extraPredefImports
+        else Imports()
 
       val (colorsRef, printer) = Interpreter.initPrinters(
         colors,
@@ -158,9 +156,6 @@ case class Main(predefCode: String = "",
       )
       val frame = Frame.createInitial(initialClassLoader)
 
-      val basePredefs = Seq(
-        PredefInfo(Name("DefaultPredef"), augmentedPredef, false, None)
-      )
       val customPredefs = predefFileInfoOpt.toSeq ++ Seq(
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
@@ -191,7 +186,7 @@ case class Main(predefCode: String = "",
           new FrontEndAPIImpl {}
         )
       )
-      interp.initializePredef(basePredefs, customPredefs, bridges) match{
+      interp.initializePredef(augmentedImports, Seq(), customPredefs, bridges) match{
         case None => Right(interp)
         case Some(problems) => Left(problems)
       }
@@ -342,9 +337,6 @@ object Main{
     }
   }
 
-  def maybeDefaultPredef(enabled: Boolean, predef: String) =
-    if (enabled) predef else ""
-
 
   /**
     * Detects if the console is interactive; lets us make console-friendly output
@@ -355,10 +347,10 @@ object Main{
     */
   def isInteractive() = System.console() != null
 
-  val extraPredefString = s"""
-    |import ammonite.main.Router.{doc, main}
-    |import ammonite.repl.tools.Util.pathScoptRead
-    |""".stripMargin
+  val extraPredefImports = Imports(
+    ImportData("ammonite.main.Router.{doc, main}"),
+    ImportData("ammonite.repl.tools.Util.pathScoptRead")
+  )
 
 
   class WhiteListClassLoader(whitelist: Set[Seq[String]], parent: ClassLoader)

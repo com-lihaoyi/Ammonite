@@ -67,7 +67,7 @@ object CachingTests extends TestSuite{
 
         val interp1 = createTestInterp(
           storage,
-          Defaults.predefString
+          predefImports = Defaults.predefImports
         )
 
         runScript(os.pwd, resourcesPath/script, interp1)
@@ -75,7 +75,7 @@ object CachingTests extends TestSuite{
         assert(interp1.compilerManager.compiler != null)
         val interp2 = createTestInterp(
           storage,
-          Defaults.predefString
+          predefImports = Defaults.predefImports
         )
         assert(interp2.compilerManager.compiler == null)
 
@@ -102,7 +102,7 @@ object CachingTests extends TestSuite{
       os.write(numFile, "1", createFolders = true)
       val interp1 = createTestInterp(
         storage,
-        Defaults.predefString
+        predefImports = Defaults.predefImports
       )
 
       runScript(
@@ -113,7 +113,7 @@ object CachingTests extends TestSuite{
 
       val interp2 = createTestInterp(
         storage,
-        Defaults.predefString
+        predefImports = Defaults.predefImports
       )
       val Res.Exception(ex, _) = Scripts.runScript(
         os.pwd,
@@ -187,7 +187,7 @@ object CachingTests extends TestSuite{
           new Storage.Folder(tempDir){
             override val predef = predefFile
           },
-          Defaults.predefString
+          predefImports = Defaults.predefImports
         )
         runScript(os.pwd, scriptFile, interp)
         assert(f(interp.compilerManager.compiler))

@@ -99,6 +99,7 @@ class Interpreter(val printer: Printer,
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
   def initializePredef(
+    baseImports: Imports,
     basePredefs: Seq[PredefInfo],
     customPredefs: Seq[PredefInfo],
     // Allows you to set up additional "bridges" between the REPL
@@ -125,7 +126,7 @@ class Interpreter(val printer: Printer,
       ("ammonite.interp.api.InterpBridge", "interp", interpApi) +: extraBridges,
       evalClassloader
     )
-    predefImports = predefImports ++ bridgeImports
+    predefImports = predefImports ++ bridgeImports ++ baseImports
 
     PredefInitialization.apply(
       interpApi,

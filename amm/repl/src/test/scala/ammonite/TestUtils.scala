@@ -12,7 +12,11 @@ object TestUtils {
   def scala2_11 = scala.util.Properties.versionNumberString.startsWith("2.11")
   def scala2_12 = scala.util.Properties.versionNumberString.startsWith("2.12")
 
-  def createTestInterp(storage: Storage, predef: String = "") = {
+  def createTestInterp(
+    storage: Storage,
+    predefImports: Imports = Imports(),
+    predef: String = ""
+  ) = {
     val initialClassLoader = Thread.currentThread().getContextClassLoader
     val startFrame = Frame.createInitial(initialClassLoader)
     val printStream = new PrintStream(System.out)
@@ -35,7 +39,12 @@ object TestUtils {
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
     // Provide a custom predef so we can verify in tests that the predef gets cached
-    interp.initializePredef(Seq(), Seq(PredefInfo(Name("predef"), predef, false, None)), Seq())
+    interp.initializePredef(
+      predefImports,
+      Seq(),
+      Seq(PredefInfo(Name("predef"), predef, false, None)),
+      Seq()
+    )
     interp
   }
 }

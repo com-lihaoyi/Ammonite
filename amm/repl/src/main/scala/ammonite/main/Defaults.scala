@@ -3,7 +3,7 @@ package ammonite.main
 
 import java.io.InputStream
 
-import ammonite.util.Util
+import ammonite.util.{ImportData, Imports, Util}
 import coursierapi.Dependency
 
 import scala.io.Codec
@@ -25,32 +25,37 @@ object Defaults{
   // Need to import stuff from ammonite.ops manually, rather than from the
   // ammonite.ops.Extensions bundle, because otherwise they result in ambiguous
   // imports if someone else imports maunally
-  val predefString = s"""
-    |import ammonite.ops.{
-    |  PipeableImplicit,
-    |  FilterMapExtImplicit,
-    |  FilterMapArraysImplicit,
-    |  FilterMapIteratorsImplicit,
-    |  FilterMapGeneratorsImplicit,
-    |  SeqFactoryFunc,
-    |  RegexContextMaker,
-    |  Callable1Implicit
-    |}
-    |import ammonite.runtime.tools._
-    |import ammonite.repl.tools._
-    |import ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}
-    |import ammonite.interp.api.InterpBridge.value.exit
-    |""".stripMargin
+  val predefImports = Imports(
+    ImportData("ammonite.interp.api.InterpBridge.value.exit"),
+    ImportData(
+      "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
+      importType = ImportData.Type
+    ),
+    ImportData("""ammonite.ops.{
+      PipeableImplicit,
+      FilterMapExtImplicit,
+      FilterMapArraysImplicit,
+      FilterMapIteratorsImplicit,
+      FilterMapGeneratorsImplicit,
+      SeqFactoryFunc,
+      RegexContextMaker,
+      Callable1Implicit
+    }"""),
+    ImportData("ammonite.runtime.tools.{browse, grep, time}"),
+    ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
+    ImportData("ammonite.repl.tools.{desugar, Desugared, source}")
+  )
 
-  val replPredef = """
-    |import ammonite.repl.ReplBridge.value.{
-    |  codeColorsImplicit,
-    |  tprintColorsImplicit,
-    |  pprinterImplicit,
-    |  show,
-    |  typeOf
-    |}
-  """.stripMargin
+
+  val replImports = Imports(
+    ImportData("""ammonite.repl.ReplBridge.value.{
+      codeColorsImplicit,
+      tprintColorsImplicit,
+      pprinterImplicit,
+      show,
+      typeOf
+    }""")
+  )
   def ammoniteHome = os.Path(System.getProperty("user.home"))/".ammonite"
 
   def alreadyLoadedDependencies(
