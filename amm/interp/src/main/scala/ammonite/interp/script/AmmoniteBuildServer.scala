@@ -160,82 +160,87 @@ class AmmoniteBuildServer(
 
   private lazy val moduleCache = new ScriptCache(proc)
 
+  private def scriptBuildTarget(script: Script, path: os.Path): BuildTarget = {
+    val scalaTarget = new ScalaBuildTarget(
+      "org.scala-lang",
+      scala.util.Properties.versionNumberString,
+      scala.util.Properties.versionNumberString.split('.').take(2).mkString("."),
+      ScalaPlatform.JVM,
+      // TODO This seems not to matter as long as the scala-compiler JARs and all
+      // are in the classpath we pass via ScalacOptions.
+      List.empty[String].asJava
+    )
+    val directDeps = script.dependencies.scriptDependencies.flatMap(_.codeSource.path.toSeq)
+    val target = new BuildTarget(
+      buildTargetIdentifier(path),
+      List.empty[String].asJava,
+      List("scala").asJava,
+      directDeps.map(buildTargetIdentifier).asJava,
+      new BuildTargetCapabilities(true, false, false)
+    )
+    target.setBaseDirectory(path.toNIO.toAbsolutePath.getParent.toUri.toASCIIString)
+    target.setDisplayName(path.last)
+    target.setDataKind("scala")
+    target.setData(scalaTarget)
+    target
+  }
+
   def workspaceBuildTargets(): CompletableFuture[WorkspaceBuildTargetsResult] =
     on(defaultEc) {
       moduleCache.load(initialScripts)
-
-      val buildTargets = moduleCache.list.flatMap { mod =>
-        // Write generated scala code before we compile things,
-        // so that clients can index things straightaway
-        try compiler.preCompile(mod)
-        catch {
-          case NonFatal(e) =>
-            System.err.println(s"Caught $e")
-            // FIXME Log this
+      val buildTargets = for {
+        script <- moduleCache.list
+        path <- script.codeSource.path.toSeq
+        _ = {
+          // Write generated scala code before we compile things,
+          // so that clients can index things straightaway
+          try compiler.preCompile(script)
+          catch {
+            case NonFatal(e) =>
+              System.err.println(s"Caught $e")
+              // FIXME Log this
+          }
         }
-
-        mod.codeSource.path.toSeq.map { path =>
-          val scalaTarget = new ScalaBuildTarget(
-            "org.scala-lang",
-            scala.util.Properties.versionNumberString,
-            scala.util.Properties.versionNumberString.split('.').take(2).mkString("."),
-            ScalaPlatform.JVM,
-            // TODO This seems not to matter as long as the scala-compiler JARs and all
-            // are in the classpath we pass via ScalacOptions.
-            List.empty[String].asJava
-          )
-          val directDeps = mod.dependencies.scriptDependencies.flatMap(_.codeSource.path.toSeq)
-          val target = new BuildTarget(
-            buildTargetIdentifier(path),
-            List.empty[String].asJava,
-            List("scala").asJava,
-            directDeps.map(buildTargetIdentifier).asJava,
-            new BuildTargetCapabilities(true, false, false)
-          )
-          target.setBaseDirectory(path.toNIO.toAbsolutePath.getParent.toUri.toASCIIString)
-          target.setDisplayName(path.last)
-          target.setDataKind("scala")
-          target.setData(scalaTarget)
-          target
-        }
-      }
-
+      } yield scriptBuildTarget(script, path)
       new WorkspaceBuildTargetsResult(buildTargets.asJava)
-  }
+    }
 
   def buildTargetSources(params: SourcesParams): CompletableFuture[SourcesResult] =
     nonBlocking {
-
       val sourcesItems = params.getTargets.asScala.toList.flatMap { id =>
-        moduleCache.get(id.getUri).toSeq.map { mod =>
+        moduleCache.get(id.getUri).toSeq.map { _ =>
           val source = new SourceItem(id.getUri, SourceItemKind.FILE, false)
           new SourcesItem(id, List(source).asJava)
         }
       }
-
       new SourcesResult(sourcesItems.asJava)
     }
+
+  private def scriptDependencySources(
+    script: Script,
+    target: BuildTargetIdentifier
+  ): DependencySourcesItem = {
+    val extra = initialClassPath.filter(_.toASCIIString.endsWith("-sources.jar")) // meh
+    val jars = proc.jarDependencies(script) match {
+      case Left(err) =>
+        // TODO Log error, or report via diagnostics? Only fetch non-errored deps?
+        Nil
+      case Right(jars0) => jars0.filter(_.last.endsWith("-sources.jar")) // meh
+    }
+    new DependencySourcesItem(
+      target,
+      (jars.map(_.toNIO.toUri) ++ extra).map(_.toASCIIString).asJava
+    )
+  }
 
   def buildTargetDependencySources(
     params: DependencySourcesParams
   ): CompletableFuture[DependencySourcesResult] =
     on(resolutionEc) {
-      val targets = params.getTargets.asScala.toList
-      val items = targets.flatMap { target =>
-        moduleCache.get(target.getUri).toSeq.map { mod =>
-          val extra = initialClassPath.filter(_.toASCIIString.endsWith("-sources.jar")) // meh
-          val jars = proc.jarDependencies(mod) match {
-            case Left(err) =>
-              // TODO Log error, or report via diagnostics? Only fetch non-errored deps?
-              Nil
-            case Right(jars0) => jars0.filter(_.last.endsWith("-sources.jar")) // meh
-          }
-          new DependencySourcesItem(
-            target,
-            (jars.map(_.toNIO.toUri) ++ extra).map(_.toASCIIString).asJava
-          )
-        }
-      }
+      val items = for {
+        target <- params.getTargets.asScala.toList
+        script <- moduleCache.get(target.getUri).toSeq
+      } yield scriptDependencySources(script, target)
       new DependencySourcesResult(items.asJava)
     }
 
@@ -251,124 +256,156 @@ class AmmoniteBuildServer(
       new InverseSourcesResult(targets.asJava)
     }
 
-  def buildTargetCompile(params: CompileParams): CompletableFuture[CompileResult] =
-    on(compileEc) {
-      val successes = params.getTargets.asScala.toList.flatMap { target =>
-        moduleCache.get(target.getUri).toSeq.map { mod =>
-          val name = mod.codeSource.path
-            .map(p => rootOpt.fold(p.toString)(p.relativeTo(_).toString))
-            .getOrElse("???")
-          val taskId = new TaskId(UUID.randomUUID().toString)
+  private def sendDiagnostics(
+    client: BuildClient,
+    mod0: Script,
+    target: BuildTargetIdentifier,
+    diagnostics: Seq[Diagnostic]
+  ): Unit = {
 
-          val startParams = new TaskStartParams(taskId)
-          startParams.setEventTime(System.currentTimeMillis())
-          startParams.setMessage(s"Compiling $name")
-          startParams.setDataKind(TaskDataKind.COMPILE_TASK)
-          startParams.setData(new CompileTask(target))
-          clientOpt.foreach(_.onBuildTaskStart(startParams))
-
-          // FIXME This actually compiles more scripts (the script dependencies are compiled too),
-          // but this isn't reported via BSP tasks.
-          val (diagnostics, res) = compiler.compile(mod, proc)
-          val success = res.isRight
-
-          val finalDiagnostics = res match {
-            case Left(err) if !diagnostics.contains(mod) =>
-              val end = PositionOffsetConversion.offsetToPos(mod.code)(mod.code.length)
-              val extra = Diagnostic("ERROR", Position(0, 0), end, err)
-              diagnostics + (mod -> Seq(extra))
-            case _ => diagnostics
+    val bspDiagnostics = diagnostics.map {
+      case Diagnostic(severity, start, end, msg) =>
+        val start0 = new BPosition(start.line, start.char)
+        val end0 = new BPosition(end.line, end.char)
+        val diagnostic = new BDiagnostic(new Range(start0, end0), msg)
+        diagnostic.setSeverity(
+          severity match {
+            case "INFO" => DiagnosticSeverity.INFORMATION
+            case "WARNING" => DiagnosticSeverity.WARNING
+            case "ERROR" => DiagnosticSeverity.ERROR
+            case _ => sys.error(s"Unrecognized severity: $severity")
           }
+        )
+        diagnostic
+    }
 
-          // FIXME Includes diagnostics for the current scripts AND its script dependencies
-          // (see comment above)
-          var warningCount = 0
-          var errorCount = 0
-          finalDiagnostics
-            .iterator
-            .flatMap(_._2)
-            .foreach {
-              case warn if warn.severity == "WARNING" => warningCount += 1
-              case error if error.severity == "ERROR" => errorCount += 1
-              case _ =>
-            }
+    val diagnosticsParams = new PublishDiagnosticsParams(
+      new TextDocumentIdentifier(
+        mod0
+          .codeSource.path
+          .getOrElse(???)
+          .toNIO
+          .toUri
+          .toASCIIString
+      ),
+      target,
+      bspDiagnostics.asJava,
+      true // ???
+    )
 
-          val finishParams = new TaskFinishParams(
-            taskId,
-            if (success) StatusCode.OK else StatusCode.ERROR
-          )
-          finishParams.setEventTime(System.currentTimeMillis())
-          finishParams.setMessage(if (success) s"Compiled $name" else s"Error compiling $name")
-          finishParams.setDataKind(TaskDataKind.COMPILE_REPORT)
-          finishParams.setData(new CompileReport(target, errorCount, warningCount))
-          clientOpt.foreach(_.onBuildTaskFinish(finishParams))
+    client.onBuildPublishDiagnostics(diagnosticsParams)
+  }
 
-          for ((mod0, modDiagnostics) <- finalDiagnostics) {
-            val modDiagnostics0 = modDiagnostics.map {
-              case Diagnostic(severity, start, end, msg) =>
-                val start0 = new BPosition(start.line, start.char)
-                val end0 = new BPosition(end.line, end.char)
-                val diagnostic = new BDiagnostic(new Range(start0, end0), msg)
-                diagnostic.setSeverity(
-                  severity match {
-                    case "INFO" => DiagnosticSeverity.INFORMATION
-                    case "WARNING" => DiagnosticSeverity.WARNING
-                    case "ERROR" => DiagnosticSeverity.ERROR
-                    case _ => sys.error(s"Unrecognized severity: $severity")
-                  }
-                )
-                diagnostic
-            }
+  private def startCompileTask(path: String, target: BuildTargetIdentifier): TaskId = {
+    val taskId = new TaskId(UUID.randomUUID().toString)
+    for (client <- clientOpt) {
+      val startParams = new TaskStartParams(taskId)
+      startParams.setEventTime(System.currentTimeMillis())
+      startParams.setMessage(s"Compiling $path")
+      startParams.setDataKind(TaskDataKind.COMPILE_TASK)
+      startParams.setData(new CompileTask(target))
+      client.onBuildTaskStart(startParams)
+    }
+    taskId
+  }
 
-            val bspDiagnostics = new PublishDiagnosticsParams(
-              new TextDocumentIdentifier(
-                mod0
-                  .codeSource.path
-                  .getOrElse(???)
-                  .toNIO
-                  .toUri
-                  .toASCIIString
-              ),
-              target,
-              modDiagnostics0.asJava,
-              true // ???
-            )
+  private def finishCompiling(
+    taskId: TaskId,
+    path: String,
+    target: BuildTargetIdentifier,
+    success: Boolean,
+    diagnostics: => Iterator[Diagnostic]
+  ): Unit =
+    for (client <- clientOpt) {
 
-            clientOpt.foreach(_.onBuildPublishDiagnostics(bspDiagnostics))
-          }
-
-          success
-        }
+      var warningCount = 0
+      var errorCount = 0
+      diagnostics.foreach {
+        case warn if warn.severity == "WARNING" => warningCount += 1
+        case error if error.severity == "ERROR" => errorCount += 1
+        case _ =>
       }
 
-      val success = successes.forall(identity)
+      val finishParams = new TaskFinishParams(
+        taskId,
+        if (success) StatusCode.OK else StatusCode.ERROR
+      )
+      finishParams.setEventTime(System.currentTimeMillis())
+      finishParams.setMessage(if (success) s"Compiled $path" else s"Error compiling $path")
+      finishParams.setDataKind(TaskDataKind.COMPILE_REPORT)
+      finishParams.setData(new CompileReport(target, errorCount, warningCount))
+      clientOpt.foreach(_.onBuildTaskFinish(finishParams))
+    }
 
+  private def compileScript(script: Script, target: BuildTargetIdentifier): Boolean = {
+
+    val name = script.codeSource.path
+      .map(p => rootOpt.fold(p.toString)(p.relativeTo(_).toString))
+      .getOrElse("???")
+
+    val taskId = startCompileTask(name, target)
+
+    // FIXME This actually compiles more scripts (the script dependencies are compiled too),
+    // but this isn't reported via BSP tasks.
+    val (diagnostics, res) = compiler.compile(script, proc)
+    val success = res.isRight
+
+    val finalDiagnostics = res match {
+      case Left(err) if !diagnostics.contains(script) =>
+        val end = PositionOffsetConversion.offsetToPos(script.code)(script.code.length)
+        val extra = Diagnostic("ERROR", Position(0, 0), end, err)
+        diagnostics + (script -> Seq(extra))
+      case _ => diagnostics
+    }
+
+    // FIXME Includes diagnostics for the current scripts AND its script dependencies
+    // (see comment above)
+    finishCompiling(taskId, name, target, success, finalDiagnostics.valuesIterator.flatten)
+
+    for (client <- clientOpt; (script0, scriptDiagnostics) <- finalDiagnostics)
+      sendDiagnostics(client, script0, target, scriptDiagnostics)
+
+    success
+  }
+
+  def buildTargetCompile(params: CompileParams): CompletableFuture[CompileResult] =
+    on(compileEc) {
+      val successes = for {
+        target <- params.getTargets.asScala.toList
+        script <- moduleCache.get(target.getUri).toSeq
+      } yield compileScript(script, target)
+      val success = successes.forall(identity)
       new CompileResult(if (success) StatusCode.OK else StatusCode.ERROR)
     }
+
+  private def scriptScalacOptions(
+    script: Script,
+    target: BuildTargetIdentifier
+  ): ScalacOptionsItem = {
+    val extra = initialClassPath.filter(!_.toASCIIString.endsWith("-sources.jar")) // meh
+    val jars = proc.jarDependencies(script) match {
+      case Left(err) =>
+        // TODO Log error, or report via diagnostics? Only fetch non-errored deps?
+        Nil
+      case Right(jars0) => jars0.filter(!_.last.endsWith("-sources.jar")) // meh
+    }
+    val classDirectory = compiler.moduleTarget(script).getOrElse(???)
+    new ScalacOptionsItem(
+      target,
+      compiler.moduleSettings(script).asJava,
+      (jars.map(_.toNIO.toUri) ++ extra).map(_.toASCIIString).asJava,
+      classDirectory.toNIO.toAbsolutePath.toUri.toASCIIString
+    )
+  }
 
   def buildTargetScalacOptions(
     params: ScalacOptionsParams
   ): CompletableFuture[ScalacOptionsResult] =
     on(resolutionEc) {
-      val targets = params.getTargets.asScala.toList
-      val items = targets.flatMap { target =>
-        moduleCache.get(target.getUri).toSeq.map { mod =>
-          val extra = initialClassPath.filter(!_.toASCIIString.endsWith("-sources.jar")) // meh
-          val jars = proc.jarDependencies(mod) match {
-            case Left(err) =>
-              // TODO Log error, or report via diagnostics? Only fetch non-errored deps?
-              Nil
-            case Right(jars0) => jars0.filter(!_.last.endsWith("-sources.jar")) // meh
-          }
-          val classDirectory = compiler.moduleTarget(mod).getOrElse(???)
-          new ScalacOptionsItem(
-            target,
-            compiler.moduleSettings(mod).asJava,
-            (jars.map(_.toNIO.toUri) ++ extra).map(_.toASCIIString).asJava,
-            classDirectory.toNIO.toAbsolutePath.toUri.toASCIIString
-          )
-        }
-      }
+      val items = for {
+        target <- params.getTargets.asScala.toList
+        script <- moduleCache.get(target.getUri).toSeq
+      } yield scriptScalacOptions(script, target)
       new ScalacOptionsResult(items.asJava)
     }
 
