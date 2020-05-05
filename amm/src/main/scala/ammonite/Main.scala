@@ -101,7 +101,7 @@ case class Main(predefCode: String = "",
 
     loadedPredefFile.right.map{ predefFileInfoOpt =>
       val augmentedImports =
-        if (defaultPredef) Defaults.replImports ++ Defaults.predefImports ++ Main.extraPredefImports
+        if (defaultPredef) Defaults.replImports ++ Interpreter.predefImports
         else Imports()
 
       val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
@@ -145,7 +145,7 @@ case class Main(predefCode: String = "",
   def instantiateInterpreter() = {
     loadedPredefFile.right.flatMap { predefFileInfoOpt =>
       val augmentedImports =
-        if (defaultPredef) Defaults.predefImports ++ Main.extraPredefImports
+        if (defaultPredef) Interpreter.predefImports
         else Imports()
 
       val (colorsRef, printer) = Interpreter.initPrinters(
@@ -186,7 +186,7 @@ case class Main(predefCode: String = "",
           new FrontEndAPIImpl {}
         )
       )
-      interp.initializePredef(augmentedImports, Seq(), customPredefs, bridges) match{
+      interp.initializePredef(Seq(), customPredefs, bridges, augmentedImports) match{
         case None => Right(interp)
         case Some(problems) => Left(problems)
       }
@@ -346,11 +346,6 @@ object Main{
     * https://stackoverflow.com/a/1403817/871202
     */
   def isInteractive() = System.console() != null
-
-  val extraPredefImports = Imports(
-    ImportData("ammonite.main.Router.{doc, main}"),
-    ImportData("ammonite.repl.tools.Util.pathScoptRead")
-  )
 
 
   class WhiteListClassLoader(whitelist: Set[Seq[String]], parent: ClassLoader)

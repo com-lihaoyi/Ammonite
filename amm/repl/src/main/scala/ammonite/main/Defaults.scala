@@ -22,18 +22,6 @@ object Defaults{
     )
   }
 
-  val predefImports = Imports(
-    ImportData("ammonite.interp.api.InterpBridge.value.exit"),
-    ImportData(
-      "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
-      importType = ImportData.Type
-    ),
-    ImportData("ammonite.runtime.tools.{browse, grep, time}"),
-    ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
-    ImportData("ammonite.repl.tools.{desugar, source}")
-  )
-
-
   val replImports = Imports(
     ImportData("""ammonite.repl.ReplBridge.value.{
       codeColorsImplicit,
