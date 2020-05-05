@@ -180,6 +180,73 @@ object AmmoniteBuildServerTests extends TestSuite {
       f
     }
 
+    "router imports" - {
+
+      val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")
+
+      val script = tmpDir / "script.sc"
+      os.write(
+        script,
+        """@doc("Main stuff")
+          |@main
+          |def doMainStuff() = {
+          |  thingOne()
+          |  otherTing()
+          |}
+          |
+          |@doc("Do the first thingy")
+          |@main
+          |def thingOne() = {
+          |  println("1.")
+          |}
+          |
+          |@doc("Do the other thing")
+          |@main
+          |def otherTing() = {
+          |  println("hello")
+          |}
+          |""".stripMargin
+      )
+
+      val scriptUri = script.toNIO.toUri.toASCIIString
+
+      val runner = new BspScriptRunner(tmpDir, Seq(script))
+
+      val f = for {
+        scalacOptionsItems <- runner.init()
+
+        scalacOptionsItem1 = scalacOptionsItems
+          .find(_.getTarget.getUri == scriptUri)
+          .getOrElse(sys.error(s"scalac options item not found for $scriptUri"))
+
+        _ <- runner.compile(StatusCode.OK, scriptUri)
+
+        _ = os.write.over(script, "val value = zz")
+        _ <- runner.compile(StatusCode.ERROR, scriptUri)
+
+        _ = {
+          val expectedDiagnostics = List(
+            new BDiagnostic(
+              new Range(new BPosition(0, 12), new BPosition(0, 14)),
+              "not found: value zz"
+            )
+          )
+          expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
+
+          val diagnostics = runner.diagnostics()
+
+          assert(diagnostics == expectedDiagnostics)
+        }
+
+      } yield ()
+
+      f.onComplete { _ =>
+        os.remove.all(tmpDir)
+      }
+
+      f
+    }
+
     "build changed notification" - {
 
       val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")

@@ -22,7 +22,7 @@ import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
   initialScripts: Seq[os.Path] = Nil,
-  initialImports: Imports = Imports(),
+  initialImports: Imports = AmmoniteBuildServer.defaultImports,
   defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
   codeWrapper: CodeWrapper = CodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
@@ -456,6 +456,9 @@ class AmmoniteBuildServer(
 }
 
 object AmmoniteBuildServer {
+
+  def defaultImports: Imports =
+    ammonite.interp.Interpreter.predefImports
 
   private def buildTargetIdentifier(p: os.Path): BuildTargetIdentifier =
     new BuildTargetIdentifier(p.toNIO.toAbsolutePath.toUri.toASCIIString)
