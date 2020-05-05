@@ -54,7 +54,7 @@ class CompilerLifecycleManager(
   def pressy: Pressy = Internal.pressy
 
   def preprocess(fileName: String) = synchronized{
-    if (compiler == null) init(force = true)
+    init()
     DefaultPreprocessor(compiler.parse(fileName, _))
   }
 
@@ -67,7 +67,8 @@ class CompilerLifecycleManager(
   // probably creates a pile of garbage
 
   def init(force: Boolean = false) = synchronized{
-    if ((headFrame ne lastFrame) ||
+    if (compiler == null ||
+        (headFrame ne lastFrame) ||
         headFrame.version != lastFrameVersion ||
         Internal.preConfiguredSettingsChanged ||
         force) {
