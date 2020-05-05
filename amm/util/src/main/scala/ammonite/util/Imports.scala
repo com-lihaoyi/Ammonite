@@ -59,6 +59,26 @@ object ImportData{
   val Type = ImportType("Type")
   val Term = ImportType("Term")
   val TermType = ImportType("TermType")
+
+  def apply(name: String, importType: ImportType = Term): Seq[ImportData] = {
+    val elements = name.split('.')
+    assert(elements.nonEmpty)
+
+    val simpleNames =
+      if (elements.last.startsWith("{") && elements.last.endsWith("}"))
+        elements.last.stripPrefix("{").stripSuffix("}").split(',').map(_.trim).toSeq
+      else
+        Seq(elements.last)
+
+    simpleNames.map { simpleName =>
+      ImportData(
+        Name(simpleName),
+        Name(simpleName),
+        Name("_root_") :: elements.init.map(Name(_)).toList,
+        importType
+      )
+    }
+  }
 }
 
 /**

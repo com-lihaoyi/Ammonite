@@ -16,6 +16,7 @@ class Repl(input: InputStream,
            output: OutputStream,
            error: OutputStream,
            storage: Storage,
+           baseImports: Imports,
            basePredefs: Seq[PredefInfo],
            customPredefs: Seq[PredefInfo],
            wd: os.Path,
@@ -138,7 +139,7 @@ class Repl(input: InputStream,
     )
   )
 
-  def initializePredef() = interp.initializePredef(basePredefs, customPredefs, bridges)
+  def initializePredef() = interp.initializePredef(baseImports, basePredefs, customPredefs, bridges)
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or

@@ -213,7 +213,11 @@ object Storage{
       }
 
       def update(t: History): Unit = {
-        os.write.over(historyFile, upickle.default.stream(t.toVector, indent = 4))
+        os.write.over(
+          historyFile,
+          upickle.default.stream(t.toVector, indent = 4),
+          createFolders = true
+        )
       }
     }
 
@@ -229,7 +233,8 @@ object Storage{
       try {
         os.write.over(
           codeCacheDir/classFilesOrder,
-          upickle.default.stream((tag, perBlockMetadata), indent = 4)
+          upickle.default.stream((tag, perBlockMetadata), indent = 4),
+          createFolders = true
         )
       } catch {
         case _: FileAlreadyExistsException => // ignore
@@ -278,10 +283,11 @@ object Storage{
       os.makeDir.all(tagCacheDir)
       os.write.over(
         tagCacheDir/metadataFile,
-        upickle.default.stream((tag, data.imports), indent = 4)
+        upickle.default.stream((tag, data.imports), indent = 4),
+          createFolders = true
       )
       data.classFiles.foreach{ case (name, bytes) =>
-        os.write.over(tagCacheDir/s"$name.class", bytes)
+        os.write.over(tagCacheDir/s"$name.class", bytes, createFolders = true)
       }
 
     }
@@ -325,7 +331,7 @@ object Storage{
         map.filter(_._2.forall(str => Files.exists(Paths.get(str)))).asInstanceOf[IvyMap]
       }
       def update(map: IvyMap) = {
-        os.write.over(ivyCacheFile, upickle.default.stream(map, indent = 4))
+        os.write.over(ivyCacheFile, upickle.default.stream(map, indent = 4), createFolders = true)
       }
     }
 
