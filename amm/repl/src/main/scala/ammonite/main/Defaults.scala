@@ -22,9 +22,6 @@ object Defaults{
     )
   }
 
-  // Need to import stuff from ammonite.ops manually, rather than from the
-  // ammonite.ops.Extensions bundle, because otherwise they result in ambiguous
-  // imports if someone else imports maunally
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpBridge.value.exit"),
     ImportData(
