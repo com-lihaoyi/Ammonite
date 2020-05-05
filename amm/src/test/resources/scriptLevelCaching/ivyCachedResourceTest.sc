@@ -1,2 +1,2 @@
-import $ivy.`io.kamon::kamon-core:0.6.3`
+import $ivy.`io.kamon::kamon-core:2.1.0`
 os.read(os.resource/"reference.conf")

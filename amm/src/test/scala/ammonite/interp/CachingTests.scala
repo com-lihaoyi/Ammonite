@@ -13,6 +13,18 @@ object CachingTests extends TestSuite{
   val tests = Tests{
     println("ScriptTests")
 
+    def runScript(wd: os.Path,
+                  path: os.Path,
+                  interp: ammonite.interp.Interpreter,
+                  scriptArgs: Seq[(String, Option[String])] = Nil) =
+      Scripts.runScript(wd, path, interp, scriptArgs) match {
+        case Res.Success(_) =>
+        case Res.Skip =>
+        case Res.Exception(t, s) => throw new Exception(s"Error running script: $s", t)
+        case Res.Failure(s) => throw new Exception(s"Error running script: $s")
+        case Res.Exit(_) => throw new Exception("Unexpected exit call from script")
+      }
+
     val scriptPath = os.pwd/'amm/'src/'test/'resources/'scripts
 
     val resourcesPath = os.pwd/'amm/'src/'test/'resources
@@ -22,7 +34,7 @@ object CachingTests extends TestSuite{
     test("noAutoIncrementWrapper"){
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      Scripts.runScript(os.pwd, scriptPath/"ThreeBlocks.sc", interp)
+      runScript(os.pwd, scriptPath/"ThreeBlocks.sc", interp)
       try{
         Class.forName("cmd0")
         assert(false)
@@ -38,7 +50,7 @@ object CachingTests extends TestSuite{
         val n0 = storage.compileCache.size
 
         assert(n0 == 0)
-        Scripts.runScript(os.pwd, scriptPath/fileName, interp)
+        runScript(os.pwd, scriptPath/fileName, interp)
 
         val n = storage.compileCache.size
         assert(n == expected)
@@ -58,7 +70,7 @@ object CachingTests extends TestSuite{
           Defaults.predefString
         )
 
-        Scripts.runScript(os.pwd, resourcesPath/script, interp1)
+        runScript(os.pwd, resourcesPath/script, interp1)
 
         assert(interp1.compilerManager.compiler != null)
         val interp2 = createTestInterp(
@@ -67,7 +79,7 @@ object CachingTests extends TestSuite{
         )
         assert(interp2.compilerManager.compiler == null)
 
-        Scripts.runScript(os.pwd, resourcesPath/script, interp2)
+        runScript(os.pwd, resourcesPath/script, interp2)
         assert(interp2.compilerManager.compiler == null)
       }
 
@@ -93,7 +105,7 @@ object CachingTests extends TestSuite{
         Defaults.predefString
       )
 
-      Scripts.runScript(
+      runScript(
         os.pwd,
         resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc",
         interp1
@@ -123,8 +135,8 @@ object CachingTests extends TestSuite{
 
       val interp1 = createTestInterp(new Storage.Folder(tempDir))
       val interp2 = createTestInterp(new Storage.Folder(tempDir))
-      Scripts.runScript(os.pwd, scriptPath/"OneBlock.sc", interp1)
-      Scripts.runScript(os.pwd, scriptPath/"OneBlock.sc", interp2)
+      runScript(os.pwd, scriptPath/"OneBlock.sc", interp1)
+      runScript(os.pwd, scriptPath/"OneBlock.sc", interp2)
       val n1 = interp1.compilationCount
       val n2 = interp2.compilationCount
       assert(n1 == 1) // OneBlock.sc
@@ -133,11 +145,11 @@ object CachingTests extends TestSuite{
     test("tags"){
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      Scripts.runScript(os.pwd, scriptPath/"TagBase.sc", interp)
-      Scripts.runScript(os.pwd, scriptPath/"TagPrevCommand.sc", interp)
+      runScript(os.pwd, scriptPath/"TagBase.sc", interp)
+      runScript(os.pwd, scriptPath/"TagPrevCommand.sc", interp)
 
       interp.loadIvy("com.lihaoyi" %% "scalatags" % "0.7.0")
-      Scripts.runScript(os.pwd, scriptPath/"TagBase.sc", interp)
+      runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       val n = storage.compileCache.size
       assert(n == 4) // two blocks for each loaded file
     }
@@ -150,8 +162,8 @@ object CachingTests extends TestSuite{
       val interp1 = createTestInterp(new Storage.Folder(tempDir))
       val interp2 = createTestInterp(new Storage.Folder(tempDir))
 
-      Scripts.runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp1)
-      Scripts.runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp2)
+      runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp1)
+      runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp2)
       assert(interp2.compilationCount == 0)
     }
 
@@ -177,7 +189,7 @@ object CachingTests extends TestSuite{
           },
           Defaults.predefString
         )
-        Scripts.runScript(os.pwd, scriptFile, interp)
+        runScript(os.pwd, scriptFile, interp)
         assert(f(interp.compilerManager.compiler))
       }
 
