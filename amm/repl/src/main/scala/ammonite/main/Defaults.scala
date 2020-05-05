@@ -31,19 +31,9 @@ object Defaults{
       "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
       importType = ImportData.Type
     ),
-    ImportData("""ammonite.ops.{
-      PipeableImplicit,
-      FilterMapExtImplicit,
-      FilterMapArraysImplicit,
-      FilterMapIteratorsImplicit,
-      FilterMapGeneratorsImplicit,
-      SeqFactoryFunc,
-      RegexContextMaker,
-      Callable1Implicit
-    }"""),
     ImportData("ammonite.runtime.tools.{browse, grep, time}"),
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
-    ImportData("ammonite.repl.tools.{desugar, Desugared, source}")
+    ImportData("ammonite.repl.tools.{desugar, source}")
   )
 
 
