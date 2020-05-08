@@ -55,7 +55,7 @@ class TestRepl {
   val frames = Ref(List(Frame.createInitial(initialClassLoader)))
   val sess0 = new SessionApiImpl(frames)
 
-  val baseImports = ammonite.main.Defaults.replImports ++ ammonite.main.Defaults.predefImports
+  val baseImports = ammonite.main.Defaults.replImports ++ Interpreter.predefImports
   val basePredefs = Seq(
     PredefInfo(Name("testPredef"), predef._1, false, predef._2)
   )
@@ -164,7 +164,7 @@ class TestRepl {
 
   for {
     (error, _) <- interp.initializePredef(
-      baseImports, basePredefs, customPredefs, extraBridges
+      basePredefs, customPredefs, extraBridges, baseImports
     )
   } {
     val (msgOpt, causeOpt) = error match {

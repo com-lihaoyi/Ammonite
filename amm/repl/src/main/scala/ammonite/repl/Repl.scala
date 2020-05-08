@@ -139,7 +139,7 @@ class Repl(input: InputStream,
     )
   )
 
-  def initializePredef() = interp.initializePredef(baseImports, basePredefs, customPredefs, bridges)
+  def initializePredef() = interp.initializePredef(basePredefs, customPredefs, bridges, baseImports)
 
   def warmup() = {
     // An arbitrary input, randomized to make sure it doesn't get cached or

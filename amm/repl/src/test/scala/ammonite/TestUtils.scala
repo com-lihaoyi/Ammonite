@@ -40,10 +40,10 @@ object TestUtils {
     )
     // Provide a custom predef so we can verify in tests that the predef gets cached
     interp.initializePredef(
-      predefImports,
       Seq(),
       Seq(PredefInfo(Name("predef"), predef, false, None)),
-      Seq()
+      Seq(),
+      predefImports
     )
     interp
   }

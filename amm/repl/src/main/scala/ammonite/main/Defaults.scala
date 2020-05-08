@@ -22,21 +22,6 @@ object Defaults{
     )
   }
 
-  // Need to import stuff from ammonite.ops manually, rather than from the
-  // ammonite.ops.Extensions bundle, because otherwise they result in ambiguous
-  // imports if someone else imports maunally
-  val predefImports = Imports(
-    ImportData("ammonite.interp.api.InterpBridge.value.exit"),
-    ImportData(
-      "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
-      importType = ImportData.Type
-    ),
-    ImportData("ammonite.runtime.tools.{browse, grep, time}"),
-    ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
-    ImportData("ammonite.repl.tools.{desugar, source}")
-  )
-
-
   val replImports = Imports(
     ImportData("""ammonite.repl.ReplBridge.value.{
       codeColorsImplicit,

@@ -99,7 +99,6 @@ class Interpreter(val printer: Printer,
   // Needs to be run after the Interpreter has been instantiated, as some of the
   // ReplAPIs available in the predef need access to the Interpreter object
   def initializePredef(
-    baseImports: Imports,
     basePredefs: Seq[PredefInfo],
     customPredefs: Seq[PredefInfo],
     // Allows you to set up additional "bridges" between the REPL
@@ -110,7 +109,8 @@ class Interpreter(val printer: Printer,
     // bridges need to be in place *before* the predef starts
     // running, so you can use them predef to e.g. configure
     // the REPL before it starts
-    extraBridges: Seq[(String, String, AnyRef)]
+    extraBridges: Seq[(String, String, AnyRef)],
+    baseImports: Imports = Interpreter.predefImports
   ): Option[(Res.Failing, Seq[(Watchable, Long)])] = {
 
     headFrame.classloader.specialLocalClasses ++= Seq(
@@ -697,6 +697,19 @@ class Interpreter(val printer: Printer,
 }
 
 object Interpreter{
+
+  val predefImports = Imports(
+    ImportData("ammonite.interp.api.InterpBridge.value.exit"),
+    ImportData(
+      "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
+      importType = ImportData.Type
+    ),
+    ImportData("ammonite.runtime.tools.{browse, grep, time}"),
+    ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
+    ImportData("ammonite.repl.tools.{desugar, source}"),
+    ImportData("ammonite.main.Router.{doc, main}"),
+    ImportData("ammonite.repl.tools.Util.pathScoptRead")
+  )
 
 
 
