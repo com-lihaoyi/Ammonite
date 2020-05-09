@@ -50,7 +50,9 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
 
     val autocompleteFilter: Filter = Filter.action(SpecialKeys.Tab){
       case TermState(rest, b, c, _) =>
-        val (newCursor, completions, details) = compilerComplete(c, b.mkString)
+        val (newCursor, completions, details) = TTY.withSttyOverride(TTY.restoreSigInt()) {
+          compilerComplete(c, b.mkString)
+        }
         val details2 = for (d <- details) yield {
 
           Highlighter.defaultHighlight(

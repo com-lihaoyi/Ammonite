@@ -36,20 +36,9 @@ object Terminal {
                filters: Filter,
                displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = LineReader.noTransform)
                : Option[String] = {
-
-
-    val initialConfig = TTY.init()
-    try {
+    TTY.withSttyOverride(TTY.readLineStty()) {
       new LineReader(ConsoleDim.width(), prompt, reader, writer, filters, displayTransform)
         .readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)
-    }finally{
-
-      // Don't close these! Closing these closes stdin/stdout,
-      // which seems to kill the entire program
-
-      // reader.close()
-      // writer.close()
-      TTY.stty(initialConfig)
     }
   }
 }

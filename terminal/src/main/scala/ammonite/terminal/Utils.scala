@@ -93,17 +93,6 @@ object TTY{
     import sys.process._
     Seq("sh", "-c", s"$pathedTput $s 2> /dev/tty").!!.trim.toInt
   }
-  def init() = {
-    stty("-a")
-
-    val initialConfig = stty("-g").trim
-    stty("-icanon min 1 -icrnl -inlcr -ixon")
-    sttyFailTolerant("dsusp undef")
-    stty("-echo")
-    stty("intr undef")
-
-    initialConfig
-  }
 
   private def sttyCmd(s: String) = {
     import sys.process._
@@ -121,8 +110,25 @@ object TTY{
   def sttyFailTolerant(s: String) =
     sttyCmd(s ++ " 2> /dev/null").!
 
-  def restore(initialConfig: String) = {
-    stty(initialConfig)
+  def withSttyOverride[A](setupStty: => Unit)(f: => A) = {
+    val initialConfig = stty("-g").trim
+    try {
+      setupStty
+      f
+    } finally {
+      stty(initialConfig)
+    }
+  }
+
+  def readLineStty(): Unit = {
+    stty("-icanon min 1 -icrnl -inlcr -ixon")
+    sttyFailTolerant("dsusp undef")
+    stty("-echo")
+    stty("intr undef")
+  }
+
+  def restoreSigInt(): Unit = {
+    stty("intr ^C")
   }
 }
 
