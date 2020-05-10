@@ -274,10 +274,27 @@ object AmmoniteBuildServerTests extends TestSuite {
         notifications0 = runner.client.didChangeNotifications()
         _ = assert(notifications0.isEmpty)
 
+        _ = os.write.over(script, "import sys.process._")
+        _ <- runner.compile(StatusCode.OK)
+
+        notifications1 = runner.client.didChangeNotifications()
+        _ = assert(notifications1.isEmpty)
+
         _ = os.write.over(script, "import $ivy.`com.chuusai::shapeless:2.3.3`; val value = 3")
         _ <- runner.compile(StatusCode.OK)
+
+        notifications = runner.client.didChangeNotifications()
+        _ = runner.client.clearDidChangeNotifications()
+
+        _ = os.write.over(
+          script,
+          "import $ivy.`com.chuusai::shapeless:2.3.3`; import sys.process._"
+        )
+        _ <- runner.compile(StatusCode.OK)
+
+        notifications2 = runner.client.didChangeNotifications()
+        _ = assert(notifications2.isEmpty)
       } yield {
-        val notifications = runner.client.didChangeNotifications()
 
         val notification = notifications match {
           case Seq() => sys.error("Got no notification")

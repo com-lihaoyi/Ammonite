@@ -37,7 +37,7 @@ final class DependencyLoader(
           coordinates
             .filter(dep => !alwaysExclude((dep.getModule.getOrganization, dep.getModule.getName)))
             .map { dep =>
-              alwaysExclude.iterator.foldLeft(dep)((dep, excl) =>
+              alwaysExclude.iterator.foldLeft(Dependency.of(dep))((dep, excl) =>
                 dep.addExclusion(excl._1, excl._2)
               )
             },
