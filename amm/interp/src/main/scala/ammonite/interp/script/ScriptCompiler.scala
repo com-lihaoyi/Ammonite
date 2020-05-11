@@ -205,7 +205,7 @@ final class ScriptCompiler(
   private def compileFromCache(
     settingsArgs: Seq[String],
     script: Script,
-    dependencies: Script.ResolvedDependencies,
+    dependencies: Script.ResolvedDependencies
   ): Option[ScriptCompileResult] =
     if (inMemoryCache && script.codeSource.path.nonEmpty) {
       cleanUpCache()
@@ -218,7 +218,7 @@ final class ScriptCompiler(
     settings0: Settings,
     settingsArgs: Seq[String],
     script: Script,
-    dependencies: Script.ResolvedDependencies,
+    dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult =
     if (inMemoryCache && script.codeSource.path.nonEmpty) {
       val key = InMemoryCacheKey(settingsArgs, script, dependencies)
