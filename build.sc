@@ -702,29 +702,28 @@ def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
 def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
                     shard: Int,
                     divisionCount: Int) =
-  if (!isMasterCommit) T.command{()}
-  else T.command{
+  T.command{
 
     val x: Seq[(Seq[(Path, String)], Artifact)] = {
       mill.define.Task.sequence(partition(publishArtifacts, shard, divisionCount))().map{
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
       }
     }
-
-    new SonatypePublisher(
-      "https://oss.sonatype.org/service/local",
-      "https://oss.sonatype.org/content/repositories/snapshots",
-      sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
-      Option(sys.env("SONATYPE_PGP_PASSWORD")),
-      None,
-      true,
-      120000,
-      120000,
-      T.ctx().log,
-      120000
-    ).publishAll(
-      true,
-      x:_*
-    )
+    if (isMasterCommit)
+      new SonatypePublisher(
+        "https://oss.sonatype.org/service/local",
+        "https://oss.sonatype.org/content/repositories/snapshots",
+        sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
+        Option(sys.env("SONATYPE_PGP_PASSWORD")),
+        None,
+        true,
+        120000,
+        120000,
+        T.ctx().log,
+        120000
+      ).publishAll(
+        true,
+        x:_*
+      )
   }
 
