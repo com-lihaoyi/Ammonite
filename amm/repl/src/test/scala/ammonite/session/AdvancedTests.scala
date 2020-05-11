@@ -340,18 +340,34 @@ object AdvancedTests extends TestSuite{
         @ assert(repl.prompt() == "B")
       """)
     }
-    test("macroParadiseWorks"){
-      // no more macroparadise in 2.13
-      if (scala2_12 && scala.util.Properties.versionNumberString != "2.12.10") {
-        val scalaVersion: String = scala.util.Properties.versionNumberString
-        val c1: DualTestRepl = new DualTestRepl()
-        c1.session(s"""
-          @ interp.load.plugin.ivy("org.scalamacros" % "paradise_${scalaVersion}" % "2.1.1")
-        """)
-        c1.session("""
-          @ val x = 1
-        """)
-      }
+    test("macro paradise or -Ymacro-annotations") {
+      val init =
+        if (scala2_12) {
+          val scalaVer = scala.util.Properties.versionNumberString
+          val paradiseVersion =
+            if (scalaVer == "2.12.0" || scalaVer == "2.12.1") "2.1.0"
+            else "2.1.1"
+          s"""import $$plugin.$$ivy.`org.scalamacros:::paradise:$paradiseVersion`"""
+        }
+        else
+          "interp.configureCompiler(_.settings.YmacroAnnotations.value = true)"
+      check.session(s"""
+        @ $init
+
+        @ import $$ivy.`io.github.alexarchambault::data-class:0.2.3`
+
+        @ import dataclass._
+        import dataclass._
+
+        @ @data class Foo(n: Int = 0)
+
+        @ val foo = Foo()
+        foo: Foo = Foo(0)
+
+        @ val foo2 = foo.withN(3)
+        foo2: Foo = Foo(3)
+
+      """)
     }
     test("desugar"){
       check.session("""
