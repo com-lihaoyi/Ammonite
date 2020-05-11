@@ -27,11 +27,6 @@ private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuil
     result.setOriginId(params.getOriginId)
     CompletableFuture.completedFuture(result)
   }
-  def buildTargetCleanCache(params: CleanCacheParams): CompletableFuture[CleanCacheResult] = {
-    val result = new CleanCacheResult("", false)
-    CompletableFuture.completedFuture(result)
-  }
-
   def onBuildExit(): Unit = ()
   def onBuildInitialized(): Unit = ()
 

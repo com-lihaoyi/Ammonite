@@ -299,7 +299,7 @@ object Main{
             initialScripts = leftoverArgs.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
               Seq("ammonite.interp.api.InterpBridge" -> "interp")
-            )
+            ) ++ AmmoniteBuildServer.defaultImports
           )
           val launcher = AmmoniteBuildServer.start(buildServer)
           printErr.println("Starting BSP server")

@@ -4,35 +4,57 @@ import java.net.URI
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
+import ch.epfl.scala.bsp4j.{BuildTargetEvent, BuildTargetEventKind, BuildTargetIdentifier}
+
 import scala.collection.JavaConverters._
 
-final class ScriptCache(proc: ScriptProcessor) {
+final class ScriptCache(
+  proc: ScriptProcessor,
+  onBuildTargetEvents: Seq[BuildTargetEvent] => Unit
+) {
 
   private val cache = new ConcurrentHashMap[String, Script]
 
   private def identifier(p: os.Path): String =
     p.toNIO.toAbsolutePath.toUri.toASCIIString
 
-  def cleanup(): Boolean = {
+  def cleanup(): Seq[BuildTargetEvent] = {
     val keys = cache.keys().asScala.toVector
     val removeKeys = keys.filter { id =>
       val path = os.Path(Paths.get(new URI(id)))
       !os.isFile(path)
     }
-    for (k <- removeKeys)
-      cache.remove(k)
-    removeKeys.nonEmpty
+
+    for {
+      k <- removeKeys
+      _ <- Option(cache.remove(k))
+    } yield {
+      val event = new BuildTargetEvent(new BuildTargetIdentifier(k))
+      event.setKind(BuildTargetEventKind.DELETED)
+      event
+    }
   }
 
-  def load(scripts: Seq[os.Path]): Boolean = {
+  def load(scripts: Seq[os.Path]): Seq[BuildTargetEvent] = {
 
-    val cleanupChangedThings = cleanup()
+    val cleanupEvents = cleanup()
 
-    val allModules = scripts
+    val scripts0 = scripts
       .filter(os.isFile(_))
       .flatMap { p =>
         // FIXME Blocking
-        proc.load(p).flatMap(proc.dependencies) match {
+        proc.load(p) match {
+          case Left(err) =>
+            // TODO Log error
+            Nil
+          case Right(script) =>
+            Seq(script)
+        }
+      }
+
+    val dependencies = scripts0
+      .flatMap { script =>
+        proc.dependencies(script) match {
           case Left(err) =>
             // TODO Log error
             Nil
@@ -40,16 +62,29 @@ final class ScriptCache(proc: ScriptProcessor) {
             modules
         }
       }
-      .distinct
 
-    for {
-      mod <- allModules
-      p <- mod.codeSource.path
-    } {
-      cache.put(identifier(p), mod)
+    val allScripts = (scripts0 ++ dependencies).distinct
+
+    val events = for {
+      script <- allScripts
+      p <- script.codeSource.path
+      id = identifier(p)
+      previousOpt = Option(cache.put(id, script))
+      if previousOpt.forall { newScript =>
+        newScript.dependencies != script.dependencies ||
+          newScript.options != script.options
+      }
+    } yield {
+      val event = new BuildTargetEvent(new BuildTargetIdentifier(id))
+      val created = previousOpt.isEmpty
+      event.setKind(
+        if (created) BuildTargetEventKind.CREATED
+        else BuildTargetEventKind.CHANGED
+      )
+      event
     }
 
-    cleanupChangedThings || allModules.nonEmpty
+    cleanupEvents ++ events
   }
 
   def get(id: String): Option[Script] = {
@@ -64,8 +99,11 @@ final class ScriptCache(proc: ScriptProcessor) {
       }
       .getOrElse(true)
 
-    if (loadOrReload)
-      load(Seq(path))
+    if (loadOrReload) {
+      val events = load(Seq(path))
+      if (events.nonEmpty)
+        onBuildTargetEvents(events)
+    }
 
     Option(cache.get(id))
   }

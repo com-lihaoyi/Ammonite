@@ -111,6 +111,8 @@ object PositionOffsetConversion {
       }
       .sum
 
+  private val firstLineWrapperPrefix = "/*<script>*/"
+
   def scalaPosToScPos(
     scCode: String,
     startLineInSc: Int,
@@ -152,7 +154,22 @@ object PositionOffsetConversion {
         lineStartScala + charScala
       )
       val lineSc = lineScala - startPosInScala.line + startLineInSc
-      val charSc = charScala - extraCharOffsetInLineScala
+
+      def lineStartsWithWrapperPrefix: Boolean =
+        scalaCode.regionMatches(
+          lineStartScala,
+          firstLineWrapperPrefix,
+          0,
+          firstLineWrapperPrefix.length
+        )
+      val firstScLineCharOffsetInLineScala =
+        if (lineSc == 0 && lineStartsWithWrapperPrefix)
+          firstLineWrapperPrefix.length
+        else
+          0
+
+      val charSc = charScala - extraCharOffsetInLineScala - firstScLineCharOffsetInLineScala
+
       Some((lineSc, charSc))
         .filter(valid)
   }

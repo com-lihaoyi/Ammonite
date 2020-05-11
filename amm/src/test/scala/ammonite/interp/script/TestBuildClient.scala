@@ -1,24 +1,36 @@
 package ammonite.interp.script
 
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ConcurrentHashMap, ConcurrentLinkedQueue}
 
-import ch.epfl.scala.bsp4j._
+import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, _}
 
 import scala.collection.JavaConverters._
 
 class TestBuildClient extends BuildClient {
 
+  import TestBuildClient._
+
   private val diagnostics0 =
     new ConcurrentHashMap[
       (BuildTargetIdentifier, TextDocumentIdentifier),
-      Seq[Diagnostic]
+      Seq[BDiagnostic]
     ]
+
+  private val taskEvents0 = new ConcurrentLinkedQueue[TaskEvent]
+  private val didChangeNotifications0 = new ConcurrentLinkedQueue[BuildTargetEvent]
 
   def diagnostics(
     targetId: BuildTargetIdentifier,
     document: TextDocumentIdentifier
-  ): Option[Seq[Diagnostic]] =
+  ): Option[Seq[BDiagnostic]] =
     Option(diagnostics0.get((targetId, document)))
+
+  def taskEvents(): Seq[TaskEvent] =
+    taskEvents0.iterator().asScala.toVector
+  def didChangeNotifications(): Seq[BuildTargetEvent] =
+    didChangeNotifications0.iterator().asScala.toVector
+  def clearDidChangeNotifications(): Unit =
+    didChangeNotifications0.clear()
 
   def onBuildPublishDiagnostics(params: PublishDiagnosticsParams): Unit =
     diagnostics0.put(
@@ -26,10 +38,27 @@ class TestBuildClient extends BuildClient {
       params.getDiagnostics.asScala.toVector
     )
 
+  def onBuildTaskStart(params: TaskStartParams): Unit =
+    taskEvents0.add(TaskEvent.Start(params))
+  def onBuildTaskProgress(params: TaskProgressParams): Unit =
+    taskEvents0.add(TaskEvent.Progress(params))
+  def onBuildTaskFinish(params: TaskFinishParams): Unit =
+    taskEvents0.add(TaskEvent.Finish(params))
+
+  def onBuildTargetDidChange(params: DidChangeBuildTarget): Unit =
+    didChangeNotifications0.addAll(params.getChanges)
+
   def onBuildLogMessage(params: LogMessageParams): Unit = ()
   def onBuildShowMessage(params: ShowMessageParams): Unit = ()
-  def onBuildTargetDidChange(params: DidChangeBuildTarget): Unit = ()
-  def onBuildTaskFinish(params: TaskFinishParams): Unit = ()
-  def onBuildTaskProgress(params: TaskProgressParams): Unit = ()
-  def onBuildTaskStart(params: TaskStartParams): Unit = ()
+}
+
+object TestBuildClient {
+
+  sealed abstract class TaskEvent extends Product with Serializable
+  object TaskEvent {
+    final case class Start(params: TaskStartParams) extends TaskEvent
+    final case class Progress(params: TaskProgressParams) extends TaskEvent
+    final case class Finish(params: TaskFinishParams) extends TaskEvent
+  }
+
 }
