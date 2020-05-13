@@ -8,9 +8,9 @@ val isMasterCommit =
   sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
   (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
 
-val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
+lazy val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
-val commitsSinceTaggedVersion = {
+lazy val commitsSinceTaggedVersion = {
   os.proc('git, "rev-list", 'master, "--not", latestTaggedVersion, "--count")
     .call()
     .out
