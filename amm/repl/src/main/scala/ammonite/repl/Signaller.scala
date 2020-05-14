@@ -29,7 +29,8 @@ case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
     finally{
       val head::tail = handlers(sig)
       handlers(sig) = tail
-      sun.misc.Signal.handle(sig, head)
+      val handlerToRegister = tail.headOption.getOrElse(sun.misc.SignalHandler.SIG_DFL)
+      sun.misc.Signal.handle(sig, handlerToRegister)
     }
   }
 }
@@ -41,6 +42,6 @@ case class Signaller(sigStr: String)(f: => Unit) extends Scoped{
 trait Scoped{
   def apply[T](t: => T): T
   def foreach[T](t: Unit => T): T = apply(t(()))
-  def flatMap[T, M[_]](t: Unit => M[T]): M[T] = apply(t(()))
+  def flatMap[T](t: Unit => T): T = apply(t(()))
   def map[T](t: Unit => T): T = apply(t(()))
 }

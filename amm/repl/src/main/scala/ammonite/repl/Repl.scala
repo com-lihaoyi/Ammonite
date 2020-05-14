@@ -173,6 +173,14 @@ class Repl(input: InputStream,
       case ex => Res.Exception(ex, "")
     }
 
+    _ <- Signaller("INT") {
+      // Put a fake `ThreadDeath` error in `lastException`, because `Thread#stop`
+      // raises an error with the stack trace of *this interrupt thread*, rather
+      // than the stack trace of *the mainThread*
+      lastException = new ThreadDeath()
+      lastException.setStackTrace(Repl.truncateStackTrace(interp.mainThread.getStackTrace))
+      interp.mainThread.stop()
+    }
     (code, stmts) <- frontEnd().action(
       input,
       reader,
@@ -186,14 +194,6 @@ class Repl(input: InputStream,
         history = history :+ code
       }
     )
-    _ <- Signaller("INT") {
-      // Put a fake `ThreadDeath` error in `lastException`, because `Thread#stop`
-      // raises an error with the stack trace of *this interrupt thread*, rather
-      // than the stack trace of *the mainThread*
-      lastException = new ThreadDeath()
-      lastException.setStackTrace(Repl.truncateStackTrace(interp.mainThread.getStackTrace))
-      interp.mainThread.stop()
-    }
     out <- interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
   } yield {
     printer.outStream.println()
