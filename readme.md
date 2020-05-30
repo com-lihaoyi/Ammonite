@@ -18,6 +18,17 @@ project lives:
 - [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the 
   Bash-replacement system shell
 
+
+If you use Ammonite and like it, you will probably enjoy the following book by the Author:
+
+- [*Hands-on Scala Programming*](https://www.handsonscala.com/)
+
+*Hands-on Scala* has uses Ammonite extensively throughout the book, using
+Ammonite to accomplish a lot of useful tasks: exploring third party libraries or
+writing parallel web-crawlers in the REPL, and implementing entire programming
+languages in Ammonite Scala Scripts. *Hands-on Scala* is a great way to level 
+up your skills in Scala in general and Ammonite in particular.
+
 If you want to learn more about Ammonite or how to use it, check out the links 
 above, or ask on the [Gitter Channel](https://gitter.im/lihaoyi/Ammonite). The 
 remainder of this document is developer-docs for people who want to work on the 
