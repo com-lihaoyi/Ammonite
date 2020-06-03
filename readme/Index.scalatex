@@ -110,6 +110,14 @@
             @sect.ref(data._2)
         @td(p(b(data._3), ".", data._4))
 
+
+  @p
+    If you use Ammonite, you will probably find the follow book by the Author 
+    helpful in using Ammonite to the fullest:
+
+  @ul
+    @li
+      @lnk("https://handsonscala.com/", "https://handsonscala.com/")
   @p
     Ammonite is a project by @lnk("Li Haoyi", "http://www.lihaoyi.com/"). If
     you use Ammonite and enjoyed it, please chip in to support our development
