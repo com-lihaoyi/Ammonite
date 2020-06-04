@@ -194,6 +194,10 @@ class Interpreter(val printer: Printer,
           else headFrame.addClasspath(res.files.map(_.toNIO.toUri.toURL))
 
           Res.Success(Imports())
+
+        case res: ImportHook.Result.Repo =>
+          Res.Success(Imports())
+
       }
     } yield hookResults
   }

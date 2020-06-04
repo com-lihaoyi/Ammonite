@@ -6,13 +6,14 @@ import ammonite.runtime.ImportHook
 import ammonite.util.Name
 
 final case class Script(
-  code: String,
-  codeSource: CodeSource,
-  blocks: Seq[Script.Block]
+    code: String,
+    codeSource: CodeSource,
+    blocks: Seq[Script.Block]
 ) {
 
   lazy val dependencyImports: Imports = {
-    val importData = dependencies.scriptDependencies.flatMap(_.hookImports.value)
+    val importData =
+      dependencies.scriptDependencies.flatMap(_.hookImports.value)
     Imports(importData)
   }
 
@@ -29,7 +30,8 @@ final case class Script(
   def segments(wd: Option[os.Path]): Option[Seq[String]] =
     for {
       p <- codeSource.path
-      segments = wd.fold(p.segments.toVector)(wd0 => p.relativeTo(wd0).segments.toVector)
+      segments = wd.fold(p.segments.toVector)(wd0 =>
+        p.relativeTo(wd0).segments.toVector)
     } yield segments
 
   def generatedScalaPath(clsName: Name): Seq[String] =
@@ -39,19 +41,19 @@ final case class Script(
 object Script {
 
   final case class Import(
-    code: Either[String, os.Path],
-    isExec: Boolean,
-    codeSource: CodeSource,
-    hookImports: Imports
+      code: Either[String, os.Path],
+      isExec: Boolean,
+      codeSource: CodeSource,
+      hookImports: Imports
   )
 
   final case class Dependencies(
-    scriptDependencies: Seq[Script.Import] = Nil,
-    dependencies: Seq[coursierapi.Dependency] = Nil,
-    jarDependencies: Seq[os.Path] = Nil,
-    pluginDependencies: Seq[coursierapi.Dependency] = Nil,
-    jarPluginDependencies: Seq[os.Path] = Nil,
-    extraRepositories: Seq[coursierapi.Repository] = Nil
+      scriptDependencies: Seq[Script.Import] = Nil,
+      dependencies: Seq[coursierapi.Dependency] = Nil,
+      jarDependencies: Seq[os.Path] = Nil,
+      pluginDependencies: Seq[coursierapi.Dependency] = Nil,
+      jarPluginDependencies: Seq[os.Path] = Nil,
+      extraRepositories: Seq[coursierapi.Repository] = Nil
   ) {
     def +(other: Dependencies): Dependencies =
       Dependencies(
@@ -74,7 +76,7 @@ object Script {
   }
 
   final case class Options(
-    extraScalacOptions: Seq[String] = Nil
+      extraScalacOptions: Seq[String] = Nil
   ) {
     def +(other: Options): Options =
       Options(
@@ -87,16 +89,16 @@ object Script {
   }
 
   final case class Block(
-    startIdx: Int,
-    leadingSpaces: String,
-    statements: Seq[String],
-    imports: Seq[ImportHook.Result]
+      startIdx: Int,
+      leadingSpaces: String,
+      statements: Seq[String],
+      imports: Seq[ImportHook.Result]
   )
 
   final case class ResolvedDependencies(
-    jars: Seq[os.Path],
-    pluginJars: Seq[os.Path],
-    byteCode: Seq[(String, Array[Byte])]
+      jars: Seq[os.Path],
+      pluginJars: Seq[os.Path],
+      byteCode: Seq[(String, Array[Byte])]
   )
 
   private def dependencies(hookRes: ImportHook.Result): Dependencies =
@@ -124,6 +126,8 @@ object Script {
           case None =>
             Dependencies() // TODO import $url
         }
+      case ImportHook.Result.Repo(r) =>
+        Dependencies(extraRepositories = Seq(r))
     }
 
 }
