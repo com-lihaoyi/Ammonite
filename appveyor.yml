@@ -13,7 +13,7 @@ environment:
     TEST_TASKS: integration[2.12.11].test integration[2.13.2].test
 
 install:
-  - SET MILL_URL=https://github.com/lihaoyi/mill/releases/download/0.6.2/0.6.2-25-6628cf-assembly
+  - SET MILL_URL=https://github.com/lihaoyi/mill/releases/download/0.7.0/0.7.0-assembly
 
 build_script:
   - SET "PATH=%JAVA_HOME%\bin;%PATH%"
