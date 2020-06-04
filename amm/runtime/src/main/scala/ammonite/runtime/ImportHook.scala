@@ -51,7 +51,6 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface {
-    def addRepository(repository: Repository): Unit
     def loadIvy(coordinates: Dependency*): Either[String, Seq[File]]
     def watch(p: os.Path): Unit
   }
@@ -296,27 +295,9 @@ object ImportHook{
       tree.prefix match {
         case url :: Nil if url.startsWith("ivy:") =>
           val repo = IvyRepository.of(url.drop(4)) // dropping `ivy:` prefix
-          interp.addRepository(repo)
           Right(Seq(Result.Repo(repo)))
         case url :: Nil =>
           val repo = MavenRepository.of(url)
-          interp.addRepository(repo)
-          Right(Seq(Result.Repo(repo)))
-        case other =>
-          throw new IllegalArgumentException("$repo import failed")
-      }
-    }
-  }
-
-  object IvyRepo extends ImportHook {
-    override def handle(source: CodeSource,
-                        tree: ImportTree,
-                        interp: InterpreterInterface,
-                        wrapperPath: Seq[Name]) = {
-      tree.prefix match {
-        case url :: Nil =>
-          val repo = IvyRepository.of(url)
-          interp.addRepository(IvyRepository.of(url))
           Right(Seq(Result.Repo(repo)))
         case other =>
           throw new IllegalArgumentException("$repo import failed")

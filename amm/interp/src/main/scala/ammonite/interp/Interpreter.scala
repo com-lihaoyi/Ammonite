@@ -195,7 +195,8 @@ class Interpreter(val printer: Printer,
 
           Res.Success(Imports())
 
-        case res: ImportHook.Result.Repo =>
+        case ImportHook.Result.Repo(repo) =>
+          addRepository(repo)
           Res.Success(Imports())
 
       }
@@ -615,7 +616,7 @@ class Interpreter(val printer: Printer,
     )
   }
 
-  override def addRepository(repository: Repository): Unit = synchronized {
+  private def addRepository(repository: Repository): Unit = synchronized {
     val current = repositories()
     repositories.update(current :+ repository)
   }
