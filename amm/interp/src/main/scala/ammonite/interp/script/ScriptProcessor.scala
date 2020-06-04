@@ -178,5 +178,6 @@ object ScriptProcessor {
     new ImportHook.InterpreterInterface {
       def loadIvy(coordinates: Dependency*): Either[String, Seq[File]] = Right(Nil)
       def watch(p: os.Path): Unit = ()
+      def addRepository(repository: Repository): Unit = ()
     }
 }

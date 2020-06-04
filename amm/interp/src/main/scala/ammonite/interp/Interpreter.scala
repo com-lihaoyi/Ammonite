@@ -7,7 +7,6 @@ import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 import ammonite.interp.CodeWrapper
 
 import scala.collection.mutable
-
 import ammonite.runtime._
 import fastparse._
 
@@ -16,7 +15,7 @@ import ammonite.runtime.tools.IvyThing
 import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util._
-import coursierapi.{Dependency, Fetch}
+import coursierapi.{Dependency, Fetch, Repository}
 
 /**
  * A convenient bundle of all the functionality necessary
@@ -610,6 +609,11 @@ class Interpreter(val printer: Printer,
       repositories(),
       resolutionHooks.toSeq
     )
+  }
+
+  override def addRepository(repository: Repository): Unit = synchronized {
+    val current = repositories()
+    repositories.update(current :+ repository)
   }
 
   abstract class DefaultLoadJar extends LoadJar {

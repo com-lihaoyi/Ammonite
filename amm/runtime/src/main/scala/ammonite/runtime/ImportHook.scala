@@ -6,7 +6,7 @@ import java.net.URI
 import ammonite.interp.api.IvyConstructor
 import ammonite.util.Util.CodeSource
 import ammonite.util._
-import coursierapi.Dependency
+import coursierapi.{Dependency, IvyRepository, MavenRepository, Repository}
 
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
@@ -39,6 +39,8 @@ object ImportHook{
     Seq("url") -> URL,
     Seq("file") -> File,
     Seq("exec") -> Exec,
+    Seq("repo", "maven") -> MavenRepo,
+    Seq("repo", "ivy") -> IvyRepo,
     Seq("ivy") -> Ivy,
     Seq("cp") -> Classpath,
     Seq("plugin", "ivy") -> PluginIvy,
@@ -50,7 +52,8 @@ object ImportHook{
     * Interpreter. Open for extension, if someone needs more stuff, but by
     * default this is what is available.
     */
-  trait InterpreterInterface{
+  trait InterpreterInterface {
+    def addRepository(repository: Repository): Unit
     def loadIvy(coordinates: Dependency*): Either[String, Seq[File]]
     def watch(p: os.Path): Unit
   }
@@ -282,6 +285,36 @@ object ImportHook{
                 exec=false
               )
           })
+      }
+    }
+  }
+
+  object MavenRepo extends ImportHook {
+    override def handle(source: CodeSource,
+                        tree: ImportTree,
+                        interp: InterpreterInterface,
+                        wrapperPath: Seq[Name]) = {
+      tree.prefix match {
+        case url :: Nil =>
+          interp.addRepository(MavenRepository.of(url))
+          Right(Seq(Result.ClassPath(None, Seq(), false)))
+        case other =>
+          throw new IllegalArgumentException("$repo import failed")
+      }
+    }
+  }
+
+  object IvyRepo extends ImportHook {
+    override def handle(source: CodeSource,
+                        tree: ImportTree,
+                        interp: InterpreterInterface,
+                        wrapperPath: Seq[Name]) = {
+      tree.prefix match {
+        case url :: Nil =>
+          interp.addRepository(IvyRepository.of(url))
+          Right(Seq(Result.ClassPath(None, Seq(), false)))
+        case other =>
+          throw new IllegalArgumentException("$repo import failed")
       }
     }
   }
