@@ -15,12 +15,13 @@ import scala.meta.internal.semanticdb.TextDocument
 
 object AmmoniteBuildServerTests extends TestSuite {
 
-  implicit class CompletableFutureOps[T](private val f: CompletableFuture[T]) extends AnyVal {
+  implicit class CompletableFutureOps[T](private val f: CompletableFuture[T])
+      extends AnyVal {
     def asScala: Future[T] =
       FutureConverters.toScala(f)
   }
 
-  val scriptBase = os.pwd/'amm/'src/'test/'resources/'bsp
+  val scriptBase = os.pwd / 'amm / 'src / 'test / 'resources / 'bsp
 
   val wd = os.temp.dir(deleteOnExit = true)
 
@@ -28,7 +29,8 @@ object AmmoniteBuildServerTests extends TestSuite {
   for (elem <- os.list(scriptBase))
     os.copy(elem, wd / elem.last, createFolders = true)
 
-  val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+  val sbv =
+    scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
 
   override def utestAfterAll(): Unit =
     os.remove.all(wd)
@@ -78,7 +80,8 @@ object AmmoniteBuildServerTests extends TestSuite {
 
         _ <- runner.compile(StatusCode.OK)
 
-        classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
+        classDirectory = os.Path(
+          Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
 
         _ = {
           val clsFile = classDirectory / "ammonite" / "$file" / "import$minusfile" / "main.class"
@@ -123,16 +126,20 @@ object AmmoniteBuildServerTests extends TestSuite {
 
         scalacOptionsItem1 = scalacOptionsItems
           .find(_.getTarget.getUri == script1Uri)
-          .getOrElse(sys.error(s"scalac options item not found for $script1Uri"))
+          .getOrElse(
+            sys.error(s"scalac options item not found for $script1Uri"))
         scalacOptionsItem2 = scalacOptionsItems
           .find(_.getTarget.getUri == script2Uri)
-          .getOrElse(sys.error(s"scalac options item not found for $script2Uri"))
+          .getOrElse(
+            sys.error(s"scalac options item not found for $script2Uri"))
 
         _ <- runner.compile(StatusCode.OK, script1Uri)
         _ <- runner.compile(StatusCode.OK, script2Uri)
 
-        classDirectory1 = os.Path(Paths.get(new URI(scalacOptionsItem1.getClassDirectory)))
-        classDirectory2 = os.Path(Paths.get(new URI(scalacOptionsItem2.getClassDirectory)))
+        classDirectory1 = os.Path(
+          Paths.get(new URI(scalacOptionsItem1.getClassDirectory)))
+        classDirectory2 = os.Path(
+          Paths.get(new URI(scalacOptionsItem2.getClassDirectory)))
 
         _ = {
           val clsFile1 = classDirectory1 / "ammonite" / "$file" / "script1.class"
@@ -280,7 +287,9 @@ object AmmoniteBuildServerTests extends TestSuite {
         notifications1 = runner.client.didChangeNotifications()
         _ = assert(notifications1.isEmpty)
 
-        _ = os.write.over(script, "import $ivy.`com.chuusai::shapeless:2.3.3`; val value = 3")
+        _ = os.write.over(
+          script,
+          "import $ivy.`com.chuusai::shapeless:2.3.3`; val value = 3")
         _ <- runner.compile(StatusCode.OK)
 
         notifications = runner.client.didChangeNotifications()
@@ -297,9 +306,9 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield {
 
         val notification = notifications match {
-          case Seq() => sys.error("Got no notification")
+          case Seq()      => sys.error("Got no notification")
           case Seq(notif) => notif
-          case _ => sys.error(s"Got too many notifications: $notifications")
+          case _          => sys.error(s"Got too many notifications: $notifications")
         }
 
         assert(notification.getKind == BuildTargetEventKind.CHANGED)
@@ -324,7 +333,8 @@ object AmmoniteBuildServerTests extends TestSuite {
         _ = {
           val classDir = Paths.get(new URI(scalacOptionsItem.getClassDirectory))
           val srcDir = os.Path(classDir.resolve("../src").normalize)
-          val relPath = os.Path(Paths.get(new URI(scalacOptionsItem.getTarget.getUri)))
+          val relPath = os
+            .Path(Paths.get(new URI(scalacOptionsItem.getTarget.getUri)))
             .relativeTo(wd)
           val expectedScalaFile = srcDir /
             "ammonite" /
@@ -376,8 +386,10 @@ object AmmoniteBuildServerTests extends TestSuite {
         s"io/circe/circe-generic_$sbv/0.12.3/circe-generic_$sbv-0.12.3.jar",
         s"io/circe/circe-parser_$sbv/0.12.3/circe-parser_$sbv-0.12.3.jar",
         s"io/circe/circe-numbers_$sbv/0.12.3/circe-numbers_$sbv-0.12.3.jar",
-        s"io/circe/circe-jawn_$sbv/0.12.3/circe-jawn_$sbv-0.12.3.jar",
-      ).map("https/repo1.maven.org/maven2/" + _)
+        s"io/circe/circe-jawn_$sbv/0.12.3/circe-jawn_$sbv-0.12.3.jar"
+      ).map("https/repo1.maven.org/maven2/" + _) ++ List(
+        "https/jitpack.io/com/github/jupyter/jvm-repr/0.4.0/jvm-repr-0.4.0.jar"
+      )
 
       for {
         scalacOptionsItems <- runner.init()
@@ -393,7 +405,8 @@ object AmmoniteBuildServerTests extends TestSuite {
         _ = scalacOptionsItems.foreach { item =>
           val classDir = Paths.get(new URI(item.getClassDirectory))
           val srcDir = os.Path(classDir.resolve("../src").normalize)
-          val relPath = os.Path(Paths.get(new URI(item.getTarget.getUri))).relativeTo(wd)
+          val relPath =
+            os.Path(Paths.get(new URI(item.getTarget.getUri))).relativeTo(wd)
           val expectedScalaFile = srcDir /
             "ammonite" /
             "$file" /
@@ -465,12 +478,13 @@ object AmmoniteBuildServerTests extends TestSuite {
       val otherScriptUri = (wd / otherScriptPath).toNIO.toUri.toASCIIString
 
       def semanticDb(
-        scalacOptionsItem: ScalacOptionsItem,
-        scriptPath: os.RelPath
+          scalacOptionsItem: ScalacOptionsItem,
+          scriptPath: os.RelPath
       ): TextDocument = {
         import scala.meta.internal.semanticdb._
 
-        val classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
+        val classDirectory =
+          os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
         val semanticDbPath = classDirectory /
           "META-INF" /
           "semanticdb" /
@@ -494,7 +508,8 @@ object AmmoniteBuildServerTests extends TestSuite {
         doc
       }
 
-      def checkMainScript(scalacOptionsItem: ScalacOptionsItem, scriptPath: os.RelPath): Unit = {
+      def checkMainScript(scalacOptionsItem: ScalacOptionsItem,
+                          scriptPath: os.RelPath): Unit = {
         import scala.meta.internal.semanticdb._
 
         val doc = semanticDb(scalacOptionsItem, scriptPath)
@@ -508,7 +523,8 @@ object AmmoniteBuildServerTests extends TestSuite {
         assert(doc.occurrences.contains(quickRequestOccurrence))
       }
 
-      def checkOtherScript(scalacOptionsItem: ScalacOptionsItem, scriptPath: os.RelPath): Unit = {
+      def checkOtherScript(scalacOptionsItem: ScalacOptionsItem,
+                           scriptPath: os.RelPath): Unit = {
         import scala.meta.internal.semanticdb._
 
         val doc = semanticDb(scalacOptionsItem, scriptPath)
@@ -589,8 +605,7 @@ object AmmoniteBuildServerTests extends TestSuite {
         val targetId = new BuildTargetIdentifier(uri)
         new SourcesItem(
           targetId,
-          List(new SourceItem(uri, SourceItemKind.FILE, false))
-            .asJava
+          List(new SourceItem(uri, SourceItemKind.FILE, false)).asJava
         )
       }
 
@@ -601,13 +616,15 @@ object AmmoniteBuildServerTests extends TestSuite {
         buildTargetsResp <- server.workspaceBuildTargets().asScala
 
         targetIds = buildTargetsResp.getTargets.asScala.toList.map(_.getId)
-        _ = assert(targetIds.sortBy(_.getUri) == expectedTargetIds.sortBy(_.getUri))
+        _ = assert(
+          targetIds.sortBy(_.getUri) == expectedTargetIds.sortBy(_.getUri))
 
         sourcesResp <- server
           .buildTargetSources(new SourcesParams(targetIds.asJava))
           .asScala
         _ = assert(
-          sourcesResp.getItems.asScala.sortBy(_.getTarget.getUri) == expectedSourcesItems
+          sourcesResp.getItems.asScala
+            .sortBy(_.getTarget.getUri) == expectedSourcesItems
         )
 
         scalacOptionsResp <- server
@@ -615,9 +632,7 @@ object AmmoniteBuildServerTests extends TestSuite {
           .asScala
         _ = {
           assert(scalacOptionsResp.getItems.size == script.length)
-          val item = scalacOptionsResp
-            .getItems
-            .asScala
+          val item = scalacOptionsResp.getItems.asScala
             .find(_.getTarget == expectedBuildTargetId)
             .getOrElse {
               throw new Exception(
@@ -636,15 +651,17 @@ object AmmoniteBuildServerTests extends TestSuite {
 
       } yield scalacOptionsResp.getItems.asScala.toList
 
-    def compile(expectedStatusCode: StatusCode, scriptUri: String = null): Future[Unit] =
+    def compile(expectedStatusCode: StatusCode,
+                scriptUri: String = null): Future[Unit] =
       for {
         compileResp <- server
           .buildTargetCompile(
-            new CompileParams(Seq(
-              Option(scriptUri)
-                .map(new BuildTargetIdentifier(_))
-                .getOrElse(expectedBuildTargetId)
-            ).asJava)
+            new CompileParams(
+              Seq(
+                Option(scriptUri)
+                  .map(new BuildTargetIdentifier(_))
+                  .getOrElse(expectedBuildTargetId)
+              ).asJava)
           )
           .asScala
         _ = assert(compileResp.getStatusCode == expectedStatusCode)
@@ -652,9 +669,11 @@ object AmmoniteBuildServerTests extends TestSuite {
 
     def diagnostics() =
       client
-        .diagnostics(expectedBuildTargetId, new TextDocumentIdentifier(scriptUri))
+        .diagnostics(expectedBuildTargetId,
+                     new TextDocumentIdentifier(scriptUri))
         .getOrElse {
-          throw new Exception(s"No diagnostics found for $expectedBuildTargetId / $scriptUri")
+          throw new Exception(
+            s"No diagnostics found for $expectedBuildTargetId / $scriptUri")
         }
   }
 
