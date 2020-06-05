@@ -49,12 +49,12 @@
 
   @hl.sh
     @readme.Sample.unstableCurl
-    
+
   @p
     Alternatively, on macOS you can install Ammonite via brew:
 
   @hl.sh
-    $ brew install ammonite-repl  
+    $ brew install ammonite-repl
 
   @p
     You can also download a bootstrap script, that can be downloaded and committed
@@ -516,6 +516,15 @@
           function and configure each @code{Dependency} to your heart's content:
 
         @hl.ref(scriptTests, Seq("loadIvyAdvanced", "@"), "\"\"\"")
+
+      @sect{import $repo}
+        @p
+          Lets you statically add Maven or Ivy repositories that will be used during artifact
+          resolution. This mechanism does not (yet) allow for credentials registration. (NB :
+          Prefixing the url pattern with "ivy:" is required only for Ivy repositories. Maven
+          repositories do not require any prefix)
+
+        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolversStatic", "@"), "\"\"\"")
 
     @sect{Builtins}
       @p

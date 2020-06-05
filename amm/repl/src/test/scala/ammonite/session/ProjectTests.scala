@@ -82,6 +82,16 @@ object ProjectTests extends TestSuite{
             """)
           }
         }
+        test("resolversStatic"){
+          retry(2){
+            // ivy flakyness...
+            if (scala2_11) check.session("""
+              @ import $repo.`ivy:https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]`
+              @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
+              @ import com.ambiata.mundane._
+            """)
+          }
+        }
       }
       test("code"){
         check.session("""

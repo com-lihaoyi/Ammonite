@@ -336,6 +336,17 @@ object ScriptTests extends TestSuite{
           """)
         }
       }
+      test("resolverStatic"){
+        test("pass"){
+          if (scala2_11) check.session(s"""
+            @ import os._
+
+            @ interp.load.module($printedScriptPath/"ResolversStatic.sc")
+
+
+          """)
+        }
+      }
       test("loadIvyAdvanced"){
         check.session(s"""
         @ import os._
