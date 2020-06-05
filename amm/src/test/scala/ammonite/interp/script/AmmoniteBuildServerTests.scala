@@ -60,6 +60,39 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
+    "don't delete directories in target" - {
+      val runner = new BspScriptRunner(wd / "simple" / "main.sc")
+
+      val expectedClassPath = List(
+        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+      ).map("https/repo1.maven.org/maven2/" + _)
+
+      for {
+        List(scalacOptionsItem) <- runner.init()
+
+        _ = {
+          val classPath = scalacOptionsItem.getClasspath.asScala.toList
+          for (p <- expectedClassPath)
+            assert(classPath.exists(_.endsWith("/" + p)))
+        }
+
+        classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
+
+        customDir = classDirectory / "dont-remove"
+        _ = os.makeDir.all(customDir)
+        _ = assert(os.isDir(customDir))
+
+        _ <- runner.compile(StatusCode.OK)
+
+        _ = assert(os.isDir(customDir))
+
+        diagnostics = runner.diagnostics()
+        _ = assert(diagnostics.isEmpty)
+
+      } yield ()
+    }
+
     "caching" - {
       val runner = new BspScriptRunner(
         Seq("main", "lib").map(name => wd / "import-file" / s"$name.sc"): _*

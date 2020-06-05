@@ -108,13 +108,15 @@ class SingleScriptCompiler(
 
 
   private def clearByteCodeDir(): Unit =
-    for (dest <- moduleTarget)
-      try os.remove.all(dest)
-      catch {
-        case _: java.nio.file.DirectoryNotEmptyException =>
-          // Can happen on Windows, if any of the file we try to delete is opened by the BSP
-          // client.
-      }
+    // remove only files from the target directory, not directories
+    // (removing directories can confuse BSP clients with file watchers)
+    for {
+      dest <- moduleTarget
+      if os.isDir(dest)
+      file <- os.walk(dest, skip = os.isDir(_))
+    } {
+      os.remove(file)
+    }
 
   private def writeSource(clsName: Name, code: String): Option[Seq[String]] =
     for (dir <- moduleSources) yield {
