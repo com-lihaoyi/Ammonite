@@ -520,11 +520,14 @@
       @sect{import $repo}
         @p
           Lets you statically add Maven or Ivy repositories that will be used during artifact
-          resolution. This mechanism does not (yet) allow for credentials registration. (NB :
-          Prefixing the url pattern with "ivy:" is required only for Ivy repositories. Maven
-          repositories do not require any prefix)
+          resolution. This mechanism does not (yet) allow for credentials registration. (
 
         @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("resolversStatic", "@"), "\"\"\"")
+
+        @p
+          NB: Prefixing the url pattern with "ivy:", such as
+          @hl.scala{import $repo.`ivy:https://dl.bintray.com/typesafe/ivy-releases/[defaultPattern]`},
+          is required for ivy repositories. Maven repositories do not require any prefix
 
     @sect{Builtins}
       @p

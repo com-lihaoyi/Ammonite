@@ -4,8 +4,6 @@ import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
 
-import scala.collection.{immutable => imm}
-
 object ProjectTests extends TestSuite{
   val tests = Tests{
     println("ProjectTests")
@@ -86,9 +84,9 @@ object ProjectTests extends TestSuite{
           retry(2){
             // ivy flakyness...
             if (scala2_11) check.session("""
-              @ import $repo.`ivy:https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]`
-              @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
-              @ import com.ambiata.mundane._
+              @ import $repo.`https://jitpack.io`
+              @ import $ivy.`com.github.jupyter:jvm-repr:0.4.0`
+              @ import jupyter._
             """)
           }
         }
