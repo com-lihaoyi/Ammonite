@@ -1,4 +1,4 @@
-import $repo.`ivy:https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]`
-import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
-import com.ambiata.mundane._
+import $repo.`ivy:https://dl.bintray.com/typesafe/ivy-releases/[defaultPattern]`
+import $ivy.`com.lightbend::emoji:1.2.1`
+import com.lightbend.emoji._
 

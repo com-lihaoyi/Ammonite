@@ -12,5 +12,7 @@ val json = foo.asJson.noSpaces
 
 val decodedFoo = decode[Foo](json)
 
-val helloFromJitpack = com.github.baccata.Hello.GREETING
+val helloFromJupyter = jupyter.Displayers.registration
+
+
 

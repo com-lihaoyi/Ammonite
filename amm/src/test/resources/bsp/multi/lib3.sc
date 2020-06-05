@@ -1,5 +1,5 @@
 // See https://github.com/Baccata/gradle-simple/blob/master/src/main/java/Hello.java
 import $repo.`https://jitpack.io`
-import $ivy.`com.github.baccata:gradle-simple:63f75f7133`
+import $ivy.`com.github.jupyter:jvm-repr:0.4.0`
 
-val hello = com.github.baccata.Hello.GREETING
+import jupyter.Displayers
