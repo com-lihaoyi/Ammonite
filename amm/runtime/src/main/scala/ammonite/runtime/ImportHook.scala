@@ -292,14 +292,14 @@ object ImportHook{
                         tree: ImportTree,
                         interp: InterpreterInterface,
                         wrapperPath: Seq[Name]) = {
-      tree.prefix match {
-        case url :: Nil if url.startsWith("ivy:") =>
+      tree.prefix.headOption match {
+        case Some(url) if url.startsWith("ivy:") =>
           val repo = IvyRepository.of(url.drop(4)) // dropping `ivy:` prefix
           Right(Seq(Result.Repo(repo)))
-        case url :: Nil =>
+        case Some(url) =>
           val repo = MavenRepository.of(url)
           Right(Seq(Result.Repo(repo)))
-        case other =>
+        case None =>
           throw new IllegalArgumentException("$repo import failed")
       }
     }
