@@ -124,6 +124,8 @@ object Script {
           case None =>
             Dependencies() // TODO import $url
         }
+      case ImportHook.Result.Repo(r) =>
+        Dependencies(extraRepositories = Seq(r))
     }
 
 }

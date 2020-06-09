@@ -401,7 +401,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
     "multi" - {
       val dir = wd / "multi"
-      val scriptNames = Seq("main", "lib1", "lib2")
+      val scriptNames = Seq("main", "lib1", "lib2", "lib3")
       val runner = new BspScriptRunner(scriptNames.map(n => dir / s"$n.sc"): _*)
 
       val expectedClassPath = List(
@@ -410,7 +410,9 @@ object AmmoniteBuildServerTests extends TestSuite {
         s"io/circe/circe-parser_$sbv/0.12.3/circe-parser_$sbv-0.12.3.jar",
         s"io/circe/circe-numbers_$sbv/0.12.3/circe-numbers_$sbv-0.12.3.jar",
         s"io/circe/circe-jawn_$sbv/0.12.3/circe-jawn_$sbv-0.12.3.jar"
-      ).map("https/repo1.maven.org/maven2/" + _)
+      ).map("https/repo1.maven.org/maven2/" + _) ++ List(
+        "https/jitpack.io/com/github/jupyter/jvm-repr/0.4.0/jvm-repr-0.4.0.jar"
+      )
 
       for {
         scalacOptionsItems <- runner.init()
@@ -471,6 +473,8 @@ object AmmoniteBuildServerTests extends TestSuite {
             "Compiled multi/lib1.sc",
             "Compiling multi/lib2.sc",
             "Compiled multi/lib2.sc",
+            "Compiling multi/lib3.sc",
+            "Compiled multi/lib3.sc",
             "Compiling multi/main.sc",
             "Compiled multi/main.sc"
           )

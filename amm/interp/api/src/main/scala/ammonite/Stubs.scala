@@ -51,3 +51,7 @@ package $cp{
 package $plugin{
   object $
 }
+
+package $repo {
+  object $
+}

@@ -4,8 +4,6 @@ import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
 
-import scala.collection.{immutable => imm}
-
 object ProjectTests extends TestSuite{
   val tests = Tests{
     println("ProjectTests")
@@ -81,6 +79,15 @@ object ProjectTests extends TestSuite{
               @ import com.ambiata.mundane._
             """)
           }
+        }
+        test("resolversStatic"){
+          check.session("""
+            @ import $repo.`https://jitpack.io`
+
+            @ import $ivy.`com.github.jupyter:jvm-repr:0.4.0`
+
+            @ import jupyter._
+          """)
         }
       }
       test("code"){
