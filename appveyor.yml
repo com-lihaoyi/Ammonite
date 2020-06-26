@@ -6,11 +6,11 @@ environment:
   matrix:
   - JAVA_OPTS: -Dfile.encoding=UTF8
     JAVA_HOME: C:\Program Files\Java\jdk9
-    TEST_TASKS: terminal[2.12.11].test amm.repl[2.12.11].test terminal[2.13.2].test amm.repl[2.13.2].test
+    TEST_TASKS: terminal[2.12.11].test amm.repl[2.12.11].test terminal[2.13.3].test amm.repl[2.13.3].test
 
   - JAVA_OPTS: -Dfile.encoding=UTF8
     JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-    TEST_TASKS: integration[2.12.11].test integration[2.13.2].test
+    TEST_TASKS: integration[2.12.11].test integration[2.13.3].test
 
 install:
   - SET MILL_URL=https://github.com/lihaoyi/mill/releases/download/0.7.0/0.7.0-assembly
