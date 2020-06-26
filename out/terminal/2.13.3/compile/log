@@ -1,0 +1,8 @@
+[info] Compiling 13 Scala sources to /home/travis/build/lihaoyi/Ammonite/out/terminal/2.13.3/compile/dest/classes ...
+[warn] /home/travis/build/lihaoyi/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/ReadlineFilters.scala:122:10: multiarg infix syntax looks like a tuple and will be deprecated
+[warn]       (b patch(c - 1, Nil, 1), c - 1)
+[warn]          ^
+[warn] 10 deprecations (since 2.13.0); re-run with -deprecation for details
+[warn] 3 feature warnings; re-run with -feature for details
+[warn] three warnings found
+[info] Done compiling.

@@ -1,0 +1,5 @@
+[info] Compiling 6 Scala sources to /home/travis/build/lihaoyi/Ammonite/out/ops/2.13.3/compile/dest/classes ...
+[warn] 8 deprecations (since 2.13.0); re-run with -deprecation for details
+[warn] 21 feature warnings; re-run with -feature for details
+[warn] two warnings found
+[info] Done compiling.

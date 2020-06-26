@@ -1,0 +1,13 @@
+{
+    "value": [
+        "ref:c15b1791:/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/java",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala-2.13.3",
+        "ref:3948e6d0:/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala-2.13",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala-2",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala-2.12.10-2.13.1+",
+        "ref:c984eca8:/home/travis/build/lihaoyi/Ammonite/ops/src/main/scala-2.13.1+"
+    ],
+    "valueHash": -1906668352,
+    "inputsHash": 1185721962
+}
