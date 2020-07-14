@@ -19,12 +19,12 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.11", "2.13.3")
+val binCrossScalaVersions = Seq("2.12.12", "2.13.3")
 def isScala2_12_10OrLater(sv: String): Boolean = {
   sv == "2.12.10" || sv == "2.12.11" || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
 val fullCrossScalaVersions = Seq(
-  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12",
   "2.13.0", "2.13.1", "2.13.2", "2.13.3"
 )
 
@@ -202,7 +202,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
-      ivy"org.scalameta::trees:4.3.17",
+      ivy"org.scalameta::trees:4.3.20",
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.3.0",
