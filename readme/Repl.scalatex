@@ -131,7 +131,7 @@
     or if there are other main methods in the @code{Test} scope
 
   @code
-    sbt projectName/test:run-main amm
+    sbt projectName/test:runMain amm
 
   @p
     To activate the Ammonite REPL
