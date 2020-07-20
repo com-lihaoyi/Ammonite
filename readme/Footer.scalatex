@@ -123,6 +123,18 @@
 
 
   @sect{Changelog}
+    @sect{2.2.0}
+      @ul
+        @li
+          Support for Scala 2.12.12, 2.13.3
+        @li
+          Handle SIGINT when reading user input
+        @li
+          BSP support for Ammonite scripts
+        @li
+          Fix position update for first line of script
+        @li
+          Inline hardcoded predef metadata to avoid compiling them every time
     @sect{2.0.5}
       @ul
         @li
