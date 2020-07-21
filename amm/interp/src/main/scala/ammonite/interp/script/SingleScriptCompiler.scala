@@ -147,11 +147,11 @@ class SingleScriptCompiler(
     def adjust(blockIdx: Int): (Int, Int) => Option[(Int, Int)] = {
       val startOffsetInSc = module.blocks(blockIdx - 1).startIdx
       val startPosInSc = offsetToPosSc(startOffsetInSc)
-      assert(startPosInSc.char == 0, s"wrong startPosInSc $startPosInSc")
 
       PositionOffsetConversion.scalaPosToScPos(
         module.code,
         startPosInSc.line,
+        startPosInSc.char,
         blocksOffsetAndCode(blockIdx - 1)._2,
         blocksOffsetAndCode(blockIdx - 1)._1
       )

@@ -589,6 +589,21 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
+    "single comment with no line feed" - {
+      val runner = new BspScriptRunner(wd / "comment" / "main.sc")
+
+      for {
+        _ <- runner.init()
+
+        _ <- runner.compile(StatusCode.OK)
+
+        diagnostics = runner.diagnostics()
+        _ = assert(diagnostics.isEmpty)
+
+      } yield ()
+    }
+
+
   }
 
   class BspScriptRunner(wd: os.Path, script: Seq[os.Path]) {
