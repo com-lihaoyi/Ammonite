@@ -116,6 +116,7 @@ object PositionOffsetConversion {
   def scalaPosToScPos(
     scCode: String,
     startLineInSc: Int,
+    startPosInSc: Int,
     scalaCode: String,
     startOffsetInScala: Int
   ): (Int, Int) => Option[(Int, Int)] = {
@@ -168,7 +169,10 @@ object PositionOffsetConversion {
         else
           0
 
-      val charSc = charScala - extraCharOffsetInLineScala - firstScLineCharOffsetInLineScala
+      val charSc = charScala +
+        -extraCharOffsetInLineScala +
+        -firstScLineCharOffsetInLineScala +
+        startPosInSc
 
       Some((lineSc, charSc))
         .filter(valid)
