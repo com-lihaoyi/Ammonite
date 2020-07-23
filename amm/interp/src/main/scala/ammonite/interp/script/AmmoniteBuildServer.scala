@@ -269,21 +269,23 @@ class AmmoniteBuildServer(
     diagnostics: Seq[Diagnostic]
   ): Unit = {
 
-    val bspDiagnostics = diagnostics.map {
-      case Diagnostic(severity, start, end, msg) =>
-        val start0 = new BPosition(start.line, start.char)
-        val end0 = new BPosition(end.line, end.char)
-        val diagnostic = new BDiagnostic(new Range(start0, end0), msg)
-        diagnostic.setSeverity(
-          severity match {
-            case "INFO" => DiagnosticSeverity.INFORMATION
-            case "WARNING" => DiagnosticSeverity.WARNING
-            case "ERROR" => DiagnosticSeverity.ERROR
-            case _ => sys.error(s"Unrecognized severity: $severity")
-          }
-        )
-        diagnostic
+    def bspDiagnostic(diagnostic: Diagnostic): BDiagnostic = {
+      val start0 = new BPosition(diagnostic.start.line, diagnostic.start.char)
+      val end0 = new BPosition(diagnostic.end.line, diagnostic.end.char)
+      val bspDiagnostic = new BDiagnostic(new Range(start0, end0), diagnostic.message)
+      bspDiagnostic.setSeverity(
+        diagnostic.severity match {
+          case "INFO" => DiagnosticSeverity.INFORMATION
+          case "WARNING" => DiagnosticSeverity.WARNING
+          case "ERROR" => DiagnosticSeverity.ERROR
+          case _ => sys.error(s"Unrecognized severity: ${diagnostic.severity}")
+        }
+      )
+      bspDiagnostic
     }
+
+    val processorDiagnostics = mod0.processorDiagnostics.map(bspDiagnostic)
+    val compileDiagnostics = diagnostics.map(bspDiagnostic)
 
     val diagnosticsParams = new PublishDiagnosticsParams(
       new TextDocumentIdentifier(
@@ -295,7 +297,7 @@ class AmmoniteBuildServer(
           .toASCIIString
       ),
       target,
-      bspDiagnostics.asJava,
+      (processorDiagnostics ++ compileDiagnostics).asJava,
       true // ???
     )
 
@@ -383,16 +385,20 @@ class AmmoniteBuildServer(
     result
   }
 
-  private def compileScript(script: Script, target: BuildTargetIdentifier): Boolean = {
+  private def compileScript(script: Script, target: BuildTargetIdentifier): Boolean =
+    if (script.processorDiagnostics.isEmpty) {
+      val (_, res) = compiler.compile(
+        script,
+        proc,
+        doCompile = compileScript(_, _)
+      )
 
-    val (_, res) = compiler.compile(
-      script,
-      proc,
-      doCompile = compileScript(_, _)
-    )
-
-    res.isRight
-  }
+      res.isRight
+    } else {
+      for (client <- clientOpt)
+        sendDiagnostics(client, script, target, Nil)
+      false
+    }
 
   def buildTargetCompile(params: CompileParams): CompletableFuture[CompileResult] =
     on(compileEc) {

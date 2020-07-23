@@ -60,7 +60,7 @@ object Parsers {
   // After each statement, there must either be `Semis`, a "}" marking the
   // end of the block, or the `End` of the input
   def StatementBlock[_: P](blockSep: => P0) =
-    P( Semis.? ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!.repX)
+    P( Semis.? ~ (Index ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!).repX)
 
   def Splitter0[_: P] = P( StatementBlock(Fail) )
   def Splitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
@@ -85,7 +85,8 @@ object Parsers {
 
     parse(code, Splitter(_), instrument = instrument) match{
       case Parsed.Failure(_, index, extra) if furthest == code.length => None
-      case x => Some(x)
+      case f @ Parsed.Failure(_, _, _) => Some(f)
+      case Parsed.Success(value, index) => Some(Parsed.Success(value.map(_._2), index))
     }
   }
 
@@ -110,10 +111,12 @@ object Parsers {
       case f: Parsed.Failure => stringWrap(s)
     }
   }
-  def parseImportHooks(source: CodeSource, stmts: Seq[String]) = synchronized{
+  def parseImportHooks(source: CodeSource, stmts: Seq[String]) =
+    parseImportHooksWithIndices(source, stmts.map((0, _)))
+  def parseImportHooksWithIndices(source: CodeSource, stmts: Seq[(Int, String)]) = synchronized{
     val hookedStmts = mutable.Buffer.empty[String]
     val importTrees = mutable.Buffer.empty[ImportTree]
-    for(stmt <- stmts) {
+    for((startIdx, stmt) <- stmts) {
       // Call `fastparse.ParserInput.fromString` explicitly, to avoid generating a
       // lambda in the class body and making the we-do-not-load-fastparse-on-cached-scripts
       // test fail
@@ -127,7 +130,11 @@ object Parsers {
               currentStmt = currentStmt.patch(
                 importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
               )
-              importTrees.append(importTree)
+              val importTree0 = importTree.copy(
+                start = startIdx + importTree.start,
+                end = startIdx + importTree.end
+              )
+              importTrees.append(importTree0)
             }
           }
           hookedStmts.append(currentStmt)
