@@ -422,6 +422,33 @@ object AmmoniteBuildServerTests extends TestSuite {
           _ = assert(diagnostics == expectedDiagnostics)
         } yield ()
       }
+
+      "import file and compilation" - {
+        val runner = new BspScriptRunner(wd / "error" / "error-and-invalid-import-file.sc")
+
+        val expectedDiagnostics = List(
+          new BDiagnostic(
+            new Range(new BPosition(0, 7), new BPosition(0, 27)),
+            "Cannot resolve $file import: ./error/nope/nope/nope.sc"
+          ),
+          new BDiagnostic(
+            new Range(new BPosition(2, 0), new BPosition(2, 2)),
+            "not found: value zz"
+          )
+        )
+        expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
+
+        for {
+          _ <- runner.init()
+          _ <- runner.compile(StatusCode.ERROR)
+
+          diagnostics = runner.diagnostics()
+          _ = diagnostics.foreach { diag =>
+            diag.setMessage(diag.getMessage.replace(wd.toString, "."))
+          }
+          _ = assert(diagnostics == expectedDiagnostics)
+        } yield ()
+      }
     }
 
     "multi" - {

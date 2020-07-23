@@ -42,7 +42,7 @@ final case class ScriptProcessor(
       Seq(Diagnostic("ERROR", startPos, endPos, s"Expected $expected"))
     }
 
-    def hookFor(tree: ImportTree): Either[Diagnostic, (ImportTree, (Seq[String], ImportHook))] = {
+    def hookFor(tree: ImportTree): Either[Diagnostic, (Seq[String], ImportHook)] = {
       val hookOpt = importHooks.find { case (k, v) => tree.strippedPrefix.startsWith(k) }
       hookOpt.toRight {
         Diagnostic(
@@ -51,7 +51,7 @@ final case class ScriptProcessor(
           offsetToPos(tree.end),
           s"Invalid import hook '${tree.strippedPrefix.mkString(".")}'"
         )
-      }.map((tree, _))
+      }
     }
 
     def hookResults(
@@ -75,33 +75,32 @@ final case class ScriptProcessor(
       }
     }
 
-    val res = for {
-      elems <- splittedScript
-      withImportHooks <- elems
-        .traverse {
-          case (startIdx, leadingSpaces, statements) =>
-            val (statements0, importTrees) =
-              Parsers.parseImportHooksWithIndices(codeSource, statements)
-            importTrees.traverse(hookFor).map((startIdx, leadingSpaces, statements0, _))
-        }
-        .left.map(_.flatten)
-      r <-  withImportHooks
-        .traverse {
-          case (startIdx, leadingSpaces, statements0, imports) =>
-            imports
-              .traverse {
-                case (tree, (hookPrefix, hook)) =>
-                  hookResults(hookPrefix, hook, tree)
-              }
-              .map(l => Script.Block(startIdx, leadingSpaces, statements0, l.flatten))
-        }
-        .left.map(_.flatten)
-    } yield r
+    val diagnostics = new mutable.ListBuffer[Diagnostic]
 
-    res match {
-      case Right(blocks) => Script(code, codeSource, blocks, Nil)
-      case Left(diagnostics) => Script(code, codeSource, Nil, diagnostics)
+    for (l <- splittedScript.left)
+      diagnostics ++= l
+
+    val blocks = for {
+      elems <- splittedScript.right.toSeq
+      (startIdx, leadingSpaces, statements) <- elems
+    } yield {
+      val (statements0, importTrees) = Parsers.parseImportHooksWithIndices(codeSource, statements)
+      val importResults =
+        for {
+          tree <- importTrees
+          (hookPrefix, hook) <- hookFor(tree) match {
+            case Left(diag) => diagnostics += diag; Nil
+            case Right(imports0) => Seq(imports0)
+          }
+          res <- hookResults(hookPrefix, hook, tree) match {
+            case Left(diag) => diagnostics += diag; Nil
+            case Right(res) => res
+          }
+        } yield res
+      Script.Block(startIdx, leadingSpaces, statements0, importResults)
     }
+
+    Script(code, codeSource, blocks, diagnostics.toVector)
   }
 
   def load(path: os.Path, codeSource: CodeSource): Script = {

@@ -385,20 +385,14 @@ class AmmoniteBuildServer(
     result
   }
 
-  private def compileScript(script: Script, target: BuildTargetIdentifier): Boolean =
-    if (script.processorDiagnostics.isEmpty) {
-      val (_, res) = compiler.compile(
-        script,
-        proc,
-        doCompile = compileScript(_, _)
-      )
-
-      res.isRight
-    } else {
-      for (client <- clientOpt)
-        sendDiagnostics(client, script, target, Nil)
-      false
-    }
+  private def compileScript(script: Script, target: BuildTargetIdentifier): Boolean = {
+    val (_, res) = compiler.compile(
+      script,
+      proc,
+      doCompile = compileScript(_, _)
+    )
+    script.processorDiagnostics.isEmpty && res.isRight
+  }
 
   def buildTargetCompile(params: CompileParams): CompletableFuture[CompileResult] =
     on(compileEc) {
