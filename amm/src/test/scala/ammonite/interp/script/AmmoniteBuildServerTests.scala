@@ -374,29 +374,81 @@ object AmmoniteBuildServerTests extends TestSuite {
     }
 
     "errored" - {
-      val runner = new BspScriptRunner(wd / "error" / "foo.sc")
+      "compilation" - {
+        val runner = new BspScriptRunner(wd / "error" / "foo.sc")
 
-      val expectedDiagnostics = List(
-        new BDiagnostic(
-          new Range(new BPosition(0, 0), new BPosition(0, 2)),
-          "not found: value aa"
-        ),
-        new BDiagnostic(
-          new Range(new BPosition(3, 0), new BPosition(3, 2)),
-          "not found: value zz"
+        val expectedDiagnostics = List(
+          new BDiagnostic(
+            new Range(new BPosition(0, 0), new BPosition(0, 2)),
+            "not found: value aa"
+          ),
+          new BDiagnostic(
+            new Range(new BPosition(3, 0), new BPosition(3, 2)),
+            "not found: value zz"
+          )
         )
-      )
-      expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
+        expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
 
-      for {
-        _ <- runner.init()
+        for {
+          _ <- runner.init()
 
-        _ <- runner.compile(StatusCode.ERROR)
+          _ <- runner.compile(StatusCode.ERROR)
 
-        diagnostics = runner.diagnostics()
-        _ = assert(diagnostics == expectedDiagnostics)
+          diagnostics = runner.diagnostics()
+          _ = assert(diagnostics == expectedDiagnostics)
 
-      } yield ()
+        } yield ()
+      }
+
+      "import file" - {
+        val runner = new BspScriptRunner(wd / "error" / "invalid-import-file.sc")
+
+        val expectedDiagnostics = List(
+          new BDiagnostic(
+            new Range(new BPosition(1, 7), new BPosition(1, 27)),
+            "Cannot resolve $file import: ./error/nope/nope/nope.sc"
+          )
+        )
+        expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
+
+        for {
+          _ <- runner.init()
+          _ <- runner.compile(StatusCode.ERROR)
+
+          diagnostics = runner.diagnostics()
+          _ = diagnostics.foreach { diag =>
+            diag.setMessage(diag.getMessage.replace(wd.toString, "."))
+          }
+          _ = assert(diagnostics == expectedDiagnostics)
+        } yield ()
+      }
+
+      "import file and compilation" - {
+        val runner = new BspScriptRunner(wd / "error" / "error-and-invalid-import-file.sc")
+
+        val expectedDiagnostics = List(
+          new BDiagnostic(
+            new Range(new BPosition(0, 7), new BPosition(0, 27)),
+            "Cannot resolve $file import: ./error/nope/nope/nope.sc"
+          ),
+          new BDiagnostic(
+            new Range(new BPosition(2, 0), new BPosition(2, 2)),
+            "not found: value zz"
+          )
+        )
+        expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
+
+        for {
+          _ <- runner.init()
+          _ <- runner.compile(StatusCode.ERROR)
+
+          diagnostics = runner.diagnostics()
+          _ = diagnostics.foreach { diag =>
+            diag.setMessage(diag.getMessage.replace(wd.toString, "."))
+          }
+          _ = assert(diagnostics == expectedDiagnostics)
+        } yield ()
+      }
     }
 
     "multi" - {

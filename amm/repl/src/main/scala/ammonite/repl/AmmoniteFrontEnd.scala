@@ -28,7 +28,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         addHistory(code)
         fastparse.parse(code, Parsers.Splitter(_)) match{
           case Parsed.Success(value, idx) =>
-            Res.Success((code, value))
+            Res.Success((code, value.map(_._2)))
           case f @ Parsed.Failure(_, index, extra) =>
             Res.Failure(
               Preprocessor.formatFastparseError("(console)", code, f)

@@ -8,7 +8,8 @@ import ammonite.util.Name
 final case class Script(
   code: String,
   codeSource: CodeSource,
-  blocks: Seq[Script.Block]
+  blocks: Seq[Script.Block],
+  processorDiagnostics: Seq[Diagnostic]
 ) {
 
   lazy val dependencyImports: Imports = {

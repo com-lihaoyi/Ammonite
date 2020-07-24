@@ -74,13 +74,14 @@ object Preprocessor{
       case f: Parsed.Failure =>
         Left(formatFastparseError(fileName, rawCode, f))
 
-      case s: Parsed.Success[Seq[(String, Seq[String])]] =>
+      case s: Parsed.Success[Seq[(String, Seq[(Int, String)])]] =>
 
         var offset = 0
         val blocks = mutable.ArrayBuffer[(String, Seq[String])]()
 
         // comment holds comments or empty lines above the code which is not caught along with code
-        for( (comment, code) <- s.value){
+        for( (comment, codeWithStartIdx) <- s.value){
+          val code = codeWithStartIdx.map(_._2)
 
           //ncomment has required number of newLines appended based on OS and offset
           //since fastparse has hardcoded `\n`s, while parsing strings with `\r\n`s it
@@ -107,10 +108,10 @@ object Preprocessor{
   def splitScriptWithStart(
     rawCode: String,
     fileName: String
-  ): Either[String, IndexedSeq[(Int, String, Seq[String])]] = {
+  ): Either[Parsed.Failure, IndexedSeq[(Int, String, Seq[(Int, String)])]] = {
     Parsers.splitScriptWithStart(rawCode) match {
       case f: Parsed.Failure =>
-        Left(formatFastparseError(fileName, rawCode, f))
+        Left(f)
 
       case Parsed.Success(value, _) =>
         val blocks = value.toVector.map {

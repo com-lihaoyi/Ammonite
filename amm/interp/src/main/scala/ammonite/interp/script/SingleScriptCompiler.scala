@@ -144,18 +144,21 @@ class SingleScriptCompiler(
     blocksOffsetAndCode: Vector[(Int, String)]
   ): Unit = {
 
-    def adjust(blockIdx: Int): (Int, Int) => Option[(Int, Int)] = {
-      val startOffsetInSc = module.blocks(blockIdx - 1).startIdx
-      val startPosInSc = offsetToPosSc(startOffsetInSc)
+    def adjust(blockIdx: Int): (Int, Int) => Option[(Int, Int)] =
+      if (module.blocks.isEmpty) // can happen if there were errors during preprocessing
+        (_, _) => None
+      else {
+        val startOffsetInSc = module.blocks(blockIdx - 1).startIdx
+        val startPosInSc = offsetToPosSc(startOffsetInSc)
 
-      PositionOffsetConversion.scalaPosToScPos(
-        module.code,
-        startPosInSc.line,
-        startPosInSc.char,
-        blocksOffsetAndCode(blockIdx - 1)._2,
-        blocksOffsetAndCode(blockIdx - 1)._1
-      )
-    }
+        PositionOffsetConversion.scalaPosToScPos(
+          module.code,
+          startPosInSc.line,
+          startPosInSc.char,
+          blocksOffsetAndCode(blockIdx - 1)._2,
+          blocksOffsetAndCode(blockIdx - 1)._1
+        )
+      }
 
     for {
       target <- moduleTarget

@@ -24,58 +24,91 @@ final case class ScriptProcessor(
   def load(
     code: String,
     codeSource: CodeSource
-  ): Either[String, Script] = {
+  ): Script = {
 
+    val rawCode = Interpreter.skipSheBangLine(code)
+    lazy val offsetToPos = PositionOffsetConversion.offsetToPos(rawCode)
     val splittedScript = Preprocessor.splitScriptWithStart(
-      Interpreter.skipSheBangLine(code),
+      rawCode,
       codeSource.fileName
-    )
+    ).left.map { f =>
+      val startPos = offsetToPos(f.index).copy(char = 0)
+      val endPos = {
+        val endIdx = rawCode.indexOf('\n', f.index)
+        val actualEndIdx = if (endIdx < 0) rawCode.length else endIdx
+        offsetToPos(actualEndIdx)
+      }
+      val expected = f.trace().failure.label
+      Seq(Diagnostic("ERROR", startPos, endPos, s"Expected $expected"))
+    }
 
-    def hookFor(tree: ImportTree) = {
+    def hookFor(tree: ImportTree): Either[Diagnostic, (Seq[String], ImportHook)] = {
       val hookOpt = importHooks.find { case (k, v) => tree.strippedPrefix.startsWith(k) }
-      hookOpt match {
-        case None => Left(s"Invalid import hook '${tree.strippedPrefix.mkString(".")}'")
-        case Some(hook) => Right((tree, hook))
+      hookOpt.toRight {
+        Diagnostic(
+          "ERROR",
+          offsetToPos(tree.start),
+          offsetToPos(tree.end),
+          s"Invalid import hook '${tree.strippedPrefix.mkString(".")}'"
+        )
       }
     }
 
-    def hookResults(hookPrefix: Seq[String], hook: ImportHook, tree: ImportTree) =
-      hook.handle(
+    def hookResults(
+      hookPrefix: Seq[String],
+      hook: ImportHook,
+      tree: ImportTree
+    ): Either[Diagnostic, Seq[ImportHook.Result]] = {
+      val r = hook.handle(
         codeSource,
         tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
         ScriptProcessor.dummyInterpreterInterface,
         codeWrapper.wrapperPath
       )
+      r.left.map { error =>
+        Diagnostic(
+          "ERROR",
+          offsetToPos(tree.start),
+          offsetToPos(tree.end),
+          error
+        )
+      }
+    }
 
-    for {
-      elems <- splittedScript
-      withImportHooks <- elems
-        .traverse {
-          case (startIdx, leadingSpaces, statements) =>
-            val (statements0, importTrees) = Parsers.parseImportHooks(codeSource, statements)
-            importTrees.traverse(hookFor).map((startIdx, leadingSpaces, statements0, _))
-        }
-        .left.map(_.mkString(", "))
-      r <-  withImportHooks
-        .traverse {
-          case (startIdx, leadingSpaces, statements0, imports) =>
-            imports
-              .traverse {
-                case (tree, (hookPrefix, hook)) =>
-                  hookResults(hookPrefix, hook, tree)
-              }
-              .map(l => Script.Block(startIdx, leadingSpaces, statements0, l.flatten))
-        }
-        .left.map(_.mkString(", "))
-    } yield Script(code, codeSource, r)
+    val diagnostics = new mutable.ListBuffer[Diagnostic]
+
+    for (l <- splittedScript.left)
+      diagnostics ++= l
+
+    val blocks = for {
+      elems <- splittedScript.right.toSeq
+      (startIdx, leadingSpaces, statements) <- elems
+    } yield {
+      val (statements0, importTrees) = Parsers.parseImportHooksWithIndices(codeSource, statements)
+      val importResults =
+        for {
+          tree <- importTrees
+          (hookPrefix, hook) <- hookFor(tree) match {
+            case Left(diag) => diagnostics += diag; Nil
+            case Right(imports0) => Seq(imports0)
+          }
+          res <- hookResults(hookPrefix, hook, tree) match {
+            case Left(diag) => diagnostics += diag; Nil
+            case Right(res) => res
+          }
+        } yield res
+      Script.Block(startIdx, leadingSpaces, statements0, importResults)
+    }
+
+    Script(code, codeSource, blocks, diagnostics.toVector)
   }
 
-  def load(path: os.Path, codeSource: CodeSource): Either[String, Script] = {
+  def load(path: os.Path, codeSource: CodeSource): Script = {
     val code = os.read(path)
     load(code, codeSource)
   }
 
-  def load(path: os.Path): Either[String, Script] = {
+  def load(path: os.Path): Script = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(Nil, path.relativeTo(wd))
     val codeSource = CodeSource(
       wrapper,
@@ -96,25 +129,20 @@ final case class ScriptProcessor(
         case h :: t if alreadySeen(h) =>
           helper(t, alreadySeen)
         case h :: t =>
-          val maybeDeps = h.dependencies.scriptDependencies
-            .traverse { imp =>
-              imp.code match {
-                case Left(code) => load(code, imp.codeSource)
-                case Right(path) => load(path, imp.codeSource)
-              }
+          val deps = h.dependencies.scriptDependencies.map { imp =>
+            imp.code match {
+              case Left(code) => load(code, imp.codeSource)
+              case Right(path) => load(path, imp.codeSource)
             }
+          }
 
-            maybeDeps match {
-              case Left(errors) => Left(errors.mkString(", "))
-              case Right(deps) =>
-                val filteredDeps = deps.filterNot(alreadySeen)
-                if (filteredDeps.isEmpty) {
-                  if (h != module)
-                    b += h
-                  helper(t, alreadySeen + h)
-                } else
-                  helper(filteredDeps.toList ::: toAdd, alreadySeen)
-            }
+          val filteredDeps = deps.filterNot(alreadySeen)
+          if (filteredDeps.isEmpty) {
+            if (h != module)
+              b += h
+            helper(t, alreadySeen + h)
+          } else
+            helper(filteredDeps.toList ::: toAdd, alreadySeen)
       }
 
     helper(module :: Nil, Set.empty)

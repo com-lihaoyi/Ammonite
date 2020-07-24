@@ -43,13 +43,8 @@ final class ScriptCache(
       .filter(os.isFile(_))
       .flatMap { p =>
         // FIXME Blocking
-        proc.load(p) match {
-          case Left(err) =>
-            // TODO Log error
-            Nil
-          case Right(script) =>
-            Seq(script)
-        }
+        val script = proc.load(p)
+        Seq(script)
       }
 
     val dependencies = scripts0
