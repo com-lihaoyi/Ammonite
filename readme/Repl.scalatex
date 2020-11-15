@@ -99,6 +99,7 @@
     libraryDependencies += {
       val version = scalaBinaryVersion.value match {
         case "2.10" => "1.0.3"
+        case "2.11" => "1.6.7"
         case _ ⇒ "@ammonite.Constants.version"
       }
       "com.lihaoyi" % "ammonite" % version % "test" cross CrossVersion.full
