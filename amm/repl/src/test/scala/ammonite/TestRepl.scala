@@ -67,7 +67,6 @@ class TestRepl {
       printer0,
       storage = storage,
       wd = os.pwd,
-      colors = Ref(Colors.BlackWhite),
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
       initialClassLoader = initialClassLoader,

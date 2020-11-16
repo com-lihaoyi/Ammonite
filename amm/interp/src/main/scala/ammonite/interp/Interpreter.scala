@@ -24,7 +24,6 @@ import coursierapi.{Dependency, Fetch, Repository}
 class Interpreter(val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
-                  colors: Ref[Colors],
                   verboseOutput: Boolean = true,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
@@ -651,8 +650,6 @@ class Interpreter(val printer: Printer,
 
 
   private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
-
-    val colors = interp.colors
 
     def watch(p: os.Path) = interp.watch(p)
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}

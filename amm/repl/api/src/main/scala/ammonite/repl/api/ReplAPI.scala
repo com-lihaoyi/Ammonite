@@ -23,6 +23,12 @@ trait ReplAPI {
   val frontEnd: Ref[FrontEnd]
 
   /**
+    * The colors that will be used to render the Ammonite REPL in the terminal,
+    * or for rendering miscellaneous info messages when running scripts.
+    */
+  val colors: Ref[Colors]
+
+  /**
    * Display help text if you don't know how to use the REPL
    */
   def help: String

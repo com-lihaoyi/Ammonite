@@ -28,7 +28,6 @@ object TestUtils {
       ),
       storage = storage,
       wd = os.pwd,
-      colors = Ref(Colors.BlackWhite),
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
       initialClassLoader = initialClassLoader,

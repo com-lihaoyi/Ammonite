@@ -1,7 +1,7 @@
 package ammonite.interp.api
 
 
-import ammonite.util.{Colors, Ref}
+import ammonite.util.Ref
 import coursierapi.{Dependency, Fetch, Repository}
 
 import scala.collection.mutable
@@ -22,12 +22,6 @@ trait InterpAPI {
    * just the contents of file paths.
    */
   def watchValue[T](v: => T): T
-
-  /**
-    * The colors that will be used to render the Ammonite REPL in the terminal,
-    * or for rendering miscellaneous info messages when running scripts.
-    */
-  val colors: Ref[Colors]
 
   /**
    * Tools related to loading external scripts and code into the REPL

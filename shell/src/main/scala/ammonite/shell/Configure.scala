@@ -11,10 +11,10 @@ object Configure {
   def apply(interp: InterpAPI, repl: ReplAPI, wd: => ammonite.ops.Path) = {
     if (scala.util.Properties.isWin) {
       repl.frontEnd() = ammonite.repl.FrontEnds.JLineWindows
-      interp.colors() = ammonite.util.Colors.BlackWhite
+      repl.colors() = ammonite.util.Colors.BlackWhite
     } else {
       repl.frontEnd() = ammonite.repl.AmmoniteFrontEnd(
-        ammonite.shell.PathComplete.pathCompleteFilter(wd, interp.colors())
+        ammonite.shell.PathComplete.pathCompleteFilter(wd, repl.colors())
       )
     }
 

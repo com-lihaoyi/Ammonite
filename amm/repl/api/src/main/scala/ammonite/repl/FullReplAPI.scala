@@ -16,8 +16,6 @@ trait FullReplAPI extends ReplAPI{ replApi =>
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
 
-  protected val colors: Ref[Colors]
-
   def help =
     """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
       |All your standard Bash hotkeys should work for navigating around or editing the line
