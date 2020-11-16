@@ -50,7 +50,7 @@ object Evaluator{
     */
   val userCodeExceptionHandler: PartialFunction[Throwable, Res.Failing] = {
     // Exit
-    case Ex(_: InvEx, _: InitEx, AmmoniteExit(value))  => Res.Exit(value)
+    case Ex(_: InvEx, _: InitEx, ammExit: AmmoniteExit)  => Res.Exit(ammExit.value)
 
     // Interrupted during pretty-printing
     case Ex(e: ThreadDeath)                 =>  interrupted(e)

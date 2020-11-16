@@ -44,11 +44,11 @@ trait InterpAPI {
   /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit
     */
-  def exit = throw AmmoniteExit(())
+  def exit = throw new AmmoniteExit(())
   /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit
     */
-  def exit(value: Any) = throw AmmoniteExit(value)
+  def exit(value: Any) = throw new AmmoniteExit(value)
   /**
     * Functions that will be chained and called on the
     * exitValue before the repl exits
