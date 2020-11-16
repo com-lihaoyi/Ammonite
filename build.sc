@@ -90,7 +90,7 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
     resolveDeps(allIvyDeps, sources = true)()
   }
 }
-trait AmmModule extends AmmInternalModule with PublishModule{
+trait AmmPublishModule extends PublishModule{
   def publishVersion = buildVersion
   def pomSettings = PomSettings(
     description = artifactName(),
@@ -102,7 +102,8 @@ trait AmmModule extends AmmInternalModule with PublishModule{
       Developer("lihaoyi", "Li Haoyi","https://github.com/lihaoyi")
     )
   )
-
+}
+trait AmmModule extends AmmInternalModule with AmmPublishModule{
   def transitiveJars: T[Agg[PathRef]] = T{
     mill.define.Task.traverse(this +: moduleDeps)(m =>
       T.task{m.jar()}
@@ -178,7 +179,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
   object runtime extends Cross[RuntimeModule](fullCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
+    def moduleDeps = Seq(amm.util(), interp.api.full(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:1.2.0",
@@ -188,15 +189,19 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
-    object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
-    class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-      def crossFullScalaVersion = true
-      def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
-      def ivyDeps = Agg(
-        ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
-        ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-        ivy"io.get-coursier:interface:0.0.21"
-      )
+    object api extends JavaModule with AmmPublishModule {
+      def artifactName = "ammonite-interp-api"
+      object full extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
+      class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
+        def moduleDeps = Seq(api, amm.util())
+        def crossFullScalaVersion = true
+        def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
+        def ivyDeps = Agg(
+          ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+          ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
+          ivy"io.get-coursier:interface:0.0.21"
+        )
+      }
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
@@ -228,7 +233,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(
         amm.util(),
-        interp.api()
+        interp.api.full()
       )
       def ivyDeps = Agg(
         ivy"com.lihaoyi::mainargs:0.1.4"
@@ -304,7 +309,7 @@ class MainModule(val crossScalaVersion: String)
   def moduleDeps = Seq(
     terminal(), ops(),
     amm.util(), amm.runtime(),
-    amm.interp.api(),
+    amm.interp.api.full(),
     amm.repl.api(),
     amm.interp(), amm.repl()
   )
@@ -315,7 +320,7 @@ class MainModule(val crossScalaVersion: String)
     terminal().sources() ++
     amm.util().sources() ++
     amm.runtime().sources() ++
-    amm.interp.api().sources() ++
+    amm.interp.api.full().sources() ++
     amm.repl.api().sources() ++
     amm.interp().sources() ++
     amm.repl().sources() ++
@@ -402,7 +407,7 @@ class MainModule(val crossScalaVersion: String)
       terminal().sources() ++
       amm.util().sources() ++
       amm.runtime().sources() ++
-      amm.interp.api().sources() ++
+      amm.interp.api.full().sources() ++
       amm.repl.api().sources() ++
       amm.interp().sources() ++
       amm.repl().sources() ++
