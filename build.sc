@@ -103,12 +103,6 @@ trait AmmModule extends AmmInternalModule with PublishModule{
     )
   )
 
-  def transitiveSources: T[Seq[PathRef]] = T{
-    mill.define.Task.traverse(this +: moduleDeps)(m =>
-      T.task{m.sources()}
-    )().flatten
-  }
-
   def transitiveJars: T[Agg[PathRef]] = T{
     mill.define.Task.traverse(this +: moduleDeps)(m =>
       T.task{m.jar()}
