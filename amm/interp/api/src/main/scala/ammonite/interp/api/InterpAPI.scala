@@ -1,5 +1,6 @@
 package ammonite.interp.api
 
+import java.nio.file.Path
 
 import ammonite.util.Ref
 import coursierapi.{Dependency, Fetch, Repository}
@@ -15,7 +16,7 @@ trait InterpAPI {
     * file changes. By default, this happens for all script files, but you can
     * call this to watch arbitrary files your script may depend on
     */
-  def watch(p: os.Path): Unit
+  def watch(p: Path): Unit
 
   /**
    * A generalization of [[watch]], allows watching arbitrary values and not
@@ -74,7 +75,7 @@ trait LoadJar {
   /**
    * Load a `.jar` file or directory into your JVM classpath
    */
-  def cp(jar: os.Path): Unit
+  def cp(jar: Path): Unit
   /**
     * Load a `.jar` from a URL into your JVM classpath
     */
@@ -82,7 +83,7 @@ trait LoadJar {
   /**
    * Load one or more `.jar` files or directories into your JVM classpath
    */
-  def cp(jars: Seq[os.Path]): Unit
+  def cp(jars: Seq[Path]): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */
@@ -91,7 +92,7 @@ trait LoadJar {
 
 trait InterpLoad extends LoadJar{
 
-  def module(path: os.Path): Unit
+  def module(path: Path): Unit
 
   def plugin: LoadJar
 

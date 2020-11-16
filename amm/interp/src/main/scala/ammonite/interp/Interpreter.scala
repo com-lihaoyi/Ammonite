@@ -1,6 +1,7 @@
 package ammonite.interp
 
 import java.io.{File, OutputStream, PrintStream}
+import java.nio.file.Path
 import java.util.regex.Pattern
 
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
@@ -626,11 +627,11 @@ class Interpreter(val printer: Printer,
   abstract class DefaultLoadJar extends LoadJar {
     def handleClasspath(jar: java.net.URL): Unit
 
-    def cp(jar: os.Path): Unit = {
-      handleClasspath(jar.toNIO.toUri.toURL)
+    def cp(jar: Path): Unit = {
+      handleClasspath(jar.toUri.toURL)
     }
-    def cp(jars: Seq[os.Path]): Unit = {
-      jars.map(_.toNIO.toUri.toURL).foreach(handleClasspath)
+    def cp(jars: Seq[Path]): Unit = {
+      jars.map(_.toUri.toURL).foreach(handleClasspath)
     }
     def cp(jar: java.net.URL): Unit = {
       handleClasspath(jar)
@@ -651,7 +652,7 @@ class Interpreter(val printer: Printer,
 
   private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
-    def watch(p: os.Path) = interp.watch(p)
+    def watch(p: Path) = interp.watch(os.Path(p))
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}
 
     def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
@@ -672,14 +673,14 @@ class Interpreter(val printer: Printer,
       def handleClasspath(jar: java.net.URL) = headFrame.addClasspath(Seq(jar))
 
 
-      def module(file: os.Path) = {
+      def module(file: Path) = {
         watch(file)
         val (pkg, wrapper) = ammonite.util.Util.pathToPackageWrapper(
           Seq(Name("dummy")),
-          file relativeTo wd
+          os.Path(file) relativeTo wd
         )
         processModule(
-          normalizeNewlines(os.read(file)),
+          normalizeNewlines(os.read(os.Path(file))),
           CodeSource(
             wrapper,
             pkg,

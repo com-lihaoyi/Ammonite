@@ -46,7 +46,7 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
-        @ interp.load.module($bareSrc)
+        @ interp.load.module(($bareSrc).toNIO)
 
         @ import ammonite.ops.ImplicitWd
 
@@ -62,7 +62,7 @@ object SessionTests extends TestSuite{
         s"""
         @ import ammonite.ops._
 
-        @ interp.load.module($bareSrc)
+        @ interp.load.module(($bareSrc).toNIO)
 
         @ val originalWd = wd
 
@@ -91,7 +91,7 @@ object SessionTests extends TestSuite{
         s"""
         @ import ammonite.ops._
 
-        @ interp.load.module($bareSrc)
+        @ interp.load.module(($bareSrc).toNIO)
 
         @ val originalWd = wd
 
@@ -139,7 +139,7 @@ object SessionTests extends TestSuite{
         s"""
         @ import ammonite.ops._
 
-        @ interp.load.module($bareSrc)
+        @ interp.load.module(($bareSrc).toNIO)
 
         @ val originalWd = wd
 

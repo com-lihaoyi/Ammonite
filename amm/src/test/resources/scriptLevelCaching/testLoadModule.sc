@@ -2,7 +2,7 @@
 
 println("Script starts!!")
 val scriptDir = os.pwd/'amm/'src/'test/'resources/'scriptLevelCaching
-interp.load.module(scriptDir/"scriptToBeLoaded.sc")
+interp.load.module((scriptDir/"scriptToBeLoaded.sc").toNIO)
 
 @
 

@@ -3,7 +3,7 @@ import ammonite.ops._
 import ammonite.interp.api.IvyConstructor.scalaBinaryVersion
 val scalaVersion = scala.util.Properties.versionNumberString
 val ammVersion = ammonite.Constants.version
-interp.load.cp(Path(sys.env("AMMONITE_SHELL"), pwd))
+interp.load.cp(Path(sys.env("AMMONITE_SHELL"), pwd).toNIO)
 @
 val shellSession = ammonite.shell.ShellSession()
 import shellSession._

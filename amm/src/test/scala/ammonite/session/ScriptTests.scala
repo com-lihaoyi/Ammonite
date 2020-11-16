@@ -167,7 +167,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"LoadIvy.sc")
+            @ interp.load.module(($printedScriptPath/"LoadIvy.sc").toNIO)
 
             @ val r = res
             r: String = "<a href=\\"www.google.com\\">omg</a>"
@@ -177,7 +177,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"PreserveImports.sc")
+            @ interp.load.module(($printedScriptPath/"PreserveImports.sc").toNIO)
 
             @ val r = res
             r: Left[String, Nothing] = Left("asd")
@@ -189,7 +189,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
           @ import os._
 
-          @ interp.load.module($printedScriptPath/"Annotation.sc")
+          @ interp.load.module(($printedScriptPath/"Annotation.sc").toNIO)
 
           @ val r = res
           r: Int = 24
@@ -199,7 +199,7 @@ object ScriptTests extends TestSuite{
             check.session(s"""
               @ import os._
 
-              @ interp.load.module($printedScriptPath/"BlockSepSyntax.sc")
+              @ interp.load.module(($printedScriptPath/"BlockSepSyntax.sc").toNIO)
 
               @ val r = res
               r: Int = 24
@@ -209,7 +209,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"LimitImports.sc")
+            @ interp.load.module(($printedScriptPath/"LimitImports.sc").toNIO)
 
             @ res
             error: not found: value res
@@ -235,7 +235,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"CompilationError.sc")
+            @ interp.load.module(($printedScriptPath/"CompilationError.sc").toNIO)
             error: Compilation Failed
 
             @ val r = res
@@ -269,7 +269,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"MultiBlockError.sc")
+            @ interp.load.module(($printedScriptPath/"MultiBlockError.sc").toNIO)
             error: Compilation Failed
 
             @ val r2 = res2
@@ -286,7 +286,7 @@ object ScriptTests extends TestSuite{
 
             @ val asd = "asd"
 
-            @ interp.load.module($printedScriptPath/"Encapsulation.sc")
+            @ interp.load.module(($printedScriptPath/"Encapsulation.sc").toNIO)
             error: not found: value asd
             """
         )
@@ -295,7 +295,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import os._
 
-          @ interp.load.module($printedScriptPath/"NestedScripts.sc")
+          @ interp.load.module(($printedScriptPath/"NestedScripts.sc").toNIO)
 
           @ val a = asd
           error: not found: value asd
@@ -308,7 +308,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import os._
 
-          @ interp.load.module($printedScriptPath/"ScriptDontUnwrap.sc")
+          @ interp.load.module(($printedScriptPath/"ScriptDontUnwrap.sc").toNIO)
 
           @ foo
           res2: String = "foo def"
@@ -322,7 +322,7 @@ object ScriptTests extends TestSuite{
           if (scala2_11) check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"Resolvers.sc")
+            @ interp.load.module(($printedScriptPath/"Resolvers.sc").toNIO)
 
 
           """)
@@ -331,7 +331,7 @@ object ScriptTests extends TestSuite{
           if (scala2_11) check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"ResolversFail.sc")
+            @ interp.load.module(($printedScriptPath/"ResolversFail.sc").toNIO)
             error: Failed to resolve ivy dependencies
           """)
         }
@@ -340,14 +340,14 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ interp.load.module($printedScriptPath/"ResolversStatic.sc")
+            @ interp.load.module(($printedScriptPath/"ResolversStatic.sc").toNIO)
           """)
       }
       test("loadIvyAdvanced"){
         check.session(s"""
         @ import os._
 
-        @ interp.load.module($printedScriptPath/"loadIvyAdvanced.sc")
+        @ interp.load.module(($printedScriptPath/"loadIvyAdvanced.sc").toNIO)
 
         @ serializer
         """)

@@ -189,7 +189,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
     class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-      def moduleDeps = Seq(ops(), amm.util())
+      def moduleDeps = Seq(amm.util())
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
