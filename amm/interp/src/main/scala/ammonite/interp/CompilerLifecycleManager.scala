@@ -86,7 +86,7 @@ class CompilerLifecycleManager(
 
       val initialClassPath = Classpath.classpath(initialClassLoader, rtCacheDir)
       val headFrameClassPath =
-        Classpath.classpath(headFrame.classloader, rtCacheDir)
+        Classpath.classpath(headFrame.classloader, rtCacheDir, stopAt = initialClassLoader)
 
       Internal.compiler = Compiler(
         headFrameClassPath,

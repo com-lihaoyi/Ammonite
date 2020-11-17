@@ -28,7 +28,8 @@ object Classpath {
    */
   def classpath(
     classLoader: ClassLoader,
-    rtCacheDir: Option[Path]
+    rtCacheDir: Option[Path],
+    stopAt: ClassLoader = null
   ): Vector[URL] = {
     lazy val actualRTCacheDir = rtCacheDir.filter { dir =>
       // no need to cache if the storage is in tmpdir
@@ -39,7 +40,7 @@ object Classpath {
     var current = classLoader
     val files = collection.mutable.Buffer.empty[java.net.URL]
     val seenClassLoaders = collection.mutable.Buffer.empty[ClassLoader]
-    while(current != null){
+    while(current != null && current != stopAt){
       seenClassLoaders.append(current)
       current match{
         case t: java.net.URLClassLoader =>
@@ -50,32 +51,34 @@ object Classpath {
     }
 
 
-    val sunBoot = System.getProperty("sun.boot.class.path")
-    if (sunBoot != null) {
-      files.appendAll(
-        sunBoot
-          .split(java.io.File.pathSeparator)
-          .map(new java.io.File(_))
-          .filter(_.exists())
-          .map(_.toURI.toURL)
-      )
-    } else {
-      if (seenClassLoaders.contains(ClassLoader.getSystemClassLoader)) {
-        for (p <- System.getProperty("java.class.path")
-          .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
-          val f = new File(p)
-          if (f.exists())
-            files.append(f.toURI.toURL)
-        }
-        try {
-          new java.net.URLClassLoader(files.map(_.toURI.toURL).toArray, null)
-            .loadClass("javax.script.ScriptEngineManager")
-        } catch {
-          case _: ClassNotFoundException =>
-            actualRTCacheDir match {
-              case Some(path) => files.append(Export.rtAt(path.toFile).toURI.toURL)
-              case _ => files.append(Export.rt().toURI.toURL)
-            }
+    if (current == null) {
+      val sunBoot = System.getProperty("sun.boot.class.path")
+      if (sunBoot != null) {
+        files.appendAll(
+          sunBoot
+            .split(java.io.File.pathSeparator)
+            .map(new java.io.File(_))
+            .filter(_.exists())
+            .map(_.toURI.toURL)
+        )
+      } else {
+        if (seenClassLoaders.contains(ClassLoader.getSystemClassLoader)) {
+          for (p <- System.getProperty("java.class.path")
+            .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
+            val f = new File(p)
+            if (f.exists())
+              files.append(f.toURI.toURL)
+          }
+          try {
+            new java.net.URLClassLoader(files.map(_.toURI.toURL).toArray, null)
+              .loadClass("javax.script.ScriptEngineManager")
+          } catch {
+            case _: ClassNotFoundException =>
+              actualRTCacheDir match {
+                case Some(path) => files.append(Export.rtAt(path.toFile).toURI.toURL)
+                case _ => files.append(Export.rt().toURI.toURL)
+              }
+          }
         }
       }
     }

@@ -195,8 +195,7 @@ object Compiler{
       }
 
       val jcp = initGlobalClasspath(
-        dirDeps,
-        jarDeps,
+        classpath,
         dynamicClasspath,
         settings,
         classPathWhitelist,
@@ -367,19 +366,26 @@ object Compiler{
     * for the Scala compiler to function, common between the
     * normal and presentation compiler
     */
-  def initGlobalClasspath(dirDeps: Seq[java.net.URL],
-                          jarDeps: Seq[java.net.URL],
+  def initGlobalClasspath(classPath: Seq[java.net.URL],
                           dynamicClasspath: VirtualDirectory,
                           settings: Settings,
                           classPathWhitelist: Set[Seq[String]],
                           initialClassPath: Seq[java.net.URL]) = {
 
-    val (initialDirDeps, newDirDeps) = dirDeps.partition(initialClassPath.contains)
-    val (initialJarDeps, newJarDeps) = jarDeps.partition(initialClassPath.contains)
-    val newJarCp = prepareJarCp(newJarDeps, settings)
+    val (dirDeps, jarDeps) = classPath.partition { u =>
+      u.getProtocol == "file" &&
+      java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+    }
+
+    val (initialDirDeps, initialJarDeps) = initialClassPath.partition { u =>
+      u.getProtocol == "file" &&
+      java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+    }
+
+    val newJarCp = prepareJarCp(jarDeps, settings)
     val initialJarCp = prepareJarCp(initialJarDeps, settings)
 
-    val newDirCp = prepareDirCp(newDirDeps)
+    val newDirCp = prepareDirCp(dirDeps)
     val initialDirCp = prepareDirCp(initialDirDeps)
     val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath){
 

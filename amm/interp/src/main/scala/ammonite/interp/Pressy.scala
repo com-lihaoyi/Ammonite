@@ -298,8 +298,7 @@ object Pressy {
           java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
       }
       val jcp = Compiler.initGlobalClasspath(
-        dirDeps,
-        jarDeps,
+        classpath,
         dynamicClasspath,
         settings,
         classPathWhitelist,

@@ -88,7 +88,7 @@ case class Main(predefCode: String = "",
     case None => Right(None)
   }
 
-  def initialClassLoader: ClassLoader = {
+  lazy val initialClassLoader: ClassLoader = {
     val contextClassLoader = Thread.currentThread().getContextClassLoader
     new Main.WhiteListClassLoader(classPathWhitelist, contextClassLoader)
   }
