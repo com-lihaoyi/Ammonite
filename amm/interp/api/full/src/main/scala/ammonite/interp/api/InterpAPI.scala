@@ -72,17 +72,13 @@ trait InterpAPI {
 trait LoadJar {
 
   /**
-   * Load a `.jar` file or directory into your JVM classpath
-   */
-  def cp(jar: Path): Unit
-  /**
     * Load a `.jar` from a URL into your JVM classpath
     */
   def cp(jar: java.net.URL): Unit
   /**
    * Load one or more `.jar` files or directories into your JVM classpath
    */
-  def cp(jars: Seq[Path]): Unit
+  def cp(jars: Path*): Unit
   /**
    * Load a library from its maven/ivy coordinates
    */

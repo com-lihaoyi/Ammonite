@@ -626,10 +626,7 @@ class Interpreter(val printer: Printer,
   abstract class DefaultLoadJar extends LoadJar {
     def handleClasspath(jar: java.net.URL): Unit
 
-    def cp(jar: Path): Unit = {
-      handleClasspath(jar.toUri.toURL)
-    }
-    def cp(jars: Seq[Path]): Unit = {
+    def cp(jars: Path*): Unit = {
       jars.map(_.toUri.toURL).foreach(handleClasspath)
     }
     def cp(jar: java.net.URL): Unit = {
