@@ -1,6 +1,5 @@
 package ammonite.unit
 
-import ammonite.repl.Highlighter
 import ammonite.util.Util
 import utest._
 

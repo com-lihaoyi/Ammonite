@@ -4,17 +4,13 @@ import java.util.concurrent.ConcurrentHashMap
 
 import ammonite.interp.{
   CodeWrapper,
-  Compiler => AmmCompiler,
-  DefaultPreprocessor,
-  Interpreter,
-  MakeReporter
+  Compiler => AmmCompiler
 }
-import ammonite.runtime.{Classpath, Storage}
-import ammonite.util.{Imports, Name, Printer}
+import ammonite.runtime.Storage
+import ammonite.util.{Imports, Printer}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
 
 final class ScriptCompiler(

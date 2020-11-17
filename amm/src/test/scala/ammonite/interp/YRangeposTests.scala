@@ -6,8 +6,6 @@ import ammonite.runtime.Storage
 import ammonite.main._
 import utest._
 
-import scala.tools.nsc.Global
-
 object YRangeposTests extends TestSuite {
   val tests = Tests {
     println("YRangeposTests")

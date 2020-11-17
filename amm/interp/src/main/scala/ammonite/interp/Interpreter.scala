@@ -8,7 +8,6 @@ import ammonite.interp.CodeWrapper
 
 import scala.collection.mutable
 import ammonite.runtime._
-import fastparse._
 
 import annotation.tailrec
 import ammonite.runtime.tools.IvyThing

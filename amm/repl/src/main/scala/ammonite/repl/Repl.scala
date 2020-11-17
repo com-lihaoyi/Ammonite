@@ -2,7 +2,7 @@ package ammonite.repl
 
 import java.io.{InputStream, InputStreamReader, OutputStream}
 
-import ammonite.repl.api.{FrontEnd, FrontEndAPI, History, ReplLoad, SourceAPI}
+import ammonite.repl.api.{FrontEnd, History, ReplLoad}
 import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}

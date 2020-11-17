@@ -2,7 +2,7 @@ package ammonite.session
 
 import ammonite.TestUtils._
 import ammonite.DualTestRepl
-import ammonite.util.{Res, Util}
+import ammonite.util.Res
 import utest._
 
 
