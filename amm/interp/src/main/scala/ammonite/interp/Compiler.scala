@@ -2,10 +2,9 @@ package ammonite.interp
 
 
 import java.io.OutputStream
-import java.nio.charset.StandardCharsets
 
-import ammonite.runtime.{Classpath, Evaluator}
-import ammonite.util.{ImportData, Imports, Name, Printer}
+import ammonite.runtime.Classpath
+import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable

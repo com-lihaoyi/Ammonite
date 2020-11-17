@@ -1,7 +1,7 @@
 package ammonite.interp
 
 
-import ammonite.interp.api.{APIHolder, InterpAPI}
+import ammonite.interp.api.InterpAPI
 import ammonite.runtime.{SpecialClassLoader, Storage}
 import ammonite.util.ScriptOutput.Metadata
 import ammonite.util.{ImportData, Imports, Name, PredefInfo, Res}
