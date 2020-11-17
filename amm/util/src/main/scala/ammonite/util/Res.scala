@@ -100,7 +100,7 @@ object Res{
   /**
     * The user wanted to exit the REPL
     */
-  case class Exit(value: Any) extends Failing
+  case class Exit(value: Object) extends Failing
 }
 
 

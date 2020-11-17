@@ -23,7 +23,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
              history: IndexedSeq[String],
              addHistory: String => Unit) = {
     readLine(reader, output, prompt, colors, compilerComplete, history) match{
-      case None => Res.Exit(())
+      case None => Res.Exit(().asInstanceOf[Object])
       case Some(code) =>
         addHistory(code)
         fastparse.parse(code, Parsers.Splitter(_)) match{

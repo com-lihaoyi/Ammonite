@@ -58,7 +58,7 @@ object FrontEnds {
           case Some(code) =>
             val pl = reader.getParser.parse(code, 0).asInstanceOf[AmmParser#AmmoniteParsedLine]
             Res.Success(code -> pl.stmts)
-          case None => Res.Exit(())
+          case None => Res.Exit(().asInstanceOf[Object])
         }
       }
 

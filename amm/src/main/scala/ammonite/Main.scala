@@ -201,7 +201,7 @@ case class Main(predefCode: String = "",
     * a sequence of paths that were watched as a result of this REPL run, in
     * case you wish to re-start the REPL when any of them change.
     */
-  def run(replArgs: Bind[_]*): (Res[Any], Seq[(Watchable, Long)]) = {
+  def run(replArgs: Bind[_]*): (Res[Object], Seq[(Watchable, Long)]) = {
 
 
     instantiateRepl(replArgs.toIndexedSeq) match{

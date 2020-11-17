@@ -46,7 +46,7 @@ object AdvancedTests extends TestSuite{
     }
 
     test("exit"){
-      check.result("exit", Res.Exit())
+      check.result("exit", Res.Exit(().asInstanceOf[Object]))
     }
     test("skip"){
       check.result("", Res.Skip)

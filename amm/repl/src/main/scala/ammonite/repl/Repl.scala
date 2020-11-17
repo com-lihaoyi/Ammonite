@@ -204,9 +204,9 @@ class Repl(input: InputStream,
 
 
 
-  def run(): Any = {
+  def run(): Object = {
     welcomeBanner.foreach(printer.outStream.println)
-    @tailrec def loop(): Any = {
+    @tailrec def loop(): Object = {
       val actionResult = action()
       Repl.handleOutput(interp, actionResult)
       Repl.handleRes(
@@ -225,7 +225,7 @@ class Repl(input: InputStream,
     loop()
   }
 
-  def beforeExit(exitValue: Any): Any = {
+  def beforeExit(exitValue: Object): Object = {
     Function.chain(interp.beforeExitHooks)(exitValue)
   }
 }
@@ -246,7 +246,7 @@ object Repl{
                 printInfo: String => Unit,
                 printError: String => Unit,
                 setLastException: Throwable => Unit,
-                colors: Colors): Option[Any] = {
+                colors: Colors): Option[Object] = {
     res match{
       case Res.Exit(value) =>
         printInfo("Bye!")

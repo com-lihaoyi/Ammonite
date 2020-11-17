@@ -191,6 +191,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends JavaModule with AmmPublishModule {
       def artifactName = "ammonite-interp-api"
+      def ivyDeps = Agg(
+        ivy"io.get-coursier:interface:0.0.21"
+      )
       object full extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
       class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
         def moduleDeps = Seq(api, amm.util())
@@ -198,8 +201,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
         def ivyDeps = Agg(
           ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
-          ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-          ivy"io.get-coursier:interface:0.0.21"
+          ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
         )
       }
     }

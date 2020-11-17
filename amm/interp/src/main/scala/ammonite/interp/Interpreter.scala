@@ -2,12 +2,14 @@ package ammonite.interp
 
 import java.io.{File, OutputStream, PrintStream}
 import java.nio.file.Path
+import java.util.function.{Function, Supplier}
 import java.util.regex.Pattern
 
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 import ammonite.interp.CodeWrapper
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 import ammonite.runtime._
 
 import annotation.tailrec
@@ -39,7 +41,7 @@ class Interpreter(val printer: Printer,
 
   def headFrame = getFrame()
   val repositories = mutable.Buffer(ammonite.runtime.tools.IvyThing.defaultRepositories: _*)
-  val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
+  val resolutionHooks = mutable.Buffer.empty[Function[Fetch, Fetch]]
 
   val mainThread = Thread.currentThread()
 
@@ -76,7 +78,9 @@ class Interpreter(val printer: Printer,
   // same result every time it gets run in the same process
   val alreadyLoadedFiles = mutable.Map.empty[CodeSource, ScriptOutput.Metadata]
 
-  val beforeExitHooks = mutable.Buffer.empty[Any => Any]
+  private val beforeExitHooksList = mutable.Buffer.empty[Function[Object, Object]]
+  def beforeExitHooks: Seq[Object => Object] =
+    beforeExitHooksList.toSeq.map(f => f.apply _)
 
   def compilationCount = compilerManager.compilationCount
 
@@ -615,7 +619,7 @@ class Interpreter(val printer: Printer,
     dependencyLoader.load(
       coordinates,
       repositories.toSeq,
-      resolutionHooks.toSeq
+      resolutionHooks.toSeq.map(f => f.apply _)
     )
   }
 
@@ -649,20 +653,14 @@ class Interpreter(val printer: Printer,
   private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
     def watch(p: Path) = interp.watch(os.Path(p))
-    def watchValue[T](v: => T): T = {interp.watchValue(v); v}
+    def addWatchValue[T](v: Supplier[T]): Unit = interp.watchValue(v.get())
 
-    def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
-      compilerManager.configureCompiler(callback)
-    }
+    def objCompilerLifeCycleManager = interp.compilerManager
 
-    def preConfigureCompiler(callback: scala.tools.nsc.Settings => Unit) = {
-      compilerManager.preConfigureCompiler(callback)
-    }
+    val beforeExitHooksList = interp.beforeExitHooksList.asJava
 
-    val beforeExitHooks = interp.beforeExitHooks
-
-    val repositories = interp.repositories
-    val resolutionHooks = interp.resolutionHooks
+    val repositoriesList = interp.repositories.asJava
+    val resolutionHooksList = interp.resolutionHooks.asJava
 
     object load extends DefaultLoadJar with InterpLoad {
 
@@ -705,7 +703,8 @@ class Interpreter(val printer: Printer,
 object Interpreter{
 
   val predefImports = Imports(
-    ImportData("ammonite.interp.api.InterpBridge.value.exit"),
+    ImportData("ammonite.interp.api.InterpExtras.exit"),
+    ImportData("ammonite.interp.api.InterpExtras.InterpAPIExtensions"),
     ImportData(
       "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
       importType = ImportData.Type
