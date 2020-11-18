@@ -277,10 +277,13 @@ class Interpreter(val printer: Printer,
                    incrementLine: () => Unit): Res[(Evaluated, Tag)] = synchronized{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
-      output <- compilerManager.compileClass(
-        processed,
-        printer,
-        fileName
+      output <- Res(
+        compilerManager.compileClass(
+          processed,
+          printer,
+          fileName
+        ),
+        "Compilation Failed"
       )
       _ = incrementLine()
       res <- eval.processLine(
@@ -313,8 +316,11 @@ class Interpreter(val printer: Printer,
 
     for {
       _ <- Catching{case e: Throwable => e.printStackTrace(); throw e}
-      output <- compilerManager.compileClass(
-        processed, printer, codeSource.fileName
+      output <- Res(
+        compilerManager.compileClass(
+          processed, printer, codeSource.fileName
+        ),
+        "Compilation Failed"
       )
       cls <- eval.loadClass(fullyQualifiedName, output.classFiles)
 
