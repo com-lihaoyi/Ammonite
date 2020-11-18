@@ -4,6 +4,8 @@ import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._
 
+import java.nio.file.Path
+
 import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
@@ -21,7 +23,7 @@ import scala.tools.nsc.Settings
   * than necessary
   */
 class CompilerLifecycleManager(
-  storage: Storage,
+  rtCacheDir: Option[Path],
   headFrame: => Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
@@ -82,9 +84,9 @@ class CompilerLifecycleManager(
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
       onSettingsInit.foreach(_(settings))
 
-      val initialClassPath = Classpath.classpath(initialClassLoader, storage)
+      val initialClassPath = Classpath.classpath(initialClassLoader, rtCacheDir)
       val headFrameClassPath =
-        Classpath.classpath(headFrame.classloader, storage)
+        Classpath.classpath(headFrame.classloader, rtCacheDir)
 
       Internal.compiler = Compiler(
         headFrameClassPath,
@@ -103,13 +105,13 @@ class CompilerLifecycleManager(
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
       Internal.pressy = Pressy(
-        Classpath.classpath(headFrame.classloader, storage),
+        headFrameClassPath,
         dynamicClasspath,
         headFrame.classloader,
         settings.copy(),
         dependencyCompleteOpt,
         classPathWhitelist,
-        Classpath.classpath(initialClassLoader, storage)
+        initialClassPath
       )
 
       Internal.preConfiguredSettingsChanged = false

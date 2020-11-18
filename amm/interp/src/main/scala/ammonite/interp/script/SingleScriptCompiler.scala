@@ -80,8 +80,14 @@ class SingleScriptCompiler(
       )
     }
 
-    val initialClassPath = Classpath.classpath(initialClassLoader, storage)
-    val classPath = Classpath.classpath(frame.classloader, storage)
+    val initialClassPath = Classpath.classpath(
+      initialClassLoader,
+      storage.dirOpt.map(_.toNIO)
+    )
+    val classPath = Classpath.classpath(
+      frame.classloader,
+      storage.dirOpt.map(_.toNIO)
+    )
 
     AmmCompiler(
       classPath,

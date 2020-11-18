@@ -52,8 +52,8 @@ class AmmoniteBuildServer(
       classOf[InterpAPI].getClassLoader
     else
       Thread.currentThread().getContextClassLoader
-  private def initialClassPath = Classpath.classpath(initialClassLoader, storage)
-    .map(_.toURI)
+  private def initialClassPath =
+    Classpath.classpath(initialClassLoader, storage.dirOpt.map(_.toNIO)).map(_.toURI)
 
   private lazy val proc =
     withRoot { root =>
