@@ -2,6 +2,7 @@ package ammonite.runtime
 
 import java.io.File
 import java.net.URL
+import java.nio.file.{Path, Paths}
 import java.util.zip.{ZipFile, ZipInputStream}
 
 
@@ -25,16 +26,14 @@ object Classpath {
    * memory but is better than reaching all over the filesystem every time we
    * want to do something.
    */
-  def classpath(classLoader: ClassLoader, storage: Storage): Vector[URL] = {
-    def rtCacheDir(storage: Storage): Option[os.Path] = storage match {
-      case storage: Storage.Folder =>
-        // no need to cache if the storage is in tmpdir
-        // because it is temporary
-        if (storage.dir.wrapped.startsWith(
-          java.nio.file.Paths.get(System.getProperty("java.io.tmpdir"))))
-          None
-        else Some(storage.dir)
-      case _ => None
+  def classpath(
+    classLoader: ClassLoader,
+    rtCacheDir: Option[Path]
+  ): Vector[URL] = {
+    lazy val actualRTCacheDir = rtCacheDir.filter { dir =>
+      // no need to cache if the storage is in tmpdir
+      // because it is temporary
+      !dir.startsWith(Paths.get(System.getProperty("java.io.tmpdir")))
     }
 
     var current = classLoader
@@ -73,8 +72,8 @@ object Classpath {
             .loadClass("javax.script.ScriptEngineManager")
         } catch {
           case _: ClassNotFoundException =>
-            rtCacheDir(storage) match {
-              case Some(path) => files.append(Export.rtAt(path.toIO).toURI.toURL)
+            actualRTCacheDir match {
+              case Some(path) => files.append(Export.rtAt(path.toFile).toURI.toURL)
               case _ => files.append(Export.rt().toURI.toURL)
             }
         }

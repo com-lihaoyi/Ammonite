@@ -53,7 +53,7 @@ class Interpreter(val printer: Printer,
     IvyThing.completer(repositories(), verbose = verboseOutput)
 
   val compilerManager = new CompilerLifecycleManager(
-    storage,
+    storage.dirOpt.map(_.toNIO),
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
