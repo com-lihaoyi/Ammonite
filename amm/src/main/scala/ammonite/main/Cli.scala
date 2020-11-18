@@ -119,23 +119,24 @@ object Cli{
       (c, v) => c.copy(welcomeBanner = if (v.nonEmpty) Some(v) else None)
     ),
     Arg[Config, Unit](
-      "no-remote-logging", None,
-      """Disable remote logging of the number of times a REPL starts and runs
-        |commands
-        |""".stripMargin,
-      (c, v) => c.copy(remoteLogging= false)
-    ),
-    Arg[Config, Unit](
       "class-based", None,
       """Wrap user code in classes rather than singletons, typically for Java serialization
         |friendliness.
         |""".stripMargin,
       (c, v) => c.copy(classBased=true)
     )
-
+  )
+  private val deprecatedOptions = Seq(
+    Arg[Config, Unit](
+      "no-remote-logging", None,
+      """Disable remote logging of the number of times a REPL starts and runs
+        |commands
+        |""".stripMargin,
+      (c, v) => c.copy(remoteLogging= false)
+    )
   )
 
-  val ammoniteArgSignature = genericSignature ++ replSignature
+  val ammoniteArgSignature = genericSignature ++ replSignature ++ deprecatedOptions
 
   def showArg(arg: Arg[_, _]) =
     "  " + arg.shortName.fold("")("-" + _ + ", ") + "--" + arg.name
