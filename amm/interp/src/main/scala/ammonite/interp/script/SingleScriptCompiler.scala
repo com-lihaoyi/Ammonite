@@ -3,7 +3,6 @@ package ammonite.interp.script
 import ammonite.interp.{
   CodeWrapper,
   Compiler => AmmCompiler,
-  DefaultPreprocessor,
   Interpreter,
   MakeReporter
 }
@@ -105,8 +104,8 @@ class SingleScriptCompiler(
 
   private val dependencyImports = initialImports ++ module.dependencyImports
 
-  private val preprocessor = new DefaultPreprocessor(
-    compiler.parse(module.codeSource.fileName, _),
+  private val preprocessor = compiler.preprocessor(
+    module.codeSource.fileName,
     markGeneratedSections = true
   )
 

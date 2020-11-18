@@ -42,10 +42,7 @@ trait Compiler{
               userCodeNestingLevel: Int,
               fileName: String): Option[Compiler.Output]
 
-  /**
-   * Either the statements that were parsed or the error message
-   */
-  def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]]
+  def preprocessor(fileName: String, markGeneratedSections: Boolean = false): Preprocessor
   var importsLen = 0
   var userCodeNestingLevel = -1
 
@@ -137,6 +134,9 @@ object Compiler{
             classPathWhitelist: Set[Seq[String]],
             initialClassPath: Seq[java.net.URL],
             lineNumberModifier: Boolean = true): Compiler = new Compiler{
+
+    def preprocessor(fileName: String, markGeneratedSections: Boolean): Preprocessor =
+      new DefaultPreprocessor(parse(fileName, _), markGeneratedSections)
 
     if(sys.env.contains("DIE"))???
     val PluginXML = "scalac-plugin.xml"

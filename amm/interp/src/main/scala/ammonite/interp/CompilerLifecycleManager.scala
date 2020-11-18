@@ -57,7 +57,7 @@ class CompilerLifecycleManager(
 
   def preprocess(fileName: String) = synchronized{
     init()
-    DefaultPreprocessor(compiler.parse(fileName, _))
+    compiler.preprocessor(fileName)
   }
 
 
