@@ -121,11 +121,6 @@ class CompilerLifecycleManager(
     pressy.complete(offset, previousImports, snippet)
   }
 
-  def search(target: scala.reflect.runtime.universe.Type) = synchronized{
-    init()
-    compiler.search(target)
-  }
-
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
                    fileName: String): Res[Compiler.Output] = synchronized{
