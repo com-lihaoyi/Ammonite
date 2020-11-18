@@ -2,7 +2,7 @@ package ammonite.interp
 
 import ammonite.runtime._
 import ammonite.util.Util._
-import ammonite.util._
+import ammonite.util.Printer
 
 import java.nio.file.Path
 
@@ -125,7 +125,7 @@ class CompilerLifecycleManager(
 
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
-                   fileName: String): Res[Compiler.Output] = synchronized{
+                   fileName: String): Either[String, Compiler.Output] = synchronized{
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
@@ -134,7 +134,7 @@ class CompilerLifecycleManager(
 
     init()
     for {
-      compiled <- Res.Success{
+      compiled <- Right {
         compiler.compile(
           processed.code.getBytes(scala.util.Properties.sourceEncoding),
           printer,
@@ -144,7 +144,7 @@ class CompilerLifecycleManager(
         )
       }
       _ = Internal.compilationCount += 1
-      output <- Res(compiled, "Compilation Failed")
+      output <- compiled.toRight("Compilation Failed")
     } yield output
 
   }
