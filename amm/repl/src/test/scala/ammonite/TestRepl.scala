@@ -110,8 +110,8 @@ class TestRepl {
         def history = new History(Vector())
         val colors = Ref(Colors.BlackWhite)
         def newCompiler() = interp.compilerManager.init(force = true)
-        def compiler = interp.compilerManager.compiler.compiler
-        def interactiveCompiler = interp.compilerManager.pressy.compiler
+        def compiler = null
+        def interactiveCompiler = null
         def fullImports = interp.predefImports ++ imports
         def imports = frames().head.imports
         def usedEarlierDefinitions = frames().head.usedEarlierDefinitions

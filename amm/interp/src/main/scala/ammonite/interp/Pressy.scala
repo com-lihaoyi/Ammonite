@@ -31,7 +31,6 @@ trait Pressy{
   def complete(snippetIndex: Int,
                previousImports: String,
                snippet: String): (Int, Seq[String], Seq[String])
-  def compiler: nsc.interactive.Global
   def shutdownPressy(): Unit
 }
 object Pressy {

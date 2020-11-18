@@ -10,7 +10,6 @@ import scala.collection.mutable
 import scala.reflect.internal.util.Position
 import scala.reflect.io
 import scala.reflect.io._
-import scala.tools.nsc
 import scala.tools.nsc.classpath.{
   AggregateClassPath,
   DirectoryClassPath,
@@ -34,7 +33,6 @@ import scala.tools.nsc.plugins.Plugin
  * you query source strings using an in-built presentation compiler
  */
 trait Compiler{
-  def compiler: nsc.Global
   def compile(src: Array[Byte],
               printer: Printer,
               importsLen0: Int,

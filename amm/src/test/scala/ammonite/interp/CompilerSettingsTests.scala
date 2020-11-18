@@ -26,7 +26,9 @@ object CompilerSettingsTests extends TestSuite {
         )
         Scripts.runScript(os.pwd, scriptPath / "configureCompiler.sc", interp)
 
-        assert(interp.compilerManager.compiler.compiler.useOffsetPositions)
+        assert((
+          /*interp.compilerManager.compiler.compiler*/ ??? : scala.tools.nsc.Global
+        ).useOffsetPositions)
       }
     }
 
@@ -41,7 +43,9 @@ object CompilerSettingsTests extends TestSuite {
       )
       Scripts.runScript(os.pwd, scriptPath / "preConfigureCompiler.sc", interp)
 
-      assert(!interp.compilerManager.compiler.compiler.useOffsetPositions)
+      assert(!(
+        /*interp.compilerManager.compiler.compiler*/ ??? : scala.tools.nsc.Global
+      ).useOffsetPositions)
     }
   }
 }

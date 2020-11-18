@@ -81,7 +81,7 @@ class CompilerLifecycleManager(
       // we also make a *separate* copy to pass to the presentation compiler.
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
-      val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      val settings = Option(null: scala.tools.nsc.Global).fold(new Settings)(_.settings.copy)
       onSettingsInit.foreach(_(settings))
 
       val initialClassPath = Classpath.classpath(initialClassLoader, rtCacheDir)
@@ -100,7 +100,7 @@ class CompilerLifecycleManager(
         initialClassPath
       )
 
-      onCompilerInit.foreach(_(compiler.compiler))
+      // onCompilerInit.foreach(_(compiler.compiler))
 
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
@@ -152,7 +152,7 @@ class CompilerLifecycleManager(
   def configureCompiler(callback: scala.tools.nsc.Global => Unit) = synchronized{
     onCompilerInit.append(callback)
     if (compiler != null){
-      callback(compiler.compiler)
+      // callback(compiler.compiler)
     }
   }
 
