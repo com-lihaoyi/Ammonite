@@ -21,7 +21,6 @@ import scala.tools.nsc.classpath.{
 import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
-import scala.util.Try
 
 
 /**
@@ -43,7 +42,6 @@ trait Compiler{
               userCodeNestingLevel: Int,
               fileName: String): Option[Compiler.Output]
 
-  def search(name: scala.reflect.runtime.universe.Type): Option[String]
   /**
    * Either the statements that were parsed or the error message
    */
@@ -275,40 +273,6 @@ object Compiler{
       run.cancel()
       (vd, reporter, scalac)
     }
-
-    def search(target: scala.reflect.runtime.universe.Type) = {
-      def resolve(path: String*): compiler.Symbol = {
-        var curr = path.toList
-        var start: compiler.Symbol = compiler.RootClass
-        while(curr != Nil){
-          val head :: rest = curr
-          start = start.typeSignature.member(compiler.newTermName(head))
-          curr = rest
-        }
-        start
-      }
-      var thingsInScope = Map[compiler.Symbol, List[compiler.Name]](
-        resolve() -> List(),
-        resolve("java", "lang") -> List(),
-        resolve("scala") -> List(),
-        resolve("scala", "Predef") -> List()
-      )
-      var level = 5
-      var found: Option[String] = None
-      while(level > 0){
-        thingsInScope = for {
-          (sym, path) <- thingsInScope
-          // No clue why this one blows up
-          m <- Try(sym.typeSignature.members).toOption.toSeq.flatten
-        } yield (m, m.name :: path)
-        thingsInScope.find(target.typeSymbol.fullName == _._1.fullName).foreach{ path =>
-          level = 0
-          found = Some(path._2.mkString("."))
-        }
-      }
-      found
-    }
-
 
 
     /**
