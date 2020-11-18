@@ -24,7 +24,7 @@ import scala.tools.nsc.Settings
   */
 class CompilerLifecycleManager(
   rtCacheDir: Option[Path],
-  headFrame: => ammonite.repl.api.Frame,
+  headFrame: => ammonite.compiler.iface.Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader

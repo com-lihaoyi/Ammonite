@@ -171,6 +171,7 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
 object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object util extends Cross[UtilModule](binCrossScalaVersions:_*)
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
+    def moduleDeps = Seq(compiler.interface)
     def ivyDeps = Agg(
       ivy"com.lihaoyi::pprint:0.5.9",
       ivy"com.lihaoyi::fansi:0.2.9",
@@ -252,7 +253,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(
         amm.util(),
-        interp.api.full()
+        interp.api.full(),
+        compiler.interface
       )
       def ivyDeps = Agg(
         ivy"com.lihaoyi::mainargs:0.1.4"

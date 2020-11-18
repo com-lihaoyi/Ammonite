@@ -704,7 +704,7 @@ object Interpreter{
 
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpExtras.exit"),
-    ImportData("ammonite.interp.api.InterpExtras.InterpAPIExtensions"),
+    ImportData("ammonite.interp.api.InterpExtras.{InterpAPIExtensions, ReplClassLoaderExtensions}"),
     ImportData(
       "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
       importType = ImportData.Type

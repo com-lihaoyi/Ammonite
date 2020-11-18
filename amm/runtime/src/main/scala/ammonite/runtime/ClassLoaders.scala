@@ -10,6 +10,7 @@ import java.util.Collections
 import ammonite.util.{Imports, Util}
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 
 
@@ -25,7 +26,8 @@ class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.net.URL],
-            private[this] var usedEarlierDefinitions0: Seq[String]) extends ammonite.repl.api.Frame{
+            private[this] var usedEarlierDefinitions0: Seq[String]
+) extends ammonite.compiler.iface.Frame{
   private var frozen0 = false
   def frozen = frozen0
   def freeze(): Unit = {
@@ -39,7 +41,7 @@ class Frame(val classloader: SpecialClassLoader,
   private[this] var version0: Int = 0
   def version = version0
   def imports = imports0
-  def classpath: Seq[java.net.URL] = classpath0
+  def classpath: Array[java.net.URL] = classpath0.toArray
   def usedEarlierDefinitions = usedEarlierDefinitions0
   def addImports(additional: Imports) = {
     if (!frozen0)
@@ -210,7 +212,7 @@ class SpecialClassLoader(parent: ClassLoader,
                          parentSignature: Seq[(Either[String, java.net.URL], Long)],
                          var specialLocalClasses: Set[String],
                          urls: URL*)
-  extends ammonite.repl.api.ReplClassLoader(urls.toArray, parent){
+  extends ammonite.compiler.iface.ReplClassLoader(urls.toArray, parent){
 
   /**
     * Files which have been compiled, stored so that our special
@@ -330,7 +332,7 @@ class SpecialClassLoader(parent: ClassLoader,
      clone
   }
 
-  def inMemoryClasses: Map[String, Array[Byte]] =
-    newFileDict.toMap
+  def inMemoryClassesMap: java.util.Map[String, Array[Byte]] =
+    newFileDict.toMap.asJava
 
 }

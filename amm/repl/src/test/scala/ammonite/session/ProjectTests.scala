@@ -430,7 +430,7 @@ object ProjectTests extends TestSuite{
             @     .flatMap(_.classpath)
             @     .map(_.toString)
             @ }
-            cp: List[String] = ?
+            cp: Array[String] = ?
 
             @ val found = cp.exists(_.endsWith("/case-app_$sbv-2.0.0-M9.jar"))
             found: Boolean = true
@@ -475,7 +475,7 @@ object ProjectTests extends TestSuite{
             @     .flatMap(_.classpath)
             @     .map(_.toString)
             @ }
-            cp: List[String] = ?
+            cp: Array[String] = ?
 
             @ def soFound() = cp.exists(_.endsWith("/libsqlite4java-linux-amd64-1.0.392.so"))
             defined function soFound

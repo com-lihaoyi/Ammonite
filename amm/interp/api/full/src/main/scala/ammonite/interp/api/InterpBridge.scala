@@ -1,5 +1,6 @@
 package ammonite.interp.api
 
+import ammonite.compiler.iface.ReplClassLoader
 import coursierapi.{Fetch, Repository}
 
 import scala.collection.JavaConverters._
@@ -53,6 +54,11 @@ object InterpExtras {
        */
     def preConfigureCompiler(c: scala.tools.nsc.Settings => Unit): Unit =
       () // TODO
+  }
+
+  implicit class ReplClassLoaderExtensions(private val cl: ReplClassLoader) extends AnyVal {
+    def inMemoryClasses: Map[String, Array[Byte]] =
+      cl.inMemoryClassesMap().asScala.toMap
   }
 
   /**
