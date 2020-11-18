@@ -7,4 +7,5 @@ trait Frame {
   def pluginClassloader: ReplClassLoader
 
   def classpath: Seq[URL]
+  def version: Int
 }
