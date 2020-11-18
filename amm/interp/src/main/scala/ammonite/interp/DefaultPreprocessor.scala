@@ -14,9 +14,6 @@ object DefaultPreprocessor {
       case m: G#MemberDef => m.mods.isPrivate
       case _ => false
     }
-
-  def apply(parse: => String => Either[String, Seq[G#Tree]]): Preprocessor =
-    new DefaultPreprocessor(parse)
 }
 
 class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
