@@ -165,10 +165,11 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
 object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object util extends Cross[UtilModule](binCrossScalaVersions:_*)
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
       ivy"com.lihaoyi::pprint:0.5.9",
       ivy"com.lihaoyi::fansi:0.2.9",
+      ivy"com.lihaoyi::os-lib:0.7.1",
+      ivy"org.scala-lang.modules::scala-collection-compat:2.1.2"
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
