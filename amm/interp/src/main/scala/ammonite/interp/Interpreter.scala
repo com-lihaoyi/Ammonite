@@ -38,7 +38,7 @@ class Interpreter(val printer: Printer,
 
 
   def headFrame = getFrame()
-  val repositories = Ref(ammonite.runtime.tools.IvyThing.defaultRepositories)
+  val repositories = mutable.Buffer(ammonite.runtime.tools.IvyThing.defaultRepositories: _*)
   val resolutionHooks = mutable.Buffer.empty[Fetch => Fetch]
 
   val mainThread = Thread.currentThread()
@@ -50,7 +50,7 @@ class Interpreter(val printer: Printer,
   def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
   def dependencyComplete: String => (Int, Seq[String]) =
-    IvyThing.completer(repositories(), verbose = verboseOutput)
+    IvyThing.completer(repositories.toSeq, verbose = verboseOutput)
 
   val compilerManager = new CompilerLifecycleManager(
     storage.dirOpt.map(_.toNIO),
@@ -614,14 +614,13 @@ class Interpreter(val printer: Printer,
   def loadIvy(coordinates: Dependency*) = synchronized {
     dependencyLoader.load(
       coordinates,
-      repositories(),
+      repositories.toSeq,
       resolutionHooks.toSeq
     )
   }
 
   private def addRepository(repository: Repository): Unit = synchronized {
-    val current = repositories()
-    repositories.update(current :+ repository)
+    repositories += repository
   }
 
   abstract class DefaultLoadJar extends LoadJar {

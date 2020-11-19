@@ -70,7 +70,7 @@ object ProjectTests extends TestSuite{
               @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
               error: Failed to resolve ivy dependencies
 
-              @ interp.repositories() ++= Seq(coursierapi.IvyRepository.of(
+              @ interp.repositories ++= Seq(coursierapi.IvyRepository.of(
               @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]"
               @ ))
 
@@ -295,7 +295,7 @@ object ProjectTests extends TestSuite{
       // tests for jitpack and optional dependencies
       check.session(
         """
-        @ interp.repositories() ++= Seq(
+        @ interp.repositories ++= Seq(
         @     coursierapi.MavenRepository.of("https://jitpack.io")
         @ )
 

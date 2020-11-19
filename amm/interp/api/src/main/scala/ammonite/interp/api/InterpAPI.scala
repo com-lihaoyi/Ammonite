@@ -2,7 +2,6 @@ package ammonite.interp.api
 
 import java.nio.file.Path
 
-import ammonite.util.Ref
 import coursierapi.{Dependency, Fetch, Repository}
 
 import scala.collection.mutable
@@ -32,7 +31,7 @@ trait InterpAPI {
   /**
    * resolvers to use when loading jars
    */
-  def repositories: Ref[List[Repository]]
+  def repositories: mutable.Buffer[Repository]
 
   /**
     * Functions that will be chained and called on the coursier

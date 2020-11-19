@@ -1,4 +1,4 @@
-interp.repositories() ++= Seq(coursierapi.IvyRepository.of(
+interp.repositories ++= Seq(coursierapi.IvyRepository.of(
   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]"
 ))
 
