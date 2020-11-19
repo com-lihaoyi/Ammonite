@@ -1,5 +1,6 @@
+import $ivy.`com.lihaoyi::os-lib:0.7.1`
 repl.load.exec(
-  ammonite.ops.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad/"Loaded.sc"
+  os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad/"Loaded.sc"
 )
 
 @

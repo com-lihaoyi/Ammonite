@@ -228,7 +228,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(
-        ops(), amm.util(),
+        amm.util(),
         interp.api()
       )
       def ivyDeps = Agg(

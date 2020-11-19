@@ -1,6 +1,5 @@
 package ammonite.repl.api
 
-import ammonite.ops.Internals
 import ammonite.util._
 
 import scala.reflect.runtime.universe._
