@@ -178,7 +178,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
   object runtime extends Cross[RuntimeModule](fullCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
+    def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:1.2.0",
