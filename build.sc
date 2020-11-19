@@ -117,7 +117,6 @@ trait AmmModule extends AmmInternalModule with PublishModule{
 
 }
 trait AmmDependenciesResourceFileModule extends JavaModule{
-  def crossScalaVersion: String
   def dependencyResourceFileName: String
   def dependencyFileResources = T{
     val deps0 = T.task{compileIvyDeps() ++ transitiveIvyDeps()}()
@@ -130,7 +129,6 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 
     Seq(PathRef(generateDependenciesFile(
-      crossScalaVersion,
       dependencyResourceFileName,
       res.minDependencies.toSeq
     )))
@@ -542,8 +540,7 @@ def generateConstantsFile(version: String = buildVersion,
   ctx.dest/"Constants.scala"
 }
 
-def generateDependenciesFile(scalaVersion: String,
-                             fileName: String,
+def generateDependenciesFile(fileName: String,
                              deps: Seq[coursier.Dependency])
                             (implicit ctx: mill.util.Ctx.Dest) = {
 
