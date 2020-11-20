@@ -208,7 +208,7 @@ object SourceRuntime{
       case Right(loc) =>
         val colored =
           if (loc.fileName.endsWith(".scala")){
-            fansi.Str(
+            fansi.Str(SeqCharSequence(
               Highlighter.defaultHighlight0(
                 scalaparse.Scala.CompilationUnit(_),
                 loc.fileContent.toVector,
@@ -218,7 +218,7 @@ object SourceRuntime{
                 colors.keyword,
                 fansi.Attr.Reset
               )
-            )
+            ))
           }else if (loc.fileName.endsWith(".java")){
             HighlightJava.highlightJavaCode(loc.fileContent, colors)
           }else {

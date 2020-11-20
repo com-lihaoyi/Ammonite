@@ -60,7 +60,7 @@ object TestMain{
             case c => Console.UNDERLINED + c + Console.RESET
           }
           // and highlight the selection
-          val ansiBuffer = fansi.Str(hl(buffer))
+          val ansiBuffer = fansi.Str(SeqCharSequence(hl(buffer)))
           val (newBuffer, cursorOffset) = SelectionFilter.mangleBuffer(
             selection, ansiBuffer, cursor, fansi.Reversed.On
           )
