@@ -196,24 +196,23 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
         }
       }
 
-      allDecls match{
+      val expanded = allDecls match{
         case Seq(first, rest@_*) =>
           val allDeclsWithComments = Expanded(first.code, first.printer) +: rest
-          Res(
-            allDeclsWithComments.reduceOption { (a, b) =>
-              Expanded(
-                // We do not need to separate the code with our own semi-colons
-                // or newlines, as each expanded code snippet itself comes with
-                // it's own trailing newline/semicolons as a result of the
-                // initial split
-                a.code + b.code,
-                a.printer ++ b.printer
-              )
-            },
-            "Don't know how to handle " + code
-          )
-        case Nil => Res.Success(Expanded("", Nil))
+          allDeclsWithComments.reduce { (a, b) =>
+            Expanded(
+              // We do not need to separate the code with our own semi-colons
+              // or newlines, as each expanded code snippet itself comes with
+              // it's own trailing newline/semicolons as a result of the
+              // initial split
+              a.code + b.code,
+              a.printer ++ b.printer
+            )
+          }
+        case Nil => Expanded("", Nil)
       }
+
+      Res.Success(expanded)
     }
   }
 }
