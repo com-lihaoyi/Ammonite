@@ -268,7 +268,7 @@ object LineReader{
 
     (cursorY, cursorX)
   }
-  def noTransform(x: Vector[Char], i: Int) = (fansi.Str(x), i)
+  def noTransform(x: Vector[Char], i: Int) = (fansi.Str(SeqCharSequence(x)), i)
 }
 
 case class Prompt(full: fansi.Str, lastLine: fansi.Str)

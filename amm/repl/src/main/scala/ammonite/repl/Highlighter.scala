@@ -24,7 +24,7 @@ object Highlighter {
       .sliding(2)
       .map{case Seq((s, c1), (e, c2)) =>
         assert(e >= s, s"s: $s e: $e")
-        c1(fansi.Str(buffer.slice(s, e), errorMode = fansi.ErrorMode.Sanitize))
+        c1(fansi.Str(SeqCharSequence(buffer.slice(s, e)), errorMode = fansi.ErrorMode.Sanitize))
       }.reduce(_ ++ _).render.toVector
   }
 

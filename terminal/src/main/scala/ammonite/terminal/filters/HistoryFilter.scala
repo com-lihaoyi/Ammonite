@@ -299,7 +299,7 @@ object HistoryFilter{
       // means it doesn't show anything but we shouldn't show an error
       case None if i < 0 => Some(-1)
       case None => None
-      case Some(s) if s.contains(searchTerm) && !s.contentEquals(skipped) =>
+      case Some(s) if s.contains(searchTerm) && !s.contentEquals(SeqCharSequence(skipped)) =>
         Some(i)
       case _ => rec(i + indexIncrement)
     }
