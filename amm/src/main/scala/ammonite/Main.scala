@@ -231,7 +231,7 @@ case class Main(predefCode: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: os.Path,
-                scriptArgs: Seq[(String, Option[String])])
+                scriptArgs: Seq[String])
                 : (Res[Any], Seq[(Watchable, Long)]) = {
 
     instantiateInterpreter() match{
@@ -405,7 +405,7 @@ class MainRunner(cliConfig: Cli.Config,
     watchLoop(
       isRepl = false,
       printing = true,
-      _.runScript(scriptPath, Scripts.groupArgs(scriptArgs))
+      _.runScript(scriptPath, scriptArgs)
     )
 
   def runCode(code: String) = watchLoop(isRepl = false, printing = false, _.runCode(code))

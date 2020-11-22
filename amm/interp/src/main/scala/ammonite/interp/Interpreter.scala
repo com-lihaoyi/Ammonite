@@ -716,7 +716,7 @@ object Interpreter{
     ImportData("ammonite.runtime.tools.{browse, grep, time}"),
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
     ImportData("ammonite.repl.tools.{desugar, source}"),
-    ImportData("ammonite.main.Router.{doc, main}"),
+    ImportData("mainargs.{doc, main}"),
     ImportData("ammonite.repl.tools.Util.pathScoptRead")
   )
 
