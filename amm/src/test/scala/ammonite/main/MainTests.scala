@@ -93,7 +93,7 @@ object MainTests extends TestSuite{
           assert(!evaled.success)
           val out = evaled.err
           val expected = stripInvisibleMargin(
-            "Unable to find subcommand: doesntExist, available subcommands mainA, functionB
+            "Unable to find subcommand: doesntExist, available subcommands: mainA, functionB"
           )
           assert(out.contains(expected.trim))
         }
