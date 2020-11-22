@@ -18,9 +18,8 @@ object Config{
     noDefaultPredef: Flag,
     @arg(
       short = 's',
-      doc =
-        "Make ivy logs go silent instead of printing though failures will " +
-        "still throw exception")
+      doc = """Make ivy logs go silent instead of printing though failures will
+        still throw exception""")
     silent: Flag,
 
     @arg(
@@ -40,21 +39,18 @@ object Config{
     @arg(
       name = "predef",
       short = 'p',
-      doc =
-        "Lets you load your predef from a custom location, rather than the " +
-        "default location in your Ammonite home")
+      doc ="""Lets you load your predef from a custom location, rather than the
+        "default location in your Ammonite home""")
     predefFile: Option[os.Path] = None,
     @arg(
-      doc =
-        "Enable or disable colored output; by default colors are enabled " +
-          "in both REPL and scripts if the console is interactive, and disabled " +
-          "otherwise")
+      doc = """Enable or disable colored output; by default colors are enabled
+          in both REPL and scripts if the console is interactive, and disabled
+          otherwise""")
     color: Option[Boolean] = None,
     @arg(
-      doc =
-        "Hide parts of the core of Ammonite and some of its dependencies. By default, " +
-        "the core of  Ammonite and all of its dependencies can be seen by users from the " +
-        "Ammonite session. This option mitigates that via class loader isolation.")
+      doc ="""Hide parts of the core of Ammonite and some of its dependencies. By default,
+        the core of  Ammonite and all of its dependencies can be seen by users from the
+        Ammonite session. This option mitigates that via class loader isolation.""")
     thin: Flag,
     @arg(doc = "Print this message")
     help: Flag
@@ -70,10 +66,9 @@ object Config{
 
     @arg(
       name = "no-home-predef",
-      doc =
-        "Disables the default behavior of loading predef files from your "+
-        "~/.ammonite/predef.sc, predefScript.sc, or predefShared.sc. You can "+
-        "choose an additional predef to use using `--predef")
+      doc = """Disables the default behavior of loading predef files from your
+        ~/.ammonite/predef.sc, predefScript.sc, or predefShared.sc. You can
+        choose an additional predef to use using `--predef""")
     noHomePredef: Flag
   )
   implicit val predefParser = ParserForClass[Predef]
