@@ -377,7 +377,7 @@
 
     @sect{Script Usage Docs}
       @p
-        You can document your scripts with the @hl.scala("@doc") annotation. By
+        You can document your scripts with the @hl.scala("@arg") annotation. By
         default, a script such as
 
       @hl.ref(

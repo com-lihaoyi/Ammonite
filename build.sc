@@ -180,7 +180,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:1.2.0",
-      ivy"com.lihaoyi::requests:0.6.5"
+      ivy"com.lihaoyi::requests:0.6.5",
+      ivy"com.lihaoyi::mainargs:0.1.1",
     )
   }
 
@@ -229,7 +230,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         interp.api()
       )
       def ivyDeps = Agg(
-        ivy"com.github.scopt::scopt:3.7.1"
+        ivy"com.lihaoyi::mainargs:0.1.1"
       )
 
       def generatedSources = T{
@@ -257,7 +258,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.jline:jline-terminal-jna:3.14.1",
       ivy"org.jline:jline-reader:3.14.1",
       ivy"com.github.javaparser:javaparser-core:3.2.5",
-      ivy"com.github.scopt::scopt:3.7.1"
+//      ivy"com.github.scopt::scopt:3.7.1"
     )
 
     object test extends Tests with AmmDependenciesResourceFileModule {

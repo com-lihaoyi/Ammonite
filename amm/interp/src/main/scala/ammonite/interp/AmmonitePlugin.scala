@@ -316,15 +316,26 @@ object LineNumberModifier {
         // relaxing the aggressive validation.
         val newPos = tree.pos match {
           case s : TransparentPosition if s.start > topWrapperLen =>
-              new TransparentPosition(trimmedSource, s.start, s.point - topWrapperLen, s.end)
+              new TransparentPosition(
+                trimmedSource,
+                s.start - topWrapperLen,
+                s.point - topWrapperLen,
+                s.end - topWrapperLen
+              )
           case s: RangePosition if s.start > topWrapperLen =>
-              new RangePosition(trimmedSource, s.start, s.point - topWrapperLen, s.end)
+              new RangePosition(
+                trimmedSource,
+                s.start - topWrapperLen,
+                s.point - topWrapperLen,
+                s.end - topWrapperLen
+              )
           case s: OffsetPosition if s.start > topWrapperLen =>
               new OffsetPosition(trimmedSource, s.point - topWrapperLen)
           case s => s
 
         }
         transformedTree.pos = newPos
+
         transformedTree
       }
 

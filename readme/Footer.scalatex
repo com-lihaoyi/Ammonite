@@ -454,7 +454,7 @@
           during @code{mtime}ing, and make it properly re-run scripts when a
           file in a watched folder is renamed.
         @li
-          Display @hl.scala("@doc") annotations on a script's @hl.scala("@main")
+          Display @hl.scala("@arg") annotations on a script's @hl.scala("@main")
           methods as part of the script's help text, thanks to
           @lnk("mgedigian", "https://github.com/mgedigian")
         @li

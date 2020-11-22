@@ -16,7 +16,7 @@ object CachingTests extends TestSuite{
     def runScript(wd: os.Path,
                   path: os.Path,
                   interp: ammonite.interp.Interpreter,
-                  scriptArgs: Seq[(String, Option[String])] = Nil) =
+                  scriptArgs: Seq[String] = Nil) =
       Scripts.runScript(wd, path, interp, scriptArgs) match {
         case Res.Success(_) =>
         case Res.Skip =>

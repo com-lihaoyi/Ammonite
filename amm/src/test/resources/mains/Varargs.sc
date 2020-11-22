@@ -1,7 +1,7 @@
 // Varargs.sc
 @main
-def main(i: Int, s: String, things: String*): Unit = {
+def main(i: Int, s: String, things: mainargs.Leftover[String]): Unit = {
   println(i)
   println(s)
-  println(things.toList)
+  println(things.value.toList)
 }

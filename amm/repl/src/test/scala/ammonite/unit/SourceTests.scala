@@ -45,11 +45,11 @@ object SourceTests extends TestSuite{
 //          "hlists.scala",
 //          "final case class ::"
 //        )
-        check(
-          load(scopt.Read),
-          "options.scala",
-          "object Read"
-        )
+//        check(
+//          load(mainargs.TokensReader),
+//          "TokensReader.scala",
+//          "class TokensReader"
+//        )
       }
       test("stdLibScala"){
         test("direct"){
