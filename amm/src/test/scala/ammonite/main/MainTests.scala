@@ -131,10 +131,9 @@ object MainTests extends TestSuite{
       }
       val argsUsageMsg =
         s"""Expected Signature: main
-           |    --i <int>
-           |    --s <str>
-           |    --path <path>
-           |""".stripMargin
+           |  --i <int>
+           |  --s <str>
+           |  --path <path>""".stripMargin
       test("tooFew"){
         val evaled = exec("Args.sc", "3")
         assert(!evaled.success)
@@ -169,7 +168,7 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Option --s <str> is missing a corresponding value
+            s"""Incomplete argument --s <str> is missing a corresponding value
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -225,9 +224,9 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Missing argument: (--s: String)
+            s"""Missing argument: --s <str>
                |Unknown arguments: "--unknown" "6"
-               |Duplicate arguments for (--i: Int): "3" "4"
+               |Duplicate arguments for --i <int>: "3" "4"
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -237,17 +236,13 @@ object MainTests extends TestSuite{
         assert(!evaled.success)
 
         val exMsg = """java.lang.NumberFormatException: For input string: "foo""""
+
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""The following argument failed to parse:
-               |
-               |--i: Int = "foo" failed to parse with $exMsg
-               |
-               |expected signature:
-               |
-               |main
-               |  --i <int>>
-               |  --s <str>>
+            s"""Invalid argument --i <int> failed to parse "foo" due to $exMsg
+               |Expected Signature: main
+               |  --i <int>
+               |  --s <str>
                |  --path <path>
                |""".stripMargin
           )

@@ -1,4 +1,4 @@
 @main
-def main(args: String*): Unit = {
-  args.foreach(arg => println(s"Argument: $arg"))
+def main(args: mainargs.Leftover[String]): Unit = {
+  args.value.foreach(arg => println(s"Argument: $arg"))
 }

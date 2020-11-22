@@ -83,7 +83,7 @@ object Scripts {
             if (scriptArgs.isEmpty) Res.Success(())
             else Res.Failure(
               "Script " + path.last +
-              " does not take arguments: " + scriptArgs.mkString(" ")
+              " does not take arguments: " + scriptArgs.map(literalize(_)).mkString(" ")
             )
 
           // If there's one @main method, we run it with all args
