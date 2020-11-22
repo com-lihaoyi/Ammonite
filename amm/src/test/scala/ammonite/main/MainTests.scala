@@ -75,18 +75,7 @@ object MainTests extends TestSuite{
           assert(!evaled.success)
           val out = evaled.err
           val expected = stripInvisibleMargin(
-            s"""
-              Need to specify a subcommand to call when running MultiMain.sc
-
-              Available subcommands:
-
-                mainA
-
-                functionB
-                  --i     Int
-                  --s     String
-                  --path  os.Path (default ${os.pwd})
-            """.stripMargin
+            "Need to specify a sub command: mainA, functionB"
           )
           assert(out.contains(expected.trim))
         }
@@ -95,20 +84,7 @@ object MainTests extends TestSuite{
           assert(!evaled.success)
           val out = evaled.err
           val expected = stripInvisibleMargin(
-            s"""
-              Need to specify a subcommand to call when running MultiMainDoc.sc
-
-              Available subcommands:
-
-                mainA
-
-                functionB
-                This explains what the function does
-                  --i     Int: how many times to repeat the string to make it very very long,
-                          more than it originally was
-                  --s     String: the string to repeat
-                  --path  os.Path (default ${os.pwd})
-            """
+            "Need to specify a sub command: mainA, functionB"
           )
           assert(out.contains(expected.trim))
         }
@@ -117,20 +93,7 @@ object MainTests extends TestSuite{
           assert(!evaled.success)
           val out = evaled.err
           val expected = stripInvisibleMargin(
-            s"""
-              Unable to find subcommand: doesntExist
-
-              Available subcommands:
-
-                mainA
-
-                functionB
-                This explains what the function does
-                  --i     Int: how many times to repeat the string to make it very very long,
-                          more than it originally was
-                  --s     String: the string to repeat
-                  --path  os.Path (default ${os.pwd})
-            """
+            "Unable to find subcommand: doesntExist, available subcommands mainA, functionB
           )
           assert(out.contains(expected.trim))
         }
@@ -167,13 +130,10 @@ object MainTests extends TestSuite{
         )
       }
       val argsUsageMsg =
-        s"""
-           |Arguments provided did not match expected signature:
-           |
-           |main
-           |  --i     Int
-           |  --s     String
-           |  --path  os.Path (default ${os.pwd})
+        s"""Expected Signature: main
+           |    --i <int>
+           |    --s <str>
+           |    --path <path>
            |""".stripMargin
       test("tooFew"){
         val evaled = exec("Args.sc", "3")
@@ -181,7 +141,7 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Missing argument: (--s: String)
+            s"""Missing argument: --s <str>
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -209,7 +169,7 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Option (--s: String) is missing a corresponding value
+            s"""Option --s <str> is missing a corresponding value
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -286,9 +246,9 @@ object MainTests extends TestSuite{
                |expected signature:
                |
                |main
-               |  --i     Int
-               |  --s     String
-               |  --path  os.Path (default ${os.pwd})
+               |  --i <int>>
+               |  --s <str>>
+               |  --path <path>
                |""".stripMargin
           )
         ))

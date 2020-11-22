@@ -265,16 +265,7 @@ object BasicTests extends TestSuite{
 
         val out = evaled.result.err.string
         val expected = Util.normalizeNewlines(
-          s"""Need to specify a subcommand to call when running MultiMain.sc
-             |
-             |Available subcommands:
-             |
-             |  mainA
-             |
-             |  functionB
-             |    --i     Int
-             |    --s     String
-             |    --path  os.Path (default""".stripMargin
+          s"""Need to specify a sub command: mainA, functionB""".stripMargin
         )
         assert(out.contains(expected))
       }

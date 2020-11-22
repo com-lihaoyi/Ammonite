@@ -46,9 +46,9 @@ object SourceTests extends TestSuite{
 //          "final case class ::"
 //        )
         check(
-          load(scopt.Read),
-          "options.scala",
-          "object Read"
+          load(mainargs.TokensReader),
+          "TokensReader.scala",
+          "class TokensReader"
         )
       }
       test("stdLibScala"){

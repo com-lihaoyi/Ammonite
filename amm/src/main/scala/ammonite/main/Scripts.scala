@@ -36,7 +36,7 @@ object Scripts {
           s"""
           |val $$routesOuter = this
           |object $$routes
-          |extends scala.Function0[scala.Seq[ammonite.main.Router.EntryPoint[$$routesOuter.type]]]{
+          |extends scala.Function0[mainargs.ParserForMethods[$$routesOuter.type]]{
           |  def apply() = mainargs.ParserForMethods[$$routesOuter.type]($$routesOuter)
           |}
           """.stripMargin
@@ -48,11 +48,6 @@ object Scripts {
         case Some(meta) => Res.Success(meta.id.wrapperPath)
         case None => Res.Skip
       }
-
-      mainCls =
-        interp
-          .evalClassloader
-          .loadClass(processed.blockInfo.last.id.wrapperPath + "$")
 
       scriptMains = interp.scriptCodeWrapper match{
         case ammonite.interp.CodeWrapper =>
@@ -84,7 +79,7 @@ object Scripts {
       res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {
           // If there are no @main methods, there's nothing to do
-          case None =>
+          case Some(parser) if parser.mains.value.isEmpty =>
             if (scriptArgs.isEmpty) Res.Success(())
             else Res.Failure(
               "Script " + path.last +
@@ -113,7 +108,9 @@ object Scripts {
                         res,
                         totalWidth = 100,
                         printHelpOnError = true,
-                        docsOnNewLine = false
+                        docsOnNewLine = false,
+                        customName = None,
+                        customDoc = None
                       )
                     )
                 }
@@ -122,98 +119,4 @@ object Scripts {
       }
     } yield res
   }
-
-//  def runMainMethod[T](base: T,
-//                       mainMethod: Router.EntryPoint[T],
-//                       scriptArgs: Seq[(String, Option[String])]): Res[Any] = {
-//    val leftColWidth = getLeftColWidth(mainMethod.argSignatures)
-//
-//    def expectedMsg = formatMainMethodSignature(base: T, mainMethod, 0, leftColWidth)
-//
-//    def pluralize(s: String, n: Int) = {
-//      if (n == 1) s else s + "s"
-//    }
-//
-//    mainMethod.invoke(base, scriptArgs) match{
-//      case Router.Result.Success(x) => Res.Success(x)
-//      case Router.Result.Error.Exception(x: AmmoniteExit) => Res.Success(x.value)
-//      case Router.Result.Error.Exception(x) => Res.Exception(x, "")
-//      case Router.Result.Error.MismatchedArguments(missing, unknown, duplicate, incomplete) =>
-//        val missingStr =
-//          if (missing.isEmpty) ""
-//          else {
-//            val chunks =
-//              for (x <- missing)
-//              yield "--" + x.name + ": " + x.typeString
-//
-//            val argumentsStr = pluralize("argument", chunks.length)
-//            s"Missing $argumentsStr: (${chunks.mkString(", ")})" + Util.newLine
-//          }
-//
-//
-//        val unknownStr =
-//          if (unknown.isEmpty) ""
-//          else {
-//            val argumentsStr = pluralize("argument", unknown.length)
-//            s"Unknown $argumentsStr: " + unknown.map(literalize(_)).mkString(" ") + Util.newLine
-//          }
-//
-//        val duplicateStr =
-//          if (duplicate.isEmpty) ""
-//          else {
-//            val lines =
-//              for ((sig, options) <- duplicate)
-//              yield {
-//                s"Duplicate arguments for (--${sig.name}: ${sig.typeString}): " +
-//                options.map(literalize(_)).mkString(" ") + Util.newLine
-//              }
-//
-//            lines.mkString
-//
-//          }
-//        val incompleteStr = incomplete match{
-//          case None => ""
-//          case Some(sig) =>
-//            s"Option (--${sig.name}: ${sig.typeString}) is missing a corresponding value" +
-//            Util.newLine
-//
-//          }
-//
-//        Res.Failure(
-//          Util.normalizeNewlines(
-//            s"""$missingStr$unknownStr$duplicateStr$incompleteStr
-//               |Arguments provided did not match expected signature:
-//               |
-//               |$expectedMsg
-//               |""".stripMargin
-//          )
-//        )
-//
-//      case Router.Result.Error.InvalidArguments(x) =>
-//        val argumentsStr = pluralize("argument", x.length)
-//        val thingies = x.map{
-//          case Router.Result.ParamError.Invalid(p, v, ex) =>
-//            val literalV = literalize(v)
-//            val rendered = {renderArgShort(p)}
-//            s"$rendered: ${p.typeString} = $literalV failed to parse with $ex"
-//          case Router.Result.ParamError.DefaultFailed(p, ex) =>
-//            s"${renderArgShort(p)}'s default value failed to evaluate with $ex"
-//        }
-//
-//        Res.Failure(
-//          Util.normalizeNewlines(
-//            s"""The following $argumentsStr failed to parse:
-//              |
-//              |${thingies.mkString(Util.newLine)}
-//              |
-//              |expected signature:
-//              |
-//              |$expectedMsg
-//            """.stripMargin
-//          )
-//        )
-//    }
-//  }
-
-
 }

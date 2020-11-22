@@ -220,21 +220,18 @@ object AmmoniteBuildServerTests extends TestSuite {
       val script = tmpDir / "script.sc"
       os.write(
         script,
-        """@doc("Main stuff")
-          |@main
+        """@main(doc = "Main stuff")
           |def doMainStuff() = {
           |  thingOne()
           |  otherTing()
           |}
           |
-          |@doc("Do the first thingy")
-          |@main
+          |@main(doc = "Do the first thingy")
           |def thingOne() = {
           |  println("1.")
           |}
           |
-          |@doc("Do the other thing")
-          |@main
+          |@main(doc = "Do the other thing")
           |def otherTing() = {
           |  println("hello")
           |}
