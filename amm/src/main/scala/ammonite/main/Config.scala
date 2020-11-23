@@ -6,7 +6,7 @@ import ammonite.repl.tools.Util.PathRead
 case class Config(core: Config.Core,
                   predef: Config.Predef,
                   repl: Config.Repl,
-                  rest: Leftover[String])
+                  rest: String*)
 
 object Config{
 

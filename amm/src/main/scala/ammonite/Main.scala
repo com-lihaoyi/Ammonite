@@ -294,7 +294,7 @@ object Main{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
-            initialScripts = cliConfig.rest.value.map(os.Path(_)),
+            initialScripts = cliConfig.rest.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
               Seq("ammonite.interp.api.InterpBridge" -> "interp")
             ) ++ AmmoniteBuildServer.defaultImports
@@ -312,7 +312,7 @@ object Main{
             cliConfig, printOut, printErr, stdIn, stdOut, stdErr,
             os.pwd
           )
-          (cliConfig.core.code, cliConfig.rest.value.toList) match{
+          (cliConfig.core.code, cliConfig.rest.toList) match{
             case (Some(code), Nil) =>
               runner.runCode(code)
 
