@@ -24,6 +24,7 @@ object TestUtils {
     val printStream = new PrintStream(System.out)
     val interp = new Interpreter(
       new CompilerLifecycleManager,
+      ammonite.compiler.Parsers,
       printer = Printer(
         printStream, new PrintStream(System.err), printStream,
         println, println, println

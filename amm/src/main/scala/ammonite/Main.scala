@@ -122,6 +122,7 @@ case class Main(predefCode: String = "",
 
       new Repl(
         new CompilerLifecycleManager,
+        ammonite.compiler.Parsers,
         inputStream, outputStream, errorStream,
         storage = storageBackend,
         baseImports = augmentedImports,
@@ -165,6 +166,7 @@ case class Main(predefCode: String = "",
       )
       val interp = new Interpreter(
         new CompilerLifecycleManager,
+        ammonite.compiler.Parsers,
         printer,
         storageBackend,
         wd,
@@ -299,6 +301,7 @@ object Main{
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
             ammonite.compiler.Compiler,
+            ammonite.compiler.Parsers,
             ObjectCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(

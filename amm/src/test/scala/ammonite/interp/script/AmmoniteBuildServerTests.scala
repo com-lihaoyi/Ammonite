@@ -662,6 +662,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
     val server = new AmmoniteBuildServer(
       ammonite.compiler.Compiler,
+      ammonite.compiler.Parsers,
       ammonite.compiler.ObjectCodeWrapper,
       initialScripts = script
     )

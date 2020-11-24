@@ -69,6 +69,7 @@ class TestRepl {
   val interp = try {
     new Interpreter(
       new CompilerLifecycleManager,
+      ammonite.compiler.Parsers,
       printer0,
       storage = storage,
       wd = os.pwd,

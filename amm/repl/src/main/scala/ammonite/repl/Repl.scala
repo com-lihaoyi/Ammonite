@@ -10,13 +10,14 @@ import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
 import ammonite.compiler.Parsers
-import ammonite.compiler.iface.{CodeWrapper, CompilerLifecycleManager, Imports}
+import ammonite.compiler.iface.{CodeWrapper, CompilerLifecycleManager, Imports, Parser}
 import ammonite.interp.Interpreter
 import coursierapi.Dependency
 
 import scala.annotation.tailrec
 
 class Repl(compilerManager: CompilerLifecycleManager,
+           parser: Parser,
            input: InputStream,
            output: OutputStream,
            error: OutputStream,
@@ -79,6 +80,7 @@ class Repl(compilerManager: CompilerLifecycleManager,
 
   val interp = new Interpreter(
     compilerManager,
+    parser,
     printer,
     storage,
     wd,

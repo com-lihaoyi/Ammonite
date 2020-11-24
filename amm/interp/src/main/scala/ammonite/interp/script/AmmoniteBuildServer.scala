@@ -8,7 +8,7 @@ import java.util.concurrent.{CompletableFuture, Executors, ThreadFactory}
 import java.util.UUID
 
 import ammonite.interp.api.InterpAPI
-import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Imports}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Imports, Parser}
 import ammonite.interp.DependencyLoader
 import ammonite.runtime.{ImportHook, Storage}
 import ammonite.util.{Classpath, Printer}
@@ -24,6 +24,7 @@ import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
   compilerBuilder: CompilerBuilder,
+  parser: Parser,
   codeWrapper: CodeWrapper,
   initialScripts: Seq[os.Path] = Nil,
   initialImports: Imports = AmmoniteBuildServer.defaultImports,
@@ -62,6 +63,7 @@ class AmmoniteBuildServer(
     withRoot { root =>
       ScriptProcessor(
         compilerBuilder.userScalaVersion,
+        parser,
         codeWrapper,
         dependencyLoader,
         defaultRepositories,

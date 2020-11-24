@@ -2,8 +2,7 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.compiler.Parsers
-import ammonite.compiler.iface.{CodeSource, CodeWrapper, ImportTree}
+import ammonite.compiler.iface.{CodeSource, CodeWrapper, ImportTree, Parser}
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{Name, Util}
@@ -14,6 +13,7 @@ import scala.collection.mutable
 
 final case class ScriptProcessor(
   userScalaVersion: String,
+  parser: Parser,
   codeWrapper: CodeWrapper,
   dependencyLoader: DependencyLoader,
   defaultRepositories: Seq[Repository],
@@ -31,18 +31,18 @@ final case class ScriptProcessor(
 
     val rawCode = Interpreter.skipSheBangLine(code)
     lazy val offsetToPos = PositionOffsetConversion.offsetToPos(rawCode)
-    val splittedScript = Parsers.splitScriptWithStart(
+    val splittedScript = parser.splitScriptWithStart(
       rawCode,
       codeSource.fileName
-    ).left.map { f =>
-      val startPos = offsetToPos(f.index).copy(char = 0)
-      val endPos = {
-        val endIdx = rawCode.indexOf('\n', f.index)
-        val actualEndIdx = if (endIdx < 0) rawCode.length else endIdx
-        offsetToPos(actualEndIdx)
-      }
-      val expected = f.trace().failure.label
-      Seq(Diagnostic("ERROR", startPos, endPos, s"Expected $expected"))
+    ).left.map {
+      case (index, expected) =>
+        val startPos = offsetToPos(index).copy(char = 0)
+        val endPos = {
+          val endIdx = rawCode.indexOf('\n', index)
+          val actualEndIdx = if (endIdx < 0) rawCode.length else endIdx
+          offsetToPos(actualEndIdx)
+        }
+        Seq(Diagnostic("ERROR", startPos, endPos, s"Expected $expected"))
     }
 
     def hookFor(tree: ImportTree): Either[Diagnostic, (Seq[String], ImportHook)] = {
@@ -87,7 +87,7 @@ final case class ScriptProcessor(
       elems <- splittedScript.right.toSeq
       (startIdx, leadingSpaces, statements) <- elems
     } yield {
-      val (statements0, importTrees) = Parsers.parseImportHooksWithIndices(codeSource, statements)
+      val (statements0, importTrees) = parser.parseImportHooksWithIndices(codeSource, statements)
       val importResults =
         for {
           tree <- importTrees

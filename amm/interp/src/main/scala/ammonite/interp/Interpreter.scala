@@ -11,6 +11,7 @@ import ammonite.compiler.iface.{
   CompilerLifecycleManager,
   Imports,
   ImportTree,
+  Parser,
   Preprocessor => IPreprocessor
 }
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
@@ -20,7 +21,6 @@ import scala.collection.JavaConverters._
 import ammonite.runtime._
 
 import annotation.tailrec
-import ammonite.compiler.Parsers
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util._
@@ -33,6 +33,7 @@ import coursierapi.{Dependency, Fetch, Repository}
  * real encapsulation for now.
  */
 class Interpreter(val compilerManager: CompilerLifecycleManager,
+                  parser: Parser,
                   val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
@@ -253,7 +254,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
       Array("ammonite", "$sess"),
       (wd/"(console)").toNIO
     )
-    val (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -398,7 +399,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = Parsers.splitScript(
+        lazy val splittedScript = parser.splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.fileName
         )
@@ -443,7 +444,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(Parsers.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(parser.splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -597,7 +598,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )
