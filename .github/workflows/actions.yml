@@ -8,6 +8,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
+      - run: git fetch --all --tags
       - run: ./mill -i unitTest 2.12.12
   unit-8-2_12_12:
     runs-on: ubuntu-latest
@@ -16,6 +17,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
+      - run: git fetch --all --tags
       - run: ./mill -i unitTest 2.12.12
 
   unit-8-2_13_3:
@@ -25,6 +27,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
+      - run: git fetch --all --tags
       - run: ./mill -i unitTest 2.13.3
 
   integration-11-2_12_12:
@@ -34,6 +37,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
+      - run: git fetch --all --tags
       - run: ./mill -i integrationTest 2.12.12
   integration-8-2_12_12:
     runs-on: ubuntu-latest
@@ -42,6 +46,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
+      - run: git fetch --all --tags
       - run: ./mill -i integrationTest 2.12.12
 
   integration-8-2_13_3:
@@ -51,4 +56,5 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
+      - run: git fetch --all --tags
       - run: ./mill -i integrationTest 2.13.3
