@@ -2,7 +2,7 @@ package ammonite.interp
 
 import ammonite.runtime._
 import ammonite.util.Util._
-import ammonite.util.Printer
+import ammonite.util.{Classpath, Printer}
 
 import java.nio.file.Path
 

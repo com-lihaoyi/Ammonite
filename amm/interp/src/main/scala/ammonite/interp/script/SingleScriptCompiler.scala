@@ -6,8 +6,8 @@ import ammonite.interp.{
   Interpreter,
   MakeReporter
 }
-import ammonite.runtime.{Classpath, Frame, Storage}
-import ammonite.util.{Imports, Name, Printer, Res}
+import ammonite.runtime.{Frame, Storage}
+import ammonite.util.{Classpath, Imports, Name, Printer, Res}
 
 import scala.collection.mutable
 import scala.reflect.internal.util.{NoPosition, Position => SPosition}
