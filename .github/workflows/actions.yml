@@ -1,5 +1,5 @@
 name: ci-push-validation
-on: [push, pr]
+on: [push, pull_request]
 jobs:
   unit-11-2_12_12:
     runs-on: ubuntu-latest
