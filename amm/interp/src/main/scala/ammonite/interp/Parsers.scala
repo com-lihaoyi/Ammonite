@@ -13,10 +13,10 @@ object Parsers {
   import scalaparse.Scala._
 
   // For some reason Scala doesn't import this by default
-  def `_`[_: P] = scalaparse.Scala.`_`
+  private def `_`[_: P] = scalaparse.Scala.`_`
 
 
-  def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
+  private def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
     def IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
@@ -39,19 +39,19 @@ object Parsers {
     P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
   }
 
-  def PatVarSplitter[_: P] = {
+  private def PatVarSplitter[_: P] = {
     def Prefixes = P(Prelude ~ (`var` | `val`))
     def Lhs = P( Prefixes ~/ BindPattern.rep(1, "," ~/ Pass) ~ (`:` ~/ Type).? )
     P( Lhs.! ~ (`=` ~/ WL ~ StatCtx.Expr.!) ~ End )
   }
-  def patVarSplit(code: String) = {
+  private def patVarSplit(code: String) = {
     val Parsed.Success((lhs, rhs), _) = parse(code, PatVarSplitter(_))
     (lhs, rhs)
   }
 
-  def Prelude[_: P] = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
+  private def Prelude[_: P] = P( (Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep )
 
-  def TmplStat[_: P] = P( Import | Prelude ~ BlockDef | StatCtx.Expr )
+  private def TmplStat[_: P] = P( Import | Prelude ~ BlockDef | StatCtx.Expr )
 
 
   // Do this funny ~~WS thing to make sure we capture the whitespace
@@ -59,13 +59,13 @@ object Parsers {
   //
   // After each statement, there must either be `Semis`, a "}" marking the
   // end of the block, or the `End` of the input
-  def StatementBlock[_: P](blockSep: => P0) =
+  private def StatementBlock[_: P](blockSep: => P0) =
     P( Semis.? ~ (Index ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!).repX)
 
-  def Splitter0[_: P] = P( StatementBlock(Fail) )
+  private def Splitter0[_: P] = P( StatementBlock(Fail) )
   def Splitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
 
-  def ObjParser[_: P] = P( ObjDef )
+  private def ObjParser[_: P] = P( ObjDef )
 
   /**
    * Attempts to break a code blob into multiple statements. Returns `None` if
@@ -95,11 +95,12 @@ object Parsers {
       .fold((_, _, _) => false, (_, _) => true)
   }
 
-  def Separator[_: P] = P( WL ~ "@" ~~ CharIn(" \n\r").rep(1) )
-  def CompilationUnit[_: P] = P( WL.! ~ StatementBlock(Separator) ~ WL )
-  def ScriptSplitter[_: P] = P( CompilationUnit.repX(1, Separator) ~ End)
+  private def Separator[_: P] = P( WL ~ "@" ~~ CharIn(" \n\r").rep(1) )
+  private def CompilationUnit[_: P] = P( WL.! ~ StatementBlock(Separator) ~ WL )
+  private def ScriptSplitter[_: P] = P( CompilationUnit.repX(1, Separator) ~ End)
   def splitScript(code: String) = parse(code, ScriptSplitter(_))
-  def ScriptSplitterWithStart[_: P] = P( Start ~ (Index ~ CompilationUnit).repX(1, Separator) ~ End)
+  private def ScriptSplitterWithStart[_: P] =
+    P( Start ~ (Index ~ CompilationUnit).repX(1, Separator) ~ End)
   def splitScriptWithStart(code: String) = parse(code, ScriptSplitterWithStart(_))
 
   def stringWrap(s: String) = "\"" + pprint.Util.literalize(s) + "\""
@@ -120,7 +121,7 @@ object Parsers {
       // Call `fastparse.ParserInput.fromString` explicitly, to avoid generating a
       // lambda in the class body and making the we-do-not-load-fastparse-on-cached-scripts
       // test fail
-      parse(fastparse.ParserInput.fromString(stmt), Parsers.ImportSplitter(_)) match{
+      parse(fastparse.ParserInput.fromString(stmt), ImportSplitter(_)) match{
         case f: Parsed.Failure => hookedStmts.append(stmt)
         case Parsed.Success(parsedTrees, _) =>
           var currentStmt = stmt
