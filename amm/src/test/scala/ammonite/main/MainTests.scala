@@ -106,7 +106,7 @@ object MainTests extends TestSuite{
 
     test("args"){
       test("full"){
-        val evaled = exec("Args.sc", "-i", "3", "--s", "Moo", (os.pwd/'omg/'moo).toString)
+        val evaled = exec("Args.sc", "-i", "3", "-s", "Moo", (os.pwd/'omg/'moo).toString)
         assert(evaled.success)
         assert(evaled.out == ("\"Hello! MooMooMoo moo.\"" + Util.newLine))
       }
@@ -131,8 +131,8 @@ object MainTests extends TestSuite{
       }
       val argsUsageMsg =
         s"""Expected Signature: main
-           |  --i <int>
-           |  --s <str>
+           |  -i <int>
+           |  -s <str>
            |  --path <path>""".stripMargin
       test("tooFew"){
         val evaled = exec("Args.sc", "3")
@@ -140,7 +140,7 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Missing argument: --s <str>
+            s"""Missing argument: -s <str>
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -168,7 +168,7 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Incomplete argument --s <str> is missing a corresponding value
+            s"""Incomplete argument -s <str> is missing a corresponding value
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -180,7 +180,7 @@ object MainTests extends TestSuite{
         // them on to their own custom argument parsing code (e.g. scopt)
         val evaled = exec("Varargs.sc",
           // Normal args get fulfilled
-          "--i", "31337", "zomg",
+          "-i", "31337", "zomg",
           // Make sure single-dash -cow has the single-dash preserved
           "-cow", "--omg",
           // Random non-keyword args get passed straight through
@@ -224,9 +224,9 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Missing argument: --s <str>
+            s"""Missing argument: -s <str>
                |Unknown arguments: "--unknown" "6"
-               |Duplicate arguments for --i <int>: "3" "4"
+               |Duplicate arguments for -i <int>: "3" "4"
                |$argsUsageMsg""".stripMargin
           )
         ))
@@ -239,10 +239,10 @@ object MainTests extends TestSuite{
 
         assert(evaled.err.contains(
           Util.normalizeNewlines(
-            s"""Invalid argument --i <int> failed to parse "foo" due to $exMsg
+            s"""Invalid argument -i <int> failed to parse "foo" due to $exMsg
                |Expected Signature: main
-               |  --i <int>
-               |  --s <str>
+               |  -i <int>
+               |  -s <str>
                |  --path <path>
                |""".stripMargin
           )

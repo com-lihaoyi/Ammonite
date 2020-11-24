@@ -269,7 +269,7 @@
         them:
 
       @hl.sh
-        $ amm Args.sc --i 3 --s Moo
+        $ amm Args.sc -i 3 -s Moo
         "Hello! MooMooMoo Ammonite."
 
       @p
