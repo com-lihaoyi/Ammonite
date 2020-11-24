@@ -1,6 +1,6 @@
 package ammonite.interp
 
-import ammonite.runtime.Classpath
+import ammonite.util.Classpath
 
 import scala.reflect.internal.util.Position
 import scala.reflect.io.FileZipArchive

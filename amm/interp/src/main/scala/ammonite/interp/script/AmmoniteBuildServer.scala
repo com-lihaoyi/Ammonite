@@ -9,8 +9,8 @@ import java.util.UUID
 
 import ammonite.interp.api.InterpAPI
 import ammonite.interp.{CodeWrapper, DependencyLoader}
-import ammonite.runtime.{Classpath, ImportHook, Storage}
-import ammonite.util.{Imports, Printer}
+import ammonite.runtime.{ImportHook, Storage}
+import ammonite.util.{Classpath, Imports, Printer}
 import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher
