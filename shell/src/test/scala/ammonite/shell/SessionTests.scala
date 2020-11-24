@@ -14,31 +14,31 @@ object SessionTests extends TestSuite{
 
   val tests = Tests{
     val check = new TestRepl()
-    test("workingDir"){
-      check.session(s"""
-        @ import ammonite.ops._
-
-        @ interp.load.module($bareSrc)
-
-        @ val originalWd = wd
-
-        @ val originalLs1 = %%ls
-
-        @ val originalLs2 = ls!
-
-        @ cd! up
-
-        @ assert(wd == originalWd/up)
-
-        @ cd! root
-
-        @ assert(wd == root)
-
-        @ assert(originalLs1 != (%%ls))
-
-        @ assert(originalLs2 != (ls!))
-      """)
-    }
+//    test("workingDir"){
+//      check.session(s"""
+//        @ import ammonite.ops._
+//
+//        @ interp.load.module($bareSrc)
+//
+//        @ val originalWd = wd
+//
+//        @ val originalLs1 = %%ls
+//
+//        @ val originalLs2 = ls!
+//
+//        @ cd! up
+//
+//        @ assert(wd == originalWd/up)
+//
+//        @ cd! root
+//
+//        @ assert(wd == root)
+//
+//        @ assert(originalLs1 != (%%ls))
+//
+//        @ assert(originalLs2 != (ls!))
+//      """)
+//    }
     test("specialPPrint"){
       // Make sure these various "special" data structures get pretty-printed
       // correctly, i.e. not as their underlying type but as something more
