@@ -73,6 +73,9 @@ jobs:
       SONATYPE_DEPLOY_USER: ${{ secrets.SONATYPE_DEPLOY_USER }}
       SONATYPE_DEPLOY_PASSWORD: ${{ secrets.SONATYPE_DEPLOY_PASSWORD }}
       SONATYPE_PGP_PASSWORD: ${{ secrets.SONATYPE_PGP_PASSWORD }}
+      LANG: "en_US.UTF-8"
+      LC_MESSAGES: "en_US.UTF-8"
+      LC_ALL: "en_US.UTF-8"
     steps:
       - uses: actions/checkout@v2
         with:
@@ -89,6 +92,9 @@ jobs:
       SONATYPE_DEPLOY_USER: ${{ secrets.SONATYPE_DEPLOY_USER }}
       SONATYPE_DEPLOY_PASSWORD: ${{ secrets.SONATYPE_DEPLOY_PASSWORD }}
       SONATYPE_PGP_PASSWORD: ${{ secrets.SONATYPE_PGP_PASSWORD }}
+      LANG: "en_US.UTF-8"
+      LC_MESSAGES: "en_US.UTF-8"
+      LC_ALL: "en_US.UTF-8"
     steps:
       - uses: actions/checkout@v2
         with:
@@ -105,6 +111,9 @@ jobs:
       SONATYPE_DEPLOY_USER: ${{ secrets.SONATYPE_DEPLOY_USER }}
       SONATYPE_DEPLOY_PASSWORD: ${{ secrets.SONATYPE_DEPLOY_PASSWORD }}
       SONATYPE_PGP_PASSWORD: ${{ secrets.SONATYPE_PGP_PASSWORD }}
+      LANG: "en_US.UTF-8"
+      LC_MESSAGES: "en_US.UTF-8"
+      LC_ALL: "en_US.UTF-8"
     steps:
       - uses: actions/checkout@v2
         with:
