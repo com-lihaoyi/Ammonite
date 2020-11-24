@@ -234,7 +234,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.compiler(), amm.util(), amm.runtime())
+    def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
@@ -285,7 +285,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def moduleDeps = Seq(
       ops(), amm.util(),
-      amm.runtime(), amm.interp(),
+      amm.runtime(), amm.interp(), amm.compiler(),
       terminal()
     )
     def ivyDeps = Agg(
