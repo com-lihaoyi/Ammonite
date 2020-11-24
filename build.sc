@@ -5,8 +5,8 @@ import $file.ci.upload
 import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
 val isMasterCommit =
-  sys.env.get("TRAVIS_PULL_REQUEST") == Some("false") &&
-  (sys.env.get("TRAVIS_BRANCH") == Some("master") || sys.env("TRAVIS_TAG") != "")
+  sys.env.get("GITHUB_REPOSITORY") == Some("lihaoyi/Ammonite") &&
+  sys.env.get("GITHUB_REF").exists(_.endsWith("/master"))
 
 val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
@@ -31,10 +31,10 @@ val fullCrossScalaVersions = Seq(
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
 val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
-  case Some(v) if v != "" => (v, false)
+  case Some(s"refs/tags/$tagName")  => (tagName, false)
   case _ =>
     val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
-    (s"$latestTaggedVersion-$commitsSinceTaggedVersion-${gitHash}", true)
+    (s"$latestTaggedVersion-$commitsSinceTaggedVersion-$gitHash", true)
 }
 
 val bspVersion = "2.0.0-M6"
