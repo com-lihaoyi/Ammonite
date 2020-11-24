@@ -1,7 +1,7 @@
 name: learn-github-actions
 on: [push]
 jobs:
-  unit-11-2.12.12:
+  unit-11-2_12_12:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -9,7 +9,7 @@ jobs:
         with:
           java-version: '11'
       - run: ./mill -i unitTest 2.12.12
-  unit-8-2.12.12:
+  unit-8-2_12_12:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,7 +18,7 @@ jobs:
           java-version: '8'
       - run: ./mill -i unitTest 2.12.12
 
-  unit-8-2.13.3:
+  unit-8-2_13_3:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +27,7 @@ jobs:
           java-version: '8'
       - run: ./mill -i unitTest 2.13.3
 
-  integration-11-2.12.12:
+  integration-11-2_12_12:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
         with:
           java-version: '11'
       - run: ./mill -i integrationTest 2.12.12
-  integration-8-2.12.12:
+  integration-8-2_12_12:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,7 +44,7 @@ jobs:
           java-version: '8'
       - run: ./mill -i integrationTest 2.12.12
 
-  integration-8-2.13.3:
+  integration-8-2_13_3:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
