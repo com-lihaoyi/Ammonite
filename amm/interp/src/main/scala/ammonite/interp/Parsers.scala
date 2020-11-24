@@ -98,13 +98,15 @@ object Parsers {
   private def Separator[_: P] = P( WL ~ "@" ~~ CharIn(" \n\r").rep(1) )
   private def CompilationUnit[_: P] = P( WL.! ~ StatementBlock(Separator) ~ WL )
   private def ScriptSplitter[_: P] = P( CompilationUnit.repX(1, Separator) ~ End)
-  def splitScript(code: String) = parse(code, ScriptSplitter(_))
+  def splitScript(code: String): Parsed[Seq[(String, Seq[(Int, String)])]] =
+    parse(code, ScriptSplitter(_))
   private def ScriptSplitterWithStart[_: P] =
     P( Start ~ (Index ~ CompilationUnit).repX(1, Separator) ~ End)
-  def splitScriptWithStart(code: String) = parse(code, ScriptSplitterWithStart(_))
+  def splitScriptWithStart(code: String): Parsed[Seq[(Int, (String, Seq[(Int, String)]))]] =
+    parse(code, ScriptSplitterWithStart(_))
 
-  def stringWrap(s: String) = "\"" + pprint.Util.literalize(s) + "\""
-  def stringSymWrap(s: String) = {
+  def stringWrap(s: String): String = "\"" + pprint.Util.literalize(s) + "\""
+  def stringSymWrap(s: String): String = {
     def idToEnd[_: P] = P( scalaparse.syntax.Identifiers.Id ~ End )
     if (s == "") "'"
     else parse(s, idToEnd(_))  match{
@@ -112,9 +114,12 @@ object Parsers {
       case f: Parsed.Failure => stringWrap(s)
     }
   }
-  def parseImportHooks(source: CodeSource, stmts: Seq[String]) =
+  def parseImportHooks(source: CodeSource, stmts: Seq[String]): (Seq[String], Seq[ImportTree]) =
     parseImportHooksWithIndices(source, stmts.map((0, _)))
-  def parseImportHooksWithIndices(source: CodeSource, stmts: Seq[(Int, String)]) = synchronized{
+  def parseImportHooksWithIndices(
+    source: CodeSource,
+    stmts: Seq[(Int, String)]
+  ): (Seq[String], Seq[ImportTree]) = synchronized{
     val hookedStmts = mutable.Buffer.empty[String]
     val importTrees = mutable.Buffer.empty[ImportTree]
     for((startIdx, stmt) <- stmts) {
