@@ -113,6 +113,8 @@ jobs:
       - run: ./mill -i publishSonatype __.publishArtifacts 3 3
   publishDocs:
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
     steps:
       - uses: actions/checkout@v2
         with:
