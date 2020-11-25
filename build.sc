@@ -10,8 +10,10 @@ val isMasterCommit =
 
 val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
+val gitHead = os.proc('git, "rev-parse", "HEAD").call().out.trim
+
 val commitsSinceTaggedVersion = {
-  os.proc('git, "rev-list", 'master, "--not", latestTaggedVersion, "--count")
+  os.proc('git, "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
     .call()
     .out
     .trim
