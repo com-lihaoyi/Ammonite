@@ -186,4 +186,17 @@ object ReplExtras {
     def history: History =
       new History(api.rawHistory)
   }
+
+  implicit class SessionChangedExtensions(
+    private val self: ammonite.repl.api.SessionChanged
+  ) extends AnyVal {
+    def removedImports: Set[scala.Symbol] =
+      self.rawRemovedImports.map(Symbol(_)).toSet
+    def addedImports: Set[scala.Symbol] =
+      self.rawAddedImports.map(Symbol(_)).toSet
+    def removedJars: Set[java.net.URL] =
+      self.rawRemovedJars.toSet
+    def addedJars: Set[java.net.URL] =
+      self.rawAddedJars.toSet
+  }
 }

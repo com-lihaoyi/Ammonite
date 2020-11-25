@@ -8,6 +8,7 @@ import java.util.Collections
 
 
 import ammonite.compiler.iface.Imports
+import ammonite.repl.api.{SessionChanged => ISessionChanged}
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util
 
@@ -91,19 +92,19 @@ object Frame{
   }
 }
 
-case class SessionChanged(removedImports: Set[scala.Symbol],
-                          addedImports: Set[scala.Symbol],
-                          removedJars: Set[java.net.URL],
-                          addedJars: Set[java.net.URL]) extends ammonite.repl.api.SessionChanged
+case class SessionChanged(rawRemovedImports: Array[String],
+                          rawAddedImports: Array[String],
+                          rawRemovedJars: Array[java.net.URL],
+                          rawAddedJars: Array[java.net.URL]) extends ISessionChanged
 object SessionChanged{
 
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
     def frameSymbols(f: Frame) = f.imports.data.map(_.toName.backticked).map(Symbol(_)).toSet
     new SessionChanged(
-      frameSymbols(oldFrame) -- frameSymbols(newFrame),
-      frameSymbols(newFrame) -- frameSymbols(oldFrame),
-      oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars.toSet,
-      newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars.toSet
+      (frameSymbols(oldFrame) -- frameSymbols(newFrame)).iterator.map(_.name).toArray,
+      (frameSymbols(newFrame) -- frameSymbols(oldFrame)).iterator.map(_.name).toArray,
+      (oldFrame.classloader.allJars.toSet -- newFrame.classloader.allJars).toArray,
+      (newFrame.classloader.allJars.toSet -- oldFrame.classloader.allJars).toArray
     )
   }
 }

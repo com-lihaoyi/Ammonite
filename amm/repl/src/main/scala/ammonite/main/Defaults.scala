@@ -25,6 +25,7 @@ object Defaults{
   val replImports = Imports(
     ImportData("""ammonite.repl.ReplExtras.{
       ReplAPIExtensions,
+      SessionChangedExtensions,
       codeColorsImplicit,
       pprinterImplicit,
       show,
