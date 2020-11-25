@@ -210,6 +210,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+      ivy"org.javassist:javassist:3.21.0-GA",
+      ivy"com.github.javaparser:javaparser-core:3.2.5",
       ivy"com.lihaoyi::scalaparse:2.3.0",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
@@ -242,7 +244,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.3.0",
-      ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
   }
@@ -292,7 +293,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.jline:jline-terminal:3.14.1",
       ivy"org.jline:jline-terminal-jna:3.14.1",
       ivy"org.jline:jline-reader:3.14.1",
-      ivy"com.github.javaparser:javaparser-core:3.2.5",
 //      ivy"com.github.scopt::scopt:3.7.1"
     )
 

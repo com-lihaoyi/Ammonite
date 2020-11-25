@@ -10,7 +10,7 @@ import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.{FrontEndAPIImpl, Repl, SourceAPIImpl}
+import ammonite.repl.{FrontEndAPIImpl, Repl}
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.newLine
 import ammonite.util._
@@ -181,11 +181,6 @@ case class Main(predefCode: String = "",
         classPathWhitelist = classPathWhitelist
       )
       val bridges = Seq(
-        (
-          "ammonite.repl.api.SourceBridge",
-          "source",
-          new SourceAPIImpl {}
-        ),
         (
           "ammonite.repl.api.FrontEndBridge",
           "frontEnd",

@@ -4,14 +4,22 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
 
 import ammonite.repl.Highlighter
-import ammonite.repl.api.Location
 import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
 import ammonite.util.Util.newLine
 import scala.collection.mutable
 import scala.language.experimental.macros
 
+case class Location(fileName: String, lineNum: Int, fileContent: String)
+
 object SourceRuntime{
+
+  def browseSourceCommand(targetLine: Int) = Seq("less", "+" + targetLine,"-RMN")
+
+  def failLoudly[T](res: Either[String, T]): T = res match{
+    case Left(s) => throw new Exception(s)
+    case Right(r) => r
+  }
 
   /**
     * Pull the height from the pretty-printer as a heuristic to shift the
@@ -202,7 +210,7 @@ object SourceRuntime{
   def browseSource(loaded: Either[String, Location],
                    verticalOffset: Int,
                    colors: CodeColors,
-                   command: Int => Strings) = {
+                   command: Int => Strings): Unit = {
 
     loaded match{
       case Right(loc) =>

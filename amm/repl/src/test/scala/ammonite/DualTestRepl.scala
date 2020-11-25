@@ -1,8 +1,6 @@
 package ammonite
 
 import ammonite.compiler.CodeClassWrapper
-import ammonite.repl.api.SourceBridge
-import ammonite.repl.SourceAPIImpl
 import ammonite.runtime.Evaluated
 import ammonite.util.Res
 
@@ -10,9 +8,6 @@ import ammonite.util.Res
   * Wraps several [[TestRepl]], and runs its tests against all of them.
   */
 class DualTestRepl { dual =>
-
-  if (SourceBridge.value0 == null)
-    SourceBridge.value0 = new SourceAPIImpl {}
 
   def predef: (String, Option[os.Path]) = ("", None)
 
