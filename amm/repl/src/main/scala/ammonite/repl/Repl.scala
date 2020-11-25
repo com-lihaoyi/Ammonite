@@ -1,6 +1,7 @@
 package ammonite.repl
 
 import java.io.{InputStream, InputStreamReader, OutputStream}
+import java.nio.file.Path
 
 import ammonite.repl.api.{FrontEnd, History, ReplLoad}
 import ammonite.runtime._
@@ -119,9 +120,9 @@ class Repl(input: InputStream,
             }
           }
 
-          def exec(file: os.Path): Unit = {
-            interp.watch(file)
-            apply(normalizeNewlines(os.read(file)))
+          def exec(file: Path): Unit = {
+            interp.watch(os.Path(file))
+            apply(normalizeNewlines(os.read(os.Path(file))))
           }
         }
       }

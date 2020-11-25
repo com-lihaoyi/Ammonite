@@ -1,5 +1,7 @@
 package ammonite.repl.api
 
+import java.nio.file.Path
+
 import ammonite.util._
 
 import scala.reflect.runtime.universe._
@@ -180,7 +182,7 @@ trait ReplLoad{
     * Compilation units separated by `@\n` are evaluated sequentially.
     * If an error happens it prints an error message to the console.
     */
-  def exec(path: os.Path): Unit
+  def exec(path: Path): Unit
 
 }
 trait Session{

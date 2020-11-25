@@ -1,6 +1,7 @@
 package ammonite
 
 import java.io.PrintStream
+import java.nio.file.Path
 
 import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
 import ammonite.main.Defaults
@@ -127,9 +128,9 @@ class TestRepl {
             }
           }
 
-          def exec(file: os.Path): Unit = {
-            interp.watch(file)
-            apply(normalizeNewlines(os.read(file)))
+          def exec(file: Path): Unit = {
+            interp.watch(os.Path(file))
+            apply(normalizeNewlines(os.read(os.Path(file))))
           }
         }
 

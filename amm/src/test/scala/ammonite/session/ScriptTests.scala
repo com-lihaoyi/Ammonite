@@ -21,7 +21,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"LoadIvy.sc")
+            @ repl.load.exec(($printedScriptPath/"LoadIvy.sc").toNIO)
 
             @ val r = res
             r: String = "<a href=\\"www.google.com\\">omg</a>"
@@ -32,7 +32,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"PreserveImports.sc")
+            @ repl.load.exec(($printedScriptPath/"PreserveImports.sc").toNIO)
 
             @ val r = res
             r: Left[String, Nothing] = Left("asd")
@@ -42,7 +42,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"Annotation.sc")
+            @ repl.load.exec(($printedScriptPath/"Annotation.sc").toNIO)
 
             @ val r = res
             r: Int = 24
@@ -52,7 +52,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"BlockSepSyntax.sc")
+            @ repl.load.exec(($printedScriptPath/"BlockSepSyntax.sc").toNIO)
 
             @ val r = res
             r: Int = 24
@@ -62,7 +62,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"LimitImports.sc")
+            @ repl.load.exec(($printedScriptPath/"LimitImports.sc").toNIO)
 
             @ res
             error: not found: value res
@@ -74,7 +74,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
+            @ repl.load.exec(($printedScriptPath/"SyntaxError.sc").toNIO)
             error: CompilationError
 
             @ val r = res
@@ -88,7 +88,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @  import os._
 
-            @ repl.load.exec($printedScriptPath/"CompilationError.sc")
+            @ repl.load.exec(($printedScriptPath/"CompilationError.sc").toNIO)
             error: Compilation Failed
 
             @ val r = res
@@ -102,7 +102,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"notHere")
+            @ repl.load.exec(($printedScriptPath/"notHere").toNIO)
             error: java.nio.file.NoSuchFileException
             """
           )
@@ -111,7 +111,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"MultiBlockError.sc")
+            @ repl.load.exec(($printedScriptPath/"MultiBlockError.sc").toNIO)
             error: Compilation Failed
 
             @ val r2 = res2
@@ -126,7 +126,7 @@ object ScriptTests extends TestSuite{
         check.session(s"""
           @ import os._
 
-          @ repl.load.exec($printedScriptPath/"NestedScripts.sc")
+          @ repl.load.exec(($printedScriptPath/"NestedScripts.sc").toNIO)
 
           @ val a = asd
           error: not found: value asd
@@ -140,7 +140,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @  import os._
 
-            @ repl.load.exec($printedScriptPath/"SheBang.sc")
+            @ repl.load.exec(($printedScriptPath/"SheBang.sc").toNIO)
 
             @ val r = res
             r: Int = 42
@@ -151,7 +151,7 @@ object ScriptTests extends TestSuite{
             s"""
             @  import os._
 
-            @ repl.load.exec($printedScriptPath/"MultilineSheBang.sc")
+            @ repl.load.exec(($printedScriptPath/"MultilineSheBang.sc").toNIO)
 
             @ val r = res
             r: Int = 42
@@ -221,7 +221,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
+            @ repl.load.exec(($printedScriptPath/"SyntaxError.sc").toNIO)
             error: CompilationError
 
             @ val r = res
@@ -248,7 +248,7 @@ object ScriptTests extends TestSuite{
           check.session(s"""
             @ import os._
 
-            @ repl.load.exec($printedScriptPath/"notHere")
+            @ repl.load.exec(($printedScriptPath/"notHere").toNIO)
             error: java.nio.file.NoSuchFileException
             """
           )
