@@ -130,16 +130,24 @@ object Sample{
     println(command)
     println(input)
     println(args)
+
+    println("A")
     val pb = new ProcessBuilder(command:_*)
+    println("B")
     for((k, v) <- args) pb.environment().put(k, v)
-
+    println("C")
     pb.redirectErrorStream(true)
+    println("D")
     val p = pb.start()
-
+    println("E")
     p.getOutputStream.write(input.getBytes)
+    println("F")
     p.getOutputStream.flush()
+    println("G")
     p.waitFor()
+    println("H")
     val output = new ByteArrayOutputStream()
+    println("I")
     var length = 0
     while({
       val buffer = new Array[Byte](2048)
