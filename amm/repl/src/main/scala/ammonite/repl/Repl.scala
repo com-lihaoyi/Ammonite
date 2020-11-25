@@ -37,7 +37,7 @@ class Repl(compilerManager: CompilerLifecycleManager,
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
            classPathWhitelist: Set[Seq[String]]) { repl =>
 
-  val prompt = Ref("@ ")
+  var prompt = () => "@ "
 
   val frontEnd = Ref[FrontEnd](
     if (scala.util.Properties.isWin)
@@ -104,7 +104,9 @@ class Repl(compilerManager: CompilerLifecycleManager,
         def printer = repl.printer
         val colors = repl.colors
         def sess = repl.sess0
-        val prompt = repl.prompt
+        def prompt = repl.prompt()
+        def prompt_=(prompt: => String): Unit =
+          repl.prompt = () => prompt
         val frontEnd = repl.frontEnd
 
         def lastException = repl.lastException

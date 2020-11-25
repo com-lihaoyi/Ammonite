@@ -18,11 +18,11 @@ object Configure {
       )
     }
 
-    repl.prompt.bind(
+    repl.prompt = {
       sys.props("user.name") +
       "-" +
       wd.segments.toSeq.lastOption.getOrElse("") +
       "@ "
-    )
+    }
   }
 }

@@ -18,7 +18,9 @@ trait ReplAPI {
    * Read/writable prompt for the shell. Use this to change the
    * REPL prompt at any time!
    */
-  val prompt: Ref[String]
+  def prompt: String
+  def prompt_=(prompt: => String): Unit
+
   /**
    * The front-end REPL used to take user input. Modifiable!
    */

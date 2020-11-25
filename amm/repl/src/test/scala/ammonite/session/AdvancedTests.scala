@@ -328,16 +328,16 @@ object AdvancedTests extends TestSuite{
       val c1 = new DualTestRepl()
       val c2 = new DualTestRepl()
       c1.session("""
-        @ repl.prompt() = "A"
+        @ repl.prompt = "A"
       """)
       c2.session("""
-        @ repl.prompt() = "B"
+        @ repl.prompt = "B"
       """)
       c1.session("""
-        @ assert(repl.prompt() == "A")
+        @ assert(repl.prompt == "A")
       """)
       c2.session("""
-        @ assert(repl.prompt() == "B")
+        @ assert(repl.prompt == "B")
       """)
     }
     test("macro paradise or -Ymacro-annotations") {

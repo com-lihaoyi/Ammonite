@@ -108,7 +108,9 @@ class TestRepl {
         def printer = printer0
 
         def sess = sess0
-        val prompt = Ref("@")
+        var prompt0 = () => "@"
+        def prompt = prompt0()
+        def prompt_=(p: => String) = { prompt0 = () => p }
         val frontEnd = Ref[FrontEnd](null)
         def lastException: Throwable = null
         def fullHistory = storage.fullHistory()

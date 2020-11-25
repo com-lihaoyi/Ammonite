@@ -13,7 +13,7 @@ object BuiltinTests extends TestSuite{
       check.session("""
         @ // Set the shell prompt to be something else
 
-        @ repl.prompt() = ">"
+        @ repl.prompt = ">"
 
         @ // Change the terminal front end; the default is
 
