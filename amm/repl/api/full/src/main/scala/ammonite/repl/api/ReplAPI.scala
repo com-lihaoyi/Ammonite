@@ -2,7 +2,7 @@ package ammonite.repl.api
 
 import java.nio.file.Path
 
-import ammonite.compiler.iface.{Frame, Imports}
+import ammonite.compiler.iface.Imports
 import ammonite.util._
 
 import scala.reflect.runtime.universe.{Bind => _, _}
@@ -126,34 +126,4 @@ trait ReplAPI {
   def fullRawHistory: Array[String]
   def rawHistory: Array[String]
   def replArgs: IndexedSeq[Bind[_]]
-}
-trait Session{
-  /**
-    * The current stack of frames
-    */
-  def frames: List[Frame]
-  /**
-    * Checkpoints your current work, placing all future work into its own
-    * frames. If a name is provided, it can be used to quickly recover
-    * that checkpoint later.
-    */
-  def save(name: String = ""): Unit
-
-  /**
-    * Discards the last frames, effectively reverting your session to
-    * the last `save`-ed checkpoint. If a name is provided, it instead reverts
-    * your session to the checkpoint with that name.
-    */
-  def load(name: String = ""): SessionChanged
-
-  /**
-    * Resets you to the last save point. If you pass in `num`, it resets
-    * you to that many savepoints since the last one.
-    */
-  def pop(num: Int = 1): SessionChanged
-  /**
-    * Deletes a named checkpoint, allowing it to be garbage collected if it
-    * is no longer accessible.
-    */
-  def delete(name: String): Unit
 }

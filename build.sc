@@ -260,7 +260,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     object api extends JavaModule with AmmPublishModule with AmmInternalJavaModule {
       def artifactName = "ammonite-repl-api"
       def moduleDeps = Seq(
-        interp.api
+        interp.api,
+        compiler.interface
       )
       def exposedClassPath = T{
         runClasspath() ++
@@ -381,8 +382,7 @@ class MainModule(val crossScalaVersion: String)
 
   def thinWhitelist = T{
     generateApiWhitelist(
-      amm.repl.api.exposedClassPath() ++
-        amm.compiler.interface.exposedClassPath()
+      amm.repl.api.exposedClassPath()
     )
   }
   def localClasspath = T{
