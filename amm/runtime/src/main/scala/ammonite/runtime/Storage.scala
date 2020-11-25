@@ -150,7 +150,7 @@ object Storage{
     var sharedPredef = ""
     def loadPredef = None
     def getSessionId = 0L
-    var _history = new History(Vector())
+    var _history = new History(Array())
     val fullHistory = new StableRef[History]{
       def apply() = _history
       def update(h: History): Unit = _history = h
@@ -222,9 +222,9 @@ object Storage{
     val fullHistory = new StableRef[History]{
       def apply(): History = {
         try{
-          new History(upickle.default.read[Vector[String]](os.read(historyFile)))
+          new History(upickle.default.read[Vector[String]](os.read(historyFile)).toArray)
         }catch{case e: Exception =>
-          new History(Vector())
+          new History(Array())
         }
       }
 

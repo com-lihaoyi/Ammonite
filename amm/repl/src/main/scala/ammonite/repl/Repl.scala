@@ -48,7 +48,7 @@ class Repl(compilerManager: CompilerLifecycleManager,
 
   var lastException: Throwable = null
 
-  var history = new History(Vector())
+  var history = new History(Array())
 
   val (colors, printer) =
     Interpreter.initPrinters(initialColors, output, error, true)
@@ -110,8 +110,8 @@ class Repl(compilerManager: CompilerLifecycleManager,
         val frontEnd = repl.frontEnd
 
         def lastException = repl.lastException
-        def fullHistory = storage.fullHistory()
-        def history = repl.history
+        def fullRawHistory = storage.fullHistory().array
+        def rawHistory = repl.history.array
         def newCompiler() = interp.compilerManager.forceInit()
         def compiler = null
         def interactiveCompiler = null

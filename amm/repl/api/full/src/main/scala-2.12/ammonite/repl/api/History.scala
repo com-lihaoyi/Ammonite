@@ -4,11 +4,11 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.{IndexedSeqLike, mutable}
 
 
-class History(s: Vector[String])
+class History(val array: Array[String])
 extends IndexedSeq[String]
 with IndexedSeqLike[String, History] {
-  def length: Int = s.length
-  def apply(idx: Int): String = s.apply(idx)
+  def length: Int = array.length
+  def apply(idx: Int): String = array.apply(idx)
   override def newBuilder = History.builder
 }
 
@@ -17,7 +17,7 @@ object History{
     val buffer = mutable.Buffer.empty[String]
     def +=(elem: String): this.type = {buffer += elem; this}
 
-    def result(): History = new History(buffer.toVector)
+    def result(): History = new History(buffer.toArray)
 
     def clear(): Unit = buffer.clear()
   }
@@ -25,6 +25,6 @@ object History{
     def apply(from: History) = builder
     def apply() = builder
   }
-  implicit def toHistory(s: Seq[String]): History = new History(s.toVector)
+  implicit def toHistory(s: Seq[String]): History = new History(s.toArray)
 }
 

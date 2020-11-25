@@ -41,17 +41,6 @@ trait ReplAPI {
     * when a Ctrl-C interrupt happened) via `lastException.printStackTrace`.
     */
   def lastException: Throwable
-  /**
-   * History of commands that have been entered into the shell, including
-   * previous sessions
-   */
-  def fullHistory: History
-
-  /**
-   * History of commands that have been entered into the shell during the
-   * current session
-   */
-  def history: History
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
@@ -134,6 +123,8 @@ trait ReplAPI {
 
   // internal
   def printer: Printer
+  def fullRawHistory: Array[String]
+  def rawHistory: Array[String]
 }
 trait ReplLoad{
   /**

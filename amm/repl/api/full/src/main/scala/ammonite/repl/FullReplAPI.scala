@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import ammonite.interp.api.APIHolder
-import ammonite.repl.api.ReplAPI
+import ammonite.repl.api.{History, ReplAPI}
 import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 
@@ -193,5 +193,19 @@ object ReplExtras {
 
     def clipboard: Clipboard =
       Clipboard.clipboardImpl
+
+    /**
+     * History of commands that have been entered into the shell, including
+     * previous sessions
+     */
+    def fullHistory: History =
+      new History(api.fullRawHistory)
+
+    /**
+     * History of commands that have been entered into the shell during the
+     * current session
+     */
+    def history: History =
+      new History(api.rawHistory)
   }
 }

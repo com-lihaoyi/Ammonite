@@ -113,8 +113,8 @@ class TestRepl {
         def prompt_=(p: => String) = { prompt0 = () => p }
         val frontEnd = Ref[FrontEnd](null)
         def lastException: Throwable = null
-        def fullHistory = storage.fullHistory()
-        def history = new History(Vector())
+        def fullRawHistory = storage.fullHistory().array
+        def rawHistory = Array()
         val colors = Ref(Colors.BlackWhite)
         def newCompiler() = interp.compilerManager.forceInit()
         def compiler = null
