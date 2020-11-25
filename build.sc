@@ -272,6 +272,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       class ReplApiFullModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
         def crossFullScalaVersion = true
         def moduleDeps = Seq(
+          api,
           amm.util(),
           interp.api.full()
         )

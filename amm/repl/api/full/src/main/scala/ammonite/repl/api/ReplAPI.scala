@@ -127,21 +127,6 @@ trait ReplAPI {
   def rawHistory: Array[String]
   def replArgs: IndexedSeq[Bind[_]]
 }
-trait ReplLoad{
-  /**
-    * Loads a command into the REPL and
-    * evaluates them one after another
-    */
-  def apply(line: String): Unit
-
-  /**
-    * Loads and executes the scriptfile on the specified path.
-    * Compilation units separated by `@\n` are evaluated sequentially.
-    * If an error happens it prints an error message to the console.
-    */
-  def exec(path: Path): Unit
-
-}
 trait Session{
   /**
     * The current stack of frames
