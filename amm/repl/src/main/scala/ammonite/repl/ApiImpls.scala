@@ -7,8 +7,6 @@ import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._
 
-import java.awt.Toolkit
-import java.awt.datatransfer.{DataFlavor, StringSelection}
 import java.util.Locale
 
 import scala.collection.mutable
@@ -114,28 +112,8 @@ trait ReplApiImpl extends FullReplAPI{
 
   def sess: SessionApiImpl
 
-  override def clipboard: Clipboard = ClipboardImpl
-}
-object ClipboardImpl extends Clipboard {
-
-  private lazy val systemClipboard =
-    Toolkit.getDefaultToolkit.getSystemClipboard
-
-  override def read: String =
-    Option(systemClipboard.getContents(null)) collect {
-      case data if data.isDataFlavorSupported(DataFlavor.stringFlavor) =>
-        data.getTransferData(DataFlavor.stringFlavor)
-    } match {
-      case Some(str: String) => str
-      case _ => ""
-    }
-
-  override def write(data: Internals.Writable): Unit = {
-    val newContents = new StringSelection(
-      data.writeableData.map(new String(_)).mkString
-    )
-    systemClipboard.setContents(newContents, newContents)
-  }
+  def clipboard: Clipboard =
+    Clipboard.clipboardImpl
 }
 
 trait SourceAPIImpl extends SourceAPI {

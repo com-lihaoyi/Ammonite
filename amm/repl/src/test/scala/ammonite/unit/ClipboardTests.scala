@@ -1,7 +1,6 @@
 package ammonite.unit
 
 import ammonite.repl.api.Clipboard
-import ammonite.repl.ClipboardImpl
 
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
@@ -12,7 +11,7 @@ import scala.util.Try
 
 object ClipboardTests extends TestSuite{
 
-  val clipboard: Clipboard = ClipboardImpl
+  val clipboard = Clipboard.clipboardImpl
 
   /**
     * This test suite requires an environment with access to a window
