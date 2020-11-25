@@ -136,7 +136,7 @@ object Sample{
     println("B")
     for((k, v) <- args) pb.environment().put(k, v)
     println("C")
-    pb.redirectErrorStream(true)
+//    pb.redirectErrorStream(true)
     println("D")
     val p = pb.start()
     println("E")
