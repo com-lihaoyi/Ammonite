@@ -8,7 +8,7 @@ import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.repl._
-import ammonite.repl.api.{FrontEnd, History, ReplLoad}
+import ammonite.repl.api.{FrontEnd, ReplAPI, ReplLoad}
 import ammonite.runtime.{Evaluated, Frame, Storage}
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.normalizeNewlines
@@ -103,9 +103,19 @@ class TestRepl {
     (
       "ammonite.repl.ReplBridge",
       "repl",
-      new ReplApiImpl { replApi =>
-        def replArgs0 = Vector.empty[Bind[_]]
+      new ReplAPI {
+        def replArgs = Vector.empty[Bind[_]]
         def printer = printer0
+
+        val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
+          pprint.PPrinter.Color.copy(
+            defaultHeight = height / 2,
+            defaultWidth = width,
+            colorLiteral = colors().literal(),
+            colorApplyPrefix = colors().prefix(),
+            additionalHandlers = PPrints.replPPrintHandlers
+          )
+        )
 
         def sess = sess0
         var prompt0 = () => "@"
@@ -141,24 +151,19 @@ class TestRepl {
           }
         }
 
-        override protected[this] def internal0: FullReplAPI.Internal =
-          new FullReplAPI.Internal {
-            def replArgs: IndexedSeq[Bind[_]] = replArgs0
-
-            // TODO Re-enable somehow
-            // override def print[T: TPrint](
-            //   value: => T,
-            //   ident: String,
-            //   custom: Option[String]
-            // )(implicit
-            //   tcolors: TPrintColors,
-            //   classTagT: ClassTag[T]
-            // ): Iterator[String] =
-            //   if (classTagT == scala.reflect.classTag[ammonite.Nope])
-            //     Iterator()
-            //   else
-            //     super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
-          }
+        // TODO Re-enable somehow
+        // override def print[T: TPrint](
+        //   value: => T,
+        //   ident: String,
+        //   custom: Option[String]
+        // )(implicit
+        //   tcolors: TPrintColors,
+        //   classTagT: ClassTag[T]
+        // ): Iterator[String] =
+        //   if (classTagT == scala.reflect.classTag[ammonite.Nope])
+        //     Iterator()
+        //   else
+        //     super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
       }
     )
   )

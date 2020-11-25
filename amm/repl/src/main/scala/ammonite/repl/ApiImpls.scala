@@ -62,17 +62,3 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
     namedFrames.remove(name)
   }
 }
-trait ReplApiImpl extends FullReplAPI{
-
-  implicit val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
-    pprint.PPrinter.Color.copy(
-      defaultHeight = height / 2,
-      defaultWidth = width,
-      colorLiteral = colors().literal(),
-      colorApplyPrefix = colors().prefix(),
-      additionalHandlers = PPrints.replPPrintHandlers
-    )
-  )
-
-  def sess: SessionApiImpl
-}

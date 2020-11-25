@@ -5,7 +5,7 @@ import java.nio.file.Path
 import ammonite.compiler.iface.{Frame, Imports}
 import ammonite.util._
 
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.{Bind => _, _}
 
 
 
@@ -91,7 +91,7 @@ trait ReplAPI {
     */
   def usedEarlierDefinitions: Seq[String]
 
-  val pprinter: Ref[pprint.PPrinter]
+  def pprinter: Ref[pprint.PPrinter]
 
   /**
    * Current width of the terminal
@@ -125,6 +125,7 @@ trait ReplAPI {
   def printer: Printer
   def fullRawHistory: Array[String]
   def rawHistory: Array[String]
+  def replArgs: IndexedSeq[Bind[_]]
 }
 trait ReplLoad{
   /**

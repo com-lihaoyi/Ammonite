@@ -12,29 +12,7 @@ import scala.reflect.ClassTag
 import scala.reflect.classTag
 import ammonite.repl.api.Clipboard
 
-trait FullReplAPI extends ReplAPI{ replApi =>
-
-  protected[this] def replArgs0: IndexedSeq[Bind[_]]
-  protected[this] def internal0: FullReplAPI.Internal =
-    new FullReplAPI.Internal {
-      def replArgs: IndexedSeq[Bind[_]] = replArgs0
-    }
-
-  /**
-    * This stuff is used for the REPL-generated code that prints things;
-    * shouldn't really be used by users, but needs to be public and accessible
-    */
-  lazy val Internal: FullReplAPI.Internal = internal0
-}
-
-object FullReplAPI {
-
-  trait Internal {
-    def replArgs: IndexedSeq[Bind[_]]
-  }
-}
-
-object ReplBridge extends APIHolder[FullReplAPI]
+object ReplBridge extends APIHolder[ReplAPI]
 
 object ReplExtras {
 

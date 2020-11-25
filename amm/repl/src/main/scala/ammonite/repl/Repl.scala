@@ -3,7 +3,7 @@ package ammonite.repl
 import java.io.{InputStream, InputStreamReader, OutputStream}
 import java.nio.file.Path
 
-import ammonite.repl.api.{FrontEnd, History, ReplLoad}
+import ammonite.repl.api.{FrontEnd, History, ReplAPI, ReplLoad}
 import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.InterfaceExtensions._
@@ -56,7 +56,7 @@ class Repl(compilerManager: CompilerLifecycleManager,
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
     val ${b.name} =
-      ammonite.repl.ReplBridge.value.Internal.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
+      ammonite.repl.ReplBridge.value.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
     """
   }.mkString(newLine)
 
@@ -99,8 +99,8 @@ class Repl(compilerManager: CompilerLifecycleManager,
     (
       "ammonite.repl.ReplBridge",
       "repl",
-      new ReplApiImpl {
-        def replArgs0 = repl.replArgs
+      new ReplAPI {
+        def replArgs = repl.replArgs
         def printer = repl.printer
         val colors = repl.colors
         def sess = repl.sess0
@@ -108,6 +108,16 @@ class Repl(compilerManager: CompilerLifecycleManager,
         def prompt_=(prompt: => String): Unit =
           repl.prompt = () => prompt
         val frontEnd = repl.frontEnd
+
+        val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
+          pprint.PPrinter.Color.copy(
+            defaultHeight = height / 2,
+            defaultWidth = width,
+            colorLiteral = colors().literal(),
+            colorApplyPrefix = colors().prefix(),
+            additionalHandlers = PPrints.replPPrintHandlers
+          )
+        )
 
         def lastException = repl.lastException
         def fullRawHistory = storage.fullHistory().array

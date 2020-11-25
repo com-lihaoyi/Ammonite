@@ -113,7 +113,6 @@ case class Main(predefCode: String = "",
           .repl
           .ReplBridge
           .value
-          .Internal
           .replArgs($idx)
           .value
           .asInstanceOf[${b.typeTag.tpe}]
