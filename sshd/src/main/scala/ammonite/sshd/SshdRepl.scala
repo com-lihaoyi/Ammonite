@@ -70,7 +70,7 @@ object SshdRepl {
           inputStream = in, outputStream = out, errorStream = out,
           verboseOutput = false,
           remoteLogging = false,
-          colors = Colors.Default
+          initialColors = "default"
         ).run(replArgs:_*)
       } catch {
         case any: Throwable =>

@@ -11,6 +11,9 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 import ammonite.repl.api.Clipboard
+import pprint.PPrinter
+import java.io.OutputStream
+import java.io.PrintStream
 
 object ReplBridge extends APIHolder[ReplAPI]
 
@@ -101,7 +104,7 @@ object ReplExtras {
       // pretty-printing of the main body
       val prefix = new pprint.Truncated(
         Iterator(
-          api.colors().ident()(ident).render, ": ",
+          api.ammColors().ident()(ident).render, ": ",
           implicitly[pprint.TPrint[T]].render(tcolors), " = "
         ),
         api.pprinter().defaultWidth,
@@ -126,12 +129,12 @@ object ReplExtras {
   }
   def printDef(definitionLabel: String, ident: String)(implicit api: ReplAPI) = {
     Iterator(
-      "defined ", api.colors().`type`()(definitionLabel).render, " ",
-      api.colors().ident()(ident).render
+      "defined ", api.ammColors().`type`()(definitionLabel).render, " ",
+      api.ammColors().ident()(ident).render
     )
   }
   def printImport(imported: String)(implicit api: ReplAPI) = {
-    Iterator(api.colors().`type`()("import ").render, api.colors().ident()(imported).render)
+    Iterator(api.ammColors().`type`()("import ").render, api.ammColors().ident()(imported).render)
   }
 
   implicit def pprinterImplicit(implicit api: ReplAPI) = api.pprinter()
@@ -141,22 +144,28 @@ object ReplExtras {
    * to shadow this with your own definition to change how things look
    */
   implicit def tprintColorsImplicit(implicit api: ReplAPI) = pprint.TPrintColors(
-    typeColor = api.colors().`type`()
+    typeColor = api.ammColors().`type`()
   )
   implicit def codeColorsImplicit(implicit api: ReplAPI): CodeColors = new CodeColors{
     def comment = {
       pprint.log(api)
       pprint.log(ReplBridge)
       api
-        .colors
-        .apply()
+        .ammColors()
         .comment()
     }
-    def `type` = api.colors().`type`()
-    def literal = api.colors().literal()
-    def keyword = api.colors().keyword()
-    def ident = api.colors().ident()
+    def `type` = api.ammColors().`type`()
+    def literal = api.ammColors().literal()
+    def keyword = api.ammColors().keyword()
+    def ident = api.ammColors().ident()
   }
+
+  private final case class Data(
+    pprinter: Ref[PPrinter]
+  )
+
+  private lazy val bw = Colors.BlackWhite
+  private lazy val default = Colors.Default
 
   implicit class ReplAPIExtensions(private val api: ReplAPI) extends AnyVal {
     def typeOf[T: WeakTypeTag] = ReplExtras.typeOf[T]
@@ -185,6 +194,44 @@ object ReplExtras {
      */
     def history: History =
       new History(api.rawHistory)
+
+
+    private def data: Data = {
+      if (api.data == null) {
+        ReplExtras.synchronized {
+          if (api.data == null) {
+            val pprinterRef: Ref[PPrinter] = Ref.live(() =>
+              pprint.PPrinter.Color.copy(
+                defaultHeight = api.height / 2,
+                defaultWidth = api.width,
+                colorLiteral = ammColors().literal(),
+                colorApplyPrefix = ammColors().prefix()
+                // TODO Add that back somehow
+                // additionalHandlers = PPrints.replPPrintHandlers
+              )
+            )
+            api.setData(Data(
+              pprinterRef
+            ))
+          }
+        }
+      }
+      api.data.asInstanceOf[Data]
+    }
+
+    def ammColors() =
+      api.getColors match {
+        case ammonite.repl.api.Colors.BLACKWHITE => bw
+        case _ => default
+      }
+
+    def colors: ammonite.repl.api.Colors =
+      api.getColors
+    def colors_=(colors: ammonite.repl.api.Colors): Unit =
+      api.setColors(colors)
+
+    def pprinter: Ref[PPrinter] =
+      data.pprinter
   }
 
   implicit class SessionChangedExtensions(

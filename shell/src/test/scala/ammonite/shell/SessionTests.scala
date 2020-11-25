@@ -46,12 +46,14 @@ object SessionTests extends TestSuite{
       check.session(s"""
         @ import ammonite.ops._
 
+        @ ammonite.repl.PPrints.setup()
+
         @ interp.load.module(($bareSrc).toNIO)
 
         @ import ammonite.ops.ImplicitWd
 
         @ %%ls "ops/src/test"
-        res3: CommandResult =
+        res4: CommandResult =
         resources
         scala
       """)

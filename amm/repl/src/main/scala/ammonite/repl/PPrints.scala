@@ -1,12 +1,19 @@
 package ammonite.repl
 
 import ammonite.ops.{CommandResult, LsSeq}
-import ammonite.repl.api.History
+import ammonite.repl.api.{History, ReplAPI}
+import ammonite.repl.ReplExtras.ReplAPIExtensions
 import ammonite.runtime.tools.GrepResult
 import ammonite.util.Util
 import pprint.Renderer
 
 object PPrints{
+  def setup()(implicit api: ammonite.repl.api.ReplAPI): Unit = {
+    val printer = api.pprinter()
+    api.pprinter() = api.pprinter().copy(
+      additionalHandlers = replPPrintHandlers
+    )
+  }
   val replPPrintHandlers: PartialFunction[Any, pprint.Tree] = {
     case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x)
 //    case x: os.Path => PPrints.pathRepr(x)

@@ -3,7 +3,7 @@ package ammonite.repl.api
 import java.nio.file.Path
 
 import ammonite.compiler.iface.Imports
-import ammonite.util._
+import ammonite.util.{Colors => _, _}
 
 import scala.reflect.runtime.universe.{Bind => _, _}
 
@@ -25,12 +25,6 @@ trait ReplAPI {
    * The front-end REPL used to take user input. Modifiable!
    */
   val frontEnd: Ref[FrontEnd]
-
-  /**
-    * The colors that will be used to render the Ammonite REPL in the terminal,
-    * or for rendering miscellaneous info messages when running scripts.
-    */
-  val colors: Ref[Colors]
 
   /**
     * The last exception that was thrown in the REPL; `null` if nothing has
@@ -75,13 +69,13 @@ trait ReplAPI {
     *
     * E.g. in a session like
     * ```
-    * @ val n = 2
+    * {@literal @} val n = 2
     * n: Int = 2
     *
-    * @ val p = 1
+    * {@literal @} val p = 1
     * p: Int = 1
     *
-    * @ n + p
+    * {@literal @} n + p
     * res2: Int = 3
     * ```
     * this would have returned an empty list if called from the same line as `val n = 2`
@@ -90,8 +84,6 @@ trait ReplAPI {
     * defines `p`, are referenced from this line.
     */
   def usedEarlierDefinitions: Seq[String]
-
-  def pprinter: Ref[pprint.PPrinter]
 
   /**
    * Current width of the terminal
@@ -126,4 +118,13 @@ trait ReplAPI {
   def fullRawHistory: Array[String]
   def rawHistory: Array[String]
   def replArgs: IndexedSeq[Bind[_]]
+
+  def getColors: Colors
+  def setColors(colors: Colors): Unit
+
+  private var data0: Object = null
+  def data = data0
+  def setData(data: Object) = {
+    data0 = data
+  }
 }

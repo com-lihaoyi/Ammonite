@@ -28,7 +28,7 @@ class Repl(compilerManager: CompilerLifecycleManager,
            wd: os.Path,
            welcomeBanner: Option[String],
            replArgs: IndexedSeq[Bind[_]] = Vector.empty,
-           initialColors: Colors = Colors.Default,
+           initialColors: String = "default",
            replCodeWrapper: CodeWrapper,
            scriptCodeWrapper: CodeWrapper,
            alreadyLoadedDependencies: Seq[Dependency],
@@ -50,8 +50,9 @@ class Repl(compilerManager: CompilerLifecycleManager,
 
   var history = new History(Array())
 
+  val apiColors = Ref[ammonite.repl.api.Colors](ammonite.repl.api.Colors.DEFAULT)
   val (colors, printer) =
-    Interpreter.initPrinters(initialColors, output, error, true)
+    Interpreter.initPrinters(apiColors, output, error, true)
 
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
@@ -102,22 +103,15 @@ class Repl(compilerManager: CompilerLifecycleManager,
       new ReplAPI {
         def replArgs = repl.replArgs
         def printer = repl.printer
-        val colors = repl.colors
+        def getColors = repl.apiColors()
+        def setColors(colors: ammonite.repl.api.Colors) = {
+          repl.apiColors() = colors
+        }
         def sess = repl.sess0
         def prompt = repl.prompt()
         def prompt_=(prompt: => String): Unit =
           repl.prompt = () => prompt
         val frontEnd = repl.frontEnd
-
-        val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
-          pprint.PPrinter.Color.copy(
-            defaultHeight = height / 2,
-            defaultWidth = width,
-            colorLiteral = colors().literal(),
-            colorApplyPrefix = colors().prefix(),
-            additionalHandlers = PPrints.replPPrintHandlers
-          )
-        )
 
         def lastException = repl.lastException
         def fullRawHistory = storage.fullHistory().array

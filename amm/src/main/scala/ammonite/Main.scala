@@ -71,7 +71,7 @@ case class Main(predefCode: String = "",
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
                 remoteLogging: Boolean = true,
-                colors: Colors = Colors.Default,
+                initialColors: String = "default",
                 replCodeWrapper: CodeWrapper = ObjectCodeWrapper,
                 scriptCodeWrapper: CodeWrapper = ObjectCodeWrapper,
                 alreadyLoadedDependencies: Seq[Dependency] =
@@ -134,7 +134,7 @@ case class Main(predefCode: String = "",
         wd = wd,
         welcomeBanner = welcomeBanner,
         replArgs = replArgs,
-        initialColors = colors,
+        initialColors = initialColors,
         replCodeWrapper = replCodeWrapper,
         scriptCodeWrapper = scriptCodeWrapper,
         alreadyLoadedDependencies = alreadyLoadedDependencies,
@@ -152,7 +152,11 @@ case class Main(predefCode: String = "",
         if (defaultPredef) Interpreter.predefImports
         else Imports()
 
-      val (colorsRef, printer) = Interpreter.initPrinters(
+      val colors = Ref[ammonite.repl.api.Colors](initialColors match {
+        case "b&w" => ammonite.repl.api.Colors.BLACKWHITE
+        case _ => ammonite.repl.api.Colors.DEFAULT
+      })
+      val (_, printer) = Interpreter.initPrinters(
         colors,
         outputStream,
         errorStream,
@@ -384,6 +388,10 @@ class MainRunner(cliConfig: Config,
     if(cliConfig.core.color.getOrElse(Main.isInteractive())) Colors.Default
     else Colors.BlackWhite
 
+  val initialColors =
+    if(cliConfig.core.color.getOrElse(Main.isInteractive())) "default"
+    else "b&w"
+
   def printInfo(s: String) = errPrintStream.println(colors.info()(s))
   def printError(s: String) = errPrintStream.println(colors.error()(s))
 
@@ -465,7 +473,7 @@ class MainRunner(cliConfig: Config,
       welcomeBanner = cliConfig.repl.banner match{case "" => None case s => Some(s)},
       verboseOutput = !cliConfig.core.silent.value,
       remoteLogging = !cliConfig.repl.noRemoteLogging.value,
-      colors = colors,
+      initialColors = initialColors,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies =

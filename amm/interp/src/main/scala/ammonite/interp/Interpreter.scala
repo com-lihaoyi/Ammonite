@@ -737,6 +737,7 @@ object Interpreter{
     ),
     ImportData("ammonite.util.InterfaceExtensions.ImportsExtensions"),
     ImportData("ammonite.repl.api.FrontEnd"),
+    ImportData("ammonite.repl.api.Colors"),
     ImportData("ammonite.runtime.tools.{browse, grep, time}"),
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
     ImportData("ammonite.repl.tools.{desugar, source}"),
@@ -790,11 +791,10 @@ object Interpreter{
     Name(wrapperName.raw + (if (wrapperIndex == 1) "" else "_" + wrapperIndex))
   }
 
-  def initPrinters(colors0: Colors,
+  def initPrinters(colors: Ref[ammonite.repl.api.Colors],
                    output: OutputStream,
                    error: OutputStream,
                    verboseOutput: Boolean) = {
-    val colors = Ref[Colors](colors0)
     val printStream = new PrintStream(output, true)
     val errorPrintStream = new PrintStream(error, true)
 
@@ -802,15 +802,25 @@ object Interpreter{
       stream.println(color(s).render)
     }
 
+    val ammColors = {
+      val bw = Colors.BlackWhite
+      val default = Colors.Default
+      () =>
+        colors() match {
+          case ammonite.repl.api.Colors.BLACKWHITE => bw
+          case _ => default
+        }
+    }
+
     val printer = Printer(
       printStream,
       errorPrintStream,
       printStream,
-      printlnWithColor(errorPrintStream, colors().warning(), _),
-      printlnWithColor(errorPrintStream, colors().error(), _),
-      s => if (verboseOutput) printlnWithColor(errorPrintStream, colors().info(), s)
+      printlnWithColor(errorPrintStream, ammColors().warning(), _),
+      printlnWithColor(errorPrintStream, ammColors().error(), _),
+      s => if (verboseOutput) printlnWithColor(errorPrintStream, ammColors().info(), s)
     )
-    (colors, printer)
+    (ammColors, printer)
   }
 
 }

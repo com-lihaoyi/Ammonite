@@ -107,16 +107,6 @@ class TestRepl {
         def replArgs = Vector.empty[Bind[_]]
         def printer = printer0
 
-        val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
-          pprint.PPrinter.Color.copy(
-            defaultHeight = height / 2,
-            defaultWidth = width,
-            colorLiteral = colors().literal(),
-            colorApplyPrefix = colors().prefix(),
-            additionalHandlers = PPrints.replPPrintHandlers
-          )
-        )
-
         def sess = sess0
         var prompt0 = () => "@"
         def prompt = prompt0()
@@ -125,7 +115,8 @@ class TestRepl {
         def lastException: Throwable = null
         def fullRawHistory = storage.fullHistory().array
         def rawHistory = Array()
-        val colors = Ref(Colors.BlackWhite)
+        val getColors = ammonite.repl.api.Colors.BLACKWHITE
+        def setColors(colors: ammonite.repl.api.Colors) = ()
         def newCompiler() = interp.compilerManager.forceInit()
         def compiler = null
         def interactiveCompiler = null
