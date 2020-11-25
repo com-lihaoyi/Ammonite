@@ -141,22 +141,21 @@ class TestRepl {
 
         override protected[this] def internal0: FullReplAPI.Internal =
           new FullReplAPI.Internal {
-            def pprinter = replApi.pprinter
-            def colors = replApi.colors
             def replArgs: IndexedSeq[Bind[_]] = replArgs0
 
-            override def print[T: TPrint](
-              value: => T,
-              ident: String,
-              custom: Option[String]
-            )(implicit
-              tcolors: TPrintColors,
-              classTagT: ClassTag[T]
-            ): Iterator[String] =
-              if (classTagT == scala.reflect.classTag[ammonite.Nope])
-                Iterator()
-              else
-                super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
+            // TODO Re-enable somehow
+            // override def print[T: TPrint](
+            //   value: => T,
+            //   ident: String,
+            //   custom: Option[String]
+            // )(implicit
+            //   tcolors: TPrintColors,
+            //   classTagT: ClassTag[T]
+            // ): Iterator[String] =
+            //   if (classTagT == scala.reflect.classTag[ammonite.Nope])
+            //     Iterator()
+            //   else
+            //     super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
           }
       }
     )

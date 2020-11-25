@@ -23,11 +23,12 @@ object Defaults{
   }
 
   val replImports = Imports(
-    ImportData("""ammonite.repl.ReplBridge.value.{
+    ImportData("""ammonite.repl.ReplExtras.{
+      ReplAPIExtensions,
       codeColorsImplicit,
-      tprintColorsImplicit,
       pprinterImplicit,
       show,
+      tprintColorsImplicit,
       typeOf
     }""")
   )

@@ -31,11 +31,6 @@ trait ReplAPI {
   val colors: Ref[Colors]
 
   /**
-   * Display help text if you don't know how to use the REPL
-   */
-  def help: String
-
-  /**
     * The last exception that was thrown in the REPL; `null` if nothing has
     * yet been thrown. Useful if you want additional information from the
     * thrown exception than the printed stack trace (e.g. many exceptions have
@@ -55,19 +50,6 @@ trait ReplAPI {
    * current session
    */
   def history: History
-
-  /**
-   * Get the `Type` object of [[T]]. Useful for finding
-   * what its methods are and what you can do with it
-   */
-  def typeOf[T: WeakTypeTag]: Type
-
-  /**
-   * Get the `Type` object representing the type of `t`. Useful
-   * for finding what its methods are and what you can do with it
-   *
-   */
-  def typeOf[T: WeakTypeTag](t: => T): Type
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
@@ -118,17 +100,7 @@ trait ReplAPI {
     */
   def usedEarlierDefinitions: Seq[String]
 
-  /**
-   * Controls how things are pretty-printed in the REPL. Feel free
-   * to shadow this with your own definition to change how things look
-   */
-  implicit def tprintColorsImplicit: pprint.TPrintColors
-
-  implicit def codeColorsImplicit: CodeColors
-
   val pprinter: Ref[pprint.PPrinter]
-
-  implicit def pprinterImplicit = pprinter()
 
   /**
    * Current width of the terminal
@@ -139,17 +111,6 @@ trait ReplAPI {
    */
   def height: Int
 
-  def show(t: Any): Unit
-  /**
-   * Lets you configure the pretty-printing of a value. By default, it simply
-   * disables truncation and prints the entire thing, but you can set other
-   * parameters as well if you want.
-   */
-
-  def show(t: Any,
-           width: Integer = null,
-           height: Integer = null,
-           indent: Integer = null): Unit
   /**
     * Functions that can be used to manipulate the current REPL session:
     * check-pointing progress, reverting to earlier checkpoints, or deleting
@@ -169,7 +130,8 @@ trait ReplAPI {
 
   def load: ReplLoad
 
-  def clipboard: Clipboard
+  // internal
+  def printer: Printer
 }
 trait ReplLoad{
   /**

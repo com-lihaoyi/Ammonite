@@ -84,9 +84,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
     s"""
     _root_.ammonite
           .repl
-          .ReplBridge
-          .value
-          .Internal
+          .ReplExtras
           .print($ident, ${fastparse.internal.Util.literalize(ident)}, $customCode)
     """
   }
@@ -94,9 +92,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
     s"""
     _root_.ammonite
           .repl
-          .ReplBridge
-          .value
-          .Internal
+          .ReplExtras
           .printDef("$definitionLabel", ${fastparse.internal.Util.literalize(name)})
     """
 
@@ -146,9 +142,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
         s"""
         _root_.ammonite
               .repl
-              .ReplBridge
-              .value
-              .Internal
+              .ReplExtras
               .printImport(${fastparse.internal.Util.literalize(body)})
         """
       ))

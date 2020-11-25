@@ -1,6 +1,6 @@
 package ammonite.repl
 
-import ammonite.repl.api.{Clipboard, Session}
+import ammonite.repl.api.Session
 import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._
@@ -64,17 +64,6 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
 }
 trait ReplApiImpl extends FullReplAPI{
 
-  implicit def tprintColorsImplicit = pprint.TPrintColors(
-    typeColor = colors().`type`()
-  )
-  implicit val codeColorsImplicit = new CodeColors{
-    def comment = colors().comment()
-    def `type` = colors().`type`()
-    def literal = colors().literal()
-    def keyword = colors().keyword()
-    def ident = colors().ident()
-  }
-
   implicit val pprinter: Ref[pprint.PPrinter] = Ref.live(() =>
     pprint.PPrinter.Color.copy(
       defaultHeight = height / 2,
@@ -85,29 +74,5 @@ trait ReplApiImpl extends FullReplAPI{
     )
   )
 
-  def show(t: Any) = show(t, null, 9999999, null)
-
-  def printer: Printer
-
-  override def show(t: Any,
-                    width: Integer = null,
-                    height: Integer = 9999999,
-                    indent: Integer = null) = {
-
-    pprinter()
-      .tokenize(
-        t,
-        width = if (width == null) pprinter().defaultWidth else width,
-        height = if (height == null) pprinter().defaultHeight else height,
-        indent = if (indent == null) pprinter().defaultIndent else indent
-      )
-      .map(_.render)
-      .foreach(printer.outStream.print)
-    printer.outStream.print(newLine)
-  }
-
   def sess: SessionApiImpl
-
-  def clipboard: Clipboard =
-    Clipboard.clipboardImpl
 }
