@@ -123,6 +123,16 @@
 
 
   @sect{Changelog}
+    @sect{2.3.0}
+      @ul
+        @li
+          Replace the built in @code{@@main} method functionality with the
+          @lnk("MainArgs", "https://github.com/lihaoyi/mainargs") library
+        @li
+          Note that the MainArgs replacement has some backwards incompatibilities:
+          Short flags like @code{-i} can no longer be passed via @code{--i},
+          the @code{@@doc("")} is now @code{@@arg(doc = "")}, @code{Seq[T]} parameters
+          are now passed via repeated @code{--foo} flags rather than comma-separated.
     @sect{2.2.0}
       @ul
         @li
