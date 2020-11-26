@@ -123,7 +123,7 @@
 
 
   @sect{Changelog}
-    @sect{2.3.1}
+    @sect{2.3.3}
       @ul
         @li
           Replace the built in @code{@@main} method functionality with the
