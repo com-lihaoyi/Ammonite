@@ -6,7 +6,7 @@ import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
 val isMasterCommit =
   sys.env.get("GITHUB_REPOSITORY") == Some("lihaoyi/Ammonite") &&
-  sys.env.get("GITHUB_REF").exists(x => x.endsWith("/master") || x.startsWith("refs/tags/"))
+  sys.env.get("GITHUB_REF").exists(x => x.endsWith("/master"))
 
 val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
@@ -33,11 +33,17 @@ val fullCrossScalaVersions = Seq(
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
 println("GITHUB REF " + sys.env.get("GITHUB_REF"))
-val (buildVersion, unstable) = sys.env.get("GITHUB_REF") match{
-  case Some(s"refs/tags/$tagName")  => (tagName, false)
-  case _ =>
+
+val (buildVersion, unstable) = scala.util.Try(
+  os.proc('git, 'describe, "--exact-match", "--tags", "--always", gitHead)
+    .call()
+    .out
+    .trim
+).toOption match{
+  case None =>
     val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
     (s"$latestTaggedVersion-$commitsSinceTaggedVersion-$gitHash", true)
+  case Some(tagName) => (tagName, false)
 }
 
 val bspVersion = "2.0.0-M6"
