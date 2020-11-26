@@ -55,7 +55,9 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frames = Ref(List(Frame.createInitial(initialClassLoader)))
+  val frames = Ref(List(
+    Frame.createInitial(initialClassLoader, forking = classPathWhitelist.isEmpty)
+  ))
 
   /**
     * The current line number of the REPL, used to make sure every snippet

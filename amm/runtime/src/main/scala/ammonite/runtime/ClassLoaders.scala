@@ -62,7 +62,10 @@ class Frame(val classloader: SpecialClassLoader,
     usedEarlierDefinitions0 = usedEarlierDefinitions
 }
 object Frame{
-  def createInitial(baseClassLoader: ClassLoader = Thread.currentThread().getContextClassLoader) = {
+  def createInitial(
+    baseClassLoader: ClassLoader = Thread.currentThread().getContextClassLoader,
+    forking: Boolean = true
+  ) = {
 
     // *Try* to load the JVM source files and make them available as resources,
     // so that the `source` helper can navigate to the sources within the
@@ -70,8 +73,11 @@ object Frame{
 
     val likelyJdkSourceLocation = os.Path(System.getProperty("java.home"))/os.up/"src.zip"
     val hash = SpecialClassLoader.initialClasspathSignature(baseClassLoader)
+    val parent =
+      if (forking) new ForkClassLoader(baseClassLoader, getClass.getClassLoader)
+      else baseClassLoader
     def special = new SpecialClassLoader(
-      new ForkClassLoader(baseClassLoader, getClass.getClassLoader),
+      parent,
       hash,
       Set.empty,
       likelyJdkSourceLocation.wrapped.toUri.toURL

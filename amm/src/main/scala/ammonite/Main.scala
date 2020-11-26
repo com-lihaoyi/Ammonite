@@ -154,7 +154,7 @@ case class Main(predefCode: String = "",
         errorStream,
         verboseOutput
       )
-      val frame = Frame.createInitial(initialClassLoader)
+      val frame = Frame.createInitial(initialClassLoader, forking = classPathWhitelist.isEmpty)
 
       val customPredefs = predefFileInfoOpt.toSeq ++ Seq(
         PredefInfo(Name("CodePredef"), predefCode, false, None)

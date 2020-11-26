@@ -43,7 +43,7 @@ class SingleScriptCompiler(
   }
 
   private val frame = {
-    val f = Frame.createInitial(initialClassLoader)
+    val f = Frame.createInitial(initialClassLoader, forking = false)
     f.addClasspath(dependencies.jars.map(_.toNIO.toUri.toURL))
     f.addPluginClasspath(dependencies.pluginJars.map(_.toNIO.toUri.toURL))
     for ((clsName, byteCode) <- dependencies.byteCode)
