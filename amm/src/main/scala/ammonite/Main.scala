@@ -114,7 +114,6 @@ case class Main(predefCode: String = "",
           .ReplBridge
           .value
           .replArgs($idx)
-          .value
           .asInstanceOf[${b.typeTag.tpe}]
         """
       }.mkString(newLine)

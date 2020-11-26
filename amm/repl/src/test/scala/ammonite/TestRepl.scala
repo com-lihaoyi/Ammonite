@@ -2,6 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 import java.nio.file.Path
+import java.util.function.Supplier
 
 import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper}
 import ammonite.compiler.iface.CodeWrapper
@@ -104,14 +105,15 @@ class TestRepl {
       "ammonite.repl.ReplBridge",
       "repl",
       new ReplAPI {
-        def replArgs = Vector.empty[Bind[_]]
+        def replArgs = Array.empty[Object]
         def printer = printer0
 
         def sess = sess0
         var prompt0 = () => "@"
-        def prompt = prompt0()
-        def prompt_=(p: => String) = { prompt0 = () => p }
-        val frontEnd = Ref[FrontEnd](null)
+        def getPrompt = prompt0()
+        def setPrompt(p: Supplier[String]) = { prompt0 = () => p.get }
+        def getFrontEnd = null
+        def setFrontEnd(frontEnd: ammonite.repl.api.FrontEnd) = ()
         def lastException: Throwable = null
         def fullRawHistory = storage.fullHistory().array
         def rawHistory = Array()
@@ -122,11 +124,11 @@ class TestRepl {
         def interactiveCompiler = null
         def fullImports = interp.predefImports ++ imports
         def imports = frames().head.imports
-        def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
+        def usedEarlierDefinitions = frames().head.usedEarlierDefinitions.toArray
         def width = 80
         def height = 80
 
-        object load extends ReplLoad with (String => Unit){
+        object replLoad extends ReplLoad with (String => Unit){
 
           def apply(line: String) = {
             interp.processExec(line, currentLine, () => currentLine += 1) match{

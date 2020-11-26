@@ -110,7 +110,8 @@ object ${indexedWrapperName.backticked}{
         else
           s"""
   @_root_.scala.transient private val __amm_usedThings =
-    _root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions.toSet"""
+    _root_.scala.Predef.genericArrayOps(""" +
+    "_root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions).iterator.toSet"
 
         val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}

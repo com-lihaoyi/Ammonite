@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import ammonite.interp.api.APIHolder
-import ammonite.repl.api.{History, ReplAPI}
+import ammonite.repl.api.{History, ReplAPI, ReplLoad}
 import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 
@@ -232,6 +232,37 @@ object ReplExtras {
 
     def pprinter: Ref[PPrinter] =
       data.pprinter
+
+    /**
+     * Read/writable prompt for the shell. Use this to change the
+     * REPL prompt at any time!
+     */
+    def prompt: String =
+      api.getPrompt
+    def prompt_=(prompt: => String) =
+      api.setPrompt(() => prompt)
+
+    /**
+     * The front-end REPL used to take user input. Modifiable!
+     */
+    def frontEnd: ammonite.repl.api.FrontEnd =
+      api.getFrontEnd
+    def frontEnd_=(frontEnd: ammonite.repl.api.FrontEnd) =
+      api.setFrontEnd(frontEnd)
+
+    /**
+     * Access the compiler to do crazy things if you really want to!
+     */
+    def compiler: scala.tools.nsc.Global = ???
+
+    /**
+      * Access the presentation compiler to do even crazier things if you really want to!
+      */
+    def interactiveCompiler: scala.tools.nsc.interactive.Global = ???
+
+    def load: ReplLoad =
+      api.replLoad
+
   }
 
   implicit class SessionChangedExtensions(

@@ -2,8 +2,9 @@ package ammonite.repl
 
 import java.io.{InputStream, InputStreamReader, OutputStream}
 import java.nio.file.Path
+import java.util.function.Supplier
 
-import ammonite.repl.api.{FrontEnd, History, ReplAPI, ReplLoad}
+import ammonite.repl.api.{History, ReplAPI, ReplLoad}
 import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.InterfaceExtensions._
@@ -77,7 +78,7 @@ class Repl(compilerManager: CompilerLifecycleManager,
   def imports = frames().head.imports
   def fullImports = interp.predefImports ++ imports
 
-  def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
+  def usedEarlierDefinitions = frames().head.usedEarlierDefinitions.toArray
 
   val interp = new Interpreter(
     compilerManager,
@@ -101,17 +102,33 @@ class Repl(compilerManager: CompilerLifecycleManager,
       "ammonite.repl.ReplBridge",
       "repl",
       new ReplAPI {
-        def replArgs = repl.replArgs
+        def replArgs = repl.replArgs.map(_.value.asInstanceOf[Object]).toArray
         def printer = repl.printer
         def getColors = repl.apiColors()
         def setColors(colors: ammonite.repl.api.Colors) = {
           repl.apiColors() = colors
         }
         def sess = repl.sess0
-        def prompt = repl.prompt()
-        def prompt_=(prompt: => String): Unit =
-          repl.prompt = () => prompt
-        val frontEnd = repl.frontEnd
+        def getPrompt = repl.prompt()
+        def setPrompt(prompt: Supplier[String]): Unit =
+          repl.prompt = () => prompt.get()
+        def getFrontEnd = repl.frontEnd() match {
+          case _: AmmoniteFrontEnd => ammonite.repl.api.FrontEnd.Ammonite()
+          case FrontEnds.JLineWindows => ammonite.repl.api.FrontEnd.JLineWindows()
+          case FrontEnds.JLineUnix => ammonite.repl.api.FrontEnd.JLineUnix()
+          case other => null // meh
+        }
+        def setFrontEnd(id: ammonite.repl.api.FrontEnd): Unit =
+          id match {
+            case _: ammonite.repl.api.FrontEnd.Ammonite =>
+              repl.frontEnd() = AmmoniteFrontEnd()
+            case _: ammonite.repl.api.FrontEnd.JLineWindows =>
+              repl.frontEnd() = FrontEnds.JLineWindows
+            case _: ammonite.repl.api.FrontEnd.JLineUnix =>
+              repl.frontEnd() = FrontEnds.JLineUnix
+            case _ =>
+              repl.printer.warning(s"Unrecognized front end $id, ignoring it")
+          }
 
         def lastException = repl.lastException
         def fullRawHistory = storage.fullHistory().array
@@ -122,10 +139,10 @@ class Repl(compilerManager: CompilerLifecycleManager,
         def fullImports = repl.fullImports
         def imports = repl.imports
         def usedEarlierDefinitions = repl.usedEarlierDefinitions
-        def width = frontEnd().width
-        def height = frontEnd().height
+        def width = repl.frontEnd().width
+        def height = repl.frontEnd().height
 
-        object load extends ReplLoad with (String => Unit){
+        object replLoad extends ReplLoad with (String => Unit){
 
           def apply(line: String) = {
             interp.processExec(line, currentLine, () => currentLine += 1) match{

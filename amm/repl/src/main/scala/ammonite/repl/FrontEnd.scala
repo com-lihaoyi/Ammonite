@@ -1,4 +1,4 @@
-package ammonite.repl.api
+package ammonite.repl
 
 import java.io.{InputStream, OutputStream}
 

@@ -1,30 +1,14 @@
-package ammonite.repl.api
+package ammonite.repl.api;
 
-import java.nio.file.Path
+import java.util.function.Supplier;
 
-import ammonite.compiler.iface.Imports
-import ammonite.util.{Colors => _, _}
+import ammonite.compiler.iface.Imports;
 
-import scala.reflect.runtime.universe.{Bind => _, _}
+public abstract class ReplAPI {
 
+  public abstract String getPrompt();
 
-
-
-trait ReplAPI {
-
-
-
-  /**
-   * Read/writable prompt for the shell. Use this to change the
-   * REPL prompt at any time!
-   */
-  def prompt: String
-  def prompt_=(prompt: => String): Unit
-
-  /**
-   * The front-end REPL used to take user input. Modifiable!
-   */
-  val frontEnd: Ref[FrontEnd]
+  public abstract FrontEnd getFrontEnd();
 
   /**
     * The last exception that was thrown in the REPL; `null` if nothing has
@@ -34,34 +18,24 @@ trait ReplAPI {
     * on an exception that doesn't normally print it (e.g. seeing the stack
     * when a Ctrl-C interrupt happened) via `lastException.printStackTrace`.
     */
-  def lastException: Throwable
+  public abstract Throwable lastException();
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one
    */
-  def newCompiler(): Unit
-
-  /**
-   * Access the compiler to do crazy things if you really want to!
-   */
-  def compiler: scala.tools.nsc.Global
-
-  /**
-    * Access the presentation compiler to do even crazier things if you really want to!
-    */
-  def interactiveCompiler: scala.tools.nsc.interactive.Global
+  public abstract void newCompiler();
 
   /**
    * Shows all imports added that bring values into scope for the commands a
    * user runs; *includes* imports from the built-in predef and user predef files
    */
-  def fullImports: Imports
+  public abstract Imports fullImports();
 
   /**
    * Shows the imports added to scope by the commands a user has entered so far;
    * *excludes* imports from the built-in predef and user predef files
    */
-  def imports: Imports
+  public abstract Imports imports();
 
   /**
     * If class wrapping is enabled, this lists the names of the previous commands
@@ -83,16 +57,16 @@ trait ReplAPI {
     * from the same line as `n + p`, as both `cmd0`, that defines `n`, and `cmd1`, that
     * defines `p`, are referenced from this line.
     */
-  def usedEarlierDefinitions: Seq[String]
+  public abstract String[] usedEarlierDefinitions();
 
   /**
    * Current width of the terminal
    */
-  def width: Int
+  public abstract int width();
   /**
    * Current height of the terminal
    */
-  def height: Int
+  public abstract int height();
 
   /**
     * Functions that can be used to manipulate the current REPL session:
@@ -109,22 +83,26 @@ trait ReplAPI {
     * due to `restore`. Named checkpoints are kept forever; call `delete`
     * on them if you really want them to go away.
     */
-  def sess: Session
+  public abstract Session sess();
 
-  def load: ReplLoad
+  public abstract ReplLoad replLoad();
 
   // internal
-  def printer: Printer
-  def fullRawHistory: Array[String]
-  def rawHistory: Array[String]
-  def replArgs: IndexedSeq[Bind[_]]
+  public abstract ammonite.compiler.iface.Logger printer();
+  public abstract Object[] replArgs();
+  public abstract String[] fullRawHistory();
+  public abstract String[] rawHistory();
 
-  def getColors: Colors
-  def setColors(colors: Colors): Unit
+  public abstract Colors getColors();
+  public abstract void setColors(Colors colors);
+  public abstract void setPrompt(Supplier<String> prompt);
+  public abstract void setFrontEnd(FrontEnd frontEnd);
 
-  private var data0: Object = null
-  def data = data0
-  def setData(data: Object) = {
-    data0 = data
+  private Object data0 = null;
+  public final Object data() {
+    return data0;
+  }
+  public final void setData(Object data) {
+    this.data0 = data;
   }
 }
