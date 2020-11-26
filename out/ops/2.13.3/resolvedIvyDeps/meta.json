@@ -1,0 +1,11 @@
+{
+    "value": [
+        "qref:fbc4c716:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13/0.2.0/acyclic_2.13-0.2.0.jar",
+        "qref:63e7660a:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.3/scala-library-2.13.3.jar",
+        "qref:61367951:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.7.1/os-lib_2.13-0.7.1.jar",
+        "qref:dcde0dfe:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.1.2/scala-collection-compat_2.13-2.1.2.jar",
+        "qref:2ca651fd:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.6.2/geny_2.13-0.6.2.jar"
+    ],
+    "valueHash": -899217812,
+    "inputsHash": -1875415955
+}
