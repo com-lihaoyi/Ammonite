@@ -23,6 +23,7 @@ object CodeClassWrapper extends ScalaCodeWrapper {
    * themselves processed by macros (definitions in objects are easier to process from
    * macros).
    */
+  private val javaIt = "_root_.ammonite.util.Util.javaIt"
   private val userCodeNestingLevel = 2
   private val q = "\""
   private val tq = "\"\"\""
@@ -53,7 +54,7 @@ object ${indexedWrapperName.backticked}{
 """
       )
 
-      val bottom = normalizeNewlines(s"""\ndef $$main() = _root_.ammonite.util.Util.javaIt { $printCode }
+      val bottom = normalizeNewlines(s"""\ndef $$main() = $javaIt { $printCode }
   override def toString = "${indexedWrapperName.encoded}"
   $extraCode
 }}
@@ -134,7 +135,8 @@ ${reworkedImports.repr}
 final class Helper extends java.io.Serializable{\n"""
     )
 
-      val bottom = normalizeNewlines(s"""\ndef $$main() = _root_.ammonite.util.Util.javaIt { $printCode }
+      val bottom = normalizeNewlines(s"""\ndef $$main() = $javaIt { $printCode }
+
   override def toString = "${indexedWrapperName.encoded}"
   $extraCode
 }}

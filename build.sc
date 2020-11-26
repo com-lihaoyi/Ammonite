@@ -189,8 +189,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:1.2.0",
-      ivy"com.lihaoyi::requests:0.6.5",
-      ivy"com.lihaoyi::mainargs:0.1.4",
+      ivy"com.lihaoyi::requests:0.6.5"
     )
   }
 
@@ -212,6 +211,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.javassist:javassist:3.21.0-GA",
       ivy"com.github.javaparser:javaparser-core:3.2.5",
+      ivy"com.lihaoyi::mainargs:0.1.4",
       ivy"com.lihaoyi::scalaparse:2.3.0",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
@@ -230,7 +230,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         def crossFullScalaVersion = true
         def ivyDeps = Agg(
           ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
-          ivy"org.scala-lang:scala-reflect:$crossScalaVersion"
+          ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
+          ivy"com.lihaoyi::mainargs:0.1.4"
         )
       }
     }
@@ -276,9 +277,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
           api,
           amm.util(),
           interp.api.full()
-        )
-        def ivyDeps = Agg(
-          ivy"com.lihaoyi::mainargs:0.1.4"
         )
         def dependencyResourceFileName = "amm-dependencies.txt"
 

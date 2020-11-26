@@ -1,5 +1,6 @@
 package ammonite.main
 import java.nio.file.NoSuchFileException
+import java.util.function.Supplier
 
 import ammonite.compiler.{CodeClassWrapper, ObjectCodeWrapper}
 import ammonite.compiler.iface.CodeSource
@@ -24,6 +25,7 @@ object Scripts {
         case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
       }
 
+      parent = s"_root_.java.util.function.Supplier[mainargs.ParserForMethods[$$routesOuter.type]]"
       processed <- interp.processModule(
         scriptTxt,
         new CodeSource(wrapper.raw, pkg.map(_.raw).toArray, Array("ammonite", "$file"), path.toNIO),
@@ -37,8 +39,8 @@ object Scripts {
           s"""
           |val $$routesOuter = this
           |object $$routes
-          |extends scala.Function0[mainargs.ParserForMethods[$$routesOuter.type]]{
-          |  def apply() = mainargs.ParserForMethods[$$routesOuter.type]($$routesOuter)
+          |extends $parent{
+          |  def get() = mainargs.ParserForMethods[$$routesOuter.type]($$routesOuter)
           |}
           """.stripMargin
         ),
@@ -58,8 +60,8 @@ object Scripts {
               .loadClass(routeClsName + "$$routes$")
               .getField("MODULE$")
               .get(null)
-              .asInstanceOf[() => mainargs.ParserForMethods[Any]]
-              .apply()
+              .asInstanceOf[Supplier[Object]] // Supplier[mainargs.ParserForMethods[Any]]
+              .get()
           )
 
         case CodeClassWrapper =>
@@ -71,58 +73,42 @@ object Scripts {
 
           Some(
             outer.getClass.getMethod("$routes").invoke(outer)
-              .asInstanceOf[() => mainargs.ParserForMethods[Any]]
-              .apply()
+              .asInstanceOf[Supplier[Object]] // mainargs.ParserForMethods[Any]
+              .get()
           )
         case _ => None
       }
 
       res <- Util.withContextClassloader(interp.evalClassloader){
         scriptMains match {
-          // If there are no @main methods, there's nothing to do
-          case Some(parser) if parser.mains.value.isEmpty =>
-            if (scriptArgs.isEmpty) Res.Success(())
-            else Res.Failure(
-              "Script " + path.last +
-              " does not take arguments: " + scriptArgs.map(literalize(_)).mkString(" ")
-            )
-
-          // If there's one @main method, we run it with all args
           case Some(parser) =>
+            val scriptInvoker: ammonite.interp.api.ScriptInvoker = {
+              val cls = interp.evalClassloader.loadClass("ammonite.interp.api.ScriptInvokerImpl")
+              cls.getConstructor().newInstance().asInstanceOf[ammonite.interp.api.ScriptInvoker]
+            }
             if (scriptArgs.take(1) == Seq("--help")){
               Res.Success(
                 new Object{
-                  override def toString() = parser.helpText(
-                    totalWidth = 100,
-                    docsOnNewLine = false
+                  override def toString() = scriptInvoker.helpText(
+                    parser,
+                    100,
+                    false
                   )
                 }
               )
-            }else mainargs.Invoker.runMains(
-              parser.mains,
-              scriptArgs,
-              allowPositional = true,
-              allowRepeats = false
-            ) match{
-              case Left(earlyError) =>
-                Res.Failure(mainargs.Renderer.renderEarlyError(earlyError))
-              case Right((mainData, result)) =>
-                result match{
-                  case mainargs.Result.Success(x) => Res.Success(x)
-                  case mainargs.Result.Failure.Exception(x: AmmoniteExit) => Res.Success(x.value)
-                  case mainargs.Result.Failure.Exception(x) => Res.Exception(x, "")
-                  case res: mainargs.Result.Failure =>
-                    Res.Failure(
-                      mainargs.Renderer.renderResult(
-                        mainData,
-                        res,
-                        totalWidth = 100,
-                        printHelpOnError = true,
-                        docsOnNewLine = false,
-                        customName = None,
-                        customDoc = None
-                      )
-                    )
+            }else scriptInvoker.invoke(
+              parser,
+              path.last,
+              scriptArgs.toArray
+            ) match {
+              case s: ammonite.interp.api.ScriptInvoker.Result.Success[_] =>
+                Res.Success(s.value)
+              case f: ammonite.interp.api.ScriptInvoker.Result.Failure =>
+                Res.Failure(f.message)
+              case e: ammonite.interp.api.ScriptInvoker.Result.ExceptionThrown =>
+                e.exception match {
+                  case x: AmmoniteExit => Res.Success(x.value)
+                  case e => Res.Exception(e, "")
                 }
             }
         }
