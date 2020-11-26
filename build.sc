@@ -6,7 +6,7 @@ import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
 val isMasterCommit =
   sys.env.get("GITHUB_REPOSITORY") == Some("lihaoyi/Ammonite") &&
-  sys.env.get("GITHUB_REF").exists(_.endsWith("/master"))
+  sys.env.get("GITHUB_REF").exists(x => x.endsWith("/master") || x.startsWith("/refs/tags/"))
 
 val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
