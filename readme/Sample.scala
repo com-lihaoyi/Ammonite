@@ -126,40 +126,48 @@ object Sample{
            input: String,
            args: Map[String, String] = Map.empty): String = cached(("exec", command, input, args)){
 
-    println("====================EXECUTING====================")
-    println(command)
-    println(input)
-    println(args)
-    val pb = new ProcessBuilder(command:_*)
-    for((k, v) <- args) pb.environment().put(k, v)
+//    println("====================EXECUTING====================")
+//    println(command)
+//    println(input)
+//    println(args)
+//
+//    println("A")
+//    val pb = new ProcessBuilder(command:_*)
+//    println("B")
+//    for((k, v) <- args) pb.environment().put(k, v)
+//    println("C")
+////    pb.redirectErrorStream(true)
+//    println("D")
+//    val p = pb.start()
+//    println("E")
+//    p.getOutputStream.write(input.getBytes)
+//    println("F")
+//    p.getOutputStream.flush()
+//    println("G")
+//    p.waitFor()
+//    println("H")
+//    val output = new ByteArrayOutputStream()
+//    println("I")
+//    var length = 0
+//    while({
+//      val buffer = new Array[Byte](2048)
+//      val count = p.getInputStream.read(buffer, 0, buffer.length)
+//      if (count != -1){
+//        println(s"====================CHUNK length:${count}====================")
+//        println(new String(buffer.take(count)))
+//        output.write(buffer, 0, count)
+//        true
+//      }else false
+//    })()
+//
+//
+//    val result = new String(output.toByteArray)
+//    println(s"====================RESULT ${p.exitValue()}====================")
+//    println(result)
+//    println("========================================")
+//    assert(p.exitValue() == 0, "Non-zero exit value for subprocess: " + p.exitValue())
 
-    pb.redirectErrorStream(true)
-    val p = pb.start()
-
-    p.getOutputStream.write(input.getBytes)
-    p.getOutputStream.flush()
-    p.waitFor()
-    val output = new ByteArrayOutputStream()
-    var length = 0
-    while({
-      val buffer = new Array[Byte](2048)
-      val count = p.getInputStream.read(buffer, 0, buffer.length)
-      if (count != -1){
-        println(s"====================CHUNK length:${count}====================")
-        println(new String(buffer.take(count)))
-        output.write(buffer, 0, count)
-        true
-      }else false
-    })()
-
-
-    val result = new String(output.toByteArray)
-    println(s"====================RESULT ${p.exitValue()}====================")
-    println(result)
-    println("========================================")
-    assert(p.exitValue() == 0, "Non-zero exit value for subprocess: " + p.exitValue())
-
-    result
+    ""
   }
   def compare(bashCode: String, ammoniteCode: String) = {
     val out = {
