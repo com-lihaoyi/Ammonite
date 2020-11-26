@@ -16,5 +16,5 @@ git fetch origin gh-pages:gh-pages
 git checkout -f gh-pages
 cp -r readme/target/scalatex/* .
 git add -A
-git commit -am $TRAVIS_COMMIT
-git push git@github.com:$TRAVIS_REPO_SLUG.git gh-pages:gh-pages
+git commit -am $(git rev-parse HEAD)
+git push git@github.com:$GITHUB_REPOSITORY.git gh-pages:gh-pages

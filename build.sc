@@ -32,7 +32,7 @@ val fullCrossScalaVersions = Seq(
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
-val (buildVersion, unstable) = sys.env.get("TRAVIS_TAG") match{
+val (buildVersion, unstable) = sys.env.get("GITHUB_REF") match{
   case Some(s"refs/tags/$tagName")  => (tagName, false)
   case _ =>
     val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
