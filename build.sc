@@ -32,6 +32,7 @@ val fullCrossScalaVersions = Seq(
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
+println("GITHUB REF " + sys.env.get("GITHUB_REF"))
 val (buildVersion, unstable) = sys.env.get("GITHUB_REF") match{
   case Some(s"refs/tags/$tagName")  => (tagName, false)
   case _ =>
