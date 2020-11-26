@@ -85,6 +85,7 @@ object Config{
       "(deprecated) Disable remote logging of the number of times a REPL starts and runs commands")
     noRemoteLogging: Flag,
     @arg(
+      name = "class-based",
       doc =
         "Wrap user code in classes rather than singletons, typically for Java serialization "+
         "friendliness.")
