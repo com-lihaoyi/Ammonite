@@ -290,6 +290,53 @@ object amm extends Cross[MainModule](binCrossScalaVersions:_*){
         }
       }
     }
+    // not a "real" cross module
+    // The cross parameter is the tested *userspace* Scala version.
+    // The sources of cross-tests itself (which are the same as the tests of amm.repl)
+    // are only compiled with the latest Scala version.
+    object `cross-tests` extends Cross[CrossTestModule](fullCrossScalaVersions:_*)
+    class CrossTestModule(val crossScalaVersion: String) extends AmmModule {
+      private def sv = binCrossScalaVersions.last
+      def scalaVersion = sv
+      def moduleDeps = Seq(
+        amm.repl(sv)
+      )
+
+
+      object test extends Tests with AmmDependenciesResourceFileModule {
+        def dependencyResourceFileName = "amm-test-dependencies.txt"
+
+        def thinWhitelist = T{
+          generateApiWhitelist(
+            amm.repl.api.exposedClassPath()
+          )
+        }
+        def localClasspath = T{
+          super.localClasspath() ++ Agg(thinWhitelist())
+        }
+
+        // Pass the class path of amm.compiler and amm.repl.api.full for
+        // the *tested* Scala version, via some Java properties.
+        def forkArgs = T{
+          val classPath = amm.compiler(sv).runClasspath() ++
+            amm.repl.api.full(sv).runClasspath()
+          val classPathStr = classPath
+            .map(_.path.toString)
+            .mkString(java.io.File.pathSeparator)
+          // hope we won't get a too long argument error on Windows
+          super.forkArgs() ++ Seq(s"-Damm.cross-tests.side-jars=$classPathStr")
+        }
+
+        def resources = T.sources {
+          super.resources() ++
+            amm.repl(sv).test.resources()
+        }
+        def sources = T.sources {
+          super.sources() ++
+            amm.repl(sv).test.sources()
+        }
+      }
+    }
 
   }
   class ReplModule(val crossScalaVersion: String) extends AmmModule{
@@ -543,6 +590,10 @@ def unitTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command
   amm(scalaVersion).test.test()()
   shell(scalaVersion).test.test()()
   sshd(scalaVersion).test.test()()
+}
+
+def crossTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
+  amm.repl.`cross-tests`(scalaVersion).test.test()()
 }
 
 def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{

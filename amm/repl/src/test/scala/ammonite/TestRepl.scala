@@ -1,12 +1,13 @@
 package ammonite
 
-import java.io.PrintStream
+import java.io.{File, PrintStream}
+import java.net.URLClassLoader
 import java.nio.file.Path
 import java.util.function.Supplier
 
 import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper}
 import ammonite.compiler.iface.CodeWrapper
-import ammonite.interp.Interpreter
+import ammonite.interp.{Interpreter, WhiteListClassLoader}
 import ammonite.main.Defaults
 import ammonite.repl._
 import ammonite.repl.api.{FrontEnd, ReplAPI, ReplLoad}
@@ -34,6 +35,13 @@ class TestRepl {
     java.nio.file.Files.createTempDirectory("ammonite-tester")
   )
 
+  val crossScalaVersionEnabled =
+    try {
+      Thread.currentThread().getContextClassLoader.loadClass("ammonite.repl.CrossTests")
+      true
+    }
+    catch { case _: ClassNotFoundException => false }
+
 
   import java.io.ByteArrayOutputStream
   import java.io.PrintStream
@@ -56,8 +64,29 @@ class TestRepl {
     x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
-  val initialClassLoader = Thread.currentThread().getContextClassLoader
-  val frames = Ref(List(Frame.createInitial(initialClassLoader)))
+  val classPathWhitelist =
+    if (crossScalaVersionEnabled) Repl.getClassPathWhitelist()
+    else Set.empty[Seq[String]]
+  val initialClassLoader = {
+    val contextClassLoader = Thread.currentThread().getContextClassLoader
+    if (crossScalaVersionEnabled) new WhiteListClassLoader(classPathWhitelist, contextClassLoader)
+    else contextClassLoader
+  }
+
+  val intermediateLoader =
+    if (crossScalaVersionEnabled) {
+      val extraJarsValue = sys.props.getOrElse(
+        "amm.cross-tests.side-jars",
+        sys.error("Property amm.cross-tests.side-jars not set for cross tests")
+      )
+      val extraJars = extraJarsValue
+        .split(File.pathSeparator)
+        .map(os.Path(_).toNIO.toUri.toURL)
+      new URLClassLoader(extraJars, initialClassLoader)
+    }
+    else initialClassLoader
+  val initialFrame = Frame.createInitial(intermediateLoader, forking = !crossScalaVersionEnabled)
+  val frames = Ref(List(initialFrame))
   val sess0 = new SessionApiImpl(frames)
 
   val baseImports = ammonite.main.Defaults.replImports ++ Interpreter.predefImports
@@ -66,11 +95,18 @@ class TestRepl {
   )
   val customPredefs = Seq()
 
+  val compilerLifecycleManager =
+    if (crossScalaVersionEnabled) Interpreter.compilerLifecycleManager(initialFrame.classloader)
+    else new CompilerLifecycleManager
+  val parser =
+    if (crossScalaVersionEnabled) Interpreter.parser(initialFrame.classloader)
+    else ammonite.compiler.Parsers
+
   var currentLine = 0
   val interp = try {
     new Interpreter(
-      new CompilerLifecycleManager,
-      ammonite.compiler.Parsers,
+      compilerLifecycleManager,
+      parser,
       printer0,
       storage = storage,
       wd = os.pwd,
@@ -81,7 +117,7 @@ class TestRepl {
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
       importHooks = ImportHook.defaults,
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = false)
+      classPathWhitelist = classPathWhitelist
     )
 
   }catch{ case e: Throwable =>

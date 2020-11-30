@@ -6,7 +6,7 @@ import java.nio.file.NoSuchFileException
 
 import ammonite.compiler.{CodeClassWrapper, CompilerLifecycleManager, ObjectCodeWrapper}
 import ammonite.compiler.iface.CodeWrapper
-import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
+import ammonite.interp.{Watchable, Interpreter, PredefInitialization, WhiteListClassLoader}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
@@ -141,7 +141,7 @@ case class Main(predefCode: String = "",
 
   lazy val initialClassLoader: ClassLoader = {
     val contextClassLoader = Thread.currentThread().getContextClassLoader
-    new Main.WhiteListClassLoader(classPathWhitelist, contextClassLoader)
+    new WhiteListClassLoader(classPathWhitelist, contextClassLoader)
   }
 
   /**
@@ -418,24 +418,6 @@ object Main{
     ammonite.compiler.Compiler
   private def defaultParser(): ammonite.compiler.iface.Parser =
     ammonite.compiler.Parsers
-
-  class WhiteListClassLoader(whitelist: Set[Seq[String]], parent: ClassLoader)
-    extends URLClassLoader(Array(), parent){
-    override def loadClass(name: String, resolve: Boolean) = {
-      val tokens = name.split('.')
-      if (Util.lookupWhiteList(whitelist, tokens.init ++ Seq(tokens.last + ".class"))) {
-        super.loadClass(name, resolve)
-      }
-      else {
-        throw new ClassNotFoundException(name)
-      }
-
-    }
-    override def getResource(name: String) = {
-      if (Util.lookupWhiteList(whitelist, name.split('/'))) super.getResource(name)
-      else null
-    }
-  }
 }
 
 /**
@@ -548,7 +530,7 @@ class MainRunner(cliConfig: Config,
       alreadyLoadedDependencies =
         Defaults.alreadyLoadedDependencies(),
       classPathWhitelist =
-        if (cliConfig.core.classLoaderIsolation) ammonite.repl.Repl.getClassPathWhitelist(true)
+        if (cliConfig.core.classLoaderIsolation) Repl.getClassPathWhitelist()
         else Set.empty,
       scalaVersion = Some(cliConfig.core.scala).map(_.trim).filter(_.nonEmpty)
     )

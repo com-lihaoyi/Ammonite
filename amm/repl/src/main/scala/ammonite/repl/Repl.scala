@@ -331,13 +331,9 @@ object Repl{
     traces.mkString(newLine)
   }
 
-  def getClassPathWhitelist(thin: Boolean): Set[Seq[String]] = {
-    if (!thin) Set.empty
-    else {
-      os.read
-        .lines(os.resource / "ammonite-api-whitelist.txt")
-        .map(_.split('/').toSeq)
-        .toSet
-    }
-  }
+  def getClassPathWhitelist(): Set[Seq[String]] =
+    os.read
+      .lines(os.resource / "ammonite-api-whitelist.txt")
+      .map(_.split('/').toSeq)
+      .toSet
 }

@@ -38,7 +38,7 @@ object TestUtils {
       scriptCodeWrapper = ObjectCodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
       importHooks = ImportHook.defaults,
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist()
     )
     // Provide a custom predef so we can verify in tests that the predef gets cached
     interp.initializePredef(
