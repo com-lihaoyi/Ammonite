@@ -2,7 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.{ObjectCodeWrapper, Preprocessor}
+import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper, Preprocessor}
 import ammonite.compiler.iface.Imports
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
@@ -23,7 +23,7 @@ object TestUtils {
     val startFrame = Frame.createInitial(initialClassLoader)
     val printStream = new PrintStream(System.out)
     val interp = new Interpreter(
-
+      new CompilerLifecycleManager,
       printer = Printer(
         printStream, new PrintStream(System.err), printStream,
         println, println, println

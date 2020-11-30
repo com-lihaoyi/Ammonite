@@ -4,7 +4,7 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
-import ammonite.compiler.{CodeClassWrapper, ObjectCodeWrapper}
+import ammonite.compiler.{CodeClassWrapper, CompilerLifecycleManager, ObjectCodeWrapper}
 import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
@@ -121,6 +121,7 @@ case class Main(predefCode: String = "",
       }.mkString(newLine)
 
       new Repl(
+        new CompilerLifecycleManager,
         inputStream, outputStream, errorStream,
         storage = storageBackend,
         baseImports = augmentedImports,
@@ -163,6 +164,7 @@ case class Main(predefCode: String = "",
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
       val interp = new Interpreter(
+        new CompilerLifecycleManager,
         printer,
         storageBackend,
         wd,

@@ -79,6 +79,7 @@ class AmmoniteBuildServer(
   private lazy val compiler =
     withRoot { root =>
       new ScriptCompiler(
+        compilerBuilder,
         storage,
         printer,
         codeWrapper,

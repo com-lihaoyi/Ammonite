@@ -5,7 +5,13 @@ import java.nio.file.Path
 import java.util.function.{Function, Supplier}
 import java.util.regex.Pattern
 
-import ammonite.compiler.iface.{CodeSource, CodeWrapper, Imports, Preprocessor => IPreprocessor}
+import ammonite.compiler.iface.{
+  CodeSource,
+  CodeWrapper,
+  CompilerLifecycleManager,
+  Imports,
+  Preprocessor => IPreprocessor
+}
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 
 import scala.collection.mutable
@@ -13,7 +19,7 @@ import scala.collection.JavaConverters._
 import ammonite.runtime._
 
 import annotation.tailrec
-import ammonite.compiler._
+import ammonite.compiler.{Parsers, Preprocessor}
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.ImportTree
 import ammonite.util.InterfaceExtensions._
@@ -26,7 +32,8 @@ import coursierapi.{Dependency, Fetch, Repository}
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(val printer: Printer,
+class Interpreter(val compilerManager: CompilerLifecycleManager,
+                  val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
                   verboseOutput: Boolean = true,
@@ -58,19 +65,15 @@ class Interpreter(val printer: Printer,
   def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories.toSeq, verbose = verboseOutput)
 
-  val compilerManager: ammonite.compiler.iface.CompilerLifecycleManager = {
-    val mgr = new CompilerLifecycleManager
-    mgr.setRTCacheDir(storage.dirOpt.map(_.toNIO).orNull)
-    mgr.setHeadFrame(() => headFrame)
-    mgr.setDependencyCompleter { () =>
-      input =>
-        val (idx, completions) = dependencyComplete(input)
-        entry(idx, completions.toArray)
-    }
-    mgr.setClassPathWhiteList(classPathWhitelist.toArray.map(_.toArray))
-    mgr.setInitialClassLoader(Option(initialClassLoader).getOrElse(headFrame.classloader))
-    mgr
+  compilerManager.setRTCacheDir(storage.dirOpt.map(_.toNIO).orNull)
+  compilerManager.setHeadFrame(() => headFrame)
+  compilerManager.setDependencyCompleter { () =>
+    input =>
+      val (idx, completions) = dependencyComplete(input)
+      entry(idx, completions.toArray)
   }
+  compilerManager.setClassPathWhiteList(classPathWhitelist.toArray.map(_.toArray))
+  compilerManager.setInitialClassLoader(Option(initialClassLoader).getOrElse(headFrame.classloader))
 
   val eval = Evaluator(headFrame)
 

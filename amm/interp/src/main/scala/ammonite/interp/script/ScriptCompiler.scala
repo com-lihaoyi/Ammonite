@@ -2,7 +2,7 @@ package ammonite.interp.script
 
 import java.util.concurrent.ConcurrentHashMap
 
-import ammonite.compiler.iface.{CodeWrapper, Imports}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Imports}
 import ammonite.runtime.Storage
 import ammonite.util.Printer
 import ammonite.util.InterfaceExtensions._
@@ -12,6 +12,7 @@ import scala.collection.mutable
 import scala.tools.nsc.Settings
 
 final class ScriptCompiler(
+  compilerBuilder: CompilerBuilder,
   storage: Storage,
   printer: Printer, // TODO Remove this
   codeWrapper: CodeWrapper,
@@ -140,6 +141,7 @@ final class ScriptCompiler(
   def preCompile(module: Script): Unit = {
 
     val compiler = new SingleScriptCompiler(
+      compilerBuilder,
       initialClassLoader,
       storage,
       printer,
@@ -227,6 +229,7 @@ final class ScriptCompiler(
   ): ScriptCompileResult = {
 
     val compiler = new SingleScriptCompiler(
+      compilerBuilder,
       initialClassLoader,
       storage,
       printer,

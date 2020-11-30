@@ -2,7 +2,6 @@ package ammonite.interp.script
 
 import java.util.function.Consumer
 
-import ammonite.compiler.{Compiler => AmmCompiler}
 import ammonite.compiler.iface.{CodeWrapper, Compiler, CompilerBuilder, Imports, Preprocessor}
 import ammonite.interp.Interpreter
 import ammonite.runtime.{Frame, Storage}
@@ -19,6 +18,7 @@ import scala.collection.mutable
  * discarded right after having called `apply` or `writeSources`.
  */
 class SingleScriptCompiler(
+  compilerBuilder: CompilerBuilder,
   initialClassLoader: ClassLoader,
   storage: Storage,
   printer: Printer,
@@ -72,7 +72,7 @@ class SingleScriptCompiler(
       stopAt = initialClassLoader
     )
 
-    AmmCompiler.create(
+    compilerBuilder.create(
       initialClassPath.toArray,
       classPath.toArray,
       dependencies.byteCode

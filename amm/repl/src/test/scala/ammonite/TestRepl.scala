@@ -3,7 +3,7 @@ package ammonite
 import java.io.PrintStream
 import java.nio.file.Path
 
-import ammonite.compiler.{ObjectCodeWrapper, Preprocessor}
+import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper, Preprocessor}
 import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
@@ -68,6 +68,7 @@ class TestRepl {
   var currentLine = 0
   val interp = try {
     new Interpreter(
+      new CompilerLifecycleManager,
       printer0,
       storage = storage,
       wd = os.pwd,
