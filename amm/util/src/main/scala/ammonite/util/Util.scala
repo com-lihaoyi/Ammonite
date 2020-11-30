@@ -104,4 +104,9 @@ object Util{
 
   def entry[K, V](k: K, v: V): JMap.Entry[K, V] =
     new Entry(k, v)
+
+  def javaIt[T](it: Iterator[T]): java.util.Iterator[T] = {
+    import scala.collection.JavaConverters._
+    it.asJava
+  }
 }

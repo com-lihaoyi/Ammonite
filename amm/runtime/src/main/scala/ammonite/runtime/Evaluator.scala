@@ -9,6 +9,7 @@ import util.Util.{ClassFiles, newLine}
 import ammonite.util.InterfaceExtensions._
 import ammonite.util._
 
+import scala.collection.JavaConverters._
 import scala.util.Try
 
 /**
@@ -126,7 +127,9 @@ object Evaluator{
 
         // Exhaust the printer iterator now, before exiting the `Catching`
         // block, so any exceptions thrown get properly caught and handled
-        val iter = evalMain(cls, contextClassLoader).asInstanceOf[Iterator[String]]
+        val iter = evalMain(cls, contextClassLoader)
+          .asInstanceOf[java.util.Iterator[String]]
+          .asScala
 
         if (!silent) evaluatorRunPrinter(iter.foreach(printer.resultStream.print))
         else evaluatorRunPrinter(iter.foreach(_ => ()))

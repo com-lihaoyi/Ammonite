@@ -23,7 +23,7 @@ ${imports.repr}
 
 object ${indexedWrapperName.backticked}{\n"""
       )
-      val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
+      val bottom = normalizeNewlines(s"""\ndef $$main() = _root_.ammonite.util.Util.javaIt { $printCode }
   override def toString = "${indexedWrapperName.encoded}"
   $extraCode
 }
