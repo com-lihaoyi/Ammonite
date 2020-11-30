@@ -168,7 +168,7 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   object test extends Tests
 }
 
-object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
+object amm extends Cross[MainModule](binCrossScalaVersions:_*){
   object util extends Cross[UtilModule](binCrossScalaVersions:_*)
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(compiler.interface)
@@ -183,10 +183,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object runtime extends Cross[RuntimeModule](fullCrossScalaVersions:_*)
+  object runtime extends Cross[RuntimeModule](binCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), interp.api.full(), amm.repl.api.full())
-    def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"com.lihaoyi::upickle:1.2.0",
       ivy"com.lihaoyi::requests:0.6.5"
@@ -217,7 +216,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
+  object interp extends Cross[InterpModule](binCrossScalaVersions:_*){
     object api extends JavaModule with AmmPublishModule with AmmDependenciesResourceFileModule {
       def artifactName = "ammonite-interp-api"
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
@@ -238,7 +237,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
-    def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
       ivy"org.scalameta::trees:4.3.20",
@@ -256,7 +254,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 //    )
 //  }
 
-  object repl extends Cross[ReplModule](fullCrossScalaVersions:_*){
+  object repl extends Cross[ReplModule](binCrossScalaVersions:_*){
 
     object api extends JavaModule with AmmPublishModule with AmmInternalJavaModule {
       def artifactName = "ammonite-repl-api"
@@ -295,7 +293,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
   }
   class ReplModule(val crossScalaVersion: String) extends AmmModule{
-    def crossFullScalaVersion = true
     def moduleDeps = Seq(
       ops(), amm.util(),
       amm.runtime(), amm.interp(), amm.compiler(),
@@ -342,8 +339,6 @@ class MainModule(val crossScalaVersion: String)
   extends AmmModule {
 
   def artifactName = "ammonite"
-
-  def crossFullScalaVersion = true
 
   def mainClass = Some("ammonite.Main")
 
@@ -484,10 +479,9 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
   PathRef(ctx.dest)
 }
 
-object shell extends Cross[ShellModule](fullCrossScalaVersions:_*)
+object shell extends Cross[ShellModule](binCrossScalaVersions:_*)
 class ShellModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
-  def crossFullScalaVersion = true
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
     def thinWhitelist = T{
@@ -507,7 +501,7 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
     )
   }
 }
-object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
+object integration extends Cross[IntegrationModule](binCrossScalaVersions:_*)
 class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
   def moduleDeps = Seq(ops(), amm())
   def ivyDeps = T{
@@ -524,10 +518,9 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
   }
 }
 
-object sshd extends Cross[SshdModule](fullCrossScalaVersions:_*)
+object sshd extends Cross[SshdModule](binCrossScalaVersions:_*)
 class SshdModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
-  def crossFullScalaVersion = true
   def ivyDeps = Agg(
     // sshd-core 1.3.0 requires java8
     ivy"org.apache.sshd:sshd-core:1.2.0",
@@ -660,14 +653,15 @@ def publishExecutable() = {
 }
 
 def publishDocs() = {
+  val scalaVersion = binCrossScalaVersions.last
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: Building readme for verification")
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.13.1").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.1").assembly().path,
+      AMMONITE_SHELL=shell(scalaVersion).jar().path,
+      AMMONITE_ASSEMBLY=amm(scalaVersion).assembly().path,
       CONSTANTS_FILE=generateConstantsFile()
     )
   }else T.command{
@@ -712,8 +706,8 @@ def publishDocs() = {
 
     %sbt(
       "readme/run",
-      AMMONITE_SHELL=shell("2.13.1").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.1").assembly().path,
+      AMMONITE_SHELL=shell(scalaVersion).jar().path,
+      AMMONITE_ASSEMBLY=amm(scalaVersion).assembly().path,
       CONSTANTS_FILE=constantsFile
     )
     %("ci/deploy_master_docs.sh")
