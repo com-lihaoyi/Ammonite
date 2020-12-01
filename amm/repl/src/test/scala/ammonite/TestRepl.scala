@@ -143,20 +143,6 @@ class TestRepl {
             apply(normalizeNewlines(os.read(os.Path(file))))
           }
         }
-
-        // TODO Re-enable somehow
-        // override def print[T: TPrint](
-        //   value: => T,
-        //   ident: String,
-        //   custom: Option[String]
-        // )(implicit
-        //   tcolors: TPrintColors,
-        //   classTagT: ClassTag[T]
-        // ): Iterator[String] =
-        //   if (classTagT == scala.reflect.classTag[ammonite.Nope])
-        //     Iterator()
-        //   else
-        //     super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
       }
     )
   )

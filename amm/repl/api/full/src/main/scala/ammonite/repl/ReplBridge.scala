@@ -73,12 +73,45 @@ object ReplExtras {
     api.printer.outStream.print(newLine)
   }
 
+  trait PrintHook {
+    def print[T](value: => T,
+                  ident: String,
+                  custom: Option[String])
+                 (implicit tprint: pprint.TPrint[T],
+                  tcolors: pprint.TPrintColors,
+                  api: ReplAPI,
+                  classTagT: ClassTag[T]): Option[Iterator[String]]
+  }
+
   def print[T: pprint.TPrint](value: => T,
                               ident: String,
                               custom: Option[String])
                              (implicit tcolors: pprint.TPrintColors,
                               api: ReplAPI,
-                              classTagT: ClassTag[T] = null) = {
+                              classTagT: ClassTag[T] = null): Iterator[String] = {
+    val hookedPrintIt = api
+      .printHooks
+      .iterator
+      .flatMap { hook =>
+        hook
+          .print(value, ident, custom)(implicitly[pprint.TPrint[T]], tcolors, api, classTagT)
+          .iterator
+      }
+    val hookedPrintOpt =
+      if (hookedPrintIt.hasNext) Some(hookedPrintIt.next())
+      else None
+
+    hookedPrintOpt.getOrElse {
+      defaultPrint[T](value, ident, custom)
+    }
+  }
+  def defaultPrint[T: pprint.TPrint](value: => T,
+                                     ident: String,
+                                     custom: Option[String])
+                                    (implicit tcolors: pprint.TPrintColors,
+                                     api: ReplAPI,
+                                     classTagT: ClassTag[T] = null): Iterator[String] = {
+
     // Here we use ClassTag to detect if T is an Unit.
     //
     // The default value null suppresses the compilation error when T is a singleton type,
@@ -161,7 +194,8 @@ object ReplExtras {
   }
 
   private final case class Data(
-    pprinter: Ref[PPrinter]
+    pprinter: Ref[PPrinter],
+    printHooks: List[PrintHook]
   )
 
   private lazy val bw = Colors.BlackWhite
@@ -211,7 +245,8 @@ object ReplExtras {
               )
             )
             api.setData(Data(
-              pprinterRef
+              pprinterRef,
+              Nil
             ))
           }
         }
@@ -262,6 +297,11 @@ object ReplExtras {
 
     def load: ReplLoad =
       api.replLoad
+
+    def printHooks: Seq[PrintHook] =
+      data.printHooks
+    def addPrintHook(hook: PrintHook): Unit =
+      api.setData(data.copy(printHooks = hook :: data.printHooks))
 
   }
 
