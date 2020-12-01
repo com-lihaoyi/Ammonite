@@ -4,10 +4,6 @@ import ammonite.interp.api.APIHolder
 import ammonite.repl.api.ReplAPI
 import ammonite.repl.ReplExtras.{PrintHook, ReplAPIExtensions}
 
-trait TestReplApi {
-  def message: String
-}
-
 object TestReplBridge extends APIHolder[TestReplApi]
 
 case class Nope(n: Int)

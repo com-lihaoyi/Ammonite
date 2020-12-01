@@ -290,13 +290,21 @@ object amm extends Cross[MainModule](binCrossScalaVersions:_*){
         }
       }
     }
+    object `test-bridge` extends Cross[TestBridgeModule](fullCrossScalaVersions:_*)
+    class TestBridgeModule(val crossScalaVersion: String) extends AmmModule{
+      def crossFullScalaVersion = true
+      def moduleDeps = Seq(
+        amm.repl.api.full()
+      )
+    }
     // not a "real" cross module
     // The cross parameter is the tested *userspace* Scala version.
     // The sources of cross-tests itself (which are the same as the tests of amm.repl)
     // are only compiled with the latest Scala version.
     object `cross-tests` extends Cross[CrossTestModule](fullCrossScalaVersions:_*)
-    class CrossTestModule(val crossScalaVersion: String) extends AmmModule {
+    class CrossTestModule(val testScalaVersion: String) extends AmmModule {
       private def sv = binCrossScalaVersions.last
+      def crossScalaVersion = sv
       def scalaVersion = sv
       def moduleDeps = Seq(
         amm.repl(sv)
@@ -306,9 +314,18 @@ object amm extends Cross[MainModule](binCrossScalaVersions:_*){
       object test extends Tests with AmmDependenciesResourceFileModule {
         def dependencyResourceFileName = "amm-test-dependencies.txt"
 
+        def moduleDeps = super.moduleDeps ++ Seq(
+          amm.repl.`test-bridge`(sv)
+        )
+
         def thinWhitelist = T{
           generateApiWhitelist(
-            amm.repl.api.exposedClassPath()
+            amm.repl.api.exposedClassPath(),
+            // This one lives in test-bridge.
+            // It's a simple Java class, with no dependencies,
+            // so we pull it manually, instead of putting it in a
+            // dedicated Java module and adding that module here.
+            Seq("ammonite/TestReplApi.class")
           )
         }
         def localClasspath = T{
@@ -318,13 +335,17 @@ object amm extends Cross[MainModule](binCrossScalaVersions:_*){
         // Pass the class path of amm.compiler and amm.repl.api.full for
         // the *tested* Scala version, via some Java properties.
         def forkArgs = T{
-          val classPath = amm.compiler(sv).runClasspath() ++
-            amm.repl.api.full(sv).runClasspath()
+          val classPath = amm.compiler(testScalaVersion).runClasspath() ++
+            amm.repl.api.full(testScalaVersion).runClasspath() ++
+            amm.repl.`test-bridge`(testScalaVersion).runClasspath() ++
+            localClasspath()
           val classPathStr = classPath
             .map(_.path.toString)
             .mkString(java.io.File.pathSeparator)
           // hope we won't get a too long argument error on Windows
-          super.forkArgs() ++ Seq(s"-Damm.cross-tests.side-jars=$classPathStr")
+          super.forkArgs() ++ Seq(
+            s"-Damm.cross-tests.side-jars=$classPathStr"
+          )
         }
 
         def resources = T.sources {
@@ -356,6 +377,10 @@ object amm extends Cross[MainModule](binCrossScalaVersions:_*){
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.crossScalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
+
+      def moduleDeps = super.moduleDeps ++ Seq(
+        amm.repl.`test-bridge`()
+      )
 
       def thinWhitelist = T{
         generateApiWhitelist(
@@ -500,7 +525,7 @@ class MainModule(val crossScalaVersion: String)
   }
 }
 
-def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Dest) = {
+def generateApiWhitelist(replApiCp: Seq[PathRef], extraEntries: Seq[String] = Nil)(implicit ctx: mill.api.Ctx.Dest) = {
 
   val thinClasspathEntries = replApiCp.map(_.path).flatMap{ cpRoot =>
     if (os.isFile(cpRoot) && cpRoot.ext == "jar") {
@@ -514,9 +539,10 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
     else if (!os.exists(cpRoot)) Nil
     else throw new Exception(cpRoot.toString)
   }
+  val allEntries = thinClasspathEntries ++ extraEntries
   os.write(
     ctx.dest / "ammonite-api-whitelist.txt",
-    thinClasspathEntries
+    allEntries
       .flatMap(_.stripSuffix("/").split('/').inits)
       .filter(_.nonEmpty)
       .map(_.mkString("/"))
