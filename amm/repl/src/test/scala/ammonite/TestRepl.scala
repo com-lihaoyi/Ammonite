@@ -29,6 +29,8 @@ final case class TestReplRuntime(
 ) {
   def initialFrame(): Frame =
     Frame.childFrame(sharedFrame)
+
+  def scala2_12 = userScalaVersion.startsWith("2.12.")
 }
 
 

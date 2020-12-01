@@ -10,6 +10,15 @@ object AdvancedTests extends TestSuite{
   val tests = Tests{
     println("AdvancedTests")
     val check = new DualTestRepl()
+    test("scalaVersion"){
+      check.session(s"""
+        @ val sv = scala.util.Properties.versionNumberString
+        sv: String = "${check.userScalaVersion}"
+
+        @ val check = sv == "${check.userScalaVersion}"
+        check: Boolean = true
+      """)
+    }
     test("pprint"){
       check.session(s"""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
@@ -344,7 +353,7 @@ object AdvancedTests extends TestSuite{
     }
     test("macro paradise or -Ymacro-annotations") {
       val init =
-        if (scala2_12) {
+        if (check.scala2_12) {
           val scalaVer = scala.util.Properties.versionNumberString
           val paradiseVersion =
             if (scalaVer == "2.12.0" || scalaVer == "2.12.1") "2.1.0"
