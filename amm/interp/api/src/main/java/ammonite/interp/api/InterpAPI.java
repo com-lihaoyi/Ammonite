@@ -36,4 +36,6 @@ public abstract class InterpAPI {
 
   // Internal
   public abstract List<Function<Object, Object>> beforeExitHooksList();
+
+  public abstract Object objCompilerLifeCycleManager();
 }

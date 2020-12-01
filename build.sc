@@ -226,7 +226,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       )
       object full extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
       class InterpApiModule(val crossScalaVersion: String) extends AmmModule{
-        def moduleDeps = Seq(api, amm.util())
+        def moduleDeps = Seq(api, amm.compiler(), amm.util())
         def crossFullScalaVersion = true
         def ivyDeps = Agg(
           ivy"org.scala-lang:scala-compiler:$crossScalaVersion",

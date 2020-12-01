@@ -46,14 +46,20 @@ object InterpExtras {
       * when it ends up being initialized later
       */
     def configureCompiler(c: scala.tools.nsc.Global => Unit): Unit =
-      () // TODO
+      api
+        .objCompilerLifeCycleManager
+        .asInstanceOf[ammonite.compiler.CompilerLifecycleManager]
+        .configureCompiler(c)
 
     /**
        * Pre-configures the next compiler. Useful for tuning options that are
        * used during parsing such as -Yrangepos
        */
     def preConfigureCompiler(c: scala.tools.nsc.Settings => Unit): Unit =
-      () // TODO
+      api
+        .objCompilerLifeCycleManager
+        .asInstanceOf[ammonite.compiler.CompilerLifecycleManager]
+        .preConfigureCompiler(c)
   }
 
   implicit class ReplClassLoaderExtensions(private val cl: ReplClassLoader) extends AnyVal {
