@@ -11,12 +11,18 @@ import java.security.MessageDigest
 
 
 object Util{
-  val javaPrefixes = Set("java", "jdk", "javax")
+  val javaPrefixes = Set(
+    Seq("java"),
+    Seq("jdk"),
+    Seq("javax"),
+    Seq("org", "xml", "sax"),
+    Seq("sun")
+  )
   def lookupWhiteList(whitelist: Set[Seq[String]], tokens: Seq[String]): Boolean = {
     if (whitelist.isEmpty) true
     else {
       tokens.foreach(s => assert(!s.contains('/'), s))
-      javaPrefixes.contains(tokens.head) || whitelist(tokens)
+      javaPrefixes.exists(tokens.startsWith(_)) || whitelist(tokens)
     }
   }
   def withContextClassloader[T](contextClassloader: ClassLoader)(t: => T) = {
