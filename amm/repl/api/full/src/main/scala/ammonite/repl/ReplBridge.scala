@@ -288,12 +288,14 @@ object ReplExtras {
     /**
      * Access the compiler to do crazy things if you really want to!
      */
-    def compiler: scala.tools.nsc.Global = ???
+    def compiler: scala.tools.nsc.Global =
+      api.objCompiler.asInstanceOf[scala.tools.nsc.Global]
 
     /**
       * Access the presentation compiler to do even crazier things if you really want to!
       */
-    def interactiveCompiler: scala.tools.nsc.interactive.Global = ???
+    def interactiveCompiler: scala.tools.nsc.interactive.Global =
+      api.objPressy.asInstanceOf[scala.tools.nsc.interactive.Global]
 
     def load: ReplLoad =
       api.replLoad

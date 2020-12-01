@@ -98,6 +98,9 @@ public abstract class ReplAPI {
   public abstract void setPrompt(Supplier<String> prompt);
   public abstract void setFrontEnd(FrontEnd frontEnd);
 
+  public abstract Object objCompiler();
+  public abstract Object objPressy();
+
   private Object data0 = null;
   public final Object data() {
     return data0;

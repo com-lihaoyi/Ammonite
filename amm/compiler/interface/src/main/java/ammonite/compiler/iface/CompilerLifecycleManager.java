@@ -31,5 +31,6 @@ public abstract class CompilerLifecycleManager {
 
   public abstract void addToClasspath(Map.Entry<String, byte[]>[] classFiles);
 
+  public abstract Object objPressy();
   public abstract void shutdownPressy();
 }

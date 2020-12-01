@@ -18,6 +18,8 @@ public abstract class Compiler {
     return preprocessor(fileName, false);
   }
 
+  public abstract Object objCompiler();
+
   public static final class Output {
 
     private final Map.Entry<String, byte[]>[] classFiles;

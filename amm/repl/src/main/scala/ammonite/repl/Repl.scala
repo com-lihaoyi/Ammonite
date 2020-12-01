@@ -133,6 +133,8 @@ class Repl(compilerManager: CompilerLifecycleManager,
         def lastException = repl.lastException
         def fullRawHistory = storage.fullHistory().array
         def rawHistory = repl.history.array
+        def objCompiler = interp.compilerManager.compiler.objCompiler
+        def objPressy = interp.compilerManager.objPressy
         def newCompiler() = interp.compilerManager.forceInit()
         def compiler = null
         def interactiveCompiler = null

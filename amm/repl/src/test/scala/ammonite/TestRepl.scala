@@ -119,6 +119,8 @@ class TestRepl {
         def rawHistory = Array()
         val getColors = ammonite.repl.api.Colors.BLACKWHITE
         def setColors(colors: ammonite.repl.api.Colors) = ()
+        def objCompiler = interp.compilerManager.compiler.objCompiler
+        def objPressy = interp.compilerManager.objPressy
         def newCompiler() = interp.compilerManager.forceInit()
         def compiler = null
         def interactiveCompiler = null

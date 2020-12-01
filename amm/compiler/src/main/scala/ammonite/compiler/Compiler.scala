@@ -269,6 +269,8 @@ object Compiler extends CompilerBuilder {
       (vd, reporter, scalac)
     }
 
+    def objCompiler = compiler
+
 
     /**
      * Compiles a blob of bytes and spits of a list of classfiles

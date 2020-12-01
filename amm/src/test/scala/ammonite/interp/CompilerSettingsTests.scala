@@ -4,6 +4,7 @@ import ammonite.TestUtils._
 
 import ammonite.runtime.Storage
 import ammonite.main.Scripts
+import ammonite.util.InterfaceExtensions
 import utest._
 
 object CompilerSettingsTests extends TestSuite {
@@ -26,9 +27,14 @@ object CompilerSettingsTests extends TestSuite {
         )
         Scripts.runScript(os.pwd, scriptPath / "configureCompiler.sc", interp)
 
-        assert((
-          /*interp.compilerManager.compiler.compiler*/ ??? : scala.tools.nsc.Global
-        ).useOffsetPositions)
+        assert(
+          interp
+            .compilerManager
+            .compiler
+            .objCompiler
+            .asInstanceOf[scala.tools.nsc.Global]
+            .useOffsetPositions
+        )
       }
     }
 
@@ -43,9 +49,14 @@ object CompilerSettingsTests extends TestSuite {
       )
       Scripts.runScript(os.pwd, scriptPath / "preConfigureCompiler.sc", interp)
 
-      assert(!(
-        /*interp.compilerManager.compiler.compiler*/ ??? : scala.tools.nsc.Global
-      ).useOffsetPositions)
+      assert(
+        !interp
+          .compilerManager
+          .compiler
+          .objCompiler
+          .asInstanceOf[scala.tools.nsc.Global]
+          .useOffsetPositions
+      )
     }
   }
 }

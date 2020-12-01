@@ -20,6 +20,7 @@ import scala.tools.nsc.reporters.Reporter
  * Nice wrapper for the presentation compiler.
  */
 trait Pressy{
+  def compiler: InteractiveGlobal
   /**
     * Ask for autocompletion at a particular spot in the code, returning
     * possible things that can be completed at that location. May try various

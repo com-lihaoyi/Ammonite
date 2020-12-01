@@ -120,7 +120,9 @@ class CompilerLifecycleManager extends ammonite.compiler.iface.CompilerLifecycle
       // we also make a *separate* copy to pass to the presentation compiler.
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
-      val settings = Option(null: scala.tools.nsc.Global).fold(new Settings)(_.settings.copy)
+      val settings = Option(compiler)
+        .map(_.objCompiler.asInstanceOf[scala.tools.nsc.Global].settings.copy)
+        .getOrElse(new Settings)
       onSettingsInit.foreach(_(settings))
 
       val initialClassPath = Classpath.classpath(initialClassLoader, rtCacheDir)
@@ -139,7 +141,7 @@ class CompilerLifecycleManager extends ammonite.compiler.iface.CompilerLifecycle
         initialClassPath
       )
 
-      // onCompilerInit.foreach(_(compiler.compiler))
+      onCompilerInit.foreach(_(compiler.objCompiler.asInstanceOf[scala.tools.nsc.Global]))
 
       // Pressy is lazy, so the actual presentation compiler won't get instantiated
       // & initialized until one of the methods on it is actually used
@@ -189,7 +191,7 @@ class CompilerLifecycleManager extends ammonite.compiler.iface.CompilerLifecycle
   def configureCompiler(callback: scala.tools.nsc.Global => Unit) = synchronized{
     onCompilerInit.append(callback)
     if (compiler != null){
-      // callback(compiler.compiler)
+      callback(compiler.objCompiler.asInstanceOf[scala.tools.nsc.Global])
     }
   }
 
@@ -203,6 +205,7 @@ class CompilerLifecycleManager extends ammonite.compiler.iface.CompilerLifecycle
     val actualClassFiles = classFiles.map(e => (e.getKey, e.getValue))
     Compiler.addToClasspath(actualClassFiles, dynamicClasspath)
   }
+  def objPressy = pressy.compiler
   // Not synchronized, since it's part of the exit sequence that needs to run
   // if the repl exits while the warmup code is compiling
   def shutdownPressy() = {
