@@ -7,15 +7,15 @@ import ammonite.util.Res
 /**
   * Wraps several [[TestRepl]], and runs its tests against all of them.
   */
-class DualTestRepl { dual =>
+class DualTestRepl(runtime: TestReplRuntime = TestRepl.sharedRuntime) { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
 
   val repls = Seq(
-    new TestRepl {
+    new TestRepl(runtime) {
       override def predef = dual.predef
     },
-    new TestRepl {
+    new TestRepl(runtime) {
       override def predef = dual.predef
       override def codeWrapper = CodeClassWrapper
     }

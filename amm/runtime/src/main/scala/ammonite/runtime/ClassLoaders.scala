@@ -90,6 +90,22 @@ object Frame{
 
     new Frame(special, special, new Imports(Array()), Seq(), Seq())
   }
+
+  def childFrame(parent: Frame): Frame = new Frame(
+    new SpecialClassLoader(
+      parent.classloader,
+      parent.classloader.classpathSignature,
+      parent.classloader.specialLocalClasses
+    ),
+    new SpecialClassLoader(
+      parent.pluginClassloader,
+      parent.pluginClassloader.classpathSignature,
+      parent.pluginClassloader.specialLocalClasses
+    ),
+    parent.imports,
+    parent.classpath,
+    parent.usedEarlierDefinitions
+  )
 }
 
 case class SessionChanged(rawRemovedImports: Array[String],

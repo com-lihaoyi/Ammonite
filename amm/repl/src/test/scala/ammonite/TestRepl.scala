@@ -22,11 +22,63 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 import ammonite.runtime.ImportHook
 
+final case class TestReplRuntime(
+  classPathWhitelist: Set[Seq[String]],
+  initialClassLoader: ClassLoader,
+  sharedFrame: Frame
+) {
+  def initialFrame(): Frame =
+    Frame.childFrame(sharedFrame)
+}
+
+
+object TestRepl {
+  lazy val crossScalaVersionEnabled =
+    try {
+      Thread.currentThread().getContextClassLoader.loadClass("ammonite.repl.CrossTests")
+      true
+    }
+    catch { case _: ClassNotFoundException => false }
+
+  def runtime(): TestReplRuntime = {
+    val classPathWhitelist =
+      if (crossScalaVersionEnabled) Repl.getClassPathWhitelist()
+      else Set.empty[Seq[String]]
+    val initialClassLoader = {
+      val contextClassLoader = Thread.currentThread().getContextClassLoader
+      if (crossScalaVersionEnabled) new WhiteListClassLoader(classPathWhitelist, contextClassLoader)
+      else contextClassLoader
+    }
+
+    val intermediateLoader =
+      if (crossScalaVersionEnabled) {
+        val extraJarsValue = sys.props.getOrElse(
+          "amm.cross-tests.side-jars",
+          sys.error("Property amm.cross-tests.side-jars not set for cross tests")
+        )
+        val extraJars = extraJarsValue
+          .split(File.pathSeparator)
+          .map(os.Path(_).toNIO.toUri.toURL)
+        new URLClassLoader(extraJars, initialClassLoader)
+      }
+      else initialClassLoader
+    val sharedFrame = Frame.createInitial(intermediateLoader, forking = !crossScalaVersionEnabled)
+    TestReplRuntime(
+      classPathWhitelist,
+      initialClassLoader,
+      sharedFrame
+    )
+  }
+
+  lazy val sharedRuntime = runtime()
+}
+
 /**
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl {
+class TestRepl(runtime: TestReplRuntime = TestRepl.runtime()) {
+
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = ObjectCodeWrapper
@@ -64,28 +116,9 @@ class TestRepl {
     x => infoBuffer.append(x + Util.newLine)
   )
   val storage = new Storage.Folder(tempDir)
-  val classPathWhitelist =
-    if (crossScalaVersionEnabled) Repl.getClassPathWhitelist()
-    else Set.empty[Seq[String]]
-  val initialClassLoader = {
-    val contextClassLoader = Thread.currentThread().getContextClassLoader
-    if (crossScalaVersionEnabled) new WhiteListClassLoader(classPathWhitelist, contextClassLoader)
-    else contextClassLoader
-  }
-
-  val intermediateLoader =
-    if (crossScalaVersionEnabled) {
-      val extraJarsValue = sys.props.getOrElse(
-        "amm.cross-tests.side-jars",
-        sys.error("Property amm.cross-tests.side-jars not set for cross tests")
-      )
-      val extraJars = extraJarsValue
-        .split(File.pathSeparator)
-        .map(os.Path(_).toNIO.toUri.toURL)
-      new URLClassLoader(extraJars, initialClassLoader)
-    }
-    else initialClassLoader
-  val initialFrame = Frame.createInitial(intermediateLoader, forking = !crossScalaVersionEnabled)
+  val classPathWhitelist = runtime.classPathWhitelist
+  val initialClassLoader = runtime.initialClassLoader
+  val initialFrame = runtime.initialFrame()
   val frames = Ref(List(initialFrame))
   val sess0 = new SessionApiImpl(frames)
 

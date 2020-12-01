@@ -11,21 +11,8 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
   def frames: Array[ammonite.compiler.iface.Frame] = frames0().toArray
   val namedFrames = mutable.Map.empty[String, List[Frame]]
 
-  def childFrame(parent: Frame) = new Frame(
-    new SpecialClassLoader(
-      parent.classloader,
-      parent.classloader.classpathSignature,
-      parent.classloader.specialLocalClasses
-    ),
-    new SpecialClassLoader(
-      parent.pluginClassloader,
-      parent.pluginClassloader.classpathSignature,
-      parent.pluginClassloader.specialLocalClasses
-    ),
-    parent.imports,
-    parent.classpath,
-    parent.usedEarlierDefinitions
-  )
+  def childFrame(parent: Frame) =
+    Frame.childFrame(parent)
 
   def save(name: String = "") = {
     if (name != "") namedFrames(name) = frames0()

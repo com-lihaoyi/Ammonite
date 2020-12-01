@@ -1,7 +1,7 @@
 package ammonite.session
 
 import ammonite.TestUtils._
-import ammonite.DualTestRepl
+import ammonite.{DualTestRepl, TestRepl}
 import ammonite.util.Res
 import utest._
 
@@ -53,7 +53,7 @@ object AdvancedTests extends TestSuite{
     }
 
     test("predef"){
-      val check2 = new DualTestRepl{
+      val check2 = new DualTestRepl(){
         override def predef = (
           """
           import math.abs
@@ -79,7 +79,7 @@ object AdvancedTests extends TestSuite{
 
     }
     test("predefSettings"){
-      val check2 = new DualTestRepl{
+      val check2 = new DualTestRepl(){
         override def predef = (
           """
           interp.configureCompiler(_.settings.Xexperimental.value = true)
