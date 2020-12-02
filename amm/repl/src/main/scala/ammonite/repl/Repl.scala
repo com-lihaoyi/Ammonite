@@ -6,9 +6,12 @@ import java.nio.file.Path
 import ammonite.repl.api.{FrontEnd, History, ReplLoad}
 import ammonite.runtime._
 import ammonite.terminal.Filter
+import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.interp.{CodeWrapper, Interpreter, Parsers, Preprocessor}
+import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.iface.{CodeWrapper, Imports}
+import ammonite.interp.Interpreter
 import coursierapi.Dependency
 
 import scala.annotation.tailrec
@@ -103,7 +106,7 @@ class Repl(input: InputStream,
         def lastException = repl.lastException
         def fullHistory = storage.fullHistory()
         def history = repl.history
-        def newCompiler() = interp.compilerManager.init(force = true)
+        def newCompiler() = interp.compilerManager.forceInit()
         def compiler = null
         def interactiveCompiler = null
         def fullImports = repl.fullImports

@@ -250,7 +250,11 @@ case class Printer(outStream: PrintStream,
                    resultStream: PrintStream,
                    warning: String => Unit,
                    error: String => Unit,
-                   info: String => Unit)
+                   info: String => Unit) extends ammonite.compiler.iface.Logger {
+  def printInfo(message: String) = info(message)
+  def printWarning(message: String) = warning(message)
+  def printError(message: String) = error(message)
+}
 
 case class ImportTree(prefix: Seq[String],
                       mappings: Option[ImportTree.ImportMapping],

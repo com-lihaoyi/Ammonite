@@ -2,20 +2,22 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.interp.{CodeWrapper, DependencyLoader, Interpreter, Parsers, Preprocessor}
+import ammonite.compiler.iface.{CodeSource, CodeWrapper}
+import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{ImportTree, Name, Util}
-import ammonite.util.Util.CodeSource
+import ammonite.util.InterfaceExtensions._
 import coursierapi.{Dependency, Repository}
 
 import scala.collection.mutable
 
 final case class ScriptProcessor(
+  codeWrapper: CodeWrapper,
   dependencyLoader: DependencyLoader,
   defaultRepositories: Seq[Repository],
   extraPluginDependencies: Seq[Dependency] = Nil,
   wd: os.Path = os.pwd,
-  codeWrapper: CodeWrapper = CodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) {
 
@@ -110,11 +112,11 @@ final case class ScriptProcessor(
 
   def load(path: os.Path): Script = {
     val (pkg, wrapper) = Util.pathToPackageWrapper(Nil, path.relativeTo(wd))
-    val codeSource = CodeSource(
-      wrapper,
-      pkg,
-      Seq(Name("ammonite"), Name("$file")),
-      Some(path)
+    val codeSource = new CodeSource(
+      wrapper.raw,
+      pkg.map(_.raw).toArray,
+      Array("ammonite", "$file"),
+      path.toNIO
     )
     val code = os.read(path)
     load(code, codeSource)

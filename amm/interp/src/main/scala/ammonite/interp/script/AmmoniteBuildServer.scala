@@ -8,9 +8,11 @@ import java.util.concurrent.{CompletableFuture, Executors, ThreadFactory}
 import java.util.UUID
 
 import ammonite.interp.api.InterpAPI
-import ammonite.interp.{CodeWrapper, DependencyLoader}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Imports}
+import ammonite.interp.DependencyLoader
 import ammonite.runtime.{ImportHook, Storage}
-import ammonite.util.{Classpath, Imports, Printer}
+import ammonite.util.{Classpath, Printer}
+import ammonite.util.InterfaceExtensions._
 import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher
@@ -21,10 +23,10 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
+  codeWrapper: CodeWrapper,
   initialScripts: Seq[os.Path] = Nil,
   initialImports: Imports = AmmoniteBuildServer.defaultImports,
   defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
-  codeWrapper: CodeWrapper = CodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) extends BuildServer with ScalaBuildServer with DummyBuildServerImplems {
 
@@ -58,6 +60,7 @@ class AmmoniteBuildServer(
   private lazy val proc =
     withRoot { root =>
       ScriptProcessor(
+        codeWrapper,
         dependencyLoader,
         defaultRepositories,
         Seq(
@@ -68,7 +71,6 @@ class AmmoniteBuildServer(
           )
         ),
         root,
-        codeWrapper,
         importHooks
       )
   }
@@ -181,7 +183,7 @@ class AmmoniteBuildServer(
       buildTargetIdentifier(path),
       List.empty[String].asJava,
       List("scala").asJava,
-      directDeps.map(buildTargetIdentifier).asJava,
+      directDeps.map(p => buildTargetIdentifier(os.Path(p))).asJava,
       new BuildTargetCapabilities(true, false, false)
     )
     target.setBaseDirectory(path.toNIO.toAbsolutePath.getParent.toUri.toASCIIString)
@@ -207,7 +209,7 @@ class AmmoniteBuildServer(
               // FIXME Log this
           }
         }
-      } yield scriptBuildTarget(script, path)
+      } yield scriptBuildTarget(script, os.Path(path))
       new WorkspaceBuildTargetsResult(buildTargets.asJava)
     }
 
@@ -292,7 +294,6 @@ class AmmoniteBuildServer(
         mod0
           .codeSource.path
           .getOrElse(???)
-          .toNIO
           .toUri
           .toASCIIString
       ),
@@ -361,12 +362,12 @@ class AmmoniteBuildServer(
     val path = script.codeSource.path.getOrElse {
       sys.error("Unexpected script with no path")
     }
-    val target = buildTargetIdentifier(path)
+    val target = buildTargetIdentifier(os.Path(path))
 
     val result = compiler
       .compileFromCache(script, dependencies)
       .getOrElse {
-        val name = rootOpt.fold(path.toString)(path.relativeTo(_).toString)
+        val name = rootOpt.fold(path.toString)(os.Path(path).relativeTo(_).toString)
         val taskId = startCompileTask(name, target)
         val result0 = compiler.compile(script, dependencies)
         finishCompiling(

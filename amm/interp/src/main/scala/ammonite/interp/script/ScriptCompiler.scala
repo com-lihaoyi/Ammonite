@@ -2,12 +2,10 @@ package ammonite.interp.script
 
 import java.util.concurrent.ConcurrentHashMap
 
-import ammonite.interp.{
-  CodeWrapper,
-  Compiler => AmmCompiler
-}
+import ammonite.compiler.iface.{CodeWrapper, Imports}
 import ammonite.runtime.Storage
-import ammonite.util.{Imports, Printer}
+import ammonite.util.Printer
+import ammonite.util.InterfaceExtensions._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -35,7 +33,7 @@ final class ScriptCompiler(
     doCompile: (Script, Script.ResolvedDependencies) => ScriptCompileResult = compile(_, _)
   ): (
     Map[Script, Seq[Diagnostic]],
-    Either[String, Seq[AmmCompiler.Output]]
+    Either[String, Seq[ammonite.compiler.iface.Compiler.Output]]
   ) = {
 
     val diagnostics = new mutable.HashMap[Script, Seq[Diagnostic]]
@@ -57,7 +55,11 @@ final class ScriptCompiler(
       jars <- processor.jarDependencies(module)
       pluginJars <- processor.jarPluginDependencies(module)
 
-      resolvedDeps = Script.ResolvedDependencies(jars, pluginJars, depsOutput.flatMap(_.classFiles))
+      resolvedDeps = Script.ResolvedDependencies(
+        jars,
+        pluginJars,
+        depsOutput.flatMap(_.classFiles.map(e => (e.getKey, e.getValue)))
+      )
 
       output <- {
         val compileResult = doCompile(module, resolvedDeps)
@@ -170,7 +172,7 @@ final class ScriptCompiler(
     dependencies: Script.ResolvedDependencies
   ) {
     def stale: Boolean =
-      script.codeSource.path.exists { path =>
+      script.codeSource.path.map(os.Path(_)).exists { path =>
         !os.isFile(path) || {
           // short-circuit that by looking at the file size?
           val content = os.read(path)

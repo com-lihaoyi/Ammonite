@@ -3,8 +3,10 @@ package ammonite.runtime
 import java.lang.reflect.InvocationTargetException
 
 import ammonite._
+import ammonite.compiler.iface.Imports
 import ammonite.interp.api.AmmoniteExit
 import util.Util.{ClassFiles, newLine}
+import ammonite.util.InterfaceExtensions._
 import ammonite.util._
 
 import scala.util.Try
@@ -161,8 +163,8 @@ object Evaluator{
                          imports: Imports) = {
       Evaluated(
         wrapperName,
-        Imports(
-          for(id <- imports.value) yield {
+        new Imports(
+          (for(id <- imports.data) yield {
             val filledPrefix =
               if (internalWrapperPath.isEmpty) {
                 val filledPrefix =
@@ -195,8 +197,8 @@ object Evaluator{
               else
                 Seq(Name("_root_")) ++ id.prefix
 
-            id.copy(prefix = filledPrefix)
-          }
+            id.withPrefix(filledPrefix)
+          }).toArray
         )
       )
     }
@@ -212,3 +214,6 @@ object Evaluator{
 
 
 }
+
+case class Evaluated(wrapper: Seq[Name],
+                     imports: Imports)

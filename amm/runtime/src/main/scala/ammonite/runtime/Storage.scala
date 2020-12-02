@@ -3,6 +3,7 @@ package ammonite.runtime
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.{Files, Paths}
 
+import ammonite.compiler.iface.Imports
 import ammonite.repl.api.History
 import ammonite.util._
 import ammonite.util.Util._
@@ -107,13 +108,18 @@ object Storage{
     upickle.default.macroRW
   implicit def importHookInfoRW: upickle.default.ReadWriter[ImportHookInfo] =
     upickle.default.macroRW
-  implicit val importDataRW: upickle.default.ReadWriter[ImportData] = upickle.default.macroRW
-  implicit val importTypeRW: upickle.default.ReadWriter[ImportData.ImportType] =
-    upickle.default.macroRW
+  implicit val importDataRW: upickle.default.ReadWriter[Imports.Data] =
+    upickle.default.readwriter[(String, String, Seq[String], String)].bimap[Imports.Data](
+      data => (data.from, data.to, data.rawPrefix.toSeq, data.`type`),
+      {
+        case (from, to, prefix, tpe) =>
+          new Imports.Data(from, to, prefix.toArray, tpe)
+      }
+  )
   implicit val importsRW: upickle.default.ReadWriter[Imports] =
-    upickle.default.readwriter[Seq[ImportData]].bimap[Imports](
-      imports => imports.value,
-      data => Imports(data)
+    upickle.default.readwriter[Seq[Imports.Data]].bimap[Imports](
+      imports => imports.data,
+      data => new Imports(data.toArray)
   )
 
   private def loadIfTagMatches(loadedTag: Tag,

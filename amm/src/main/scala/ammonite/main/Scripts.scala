@@ -1,8 +1,9 @@
 package ammonite.main
 import java.nio.file.NoSuchFileException
 
+import ammonite.compiler.{CodeClassWrapper, ObjectCodeWrapper}
+import ammonite.compiler.iface.CodeSource
 import ammonite.interp.api.AmmoniteExit
-import ammonite.util.Util.CodeSource
 import ammonite.util.{Name, Res, Util}
 import fastparse.internal.Util.literalize
 
@@ -25,7 +26,7 @@ object Scripts {
 
       processed <- interp.processModule(
         scriptTxt,
-        CodeSource(wrapper, pkg, Seq(Name("ammonite"), Name("$file")), Some(path)),
+        new CodeSource(wrapper.raw, pkg.map(_.raw).toArray, Array("ammonite", "$file"), path.toNIO),
         autoImport = true,
         // Not sure why we need to wrap this in a separate `$routes` object,
         // but if we don't do it for some reason the `generateRoutes` macro
@@ -50,7 +51,7 @@ object Scripts {
       }
 
       scriptMains = interp.scriptCodeWrapper match{
-        case ammonite.interp.CodeWrapper =>
+        case ObjectCodeWrapper =>
           Some(
             interp
               .evalClassloader
@@ -61,7 +62,7 @@ object Scripts {
               .apply()
           )
 
-        case ammonite.interp.CodeClassWrapper =>
+        case CodeClassWrapper =>
           val outer = interp
             .evalClassloader
             .loadClass(routeClsName)

@@ -4,6 +4,8 @@ import java.math.BigInteger
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
+import ammonite.util.InterfaceExtensions._
+
 import scala.collection.mutable
 import scala.meta.internal.semanticdb._
 
@@ -86,7 +88,7 @@ object SemanticdbProcessor {
       val updatedDocs = docs.withDocuments {
         val uriOpt =
           for (wd0 <- wd; p <- module.codeSource.path)
-            yield wd0.toNIO.toUri.relativize(p.toNIO.toUri).toASCIIString
+            yield wd0.toNIO.toUri.relativize(p.toUri).toASCIIString
         docs.documents.map { doc =>
           doc
             .withText(module.code)

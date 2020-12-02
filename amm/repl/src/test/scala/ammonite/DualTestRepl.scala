@@ -1,9 +1,10 @@
 package ammonite
 
-import ammonite.interp.CodeClassWrapper
+import ammonite.compiler.CodeClassWrapper
 import ammonite.repl.api.SourceBridge
 import ammonite.repl.SourceAPIImpl
-import ammonite.util.{Evaluated, Res}
+import ammonite.runtime.Evaluated
+import ammonite.util.Res
 
 /**
   * Wraps several [[TestRepl]], and runs its tests against all of them.

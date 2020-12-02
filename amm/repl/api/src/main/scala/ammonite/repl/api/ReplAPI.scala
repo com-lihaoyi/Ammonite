@@ -2,7 +2,7 @@ package ammonite.repl.api
 
 import java.nio.file.Path
 
-import ammonite.compiler.iface.Frame
+import ammonite.compiler.iface.{Frame, Imports}
 import ammonite.util._
 
 import scala.reflect.runtime.universe._

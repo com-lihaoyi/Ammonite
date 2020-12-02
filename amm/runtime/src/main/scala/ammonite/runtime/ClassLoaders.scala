@@ -7,7 +7,9 @@ import java.util.Collections
 
 
 
-import ammonite.util.{Imports, Util}
+import ammonite.compiler.iface.Imports
+import ammonite.util.InterfaceExtensions._
+import ammonite.util.Util
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
@@ -85,7 +87,7 @@ object Frame{
       likelyJdkSourceLocation.wrapped.toUri.toURL
     )
 
-    new Frame(special, special, Imports(), Seq(), Seq())
+    new Frame(special, special, new Imports(Array()), Seq(), Seq())
   }
 }
 
@@ -96,7 +98,7 @@ case class SessionChanged(removedImports: Set[scala.Symbol],
 object SessionChanged{
 
   def delta(oldFrame: Frame, newFrame: Frame): SessionChanged = {
-    def frameSymbols(f: Frame) = f.imports.value.map(_.toName.backticked).map(Symbol(_)).toSet
+    def frameSymbols(f: Frame) = f.imports.data.map(_.toName.backticked).map(Symbol(_)).toSet
     new SessionChanged(
       frameSymbols(oldFrame) -- frameSymbols(newFrame),
       frameSymbols(newFrame) -- frameSymbols(oldFrame),

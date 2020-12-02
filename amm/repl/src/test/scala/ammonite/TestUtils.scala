@@ -2,7 +2,9 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
+import ammonite.compiler.{ObjectCodeWrapper, Preprocessor}
+import ammonite.compiler.iface.Imports
+import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.runtime.{Frame, Storage}
 import ammonite.util._
@@ -14,7 +16,7 @@ object TestUtils {
 
   def createTestInterp(
     storage: Storage,
-    predefImports: Imports = Imports(),
+    predefImports: Imports = new Imports,
     predef: String = ""
   ) = {
     val initialClassLoader = Thread.currentThread().getContextClassLoader
@@ -31,8 +33,8 @@ object TestUtils {
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
       initialClassLoader = initialClassLoader,
-      replCodeWrapper = CodeWrapper,
-      scriptCodeWrapper = CodeWrapper,
+      replCodeWrapper = ObjectCodeWrapper,
+      scriptCodeWrapper = ObjectCodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
       importHooks = ImportHook.defaults,
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)

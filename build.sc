@@ -194,7 +194,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object compiler extends Module {
+  object compiler extends Cross[CompilerModule](fullCrossScalaVersions:_*) {
     object interface extends JavaModule with AmmPublishModule with AmmInternalJavaModule {
       def artifactName = "ammonite-compiler-interface"
       def exposedClassPath = T{
@@ -204,6 +204,15 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
           transitiveSourceJars()
       }
     }
+  }
+  class CompilerModule(val crossScalaVersion: String) extends AmmModule{
+    def moduleDeps = Seq(amm.util())
+    def crossFullScalaVersion = true
+    def ivyDeps = Agg(
+      ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
+      ivy"com.lihaoyi::scalaparse:2.3.0",
+      ivy"org.scala-lang.modules::scala-xml:1.2.0"
+    )
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
@@ -225,7 +234,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
+    def moduleDeps = Seq(ops(), amm.compiler(), amm.util(), amm.runtime())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
@@ -253,8 +262,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(
         amm.util(),
-        interp.api.full(),
-        compiler.interface
+        interp.api.full()
       )
       def ivyDeps = Agg(
         ivy"com.lihaoyi::mainargs:0.1.4"

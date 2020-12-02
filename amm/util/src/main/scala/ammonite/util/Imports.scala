@@ -4,6 +4,7 @@
   */
 package ammonite.util
 
+import ammonite.compiler.iface.{Imports => IImports}
 import ammonite.util.Util.{ClassFiles, VersionedWrapperId, newLine}
 
 import scala.collection.mutable
@@ -21,15 +22,13 @@ object ScriptOutput{
   case class BlockMetadata(id: VersionedWrapperId,
                            leadingSpaces: String,
                            hookInfo: ImportHookInfo,
-                           finalImports: Imports)
+                           finalImports: IImports)
   case class Metadata(blockInfo: Seq[BlockMetadata])
 }
 
-case class ImportHookInfo(imports: Imports,
+case class ImportHookInfo(imports: IImports,
                           stmts: Seq[String],
                           trees: Seq[ImportTree])
-case class Evaluated(wrapper: Seq[Name],
-                     imports: Imports)
 
 /**
   * Represents the importing of a single name in the Ammonite REPL, of the
@@ -48,19 +47,20 @@ case class Evaluated(wrapper: Seq[Name],
   * a type, a term, or both. This lets us properly deal with shadowing correctly
   * if we import the type and term of the same name from different places
   */
-case class ImportData(fromName: Name,
-                      toName: Name,
-                      prefix: Seq[Name],
-                      importType: ImportData.ImportType)
-
 
 object ImportData{
   sealed case class ImportType(name: String)
-  val Type = ImportType("Type")
-  val Term = ImportType("Term")
-  val TermType = ImportType("TermType")
+  val Type = ImportType(IImports.Type)
+  val Term = ImportType(IImports.Term)
+  val TermType = ImportType(IImports.TermType)
 
-  def apply(name: String, importType: ImportType = Term): Seq[ImportData] = {
+  def apply(fromName: Name,
+            toName: Name,
+            prefix: Seq[Name],
+            importType: ImportData.ImportType): IImports.Data =
+    new IImports.Data(fromName.raw, toName.raw, prefix.map(_.raw).toArray, importType.name)
+
+  def apply(name: String, importType: ImportType = Term): Seq[IImports.Data] = {
     val elements = name.split('.')
     assert(elements.nonEmpty)
 
@@ -71,38 +71,35 @@ object ImportData{
         Seq(elements.last)
 
     simpleNames.map { simpleName =>
-      ImportData(
-        Name(simpleName),
-        Name(simpleName),
-        Name("_root_") :: elements.init.map(Name(_)).toList,
-        importType
+      new IImports.Data(
+        simpleName,
+        simpleName,
+        ("_root_" +: elements.init).toArray,
+        importType.name
       )
     }
   }
 }
 
-/**
-  * Represents the imports that occur before a piece of user code in the
-  * Ammonite REPL. It's basically a `Seq[ImportData]`, except we really want
-  * it to be always in a "canonical" form without shadowed/duplicate imports.
-  *
-  * Thus we only expose an `apply` method which performs this de-duplication,
-  * and a `++` operator that combines two sets of imports while performing
-  * de-duplication.
-  */
-class Imports private (val value: Seq[ImportData]){
-  def ++(others: Imports) = Imports(this.value, others.value)
-  override def equals(obj: Any): Boolean =
-    obj match {
-      case other: Imports => value == other.value
-      case _ => false
-    }
-  override def hashCode(): Int = value.##
-  override def toString() = {
+object Imports{
+
+  private implicit class ImportsDataExtensions(private val data: IImports.Data) extends AnyVal {
+    def fromName = Name(data.from)
+    def toName = Name(data.to)
+    def prefix = data.rawPrefix.map(Name(_))
+    def importType: ImportData.ImportType =
+      data.`type` match {
+        case IImports.Term => ImportData.Term
+        case IImports.Type => ImportData.Type
+        case IImports.TermType => ImportData.TermType
+      }
+  }
+
+  def toString(imports: IImports): String = {
     // Group the remaining imports into sliding groups according to their
     // prefix, while still maintaining their ordering
-    val grouped = mutable.Buffer[mutable.Buffer[ImportData]]()
-    for(data <- value){
+    val grouped = mutable.Buffer[mutable.Buffer[IImports.Data]]()
+    for(data <- imports.data){
       if (grouped.isEmpty) grouped.append(mutable.Buffer(data))
       else {
         val last = grouped.last.last
@@ -130,19 +127,17 @@ class Imports private (val value: Seq[ImportData]){
     }
     out.mkString
   }
-}
 
-object Imports{
   // This isn't called directly, but we need to define it so uPickle can know
   // how to read/write imports
-  def unapply(s: Imports): Option[Seq[ImportData]] = Some(s.value)
+  def unapply(s: IImports): Option[Seq[IImports.Data]] = Some(s.data())
   /**
     * Constructs an `Imports` object from one or more loose sequence of imports
     *
     * Figures out which imports will get stomped over by future imports
     * before they get used, and just ignore those.
     */
-  def apply(importss: Seq[ImportData]*): Imports = {
+  def apply(importss: Seq[IImports.Data]*): IImports = {
     // We iterate over the combined reversed imports, keeping track of the
     // things that will-be-stomped-over-in-the-non-reversed-world in a map.
     // If an import's target destination will get stomped over we ignore it
@@ -151,7 +146,7 @@ object Imports{
     val importData = importss.flatten
     val stompedTypes = mutable.Set.empty[Name]
     val stompedTerms = mutable.Set.empty[Name]
-    val out = mutable.Buffer.empty[ImportData]
+    val out = mutable.Buffer.empty[IImports.Data]
     for(data <- importData.reverseIterator){
       val stomped = data.importType match{
         case ImportData.Term => Seq(stompedTerms)
@@ -165,6 +160,6 @@ object Imports{
         data.prefix.headOption.foreach(stompedTerms.remove)
       }
     }
-    new Imports(out.reverse.toSeq)
+    new IImports(out.reverse.toArray)
   }
 }

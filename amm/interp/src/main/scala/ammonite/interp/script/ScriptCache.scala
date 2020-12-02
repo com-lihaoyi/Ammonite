@@ -4,6 +4,7 @@ import java.net.URI
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
+import ammonite.util.InterfaceExtensions._
 import ch.epfl.scala.bsp4j.{BuildTargetEvent, BuildTargetEventKind, BuildTargetIdentifier}
 
 import scala.collection.JavaConverters._
@@ -63,7 +64,7 @@ final class ScriptCache(
     val events = for {
       script <- allScripts
       p <- script.codeSource.path
-      id = identifier(p)
+      id = identifier(os.Path(p))
       previousOpt = Option(cache.put(id, script))
       if previousOpt.forall { newScript =>
         newScript.dependencies != script.dependencies ||

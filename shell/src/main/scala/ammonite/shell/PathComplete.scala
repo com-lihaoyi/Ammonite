@@ -6,7 +6,7 @@ import ammonite.terminal._
 import Filter._
 import ammonite.repl.{FrontEndUtils, Highlighter}
 import ammonite.util.Colors
-import ammonite.interp.Parsers
+import ammonite.compiler.Parsers
 import ammonite.terminal._
 import ammonite.terminal.LazyList.~:
 /**

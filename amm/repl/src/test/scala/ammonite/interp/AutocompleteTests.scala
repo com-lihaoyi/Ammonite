@@ -3,6 +3,7 @@ package ammonite.interp
 import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
+import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util
 
 object AutocompleteTests extends TestSuite{

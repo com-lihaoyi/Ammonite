@@ -1,8 +1,8 @@
 package ammonite.interp.script
 
-import ammonite.util.Imports
-import ammonite.util.Util.CodeSource
+import ammonite.compiler.iface.{CodeSource, Imports}
 import ammonite.runtime.ImportHook
+import ammonite.util.InterfaceExtensions._
 import ammonite.util.Name
 
 final case class Script(
@@ -13,8 +13,8 @@ final case class Script(
 ) {
 
   lazy val dependencyImports: Imports = {
-    val importData = dependencies.scriptDependencies.flatMap(_.hookImports.value)
-    Imports(importData)
+    val importData = dependencies.scriptDependencies.flatMap(_.hookImports.data).toArray
+    new Imports(importData)
   }
 
   lazy val dependencies: Script.Dependencies =
@@ -29,7 +29,7 @@ final case class Script(
 
   def segments(wd: Option[os.Path]): Option[Seq[String]] =
     for {
-      p <- codeSource.path
+      p <- codeSource.path.map(os.Path(_))
       segments = wd.fold(p.segments.toVector)(wd0 => p.relativeTo(wd0).segments.toVector)
     } yield segments
 
@@ -120,7 +120,7 @@ object Script {
           case Some(p) =>
             Dependencies(
               scriptDependencies =
-                Seq(Import(Right(p), s.exec, s.codeSource, s.hookImports))
+                Seq(Import(Right(os.Path(p)), s.exec, s.codeSource, s.hookImports))
             )
           case None =>
             Dependencies() // TODO import $url

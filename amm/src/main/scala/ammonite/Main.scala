@@ -4,11 +4,14 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.{Watchable, CodeClassWrapper, CodeWrapper, Interpreter, PredefInitialization}
+import ammonite.compiler.{CodeClassWrapper, ObjectCodeWrapper}
+import ammonite.compiler.iface.CodeWrapper
+import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
 import ammonite.repl.{FrontEndAPIImpl, Repl, SourceAPIImpl}
+import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.newLine
 import ammonite.util._
 
@@ -69,8 +72,8 @@ case class Main(predefCode: String = "",
                 verboseOutput: Boolean = true,
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default,
-                replCodeWrapper: CodeWrapper = CodeWrapper,
-                scriptCodeWrapper: CodeWrapper = CodeWrapper,
+                replCodeWrapper: CodeWrapper = ObjectCodeWrapper,
+                scriptCodeWrapper: CodeWrapper = ObjectCodeWrapper,
                 alreadyLoadedDependencies: Seq[Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
@@ -293,6 +296,7 @@ object Main{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
+            ObjectCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
               Seq("ammonite.interp.api.InterpBridge" -> "interp")
@@ -453,7 +457,7 @@ class MainRunner(cliConfig: Config,
 
     val codeWrapper =
       if (cliConfig.repl.classBased.value) CodeClassWrapper
-      else CodeWrapper
+      else ObjectCodeWrapper
 
     Main(
       cliConfig.predef.predefCode,

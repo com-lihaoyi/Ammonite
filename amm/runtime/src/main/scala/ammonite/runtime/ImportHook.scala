@@ -3,9 +3,10 @@ package ammonite.runtime
 import java.io.{ByteArrayOutputStream, File}
 import java.net.URI
 
+import ammonite.compiler.iface.{CodeSource, Imports}
 import ammonite.interp.api.IvyConstructor
-import ammonite.util.Util.CodeSource
 import ammonite.util._
+import ammonite.util.InterfaceExtensions._
 import coursierapi.{Dependency, IvyRepository, MavenRepository, Repository}
 
 import scala.util.{Failure, Success, Try}
@@ -114,7 +115,7 @@ object ImportHook{
         case Some(currentScriptPath) =>
 
           val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".sc")
+            tree, os.Path(currentScriptPath), Seq(".sc")
           )
 
           files.foreach(interp.watch)
@@ -126,7 +127,7 @@ object ImportHook{
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
 
                 val (flexiblePkg, wrapper) = Util.pathToPackageWrapper(
-                  source.flexiblePkgName, filePath relativeTo currentScriptPath/os.up
+                  source.flexiblePkgName, filePath relativeTo os.Path(currentScriptPath)/os.up
                 )
 
                 val fullPrefix = source.pkgRoot ++ flexiblePkg ++ Seq(wrapper) ++ wrapperPath
@@ -136,17 +137,17 @@ object ImportHook{
                   fullPrefix.dropRight(1), ImportData.TermType
                 ))
 
-                val codeSrc = CodeSource(
-                  wrapper,
-                  flexiblePkg,
-                  source.pkgRoot,
-                  Some(filePath)
+                val codeSrc = new CodeSource(
+                  wrapper.raw,
+                  flexiblePkg.map(_.raw).toArray,
+                  source.pkgRoot.map(_.raw).toArray,
+                  filePath.toNIO
                 )
 
                 Result.Source(
                   Util.normalizeNewlines(os.read(filePath)),
                   codeSrc,
-                  Imports(importData),
+                  new Imports(importData.toArray),
                   exec
                 )
               }
@@ -212,7 +213,7 @@ object ImportHook{
         case None => Left("Cannot resolve $cp import in code without source")
         case Some(currentScriptPath) =>
           val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".jar", "")
+            tree, os.Path(currentScriptPath), Seq(".jar", "")
           )
 
           if (missing.nonEmpty)
@@ -264,22 +265,22 @@ object ImportHook{
                 inputStream.close()
               }
 
-              val codeSrc = CodeSource(
-                Name(uri.toString),
-                Nil,
-                source.pkgRoot,
-                None
+              val codeSrc = new CodeSource(
+                uri.toString,
+                Array(),
+                source.pkgRoot.map(_.raw).toArray,
+                null
               )
 
               val fullPrefix = source.pkgRoot ++ Seq(Name(uri.toString)) ++ wrapperPath
-              val importData = Seq(ImportData(
-                fullPrefix.last, Name(rename),
-                fullPrefix.dropRight(1), ImportData.TermType
+              val importData = Array(new Imports.Data(
+                fullPrefix.last.raw, rename,
+                fullPrefix.dropRight(1).map(_.raw).toArray, "TermType"
               ))
               Result.Source(
                 Util.normalizeNewlines(code),
                 codeSrc,
-                Imports(importData),
+                new Imports(importData),
                 exec=false
               )
           })

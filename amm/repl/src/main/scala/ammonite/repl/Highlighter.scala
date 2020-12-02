@@ -1,7 +1,7 @@
 package ammonite.repl
 
 
-import ammonite.interp.Parsers
+import ammonite.compiler.Parsers
 
 import fastparse._, NoWhitespace._
 

@@ -2,9 +2,27 @@ package ammonite.compiler.iface;
 
 import java.util.function.Function;
 
+/**
+  * Responsible for all scala-source-code-munging that happens within the
+  * Ammonite REPL.
+  *
+  * Performs several tasks:
+  *
+  * - Takes top-level Scala expressions and assigns them to `res{1, 2, 3, ...}`
+  *   values so they can be accessed later in the REPL
+  *
+  * - Wraps the code snippet with an wrapper `object` since Scala doesn't allow
+  *   top-level expressions
+  *
+  * - Mangles imports from our [[ammonite.util.ImportData]] data structure into a source
+  *   String
+  *
+  * - Combines all of these into a complete compilation unit ready to feed into
+  *   the Scala compiler
+  */
 public abstract class Preprocessor {
 
-  public abstract Output transform(
+  public abstract Output transformOrNull(
     String[] stmts,
     String resultIndex,
     String leadingSpaces,

@@ -1,11 +1,12 @@
 package ammonite.interp
 
 
+import ammonite.compiler.iface.{CodeSource, Imports}
 import ammonite.interp.api.InterpAPI
 import ammonite.runtime.{SpecialClassLoader, Storage}
+import ammonite.util.InterfaceExtensions._
 import ammonite.util.ScriptOutput.Metadata
-import ammonite.util.{ImportData, Imports, Name, PredefInfo, Res}
-import ammonite.util.Util.CodeSource
+import ammonite.util.{ImportData, Name, PredefInfo, Res}
 
 /**
   * The logic around executing an [[Interpreter]]'s predef during
@@ -26,17 +27,17 @@ object PredefInitialization {
 
     val allImports =
       for ((name, shortName) <- bridges)
-        yield Imports(
-          Seq(ImportData(
-            Name("value"),
-            Name(shortName),
+        yield new Imports(
+          Array(new Imports.Data(
+            "value",
+            shortName,
             // FIXME Not sure special chars / backticked things in name are fine here
-            Name("_root_") +: name.stripPrefix("_root_.").split('.').map(Name(_)).toSeq,
-            ImportData.Term
+            "_root_" +: name.stripPrefix("_root_.").split('.').toArray,
+            "Term"
           ))
         )
 
-    allImports.foldLeft(Imports())(_ ++ _)
+    allImports.foldLeft(new Imports)(_ ++ _)
   }
   def initBridges(bridges: Seq[(String, String, AnyRef)],
                   evalClassloader: SpecialClassLoader): Imports = {
@@ -70,11 +71,11 @@ object PredefInitialization {
       else {
         processModule(
           predefInfo.code,
-          CodeSource(
-            predefInfo.name,
-            Seq(),
-            Seq(Name("ammonite"), Name("predef")),
-            predefInfo.path
+          new CodeSource(
+            predefInfo.name.raw,
+            Array(),
+            Array("ammonite", "predef"),
+            predefInfo.path.map(_.toNIO).orNull
           ),
           predefInfo.hardcoded
         ) match{

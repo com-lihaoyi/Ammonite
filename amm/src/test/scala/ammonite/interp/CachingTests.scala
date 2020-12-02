@@ -185,7 +185,7 @@ object CachingTests extends TestSuite{
         """)
       val scriptFile = os.temp("""div("<('.'<)", y).render""")
 
-      def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) ={
+      def processAndCheckCompiler(f: ammonite.compiler.iface.Compiler => Boolean) ={
         val interp = createTestInterp(
           new Storage.Folder(tempDir){
             override val predef = predefFile
