@@ -70,18 +70,26 @@ object BasicTests extends TestSuite{
       assert(count2 < 5)
     }
     test("fastparseNotLoadedByCachedScritps"){
+      def filterOutInstrument(input: String): String =
+        input
+          .replace("fastparse.Implicits$Repeater", "")
+          .replace("fastparse.ParserInputSource", "")
+          .replace("fastparse.internal.Instrument", "")
+          .replace("/fastparse_", "")
       val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
         os.rel/'basic/"Print.sc",
         tmpDir
       )
-      assert(evaled1.out.trim.contains("fastparse"))
+      val output1 = filterOutInstrument(evaled1.out.trim)
+      assert(output1.contains("fastparse"))
 
       val evaled2 = execWithJavaOptsSet(
         os.rel/'basic/"Print.sc",
         tmpDir
-        )
-      assert(!evaled2.out.trim.contains("fastparse"))
+      )
+      val output2 = filterOutInstrument(evaled2.out.trim)
+      assert(!output2.contains("fastparse"))
     }
 
 
