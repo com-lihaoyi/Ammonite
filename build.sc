@@ -48,6 +48,12 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.0.0-M6"
 
+trait AmmInternalJavaModule extends JavaModule {
+  def artifactName = "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
+  def externalSources = T{
+    resolveDeps(transitiveIvyDeps, sources = true)()
+  }
+}
 trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def artifactName = "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   def testFramework = "utest.runner.Framework"
@@ -102,8 +108,7 @@ trait AmmPublishModule extends PublishModule{
       Developer("lihaoyi", "Li Haoyi","https://github.com/lihaoyi")
     )
   )
-}
-trait AmmModule extends AmmInternalModule with AmmPublishModule{
+
   def transitiveJars: T[Agg[PathRef]] = T{
     mill.define.Task.traverse(this +: moduleDeps)(m =>
       T.task{m.jar()}
@@ -115,8 +120,8 @@ trait AmmModule extends AmmInternalModule with AmmPublishModule{
       T.task{m.sourceJar()}
     )()
   }
-
 }
+trait AmmModule extends AmmInternalModule with AmmPublishModule
 trait AmmDependenciesResourceFileModule extends JavaModule{
   def dependencyResourceFileName: String
   def dependencyFileResources = T{
@@ -186,6 +191,18 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ivy"com.lihaoyi::requests:0.6.5",
       ivy"com.lihaoyi::mainargs:0.1.4",
     )
+  }
+
+  object compiler extends Module {
+    object interface extends JavaModule with AmmPublishModule with AmmInternalJavaModule {
+      def artifactName = "ammonite-compiler-interface"
+      def exposedClassPath = T{
+        runClasspath() ++
+          externalSources() ++
+          transitiveJars() ++
+          transitiveSourceJars()
+      }
+    }
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
@@ -341,7 +358,8 @@ class MainModule(val crossScalaVersion: String)
 
   def thinWhitelist = T{
     generateApiWhitelist(
-      amm.repl.api().exposedClassPath()
+      amm.repl.api().exposedClassPath() ++
+        amm.compiler.interface.exposedClassPath()
     )
   }
   def localClasspath = T{
