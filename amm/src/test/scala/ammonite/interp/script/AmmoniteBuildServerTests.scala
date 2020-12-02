@@ -584,7 +584,7 @@ object AmmoniteBuildServerTests extends TestSuite {
         val doc = semanticDb(scalacOptionsItem, scriptPath)
 
         val quickRequestOccurrence = new SymbolOccurrence(
-          Some(new Range(3, 0, 3, 12)),
+          Some(new Range(2, 0, 2, 12)),
           "sttp/client/SttpApi#quickRequest.",
           SymbolOccurrence.Role.REFERENCE
         )
