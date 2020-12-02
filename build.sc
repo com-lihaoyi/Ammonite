@@ -8,12 +8,19 @@ val isMasterCommit =
   sys.env.get("GITHUB_REPOSITORY") == Some("lihaoyi/Ammonite") &&
   sys.env.get("GITHUB_REF").exists(x => x.endsWith("/master"))
 
-val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
+val releaseArchiveVersion = sys.env.get("RELEASE_ARCHIVE_VERSION")
 
-val gitHead = os.proc('git, "rev-parse", "HEAD").call().out.trim
+val latestTaggedVersion = releaseArchiveVersion
+  .getOrElse(os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim)
 
-val commitsSinceTaggedVersion = {
-  os.proc('git, "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
+val gitHead = releaseArchiveVersion match {
+  case Some(ver) => ver
+  case None => os.proc('git, "rev-parse", "HEAD").call().out.trim
+}
+
+val commitsSinceTaggedVersion = releaseArchiveVersion match {
+  case Some(_) => 0
+  case None => os.proc('git, "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
     .call()
     .out
     .trim
@@ -35,10 +42,13 @@ val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 println("GITHUB REF " + sys.env.get("GITHUB_REF"))
 
 val (buildVersion, unstable) = scala.util.Try(
-  os.proc('git, 'describe, "--exact-match", "--tags", "--always", gitHead)
-    .call()
-    .out
-    .trim
+  releaseArchiveVersion match {
+    case Some(ver) => ver
+    case None => os.proc('git, 'describe, "--exact-match", "--tags", "--always", gitHead)
+      .call()
+      .out
+      .trim
+  }
 ).toOption match{
   case None =>
     val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
