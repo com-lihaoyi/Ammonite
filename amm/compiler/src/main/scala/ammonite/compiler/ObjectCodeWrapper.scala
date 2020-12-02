@@ -19,7 +19,7 @@ object ObjectCodeWrapper extends ScalaCodeWrapper{
     val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
-$imports
+${imports.repr}
 
 object ${indexedWrapperName.backticked}{\n"""
       )

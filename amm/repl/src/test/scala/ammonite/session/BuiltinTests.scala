@@ -55,17 +55,17 @@ object BuiltinTests extends TestSuite{
 
     test("imports"){
       check.session("""
-        @ assert(repl.imports.toString == ""); assert(repl.fullImports.toString != "")
+        @ assert(repl.imports.repr == ""); assert(repl.fullImports.repr != "")
 
         @ val definedValue = 123
 
-        @ assert(repl.imports.toString.contains("definedValue"))
+        @ assert(repl.imports.repr.contains("definedValue"))
 
-        @ assert(repl.fullImports.toString.contains("definedValue"))
+        @ assert(repl.fullImports.repr.contains("definedValue"))
 
-        @ assert(!repl.imports.toString.contains("ammonite.runtime.tools"))
+        @ assert(!repl.imports.repr.contains("ammonite.runtime.tools"))
 
-        @ assert(repl.fullImports.toString.contains("ammonite.runtime.tools"))
+        @ assert(repl.fullImports.repr.contains("ammonite.runtime.tools"))
       """)
     }
 

@@ -192,7 +192,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.compilerManager.complete(_, fullImports.toString, _),
+      interp.compilerManager.complete(_, fullImports.repr, _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code

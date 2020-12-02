@@ -43,7 +43,7 @@ object CodeClassWrapper extends ScalaCodeWrapper {
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
 
-$imports
+${imports.repr}
 
 object ${indexedWrapperName.backticked}{
   val instance: Helper.type = Helper
@@ -128,7 +128,7 @@ $usedThingsSet
 
   override def toString = $q${indexedWrapperName.encoded}$q
 $requiredVals
-$reworkedImports
+${reworkedImports.repr}
 
 final class Helper extends java.io.Serializable{\n"""
     )
