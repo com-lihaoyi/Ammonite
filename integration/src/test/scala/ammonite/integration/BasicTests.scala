@@ -45,7 +45,6 @@ object BasicTests extends TestSuite{
         os.write(scriptAddr, """println("Script Worked!!")""", createFolders = true)
         val evaled = os.proc(
           executable,
-          "--thin",
           "-s",
           scriptAddr
           // Somehow this is being set of travis and causing weird errors/warnings
@@ -92,7 +91,6 @@ object BasicTests extends TestSuite{
       os.write(scriptAddr, """println("Worked!!")""")
       val evaled = os.proc(
         executable,
-        "--thin",
         scriptAddr
       ).call()
       assert(evaled.out.trim == "Worked!!" )
@@ -145,7 +143,6 @@ object BasicTests extends TestSuite{
       if (!Util.windowsPlatform && !Util.java9OrAbove) {
         os.proc(
           executable,
-          "--thin",
           "-c",
           """val loc = source.load(new String().substring(_: Int))
             |val snip = Predef.augmentString(loc.fileContent)

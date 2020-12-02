@@ -1,11 +1,6 @@
 #!/usr/bin/env amm
 // HttpApi.sc
 
-import $ivy.{
-  `com.lihaoyi::requests:0.2.0`,
-  `com.lihaoyi::ujson:0.7.5`
-}
-
 lazy val jsonPlaceHolderBase =
   Option(System.getenv("JSONPLACEHOLDER")).getOrElse {
     "http://jsonplaceholder.typicode.com"
@@ -14,7 +9,7 @@ lazy val jsonPlaceHolderBase =
 @main
 def addPost(title: String, body: String) = {
   ujson.read(
-    requests.get(
+    requests.post(
       s"$jsonPlaceHolderBase/posts",
       data = Seq(
         "title"  -> title,

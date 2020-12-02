@@ -34,7 +34,7 @@ object TestUtils {
     os.proc(
       executable,
       extraAmmArgs,
-      if (thin) Seq("--thin") else Nil,
+      Nil,
       "--no-remote-logging",
       "--home",
       home,
