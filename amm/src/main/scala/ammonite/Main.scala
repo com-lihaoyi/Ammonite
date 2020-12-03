@@ -10,7 +10,7 @@ import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.{FrontEndAPIImpl, Repl}
+import ammonite.repl.Repl
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.newLine
 import ammonite.util._
@@ -180,13 +180,7 @@ case class Main(predefCode: String = "",
         importHooks = importHooks,
         classPathWhitelist = classPathWhitelist
       )
-      val bridges = Seq(
-        (
-          "ammonite.repl.api.FrontEndBridge",
-          "frontEnd",
-          new FrontEndAPIImpl {}
-        )
-      )
+      val bridges = Nil
       interp.initializePredef(Seq(), customPredefs, bridges, augmentedImports) match{
         case None => Right(interp)
         case Some(problems) => Left(problems)

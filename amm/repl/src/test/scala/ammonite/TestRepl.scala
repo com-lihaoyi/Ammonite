@@ -159,11 +159,6 @@ class TestRepl {
                 super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
           }
       }
-    ),
-    (
-      "ammonite.repl.api.FrontEndBridge",
-      "frontEnd",
-      new FrontEndAPIImpl {}
     )
   )
 

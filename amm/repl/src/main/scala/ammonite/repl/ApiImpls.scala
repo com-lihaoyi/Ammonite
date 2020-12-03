@@ -1,13 +1,9 @@
 package ammonite.repl
 
-import ammonite.ops.Internals
-import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Session}
-import ammonite.repl.tools.{Desugared, SourceRuntime}
+import ammonite.repl.api.{Clipboard, Session}
 import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util._
-
-import java.util.Locale
 
 import scala.collection.mutable
 
@@ -114,14 +110,4 @@ trait ReplApiImpl extends FullReplAPI{
 
   def clipboard: Clipboard =
     Clipboard.clipboardImpl
-}
-
-trait FrontEndAPIImpl extends FrontEndAPI {
-  def apply(name: String): FrontEnd =
-    name.toLowerCase(Locale.ROOT) match {
-      case "ammonite" => AmmoniteFrontEnd()
-      case "windows" => FrontEnds.JLineWindows
-      case "unix" => FrontEnds.JLineUnix
-      case _ => throw new NoSuchElementException(s"Front-end $name")
-    }
 }

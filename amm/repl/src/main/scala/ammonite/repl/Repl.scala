@@ -135,11 +135,6 @@ class Repl(compilerManager: CompilerLifecycleManager,
           }
         }
       }
-    ),
-    (
-      "ammonite.repl.api.FrontEndBridge",
-      "frontEnd",
-      new FrontEndAPIImpl {}
     )
   )
 

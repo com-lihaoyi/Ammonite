@@ -736,6 +736,7 @@ object Interpreter{
       importType = ImportData.Type
     ),
     ImportData("ammonite.util.InterfaceExtensions.ImportsExtensions"),
+    ImportData("ammonite.repl.api.FrontEnd"),
     ImportData("ammonite.runtime.tools.{browse, grep, time}"),
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
     ImportData("ammonite.repl.tools.{desugar, source}"),
