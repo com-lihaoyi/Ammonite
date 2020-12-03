@@ -54,6 +54,7 @@ object ImportHook{
   trait InterpreterInterface {
     def loadIvy(coordinates: Dependency*): Either[String, Seq[File]]
     def watch(p: os.Path): Unit
+    def userScalaVersion: String
   }
 
   /**
@@ -178,9 +179,11 @@ object ImportHook{
           case Array(a, b, c) =>
             Right(Dependency.of(a, b, c))
           case Array(a, "", b, c) =>
-            Right(Dependency.of(a, b + "_" + IvyConstructor.scalaBinaryVersion, c))
+            val name = b + "_" + IvyConstructor.binaryVersion(interp.userScalaVersion)
+            Right(Dependency.of(a, name, c))
           case Array(a, "", "", b, c) =>
-            Right(Dependency.of(a, b + "_" + IvyConstructor.scalaFullBinaryVersion, c))
+            val name = b + "_" + interp.userScalaVersion
+            Right(Dependency.of(a, name, c))
           case _ => Left(signature)
         }
       }

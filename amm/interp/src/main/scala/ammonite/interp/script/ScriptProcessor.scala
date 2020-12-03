@@ -13,6 +13,7 @@ import coursierapi.{Dependency, Repository}
 import scala.collection.mutable
 
 final case class ScriptProcessor(
+  userScalaVersion: String,
   codeWrapper: CodeWrapper,
   dependencyLoader: DependencyLoader,
   defaultRepositories: Seq[Repository],
@@ -64,7 +65,7 @@ final case class ScriptProcessor(
       val r = hook.handle(
         codeSource,
         tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
-        ScriptProcessor.dummyInterpreterInterface,
+        ScriptProcessor.dummyInterpreterInterface(userScalaVersion),
         codeWrapper.wrapperPath
       )
       r.left.map { error =>
@@ -204,9 +205,10 @@ object ScriptProcessor {
     }
   }
 
-  private val dummyInterpreterInterface =
+  private def dummyInterpreterInterface(scalaVersion: String) =
     new ImportHook.InterpreterInterface {
       def loadIvy(coordinates: Dependency*): Either[String, Seq[File]] = Right(Nil)
       def watch(p: os.Path): Unit = ()
+      def userScalaVersion = scalaVersion
     }
 }

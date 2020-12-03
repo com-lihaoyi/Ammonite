@@ -4,13 +4,14 @@ import coursierapi.{Dependency, Module}
 
 object IvyConstructor extends IvyConstructor {
 
-  val scalaBinaryVersion =
-    scala.util.Properties
-              .versionString
-              .stripPrefix("version ")
-              .split('.')
-              .take(2)
-              .mkString(".")
+  def binaryVersion(version: String): String =
+    version
+      .stripPrefix("version ")
+      .split('.')
+      .take(2)
+      .mkString(".")
+
+  val scalaBinaryVersion = binaryVersion(scala.util.Properties.versionString)
 
   val scalaFullBinaryVersion =
     scala.util.Properties

@@ -41,6 +41,8 @@ class Interpreter(val printer: Printer,
   extends ImportHook.InterpreterInterface{ interp =>
 
 
+  def userScalaVersion = compilerManager.userScalaVersion
+
   def headFrame = getFrame()
   val repositories = mutable.Buffer(ammonite.runtime.tools.IvyThing.defaultRepositories: _*)
   val resolutionHooks = mutable.Buffer.empty[Function[Fetch, Fetch]]

@@ -61,6 +61,7 @@ class AmmoniteBuildServer(
   private lazy val proc =
     withRoot { root =>
       ScriptProcessor(
+        compilerBuilder.userScalaVersion,
         codeWrapper,
         dependencyLoader,
         defaultRepositories,
