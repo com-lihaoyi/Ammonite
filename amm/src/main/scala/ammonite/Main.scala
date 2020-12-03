@@ -132,6 +132,13 @@ case class Main(predefCode: String = "",
         .toArray
   }
 
+  def finalWelcomeBanner = welcomeBanner.map { banner =>
+    banner.replace(
+      "%SCALA%",
+      fullScalaVersionOpt.getOrElse(scala.util.Properties.versionNumberString)
+    )
+  }
+
   lazy val initialClassLoader: ClassLoader = {
     val contextClassLoader = Thread.currentThread().getContextClassLoader
     new Main.WhiteListClassLoader(classPathWhitelist, contextClassLoader)
@@ -183,7 +190,7 @@ case class Main(predefCode: String = "",
           PredefInfo(Name("CodePredef"), predefCode, false, Some(wd/"(console)"))
         ),
         wd = wd,
-        welcomeBanner = welcomeBanner,
+        welcomeBanner = finalWelcomeBanner,
         replArgs = replArgs,
         initialColors = initialColors,
         replCodeWrapper = replCodeWrapper,

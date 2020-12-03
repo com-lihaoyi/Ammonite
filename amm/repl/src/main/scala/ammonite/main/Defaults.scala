@@ -18,7 +18,7 @@ object Defaults{
     def scalaVersion = scala.util.Properties.versionNumberString
     def javaVersion = System.getProperty("java.version")
     Util.normalizeNewlines(
-      s"Welcome to the Ammonite Repl $ammoniteVersion (Scala $scalaVersion Java $javaVersion)"
+      s"Welcome to the Ammonite Repl $ammoniteVersion (Scala %SCALA% Java $javaVersion)"
     )
   }
 
