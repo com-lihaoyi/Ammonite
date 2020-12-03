@@ -52,9 +52,15 @@ object Config{
         the core of  Ammonite and all of its dependencies can be seen by users from the
         Ammonite session. This option mitigates that via class loader isolation.""")
     thin: Flag,
+    @arg(
+      doc ="""Use a specific Scala version, rather than the default one.""")
+    scala: String = "",
     @arg(doc = "Print this message")
     help: Flag
-  )
+  ) {
+    def classLoaderIsolation: Boolean =
+      thin.value || scala.nonEmpty
+  }
   implicit val coreParser = ParserForClass[Core]
 
   @main

@@ -823,4 +823,21 @@ object Interpreter{
     (ammColors, printer)
   }
 
+  def compilerLifecycleManager(
+    cl: ClassLoader
+  ): ammonite.compiler.iface.CompilerLifecycleManager = {
+    // Equivalent to
+    //   new ammonite.compiler.CompilerLifecycleManager
+    // if cl loaded Ammonite itself.
+    val cls = cl.loadClass("ammonite.compiler.CompilerLifecycleManager")
+    cls.getConstructor().newInstance()
+      .asInstanceOf[ammonite.compiler.iface.CompilerLifecycleManager]
+  }
+  def parser(cl: ClassLoader): Parser = {
+    // Equivalent to
+    //   new ammonite.compiler.Parsers
+    // if cl loaded Ammonite itself.
+    val cls = cl.loadClass("ammonite.compiler.Parsers")
+    cls.getConstructor().newInstance().asInstanceOf[Parser]
+  }
 }

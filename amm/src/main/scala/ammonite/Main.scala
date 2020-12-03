@@ -77,7 +77,8 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                classPathWhitelist: Set[Seq[String]] = Set.empty){
+                classPathWhitelist: Set[Seq[String]] = Set.empty,
+                scalaVersion: Option[String] = None){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -89,6 +90,46 @@ case class Main(predefCode: String = "",
         )
       }
     case None => Right(None)
+  }
+
+  lazy val fullScalaVersionOpt: Option[String] = scalaVersion.map { sv =>
+    import coursierapi._
+    import scala.collection.JavaConverters._
+
+    // FIXME We should allow users to use custom repositories here.
+
+    if (sv.count(_ == '.') >= 2) sv
+    else {
+      // Short version - we need to find what the exact version is going to be.
+      val listing = ammonite.Constants.scalaVersions
+      val prefix = sv.stripSuffix(".") + "."
+      val matches = listing.filter(v => v.startsWith(prefix))
+      matches.lastOption.getOrElse {
+        new PrintStream(errorStream).println(s"Error: cannot find a Scala version matching $sv")
+        sys.exit(1)
+      }
+    }
+  }
+
+  lazy val extraCp: Array[java.net.URL] = fullScalaVersionOpt match {
+    case None => Array.empty
+    case Some(sv) =>
+      import coursierapi._
+      import scala.collection.JavaConverters._
+      // FIXME We should allow users to use custom repositories here.
+      val files = Fetch.create()
+        .withMainArtifacts()
+        .addClassifiers("sources")
+        .addDependencies(
+          Dependency.of("com.lihaoyi", "ammonite-repl-api-full_" + sv, ammonite.Constants.version),
+          Dependency.of("com.lihaoyi", "ammonite-compiler_" + sv, ammonite.Constants.version)
+        )
+        .fetch()
+      files
+        .iterator()
+        .asScala
+        .map(_.toURI.toURL)
+        .toArray
   }
 
   lazy val initialClassLoader: ClassLoader = {
@@ -118,9 +159,20 @@ case class Main(predefCode: String = "",
         """
       }.mkString(newLine)
 
+      val frame = {
+        // Not passing sharedLoader around where initialClassLoader is used.
+        // initialClassLoader is used to compute the "initial class path" later on,
+        // that is subject to black/whitelisting. We don't want the JARs of extraCp
+        // to get black/whitelisted.
+        val sharedLoader =
+          if (extraCp.isEmpty) initialClassLoader
+          else new URLClassLoader(extraCp, initialClassLoader)
+        Frame.createInitial(sharedLoader, forking = extraCp.isEmpty && classPathWhitelist.isEmpty)
+      }
+
       new Repl(
-        new CompilerLifecycleManager,
-        ammonite.compiler.Parsers,
+        Interpreter.compilerLifecycleManager(frame.classloader),
+        Interpreter.parser(frame.classloader),
         inputStream, outputStream, errorStream,
         storage = storageBackend,
         baseImports = augmentedImports,
@@ -139,7 +191,8 @@ case class Main(predefCode: String = "",
         alreadyLoadedDependencies = alreadyLoadedDependencies,
         importHooks = importHooks,
         initialClassLoader = initialClassLoader,
-        classPathWhitelist = classPathWhitelist
+        classPathWhitelist = classPathWhitelist,
+        initialFrame = frame
       )
     }
 
@@ -161,14 +214,20 @@ case class Main(predefCode: String = "",
         errorStream,
         verboseOutput
       )
-      val frame = Frame.createInitial(initialClassLoader, forking = classPathWhitelist.isEmpty)
+
+      val frame = {
+        val sharedLoader =
+          if (extraCp.isEmpty) initialClassLoader
+          else new URLClassLoader(extraCp, initialClassLoader)
+        Frame.createInitial(sharedLoader, forking = extraCp.isEmpty && classPathWhitelist.isEmpty)
+      }
 
       val customPredefs = predefFileInfoOpt.toSeq ++ Seq(
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
       val interp = new Interpreter(
-        new CompilerLifecycleManager,
-        ammonite.compiler.Parsers,
+        Interpreter.compilerLifecycleManager(frame.classloader),
+        Interpreter.parser(frame.classloader),
         printer,
         storageBackend,
         wd,
@@ -291,8 +350,8 @@ object Main{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
-            ammonite.compiler.Compiler,
-            ammonite.compiler.Parsers,
+            defaultCompilerBuilder(),
+            defaultParser(),
             ObjectCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
@@ -348,6 +407,10 @@ object Main{
     */
   def isInteractive() = System.console() != null
 
+  private def defaultCompilerBuilder(): ammonite.compiler.iface.CompilerBuilder =
+    ammonite.compiler.Compiler
+  private def defaultParser(): ammonite.compiler.iface.Parser =
+    ammonite.compiler.Parsers
 
   class WhiteListClassLoader(whitelist: Set[Seq[String]], parent: ClassLoader)
     extends URLClassLoader(Array(), parent){
@@ -477,8 +540,10 @@ class MainRunner(cliConfig: Config,
       scriptCodeWrapper = codeWrapper,
       alreadyLoadedDependencies =
         Defaults.alreadyLoadedDependencies(),
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.core.thin.value)
-
+      classPathWhitelist =
+        if (cliConfig.core.classLoaderIsolation) ammonite.repl.Repl.getClassPathWhitelist(true)
+        else Set.empty,
+      scalaVersion = Some(cliConfig.core.scala).map(_.trim).filter(_.nonEmpty)
     )
   }
 

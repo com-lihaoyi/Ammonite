@@ -555,8 +555,10 @@ def generateConstantsFile(version: String = buildVersion,
                           curlUrl: String = "<fill-me-in-in-Constants.scala>",
                           unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
                           oldCurlUrls: Seq[(String, String)] = Nil,
-                          oldUnstableCurlUrls: Seq[(String, String)] = Nil)
+                          oldUnstableCurlUrls: Seq[(String, String)] = Nil,
+                          scalaVersions: Seq[String] = fullCrossScalaVersions)
                          (implicit ctx: mill.util.Ctx.Dest)= {
+  val scalaVersionsStr = scalaVersions.map("\"" + _ + "\"").mkString("Seq(", ", ", ")")
   val versionTxt = s"""
     package ammonite
     object Constants{
@@ -571,6 +573,7 @@ def generateConstantsFile(version: String = buildVersion,
       val oldUnstableCurlUrls = Seq[(String, String)](
         ${oldUnstableCurlUrls.map{case (name, value) => s""" "$name" -> "$value" """}.mkString(",\n")}
       )
+      val scalaVersions = $scalaVersionsStr
     }
   """
   println("Writing Constants.scala")

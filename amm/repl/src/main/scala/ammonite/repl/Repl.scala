@@ -36,7 +36,8 @@ class Repl(compilerManager: CompilerLifecycleManager,
            importHooks: Map[Seq[String], ImportHook],
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
-           classPathWhitelist: Set[Seq[String]]) { repl =>
+           classPathWhitelist: Set[Seq[String]],
+           initialFrame: Frame = null) { repl =>
 
   var prompt = () => "@ "
 
@@ -62,9 +63,9 @@ class Repl(compilerManager: CompilerLifecycleManager,
     """
   }.mkString(newLine)
 
-  val frames = Ref(List(
+  val frames = Ref(List(Option(initialFrame).getOrElse(
     Frame.createInitial(initialClassLoader, forking = classPathWhitelist.isEmpty)
-  ))
+  )))
 
   /**
     * The current line number of the REPL, used to make sure every snippet
