@@ -23,6 +23,7 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
+  compilerBuilder: CompilerBuilder,
   codeWrapper: CodeWrapper,
   initialScripts: Seq[os.Path] = Nil,
   initialImports: Imports = AmmoniteBuildServer.defaultImports,

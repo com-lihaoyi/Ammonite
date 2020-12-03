@@ -1,16 +1,16 @@
 package ammonite.interp.script
 
-import ammonite.compiler.{Compiler => AmmCompiler, MakeReporter}
-import ammonite.compiler.iface.{CodeWrapper, Compiler, Imports}
+import java.util.function.Consumer
+
+import ammonite.compiler.{Compiler => AmmCompiler}
+import ammonite.compiler.iface.{CodeWrapper, Compiler, CompilerBuilder, Imports, Preprocessor}
 import ammonite.interp.Interpreter
 import ammonite.runtime.{Frame, Storage}
 import ammonite.util.{Classpath, Name, Printer, Res}
 import ammonite.util.InterfaceExtensions._
+import ammonite.util.Util.entry
 
 import scala.collection.mutable
-import scala.reflect.internal.util.{NoPosition, Position => SPosition}
-import scala.reflect.io.VirtualDirectory
-import scala.tools.nsc.Settings
 
 /**
  * Helper class to compile a single script
@@ -27,27 +27,12 @@ class SingleScriptCompiler(
   codeWrapper: CodeWrapper,
   wd: Option[os.Path],
   generateSemanticDbs: Boolean,
-  settings: Settings,
+  settings: Seq[String],
   module: Script,
   dependencies: Script.ResolvedDependencies,
   moduleTarget: Option[os.Path],
   moduleSources: Option[os.Path]
 ) {
-
-  private val dynamicClasspath = {
-    val vd = new VirtualDirectory("(memory)", None)
-    AmmCompiler.addToClasspath(dependencies.byteCode, vd)
-    vd
-  }
-
-  private val frame = {
-    val f = Frame.createInitial(initialClassLoader, forking = false)
-    f.addClasspath(dependencies.jars.map(_.toNIO.toUri.toURL))
-    f.addPluginClasspath(dependencies.pluginJars.map(_.toNIO.toUri.toURL))
-    for ((clsName, byteCode) <- dependencies.byteCode)
-      f.classloader.addClassFile(clsName, byteCode)
-    f
-  }
 
   private var messages = new mutable.ListBuffer[Diagnostic]
   private var newMessages = new mutable.ListBuffer[(String, Int, Int, String)]
@@ -61,20 +46,20 @@ class SingleScriptCompiler(
     newMessages.clear()
   }
 
-  private val compiler = {
+  private val compiler: Compiler = {
 
-    val reporter = {
-      def add(pos: SPosition, msg: String, severity: String) =
-        if (pos == NoPosition)
-          newMessages.append((severity, 0, 0, msg))
-        else
-          newMessages.append((severity, pos.start, pos.end, msg))
-      MakeReporter.makeReporter(
-        (pos, msg) => add(pos, msg, "ERROR"),
-        (pos, msg) => add(pos, msg, "WARNING"),
-        (pos, msg) => add(pos, msg, "INFO"),
-        settings
-      )
+    val frame = {
+      val f = Frame.createInitial(initialClassLoader, forking = false)
+      f.addClasspath(dependencies.jars.map(_.toNIO.toUri.toURL))
+      f.addPluginClasspath(dependencies.pluginJars.map(_.toNIO.toUri.toURL))
+      for ((clsName, byteCode) <- dependencies.byteCode)
+        f.classloader.addClassFile(clsName, byteCode)
+      f
+    }
+
+    val reporter: Consumer[CompilerBuilder.Message] = {
+      msg =>
+        newMessages.append((msg.severity, msg.start, msg.end, msg.message))
     }
 
     val initialClassPath = Classpath.classpath(
@@ -87,17 +72,18 @@ class SingleScriptCompiler(
       stopAt = initialClassLoader
     )
 
-    AmmCompiler(
-      classPath,
-      dynamicClasspath,
+    AmmCompiler.create(
+      initialClassPath.toArray,
+      classPath.toArray,
+      dependencies.byteCode
+        .map { case (name, b) => entry(name, b) }
+        .toArray,
       frame.classloader,
       frame.pluginClassloader,
-      () => (),
-      Some(reporter),
-      settings,
-      classPathWhitelist,
-      initialClassPath,
-      lineNumberModifier = false
+      reporter,
+      settings.toArray,
+      classPathWhitelist.toArray.map(_.toArray),
+      false
     )
   }
 

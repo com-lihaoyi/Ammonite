@@ -6,15 +6,16 @@ import java.net.URL
 
 import ammonite.compiler.iface.{
   Compiler => ICompiler,
+  CompilerBuilder,
   Imports,
   Logger,
   Preprocessor
 }
-import ammonite.util.Classpath
+import ammonite.util.{Classpath, Printer}
 import ammonite.util.Util.{entry, newLine}
 
 import scala.collection.mutable
-import scala.reflect.internal.util.Position
+import scala.reflect.internal.util.{NoPosition, Position}
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc.classpath.{
@@ -39,7 +40,7 @@ import scala.tools.nsc.plugins.Plugin
  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
  * you query source strings using an in-built presentation compiler
  */
-object Compiler {
+object Compiler extends CompilerBuilder {
   /**
     * Writes files to dynamicClasspath. Needed for loading cached classes.
     */
@@ -113,6 +114,8 @@ object Compiler {
       e => throw e
     )
   }
+
+  def userScalaVersion = scala.util.Properties.versionNumberString
 
   def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
@@ -422,5 +425,61 @@ object Compiler {
 
 
     jcp
+  }
+
+  def create(
+    initialClassPath: Array[URL],
+    classPath: Array[URL],
+    dynamicClassPath: Array[java.util.Map.Entry[String,Array[Byte]]],
+    evalClassLoader: ClassLoader,
+    pluginClassLoader: ClassLoader,
+    reporter: java.util.function.Consumer[CompilerBuilder.Message],
+    settings: Array[String],
+    classPathWhiteList: Array[Array[String]],
+    lineNumberModifier: Boolean
+  ): ICompiler = {
+
+    val vd = new VirtualDirectory("(memory)", None)
+    addToClasspath(dynamicClassPath.map(e => (e.getKey, e.getValue)), vd)
+
+    val scalacSettings = {
+      // not 100% sure error collection is correct (duplicates?)
+      val errors = new mutable.ListBuffer[String]
+      val settings0 = new Settings(err => errors += err)
+      val (_, unparsed) = settings0.processArguments(settings.toList, processAll = true)
+      for (arg <- unparsed)
+        errors += s"Unrecognized argument: $arg"
+      // TODO Report the errors via reporter?
+      settings0
+    }
+
+    val scalacReporterOpt = Option(reporter).map { f =>
+      def report(pos: Position, message: String, severity: String) = {
+        val (start, end) =
+          if (pos == NoPosition) (0, 0)
+          else (pos.start, pos.end)
+        val msg = new CompilerBuilder.Message(severity, start, end, message)
+        f.accept(msg)
+      }
+      MakeReporter.makeReporter(
+        (pos, msg) => report(pos, msg, "ERROR"),
+        (pos, msg) => report(pos, msg, "WARNING"),
+        (pos, msg) => report(pos, msg, "INFO"),
+        scalacSettings
+      )
+    }
+
+    apply(
+      classPath,
+      vd,
+      evalClassLoader,
+      pluginClassLoader,
+      () => (),
+      scalacReporterOpt,
+      scalacSettings,
+      classPathWhiteList.map(_.toSeq).toSet,
+      initialClassPath,
+      lineNumberModifier
+    )
   }
 }

@@ -82,11 +82,7 @@ final class ScriptCompiler(
     module: Script,
     dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult =
-    settingsOrError(module) match {
-      case Left(errors) => ScriptCompileResult(Nil, Left(errors.mkString(", ")))
-      case Right((settings, settingsArgs)) =>
-        compileIfNeeded(settings, settingsArgs, module, dependencies)
-    }
+    compileIfNeeded(moduleSettings(module), module, dependencies)
 
   /**
    * Reads compilation output from cache.
@@ -143,10 +139,6 @@ final class ScriptCompiler(
   /** Writes on disk the source passed to scalac, corresponding to this script */
   def preCompile(module: Script): Unit = {
 
-    val settings = settingsOrError(module)
-      .map(_._1)
-      .getOrElse(new Settings(_ => ()))
-
     val compiler = new SingleScriptCompiler(
       initialClassLoader,
       storage,
@@ -156,7 +148,7 @@ final class ScriptCompiler(
       codeWrapper,
       wd,
       generateSemanticDbs,
-      settings,
+      moduleSettings(module),
       module,
       Script.ResolvedDependencies(Nil, Nil, Nil),
       moduleTarget(module),
@@ -213,7 +205,6 @@ final class ScriptCompiler(
       None
 
   private def compileIfNeeded(
-    settings0: Settings,
     settingsArgs: Seq[String],
     script: Script,
     dependencies: Script.ResolvedDependencies
@@ -222,15 +213,15 @@ final class ScriptCompiler(
       val key = InMemoryCacheKey(settingsArgs, script, dependencies)
       Option(cache.get(key)).getOrElse {
         cleanUpCache()
-        val res = doCompile(settings0, script, dependencies)
+        val res = doCompile(settingsArgs, script, dependencies)
         Option(cache.putIfAbsent(key, res))
           .getOrElse(res)
       }
     } else
-      doCompile(settings0, script, dependencies)
+      doCompile(settingsArgs, script, dependencies)
 
   private def doCompile(
-    settings0: Settings,
+    settingsArgs: Seq[String],
     module: Script,
     dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult = {
@@ -244,7 +235,7 @@ final class ScriptCompiler(
       codeWrapper,
       wd,
       generateSemanticDbs,
-      settings0,
+      settingsArgs,
       module,
       dependencies,
       moduleTarget(module),

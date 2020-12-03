@@ -296,6 +296,7 @@ object Main{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
+            ammonite.compiler.Compiler,
             ObjectCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
