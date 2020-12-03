@@ -20,7 +20,6 @@ object BasicTests extends TestSuite{
 
     def execWithJavaOptsSet(name: os.RelPath, home: os.Path) = os.proc(
       executable,
-      "--thin",
       "--no-remote-logging",
       "-h",
       home,
@@ -113,7 +112,6 @@ object BasicTests extends TestSuite{
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = os.proc(
         executable,
-        "--thin",
         "--no-home-predef",
         "--predef",
         exampleBarePredef,
@@ -168,7 +166,14 @@ object BasicTests extends TestSuite{
     }
 
     test("classloaders"){
-      val evaled = exec(os.rel / 'basic / "Resources.sc")
+      val evaled = execBase(
+        os.rel / 'basic / "Resources.sc",
+        Nil,
+        ammonite.ops.tmp.dir(),
+        Nil,
+        thin = false,
+        Nil
+      )
       assert(evaled.out.string.contains("1745"))
     }
     test("testSilentScriptRunning"){
