@@ -12,7 +12,7 @@ import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.repl.api.FrontEnd
-import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.Parsers
 import org.jline.reader.impl.DefaultParser
 
 
@@ -158,7 +158,7 @@ class AmmParser extends Parser {
         if (context == Parser.ParseContext.ACCEPT_LINE) {
           addHistory(line)
           throw new SyntaxError(
-            Preprocessor.formatFastparseError("(console)", line, f)
+            ammonite.compiler.Parsers.formatFastparseError("(console)", line, f)
           )
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)

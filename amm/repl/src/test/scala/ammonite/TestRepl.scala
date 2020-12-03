@@ -3,7 +3,7 @@ package ammonite
 import java.io.PrintStream
 import java.nio.file.Path
 
-import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper, Preprocessor}
+import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper}
 import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults

@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
 import ammonite.runtime._
 
 import annotation.tailrec
-import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.Parsers
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.ImportTree
 import ammonite.util.InterfaceExtensions._
@@ -398,7 +398,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = Preprocessor.splitScript(
+        lazy val splittedScript = Parsers.splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.fileName
         )
@@ -443,7 +443,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(Parsers.splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),

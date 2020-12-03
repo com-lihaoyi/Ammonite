@@ -9,7 +9,7 @@ import ammonite.terminal.Filter
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.Parsers
 import ammonite.compiler.iface.{CodeWrapper, CompilerLifecycleManager, Imports}
 import ammonite.interp.Interpreter
 import coursierapi.Dependency

@@ -3,7 +3,7 @@ package ammonite.interp.script
 import java.io.File
 
 import ammonite.compiler.iface.{CodeSource, CodeWrapper}
-import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.Parsers
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{ImportTree, Name, Util}
@@ -31,7 +31,7 @@ final case class ScriptProcessor(
 
     val rawCode = Interpreter.skipSheBangLine(code)
     lazy val offsetToPos = PositionOffsetConversion.offsetToPos(rawCode)
-    val splittedScript = Preprocessor.splitScriptWithStart(
+    val splittedScript = Parsers.splitScriptWithStart(
       rawCode,
       codeSource.fileName
     ).left.map { f =>

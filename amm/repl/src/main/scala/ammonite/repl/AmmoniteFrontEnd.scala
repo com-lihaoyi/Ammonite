@@ -8,7 +8,7 @@ import GUILikeFilters.SelectionFilter
 import ammonite.terminal._
 import fastparse.Parsed
 import ammonite.util.{Colors, Res}
-import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.Parsers
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width
@@ -31,7 +31,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
             Res.Success((code, value.map(_._2)))
           case f @ Parsed.Failure(_, index, extra) =>
             Res.Failure(
-              Preprocessor.formatFastparseError("(console)", code, f)
+              ammonite.compiler.Parsers.formatFastparseError("(console)", code, f)
             )
         }
     }

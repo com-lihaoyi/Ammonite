@@ -2,7 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper, Preprocessor}
+import ammonite.compiler.{CompilerLifecycleManager, ObjectCodeWrapper}
 import ammonite.compiler.iface.Imports
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
