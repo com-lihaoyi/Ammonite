@@ -28,7 +28,7 @@ object ScriptOutput{
 
 case class ImportHookInfo(imports: IImports,
                           stmts: Seq[String],
-                          trees: Seq[ImportTree])
+                          trees: Seq[ammonite.compiler.iface.ImportTree])
 
 /**
   * Represents the importing of a single name in the Ammonite REPL, of the

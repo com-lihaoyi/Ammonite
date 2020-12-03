@@ -3,7 +3,7 @@ package ammonite.runtime
 import java.io.{ByteArrayOutputStream, File}
 import java.net.URI
 
-import ammonite.compiler.iface.{CodeSource, Imports}
+import ammonite.compiler.iface.{CodeSource, Imports, ImportTree}
 import ammonite.interp.api.IvyConstructor
 import ammonite.util._
 import ammonite.util.InterfaceExtensions._
@@ -163,9 +163,9 @@ object ImportHook{
   object PluginIvy extends BaseIvy(plugin = true)
   class BaseIvy(plugin: Boolean) extends ImportHook{
     def splitImportTree(tree: ImportTree): Either[String, Seq[String]] = {
-      tree match{
-        case ImportTree(Seq(part), None, _, _) => Right(Seq(part))
-        case ImportTree(Nil, Some(mapping), _, _) if mapping.map(_._2).forall(_.isEmpty) =>
+      tree.tupled match{
+        case (Seq(part), None, _, _) => Right(Seq(part))
+        case (Nil, Some(mapping), _, _) if mapping.map(_._2).forall(_.isEmpty) =>
           Right(mapping.map(_._1))
         case _ => Left("Invalid $ivy import " + tree)
       }

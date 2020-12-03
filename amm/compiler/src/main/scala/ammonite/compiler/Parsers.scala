@@ -1,12 +1,14 @@
 package ammonite.compiler
 
-import ammonite.compiler.iface.CodeSource
-import ammonite.util.ImportTree
-import ammonite.util.Util.{newLine, windowsPlatform}
+import java.util.Map
+
+import ammonite.compiler.iface.{Parser => IParser, _}
+import ammonite.util.InterfaceExtensions.importTree
+import ammonite.util.Util.{entry, newLine, windowsPlatform}
 
 import scala.collection.mutable
 
-object Parsers {
+class Parsers extends IParser {
 
   import fastparse._
 
@@ -17,7 +19,7 @@ object Parsers {
   private def `_`[_: P] = scalaparse.Scala.`_`
 
 
-  private def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
+  private def ImportSplitter[_: P]: P[Seq[ImportTree]] = {
     def IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
@@ -28,13 +30,13 @@ object Parsers {
     )
     def Prefix = P( IdParser.rep(1, sep = ".") )
     def Suffix = P( "." ~/ (BulkImport | Selectors) )
-    def ImportExpr: P[ammonite.util.ImportTree] = {
+    def ImportExpr: P[ImportTree] = {
       // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
       // we do not want the whitespace to be consumed even if the WL0 parser parses
       // to the end of the input (which is the default behavior for WhitespaceApi)
       P( Index ~~ Prefix ~~ (WL0 ~~ Suffix).? ~~ Index).map{
         case (start, idSeq, selectors, end) =>
-          ammonite.util.ImportTree(idSeq, selectors, start, end)
+          importTree(idSeq, selectors, start, end)
       }
     }
     P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
@@ -164,6 +166,24 @@ object Parsers {
   }
 
 
+  def scriptBlocks(
+    rawCode: String,
+    fileName: String
+  ): Array[ammonite.compiler.iface.Parser.ScriptBlock] =
+    splitScript(rawCode, fileName) match {
+      case Left(error) => throw new ammonite.compiler.iface.Parser.ScriptSplittingError(error)
+      case Right(blocks) =>
+        blocks
+          .map {
+            case (ncomment, code) =>
+              val codeWithDummyIndices = code.map { content =>
+                entry(0: Integer, content)
+              }
+              new ammonite.compiler.iface.Parser.ScriptBlock(ncomment, codeWithDummyIndices.toArray)
+          }
+          .toArray
+    }
+
   def splitScriptWithStart(
     rawCode: String,
     fileName: String
@@ -179,6 +199,31 @@ object Parsers {
         }
         Right(blocks)
     }
+
+  def scriptBlocksWithStartIndices(
+    rawCode: String,
+    fileName: String
+  ): Array[ammonite.compiler.iface.Parser.ScriptBlock] = {
+    splitScriptWithStart(rawCode, fileName) match {
+      case Left(f) =>
+        throw new ammonite.compiler.iface.Parser.ScriptSplittingError(
+          formatFastparseError(fileName, rawCode, f),
+          f.index,
+          f.trace().failure.label
+        )
+      case Right(blocks) =>
+        blocks
+          .map {
+            case (startIdx, ncomment, code) =>
+              val codeAsEntries = code.map {
+                case (index, content) =>
+                  entry(index: Integer, content)
+              }
+              new ammonite.compiler.iface.Parser.ScriptBlock(ncomment, codeAsEntries.toArray)
+          }
+          .toArray
+    }
+  }
 
 
   private def ScriptSplitterWithStart[_: P] =
@@ -212,14 +257,14 @@ object Parsers {
         case Parsed.Success(parsedTrees, _) =>
           var currentStmt = stmt
           for(importTree <- parsedTrees){
-            if (importTree.prefix(0)(0) == '$') {
+            if (importTree.prefix.apply(0)(0) == '$') {
               val length = importTree.end - importTree.start
               currentStmt = currentStmt.patch(
-                importTree.start, (importTree.prefix(0) + ".$").padTo(length, ' '), length
+                importTree.start, (importTree.prefix.apply(0) + ".$").padTo(length, ' '), length
               )
-              val importTree0 = importTree.copy(
-                start = startIdx + importTree.start,
-                end = startIdx + importTree.end
+              val importTree0 = importTree.updateBounds(
+                startIdx + importTree.start,
+                startIdx + importTree.end
               )
               importTrees.append(importTree0)
             }
@@ -229,4 +274,17 @@ object Parsers {
     }
     (hookedStmts.toSeq, importTrees.toSeq)
   }
+
+  def importHooks(
+    source: CodeSource,
+    statements: Array[Map.Entry[Integer, String]]
+  ): IParser.ParsedImportHooks = {
+    val (hookStatements, importTrees) = parseImportHooksWithIndices(
+      source,
+      statements.map(e => (e.getKey: Int, e.getValue))
+    )
+    new IParser.ParsedImportHooks(hookStatements.toArray, importTrees.toArray)
+  }
 }
+
+object Parsers extends Parsers

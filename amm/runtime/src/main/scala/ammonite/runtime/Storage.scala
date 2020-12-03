@@ -3,9 +3,10 @@ package ammonite.runtime
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.{Files, Paths}
 
-import ammonite.compiler.iface.Imports
+import ammonite.compiler.iface.{Imports, ImportTree}
 import ammonite.repl.api.History
 import ammonite.util._
+import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util._
 import coursierapi.{Dependency, Module}
 
@@ -99,7 +100,14 @@ object Storage{
       name => name.raw,
       raw => Name(raw)
   )
-  implicit def importTreeRW: upickle.default.ReadWriter[ImportTree] = upickle.default.macroRW
+  implicit def importTreeRW: upickle.default.ReadWriter[ImportTree] =
+    upickle.default.readwriter[(Seq[String], Option[ImportMapping], Int, Int)].bimap[ImportTree](
+      _.tupled,
+      {
+        case (prefix, mappings, start, end) =>
+          importTree(prefix, mappings, start, end)
+      }
+    )
   implicit def versionedWrapperIdRW: upickle.default.ReadWriter[VersionedWrapperId] =
     upickle.default.macroRW
   implicit def blockMetadataRW: upickle.default.ReadWriter[ScriptOutput.BlockMetadata] =

@@ -10,6 +10,7 @@ import ammonite.compiler.iface.{
   CodeWrapper,
   CompilerLifecycleManager,
   Imports,
+  ImportTree,
   Preprocessor => IPreprocessor
 }
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
@@ -21,7 +22,6 @@ import ammonite.runtime._
 import annotation.tailrec
 import ammonite.compiler.Parsers
 import ammonite.runtime.tools.IvyThing
-import ammonite.util.ImportTree
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util._
 import ammonite.util._
@@ -182,7 +182,7 @@ class Interpreter(val compilerManager: CompilerLifecycleManager,
       hooked <- Res(
         hook.handle(
           source,
-          tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
+          tree.withPrefix(tree.prefix.drop(hookPrefix.length)),
           this,
           wrapperPath
         )

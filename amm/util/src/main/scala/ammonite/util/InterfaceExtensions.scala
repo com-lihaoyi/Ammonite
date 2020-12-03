@@ -2,6 +2,7 @@ package ammonite.util
 
 import ammonite.compiler.iface._
 import ammonite.util.Name
+import ammonite.util.Util.entry
 
 import scala.collection.mutable
 
@@ -146,5 +147,94 @@ object InterfaceExtensions {
         newPrefix.map(_.raw).toArray,
         data.`type`()
       )
+  }
+
+  implicit class ImportTreeExtensions(private val importTree: ImportTree) extends AnyVal {
+    def mappings: Option[ImportMapping] =
+      Option(importTree.mappingsOrNull).map { mappings =>
+        mappings.toSeq.map { e =>
+          (e.getKey, Option(e.getValue))
+        }
+      }
+    def tupled: (Seq[String], Option[ImportMapping], Int, Int) =
+      (importTree.prefix.toSeq, mappings, importTree.start, importTree.end)
+  }
+
+  type ImportMapping = Seq[(String, Option[String])]
+  def importTree(
+    prefix: Seq[String],
+    mappings: Option[ImportMapping],
+    start: Int,
+    end: Int
+  ): ImportTree =
+    new ImportTree(
+      prefix.toArray,
+      mappings
+        .map { seq =>
+          seq
+            .toArray
+            .map { case (a, b) => entry(a, b.orNull) }
+        }
+        .orNull,
+      start,
+      end
+    )
+
+  implicit class ParserExtensions(private val parser: Parser) extends AnyVal {
+    def parseImportHooks(source: CodeSource, stmts: Seq[String]): (Seq[String], Seq[ImportTree]) = {
+      val statementsWithIndices = stmts.map { s =>
+        entry(0: Integer, s)
+      }
+      val res = parser.importHooks(source, statementsWithIndices.toArray)
+      (res.hookStatements.toSeq, res.importTrees.toSeq)
+    }
+    def parseImportHooksWithIndices(
+      source: CodeSource,
+      stmts: Seq[(Int, String)]
+    ): (Seq[String], Seq[ImportTree]) = {
+      val statementsWithIndices = stmts.map {
+        case (idx, s) =>
+          entry(idx: Integer, s)
+      }
+      val res = parser.importHooks(source, statementsWithIndices.toArray)
+      (res.hookStatements.toSeq, res.importTrees.toSeq)
+    }
+
+    def splitScript(
+      rawCode: String,
+      fileName: String
+    ): Either[String, IndexedSeq[(String, Seq[String])]] = {
+      val res =
+        try Right(parser.scriptBlocks(rawCode, fileName))
+        catch {
+          case e: Parser.ScriptSplittingError =>
+            Left(e.getMessage)
+        }
+      res.map { blocks =>
+        blocks.map { block =>
+          (block.ncomment, block.codeWithStartIndices.toSeq.map(_.getValue))
+        }.toVector
+      }
+    }
+    def splitScriptWithStart(
+      rawCode: String,
+      fileName: String
+    ): Either[(Int, String), IndexedSeq[(Int, String, Seq[(Int, String)])]] = {
+      val res =
+        try Right(parser.scriptBlocksWithStartIndices(rawCode, fileName))
+        catch {
+          case e: Parser.ScriptSplittingError =>
+            Left((e.index, e.expected))
+        }
+      res.map { blocks =>
+        blocks.map { block =>
+          (
+            block.startIndex,
+            block.ncomment,
+            block.codeWithStartIndices.toSeq.map(e => (e.getKey: Int, e.getValue))
+          )
+        }.toVector
+      }
+    }
   }
 }

@@ -2,11 +2,11 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.compiler.iface.{CodeSource, CodeWrapper}
 import ammonite.compiler.Parsers
+import ammonite.compiler.iface.{CodeSource, CodeWrapper, ImportTree}
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
-import ammonite.util.{ImportTree, Name, Util}
+import ammonite.util.{Name, Util}
 import ammonite.util.InterfaceExtensions._
 import coursierapi.{Dependency, Repository}
 
@@ -64,7 +64,7 @@ final case class ScriptProcessor(
     ): Either[Diagnostic, Seq[ImportHook.Result]] = {
       val r = hook.handle(
         codeSource,
-        tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
+        tree.withPrefix(tree.prefix.drop(hookPrefix.length)),
         ScriptProcessor.dummyInterpreterInterface(userScalaVersion),
         codeWrapper.wrapperPath
       )
