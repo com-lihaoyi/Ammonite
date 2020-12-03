@@ -14,6 +14,30 @@ object DefaultPreprocessor {
       case m: G#MemberDef => m.mods.isPrivate
       case _ => false
     }
+
+  def wrapCode(codeSource: CodeSource,
+               indexedWrapperName: Name,
+               code: String,
+               printCode: String,
+               imports: Imports,
+               extraCode: String,
+               markScript: Boolean,
+               codeWrapper: CodeWrapper) = {
+
+    //we need to normalize topWrapper and bottomWrapper in order to ensure
+    //the snippets always use the platform-specific newLine
+    val extraCode0 =
+      if (markScript) extraCode + "/*</generated>*/"
+      else extraCode
+    val (topWrapper, bottomWrapper, userCodeNestingLevel) =
+     codeWrapper(code, codeSource, imports, printCode, indexedWrapperName, extraCode0)
+    val (topWrapper0, bottomWrapper0) =
+      if (markScript) (topWrapper + "/*<script>*/", "/*</script>*/ /*<generated>*/" + bottomWrapper)
+      else (topWrapper, bottomWrapper)
+    val importsLen = topWrapper0.length
+
+    (topWrapper0 + code + bottomWrapper0, importsLen, userCodeNestingLevel)
+  }
 }
 
 class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
@@ -37,7 +61,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
     assert(codeSource.pkgName.head == Name("ammonite"))
     for{
       Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
-      (wrappedCode, importsLength, userCodeNestingLevel) = Preprocessor.wrapCode(
+      (wrappedCode, importsLength, userCodeNestingLevel) = wrapCode(
         codeSource, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
         imports, extraCode, markScript, codeWrapper
