@@ -1,14 +1,15 @@
 package ammonite.interp
 
-import ammonite.DualTestRepl
+import ammonite.{DualTestRepl, TestRepl}
 import ammonite.TestUtils._
 import utest._
 import ammonite.util.InterfaceExtensions._
 import ammonite.util.Util
 
 object AutocompleteTests extends TestSuite{
+  val runtime = TestRepl.sharedRuntime
   class Completer{
-    val check = new DualTestRepl()
+    val check = new DualTestRepl(runtime)
     def apply(caretCode: String,
                  cmp: (Set[String]) => Set[String],
                  sigs: (Set[String]) => Set[String] = _ => Set()) = {
@@ -133,7 +134,7 @@ object AutocompleteTests extends TestSuite{
         )
 
         val extra =
-          if (scala2_12) Set()
+          if (runtime.scala2_12) Set()
           else Set("unless", "when")
         complete( """scala.Option.<caret>""",
           (anyCompletion ++ Set("apply", "empty") ++ extra) ^ _

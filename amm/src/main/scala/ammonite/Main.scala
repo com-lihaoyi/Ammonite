@@ -12,7 +12,7 @@ import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
 import ammonite.repl.Repl
 import ammonite.util.InterfaceExtensions._
-import ammonite.util.Util.newLine
+import ammonite.util.Util.{isUnit, newLine}
 import ammonite.util._
 
 import scala.annotation.tailrec
@@ -491,7 +491,7 @@ class MainRunner(cliConfig: Config,
         false
 
       case Res.Success(value) =>
-        if (printing && value != ()) outprintStream.println(pprint.PPrinter.BlackWhite(value))
+        if (printing && !isUnit(value)) outprintStream.println(pprint.PPrinter.BlackWhite(value))
         true
 
       case Res.Skip   => true // do nothing on success, everything's already happened

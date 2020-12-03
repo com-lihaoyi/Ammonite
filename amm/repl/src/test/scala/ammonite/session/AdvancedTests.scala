@@ -3,6 +3,7 @@ package ammonite.session
 import ammonite.TestUtils._
 import ammonite.{DualTestRepl, TestRepl}
 import ammonite.util.Res
+import ammonite.util.Util.isUnit
 import utest._
 
 
@@ -55,7 +56,10 @@ object AdvancedTests extends TestSuite{
     }
 
     test("exit"){
-      check.result("exit", Res.Exit(().asInstanceOf[Object]))
+      check.result("exit") {
+        case Res.Exit(value) => isUnit(value)
+        case _ => false
+      }
     }
     test("skip"){
       check.result("", Res.Skip)
@@ -354,7 +358,7 @@ object AdvancedTests extends TestSuite{
     test("macro paradise or -Ymacro-annotations") {
       val init =
         if (check.scala2_12) {
-          val scalaVer = scala.util.Properties.versionNumberString
+          val scalaVer = check.userScalaVersion
           val paradiseVersion =
             if (scalaVer == "2.12.0" || scalaVer == "2.12.1") "2.1.0"
             else "2.1.1"
@@ -503,7 +507,7 @@ object AdvancedTests extends TestSuite{
 
     test("loadURL"){
       val sbv = {
-        val sv = scala.util.Properties.versionNumberString
+        val sv = check.userScalaVersion
         if (sv.forall(c => c.isDigit || c == '.'))
           sv.split('.').take(2).mkString(".")
         else

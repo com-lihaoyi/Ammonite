@@ -11,6 +11,7 @@ class DualTestRepl(runtime: TestReplRuntime = TestRepl.sharedRuntime) { dual =>
 
   def scala2_12 = runtime.scala2_12
   def userScalaVersion = runtime.userScalaVersion
+  def thin = runtime.thin
 
   def predef: (String, Option[os.Path]) = ("", None)
 
@@ -30,6 +31,8 @@ class DualTestRepl(runtime: TestReplRuntime = TestRepl.sharedRuntime) { dual =>
     repls.foreach(_.session(sess))
   def result(input: String, expected: Res[Evaluated]): Unit =
     repls.foreach(_.result(input, expected))
+  def result(input: String)(check: Res[Evaluated] => Boolean): Unit =
+    repls.foreach(_.result(input, check))
   def fail(input: String,
            failureCheck: String => Boolean = _ => true): Unit =
     repls.foreach(_.fail(input, failureCheck))

@@ -344,7 +344,8 @@ object amm extends Cross[MainModule](binCrossScalaVersions:_*){
             .mkString(java.io.File.pathSeparator)
           // hope we won't get a too long argument error on Windows
           super.forkArgs() ++ Seq(
-            s"-Damm.cross-tests.side-jars=$classPathStr"
+            s"-Damm.cross-tests.side-jars=$classPathStr",
+            s"-Damm.cross-tests.scala-version=$testScalaVersion"
           )
         }
 

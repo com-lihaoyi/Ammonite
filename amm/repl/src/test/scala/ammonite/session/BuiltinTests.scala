@@ -1,6 +1,6 @@
 package ammonite.session
 
-import ammonite.{DualTestRepl, TestUtils}
+import ammonite.{DualTestRepl, TestRepl}
 import utest._
 
 import scala.collection.{immutable => imm}
@@ -70,7 +70,8 @@ object BuiltinTests extends TestSuite{
     }
 
     test("loadCP"){
-      check.session("""
+      if (check.thin) "disabled"
+      else check.session("""
         @ import ammonite.ops._, ImplicitWd._
 
         @ val javaSrc = pwd/'amm/'src/'test/'resources/'loadable/'hello/"Hello.java"
@@ -94,7 +95,7 @@ object BuiltinTests extends TestSuite{
       // not sure why that one doesn't pass in 2.13
       // even disabling the noimports and imports settings instead of setting noimports to false
       // doesn't seem to reinstate imports
-      if (TestUtils.scala2_12) check.session(s"""
+      if (check.scala2_12) check.session(s"""
         @ // Disabling default Scala imports
 
         @ List(1, 2, 3) + "lol"

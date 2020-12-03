@@ -6,7 +6,6 @@ import ammonite.interp.api.IvyConstructor
 import utest._
 
 import scala.collection.{immutable => imm}
-import scala.util.Properties
 import ammonite.util.Util
 
 object ImportHookTests extends TestSuite{
@@ -85,7 +84,12 @@ object ImportHookTests extends TestSuite{
         }
 
         test("explicitBinaryVersion"){
-          check.session(s"""
+          // FIXME We shouldn't need to disable that
+          // These lines work when manually firing up a REPL with --scala-version
+          // This might originate from leaks between the amm.repl class path and the user class path
+          // in the test sessions.
+          if (check.thin) "disabled"
+          else check.session(s"""
             @ import scalatags.Text.all._
             error: not found: value scalatags
 
@@ -112,7 +116,7 @@ object ImportHookTests extends TestSuite{
 
         test("inlineFull"){
           // no more macroparadise in 2.13
-          if (scala2_12 && scala.util.Properties.versionNumberString != "2.12.10") {
+          if (check.scala2_12 && check.userScalaVersion != "2.12.10") {
             check.session("""
             @ import org.scalamacros.paradise.Settings._
             error: object scalamacros is not a member of package org

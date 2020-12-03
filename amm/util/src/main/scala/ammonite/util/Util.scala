@@ -109,4 +109,9 @@ object Util{
     import scala.collection.JavaConverters._
     it.asJava
   }
+
+  def isUnit(value: Any): Boolean =
+    value == () ||
+      // If value was created by a Scala library loaded by a separate ClassLoader
+      value.getClass.getName == "scala.runtime.BoxedUnit"
 }

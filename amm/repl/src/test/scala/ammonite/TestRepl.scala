@@ -25,7 +25,9 @@ import ammonite.runtime.ImportHook
 final case class TestReplRuntime(
   classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader,
-  sharedFrame: Frame
+  sharedFrame: Frame,
+  userScalaVersion: String,
+  thin: Boolean
 ) {
   def initialFrame(): Frame =
     Frame.childFrame(sharedFrame)
@@ -65,10 +67,19 @@ object TestRepl {
       }
       else initialClassLoader
     val sharedFrame = Frame.createInitial(intermediateLoader, forking = !crossScalaVersionEnabled)
+    val sv =
+      if (crossScalaVersionEnabled)
+        sys.props.getOrElse(
+          "amm.cross-tests.scala-version",
+          sys.error("Property amm.cross-tests.scala-version not set for cross tests")
+        )
+      else scala.util.Properties.versionNumberString
     TestReplRuntime(
       classPathWhitelist,
       initialClassLoader,
-      sharedFrame
+      sharedFrame,
+      sv,
+      crossScalaVersionEnabled
     )
   }
 
@@ -428,6 +439,10 @@ class TestRepl(runtime: TestReplRuntime = TestRepl.runtime()) {
   def result(input: String, expected: Res[Evaluated]) = {
     val (processed, allOut, _, warning, error, info) = run(input, 0)
     assert(processed == expected)
+  }
+  def result(input: String, check: Res[Evaluated] => Boolean) = {
+    val (processed, allOut, _, warning, error, info) = run(input, 0)
+    assert(check(processed))
   }
   def failLoudly[T](t: => T) =
     try t
