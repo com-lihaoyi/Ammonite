@@ -88,7 +88,16 @@ object Scripts {
 
           // If there's one @main method, we run it with all args
           case Some(parser) =>
-            mainargs.Invoker.runMains(
+            if (scriptArgs.take(1) == Seq("--help")){
+              mainargs.Result.Success(
+                parser.helpText(
+                  totalWidth = 100,
+                  docsOnNewLine = false,
+                  customName = None,
+                  customDoc = None
+                )
+              )
+            }else mainargs.Invoker.runMains(
               parser.mains,
               scriptArgs,
               allowPositional = true,
