@@ -1,7 +1,8 @@
 package ammonite.repl
 
+import ammonite.compiler.iface.Imports
 import ammonite.interp.api.APIHolder
-import ammonite.repl.api.{History, ReplAPI, ReplLoad}
+import ammonite.repl.api.{History, ReplAPI, ReplLoad, Session}
 import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 
@@ -19,21 +20,9 @@ object ReplBridge extends APIHolder[ReplAPI]
 
 object ReplExtras {
 
-  /**
-   * Get the `Type` object of [[T]]. Useful for finding
-   * what its methods are and what you can do with it
-   */
   def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
-  /**
-   * Get the `Type` object representing the type of `t`. Useful
-   * for finding what its methods are and what you can do with it
-   *
-   */
   def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
 
-  /**
-   * Display help text if you don't know how to use the REPL
-   */
   def help =
     """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
       |All your standard Bash hotkeys should work for navigating around or editing the line
@@ -51,11 +40,6 @@ object ReplExtras {
          .drop(1)
   }
 
-  /**
-   * Lets you configure the pretty-printing of a value. By default, it simply
-   * disables truncation and prints the entire thing, but you can set other
-   * parameters as well if you want.
-   */
   def show(t: Any,
            width: Integer = null,
            height: Integer = 9999999,
@@ -201,7 +185,8 @@ object ReplExtras {
   private lazy val bw = Colors.BlackWhite
   private lazy val default = Colors.Default
 
-  implicit class ReplAPIExtensions(private val api: ReplAPI) extends AnyVal {
+  implicit class ReplAPIExtensions(private val api: ReplAPI)
+    extends AnyVal with ammonite.repl.api.doc.ReplAPI {
     def typeOf[T: WeakTypeTag] = ReplExtras.typeOf[T]
     def typeOf[T: WeakTypeTag](t: => T) = ReplExtras.typeOf[T](t)
     def help = ReplExtras.help
@@ -305,6 +290,25 @@ object ReplExtras {
     def addPrintHook(hook: PrintHook): Unit =
       api.setData(data.copy(printHooks = hook :: data.printHooks))
 
+    // The methods below shouldn't actually be called in practice, as ReplAPI
+    // already has such methods. They're here so that they can be put in
+    // ammonite.repl.api.doc.ReplAPI, that is put verbatim in the Ammonite website.
+    def lastException: Throwable =
+      api.lastException
+    def newCompiler(): Unit =
+      api.newCompiler()
+    def fullImports: Imports =
+      api.fullImports
+    def imports: Imports =
+      api.imports
+    def usedEarlierDefinitions: Array[String] =
+      api.usedEarlierDefinitions
+    def width: Int =
+      api.width
+    def height: Int =
+      api.height
+    def sess: Session =
+      api.sess
   }
 
   implicit class SessionChangedExtensions(

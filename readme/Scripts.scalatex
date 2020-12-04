@@ -216,7 +216,7 @@
         val scalazVersion = "7.2.7"
         interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
 
-        // This @@ is necessary for Ammonite to process the `interp.load.ivy` 
+        // This @@ is necessary for Ammonite to process the `interp.load.ivy`
         // before continuing
         @@
 
@@ -468,7 +468,7 @@
         like the @code{repl.prompt}, @code{repl.history}, and other things
         that only really make sense in the interactive REPL.
 
-      @hl.ref('amm/"interp"/"api"/'src/'main/'scala/'ammonite/'interp/'api/"InterpAPI.scala", "trait InterpAPI")
+      @hl.ref('amm/'interp/'api/'full/'src/'main/'scala/'ammonite/'interp/'api/'doc/"InterpAPI.scala", "trait InterpAPI")
 
     @sect{Script Predef}
       @p
