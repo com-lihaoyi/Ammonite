@@ -801,13 +801,15 @@ def partition(publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
 
   val groupedArtifacts = publishArtifacts.value
     .map{ t =>
-      val taskCrossVersion = t.ctx.segments.value
+      val taskCrossVersionOpt = t.ctx.segments.value
         .collectFirst{ case mill.define.Segment.Cross(List(v)) => v }
-        .get
+      val index = taskCrossVersionOpt
+        .map(fullCrossScalaVersions.indexOf(_))
+        .getOrElse(0)
 
       // Sort primarily on the scalaVersion, using the rendered name of the
       // task as the secondary sort key to break ties and ensure determinism
-      t -> (fullCrossScalaVersions.indexOf(taskCrossVersion), t.ctx.segments.render)
+      t -> (index, t.ctx.segments.render)
     }
     .toMap
 
