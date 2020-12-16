@@ -237,7 +237,7 @@ object EvaluatorTests extends TestSuite{
         res3_2: Int = 3
 
         @ C()
-        res4: C = C(0)
+        res4: C = ${Print.C(i = 0)}
       """)
     }
 

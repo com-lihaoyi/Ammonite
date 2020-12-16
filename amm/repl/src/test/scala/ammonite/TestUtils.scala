@@ -8,6 +8,8 @@ import ammonite.runtime.{Frame, Storage}
 import ammonite.util._
 import ammonite.runtime.ImportHook
 
+import scala.language.dynamics
+
 object TestUtils {
   def scala2_11 = scala.util.Properties.versionNumberString.startsWith("2.11")
   def scala2_12 = scala.util.Properties.versionNumberString.startsWith("2.12")
@@ -46,5 +48,23 @@ object TestUtils {
       predefImports
     )
     interp
+  }
+
+  object Print extends Dynamic {
+    def applyDynamicNamed(className: String)(args: (String, Any)*): String = {
+      var indent = ""
+      val fields = args.flatMap {
+        case ("indent", value: String) => indent = value; Nil
+        case (name, value) =>
+          val repr =
+            if (scala2_12) s"$value"
+            else s"$name = $value"
+          Seq(repr)
+      }
+      if (indent.isEmpty())
+        s"$className(${fields.mkString(", ")})"
+      else
+        s"$className(\n${fields.map(indent + "  " + _).mkString(",\n")}\n$indent)"
+    }
   }
 }
