@@ -53,10 +53,6 @@ object SourceTests extends TestSuite{
       }
       test("stdLibScala"){
         test("direct"){
-          // The Scala standard library classes for some reason don't get
-          // properly included in the classpath in 2.10; it's unfortunate but
-          // we'll just ignore it since the community has already moved on to
-          // 2.11 and 2.12
           check(
             load(Nil),
             "List.scala",
