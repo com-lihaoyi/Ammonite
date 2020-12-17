@@ -603,7 +603,17 @@ object AmmoniteBuildServerTests extends TestSuite {
           SymbolOccurrence.Role.REFERENCE
         )
 
-        assert(doc.occurrences.contains(listOccurrence))
+        // Seems necessary for 2.13.4
+        val alternativeListOccurrence = new SymbolOccurrence(
+          Some(new Range(0, 11, 0, 15)),
+          "scala/package.List.",
+          SymbolOccurrence.Role.REFERENCE
+        )
+
+        assert(
+          doc.occurrences.contains(listOccurrence) ||
+            doc.occurrences.contains(alternativeListOccurrence)
+        )
       }
 
       for {

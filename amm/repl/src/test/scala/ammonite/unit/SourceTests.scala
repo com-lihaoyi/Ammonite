@@ -53,14 +53,16 @@ object SourceTests extends TestSuite{
       }
       test("stdLibScala"){
         test("direct"){
-          // The Scala standard library classes for some reason don't get
-          // properly included in the classpath in 2.10; it's unfortunate but
-          // we'll just ignore it since the community has already moved on to
-          // 2.11 and 2.12
+          val is2_13_3_orLower = {
+            val ver = scala.util.Properties.versionNumberString
+            !ver.startsWith("2.13.") ||
+              scala.util.Try(ver.stripPrefix("2.13.").toInt).toOption.exists(_ <= 3)
+          }
           check(
             load(Nil),
-            "List.scala",
-            "case object Nil extends List[Nothing]"
+            if (is2_13_3_orLower) "List.scala" else "package.scala",
+            if (is2_13_3_orLower) "case object Nil extends List[Nothing]"
+            else "val Nil = scala.collection.immutable.Nil"
           )
         }
         test("runtimeTyped"){
