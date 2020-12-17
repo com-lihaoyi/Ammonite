@@ -1,0 +1,12 @@
+{
+    "value": [
+        "ref:79698939:/home/runner/work/Ammonite/Ammonite/ops/src/main/scala/ammonite/ops/Extensions.scala",
+        "ref:bb6fbe21:/home/runner/work/Ammonite/Ammonite/ops/src/main/scala/ammonite/ops/Shellout.scala",
+        "ref:517528a4:/home/runner/work/Ammonite/Ammonite/ops/src/main/scala/ammonite/ops/FileOps.scala",
+        "ref:ad4dc59a:/home/runner/work/Ammonite/Ammonite/ops/src/main/scala/ammonite/ops/package.scala",
+        "ref:3d9dee12:/home/runner/work/Ammonite/Ammonite/ops/src/main/scala-2.13/ammonite/ops/FilterMapExt.scala",
+        "ref:3d169f9a:/home/runner/work/Ammonite/Ammonite/ops/src/main/scala-2.13/ammonite/ops/LsSeq.scala"
+    ],
+    "valueHash": -1331572221,
+    "inputsHash": 938939941
+}

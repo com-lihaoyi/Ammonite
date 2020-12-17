@@ -1,0 +1,12 @@
+[info] Compiling 4 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.4/compile/dest/classes ...
+[warn] /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:32:35: abstract type pattern T is unchecked since it is eliminated by erasure
+[warn]       case (Res.Success(prev), x: T) => f(prev, x)
+[warn]                                   ^
+[warn] /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:30:47: match may not be exhaustive.
+[warn] It would fail on the following input: (Success(_), _)
+[warn]     inputs.foldLeft[Res[V]](Res.Success(init)){
+[warn]                                               ^
+[warn] 3 deprecations (since 2.13.0); re-run with -deprecation for details
+[warn] 2 feature warnings; re-run with -feature for details
+[warn] four warnings found
+[info] Done compiling.

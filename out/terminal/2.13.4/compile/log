@@ -1,0 +1,45 @@
+[info] Compiling 13 Scala sources to /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.4/compile/dest/classes ...
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala:59:33: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(SpecialKeys.FnDelete){
+[warn]                                 ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala:64:34: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(SpecialKeys.Backspace){
+[warn]                                  ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala:87:56: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]   def enterFilter: Filter = action(SpecialKeys.NewLine){
+[warn]                                                        ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala:93:22: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(Ctrl('d')){case TS(rest, b, c, _) =>
+[warn]                      ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala:106:22: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(Ctrl('l')){case TS(rest, b, c, _) => ClearScreen(TS(rest, b, c))}
+[warn]                      ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/HistoryFilter.scala:61:59: match may not be exhaustive.
+[warn] It would fail on the following input: Some(_)
+[warn]     val (newHistoryIndex, newBuffer, newMsg, newCursor) = searchTerm match{
+[warn]                                                           ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala:125:16: match may not be exhaustive.
+[warn] It would fail on the following input: TermInfo(_, _)
+[warn]     Filter.wrap{
+[warn]                ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala:130:22: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(Ctrl('-')){ case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
+[warn]                      ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala:131:34: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(SpecialKeys.Alt + 'r'){ case TS(rest, b, c, _) => wrap(undo(b, c), rest) },
+[warn]                                  ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala:132:34: match may not be exhaustive.
+[warn] It would fail on the following input: TermState(_, _, _, _)
+[warn]     action(SpecialKeys.Alt + '-'){ case TS(rest, b, c, _) => wrap(redo(b, c), rest) }
+[warn]                                  ^
+[warn] 10 deprecations (since 2.13.0); re-run with -deprecation for details
+[warn] 3 feature warnings; re-run with -feature for details
+[warn] 12 warnings found
+[info] Done compiling.
