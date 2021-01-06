@@ -35,7 +35,7 @@ object ScriptTests extends TestSuite{
             @ repl.load.exec($printedScriptPath/"PreserveImports.sc")
 
             @ val r = res
-            r: Left[String, Nothing] = Left("asd")
+            r: Left[String, Nothing] = ${Print.Left(value = "\"asd\"")}
             """)
         }
         test("annotation"){
@@ -180,7 +180,7 @@ object ScriptTests extends TestSuite{
             @ interp.load.module($printedScriptPath/"PreserveImports.sc")
 
             @ val r = res
-            r: Left[String, Nothing] = Left("asd")
+            r: Left[String, Nothing] = ${Print.Left(value = "\"asd\"")}
             """)
 
         }

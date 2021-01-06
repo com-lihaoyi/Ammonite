@@ -175,7 +175,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      ivy"com.lihaoyi::pprint:0.5.9",
+      ivy"com.lihaoyi::pprint:0.6.0",
       ivy"com.lihaoyi::fansi:0.2.9",
     )
     def compileIvyDeps = Agg(

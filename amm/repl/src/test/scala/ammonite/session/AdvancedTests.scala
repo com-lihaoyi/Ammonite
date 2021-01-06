@@ -30,18 +30,19 @@ object AdvancedTests extends TestSuite{
         defined class Foo
 
         @ Foo(1, "", Nil)
-        res2: Foo = Foo(1, "", List())
+        res2: Foo = ${Print.Foo(i = "1", s0 = "\"\"", s1 = "List()")}
 
         @ Foo(
         @   1234567,
         @   "I am a cow, hear me moo",
         @   Seq("I weigh twice as much as you", "and I look good on the barbecue")
         @ )
-        res3: Foo = Foo(
-          1234567,
-          "I am a cow, hear me moo",
-          List("I weigh twice as much as you", "and I look good on the barbecue")
-        )
+        res3: Foo = ${Print.Foo(
+          i = 1234567,
+          s0 = "\"I am a cow, hear me moo\"",
+          s1 = "List(\"I weigh twice as much as you\", \"and I look good on the barbecue\")",
+          indent = "        "
+        )}
       """)
     }
 
@@ -362,10 +363,10 @@ object AdvancedTests extends TestSuite{
         @ @data class Foo(n: Int = 0)
 
         @ val foo = Foo()
-        foo: Foo = Foo(0)
+        foo: Foo = ${Print.Foo(n = 0)}
 
         @ val foo2 = foo.withN(3)
-        foo2: Foo = Foo(3)
+        foo2: Foo = ${Print.Foo(n = 3)}
 
       """)
     }
