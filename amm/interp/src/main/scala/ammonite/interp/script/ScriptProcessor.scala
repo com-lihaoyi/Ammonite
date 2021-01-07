@@ -2,7 +2,8 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.interp.{CodeWrapper, DependencyLoader, Interpreter, Parsers, Preprocessor}
+import ammonite.compiler.{CodeWrapper, Parsers, Preprocessor}
+import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{ImportTree, Name, Util}
 import ammonite.util.Util.CodeSource

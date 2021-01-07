@@ -7,7 +7,8 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.interp.{CodeWrapper, Interpreter, Parsers, Preprocessor}
+import ammonite.compiler.{CodeWrapper, Parsers, Preprocessor}
+import ammonite.interp.Interpreter
 import coursierapi.Dependency
 
 import scala.annotation.tailrec

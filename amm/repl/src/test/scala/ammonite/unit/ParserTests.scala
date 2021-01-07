@@ -68,7 +68,7 @@ object ParserTests extends TestSuite{
     // somewhat-subtle logic around the parsers, one of these will catch it
     test("endOfCommandDetection"){
       def assertResult(x: String, pred: Option[fastparse.Parsed[_]] => Boolean) = {
-        val res = ammonite.interp.Parsers.split(x)
+        val res = ammonite.compiler.Parsers.split(x)
         assert(pred(res))
       }
       def assertIncomplete(x: String) = assertResult(x, _.isEmpty)

@@ -2,13 +2,14 @@ package ammonite.repl
 
 import java.io.{InputStream, OutputStream, OutputStreamWriter}
 
+import ammonite.compiler.Highlighter
 import ammonite.repl.api.FrontEnd
 import ammonite.terminal.filters._
 import GUILikeFilters.SelectionFilter
 import ammonite.terminal._
 import fastparse.Parsed
 import ammonite.util.{Colors, Res}
-import ammonite.interp.{Parsers, Preprocessor}
+import ammonite.compiler.{Parsers, Preprocessor}
 case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
 
   def width = FrontEndUtils.width

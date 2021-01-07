@@ -189,7 +189,7 @@ trait SourceAPIImpl extends SourceAPI {
   def desugarImpl(s: String)(implicit colors: ammonite.util.CodeColors): Desugared = {
 
     new Desugared(
-      ammonite.repl.Highlighter.defaultHighlight(
+      ammonite.compiler.Highlighter.defaultHighlight(
         s.toVector,
         colors.comment,
         colors.`type`,

@@ -2,7 +2,8 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.interp.{CodeWrapper, Interpreter, Preprocessor}
+import ammonite.compiler.{CodeWrapper, Preprocessor}
+import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.runtime.{Frame, Storage}
 import ammonite.util._

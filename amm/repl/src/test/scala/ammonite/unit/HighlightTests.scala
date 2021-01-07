@@ -1,6 +1,6 @@
 package ammonite.unit
 
-import ammonite.repl.Highlighter
+import ammonite.compiler.Highlighter
 import utest._
 
 object HighlightTests extends TestSuite{

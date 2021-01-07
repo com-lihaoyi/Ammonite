@@ -1,7 +1,7 @@
 package ammonite.session
 
 import ammonite.TestRepl
-import ammonite.interp.CodeClassWrapper
+import ammonite.compiler.CodeClassWrapper
 import utest._
 
 object SerializationTests extends TestSuite{

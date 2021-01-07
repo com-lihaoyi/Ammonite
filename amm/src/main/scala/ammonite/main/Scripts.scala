@@ -50,7 +50,7 @@ object Scripts {
       }
 
       scriptMains = interp.scriptCodeWrapper match{
-        case ammonite.interp.CodeWrapper =>
+        case ammonite.compiler.CodeWrapper =>
           Some(
             interp
               .evalClassloader
@@ -61,7 +61,7 @@ object Scripts {
               .apply()
           )
 
-        case ammonite.interp.CodeClassWrapper =>
+        case ammonite.compiler.CodeClassWrapper =>
           val outer = interp
             .evalClassloader
             .loadClass(routeClsName)

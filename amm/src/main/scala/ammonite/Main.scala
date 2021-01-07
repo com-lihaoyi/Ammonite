@@ -4,7 +4,8 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
-import ammonite.interp.{Watchable, CodeClassWrapper, CodeWrapper, Interpreter, PredefInitialization}
+import ammonite.compiler.{CodeClassWrapper, CodeWrapper}
+import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._

@@ -3,8 +3,8 @@ package ammonite.interp
 import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
+import ammonite.compiler._
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
-import ammonite.interp.CodeWrapper
 
 import scala.collection.mutable
 import ammonite.runtime._

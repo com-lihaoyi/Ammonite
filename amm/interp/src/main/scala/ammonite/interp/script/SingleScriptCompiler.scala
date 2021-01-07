@@ -1,11 +1,11 @@
 package ammonite.interp.script
 
-import ammonite.interp.{
+import ammonite.compiler.{
   CodeWrapper,
   Compiler => AmmCompiler,
-  Interpreter,
   MakeReporter
 }
+import ammonite.interp.Interpreter
 import ammonite.runtime.{Frame, Storage}
 import ammonite.util.{Classpath, Imports, Name, Printer, Res}
 

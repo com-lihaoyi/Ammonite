@@ -12,7 +12,7 @@ import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.repl.api.FrontEnd
-import ammonite.interp.{Parsers, Preprocessor}
+import ammonite.compiler.{Highlighter, Parsers, Preprocessor}
 import org.jline.reader.impl.DefaultParser
 
 

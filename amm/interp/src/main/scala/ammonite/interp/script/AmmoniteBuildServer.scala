@@ -7,8 +7,9 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{CompletableFuture, Executors, ThreadFactory}
 import java.util.UUID
 
+import ammonite.compiler._
 import ammonite.interp.api.InterpAPI
-import ammonite.interp.{CodeWrapper, DependencyLoader}
+import ammonite.interp.DependencyLoader
 import ammonite.runtime.{ImportHook, Storage}
 import ammonite.util.{Classpath, Imports, Printer}
 import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}

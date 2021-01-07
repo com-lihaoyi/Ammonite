@@ -1,6 +1,6 @@
 package ammonite
 
-import ammonite.interp.CodeClassWrapper
+import ammonite.compiler.CodeClassWrapper
 import ammonite.repl.api.SourceBridge
 import ammonite.repl.SourceAPIImpl
 import ammonite.util.{Evaluated, Res}
