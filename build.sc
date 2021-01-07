@@ -200,7 +200,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
   class CompilerModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(amm.util(), amm.repl.api())
+    def moduleDeps = Seq(amm.compiler.interface(), amm.util(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = T {
       Agg(

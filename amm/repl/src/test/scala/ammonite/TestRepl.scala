@@ -2,7 +2,8 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.{CodeWrapper, Preprocessor}
+import ammonite.compiler.{DefaultCodeWrapper, Preprocessor}
+import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.repl._
@@ -24,7 +25,7 @@ import ammonite.runtime.ImportHook
 class TestRepl {
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
-  def codeWrapper: CodeWrapper = CodeWrapper
+  def codeWrapper: CodeWrapper = DefaultCodeWrapper
 
   val tempDir = os.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")

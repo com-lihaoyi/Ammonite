@@ -2,7 +2,8 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.compiler.{CodeWrapper, Parsers, Preprocessor}
+import ammonite.compiler.{DefaultCodeWrapper, Parsers, Preprocessor}
+import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{ImportTree, Name, Util}
@@ -16,7 +17,7 @@ final case class ScriptProcessor(
   defaultRepositories: Seq[Repository],
   extraPluginDependencies: Seq[Dependency] = Nil,
   wd: os.Path = os.pwd,
-  codeWrapper: CodeWrapper = CodeWrapper,
+  codeWrapper: CodeWrapper = DefaultCodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) {
 

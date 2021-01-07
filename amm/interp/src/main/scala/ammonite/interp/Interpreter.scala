@@ -4,6 +4,7 @@ import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
 import ammonite.compiler._
+import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 
 import scala.collection.mutable

@@ -50,7 +50,7 @@ object Scripts {
       }
 
       scriptMains = interp.scriptCodeWrapper match{
-        case ammonite.compiler.CodeWrapper =>
+        case ammonite.compiler.DefaultCodeWrapper =>
           Some(
             interp
               .evalClassloader

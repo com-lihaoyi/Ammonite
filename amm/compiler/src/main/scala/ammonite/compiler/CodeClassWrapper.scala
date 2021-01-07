@@ -1,5 +1,6 @@
 package ammonite.compiler
 
+import ammonite.compiler.iface.CodeWrapper
 import ammonite.util._
 import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines}
 

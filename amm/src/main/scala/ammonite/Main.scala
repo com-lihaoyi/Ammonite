@@ -4,7 +4,8 @@ import java.io.{InputStream, OutputStream, PrintStream}
 import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
-import ammonite.compiler.{CodeClassWrapper, CodeWrapper}
+import ammonite.compiler.{CodeClassWrapper, DefaultCodeWrapper}
+import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
@@ -70,8 +71,8 @@ case class Main(predefCode: String = "",
                 verboseOutput: Boolean = true,
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default,
-                replCodeWrapper: CodeWrapper = CodeWrapper,
-                scriptCodeWrapper: CodeWrapper = CodeWrapper,
+                replCodeWrapper: CodeWrapper = DefaultCodeWrapper,
+                scriptCodeWrapper: CodeWrapper = DefaultCodeWrapper,
                 alreadyLoadedDependencies: Seq[Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
@@ -450,7 +451,7 @@ class MainRunner(cliConfig: Config,
 
     val codeWrapper =
       if (cliConfig.repl.classBased.value) CodeClassWrapper
-      else CodeWrapper
+      else DefaultCodeWrapper
 
     Main(
       cliConfig.predef.predefCode,
