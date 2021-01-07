@@ -2,7 +2,7 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.{DefaultCodeWrapper, Preprocessor}
+import ammonite.compiler.DefaultCodeWrapper
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.runtime.{Frame, Storage}

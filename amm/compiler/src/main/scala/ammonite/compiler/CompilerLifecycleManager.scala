@@ -1,5 +1,6 @@
 package ammonite.compiler
 
+import ammonite.compiler.iface.Preprocessor
 import ammonite.util.Util._
 import ammonite.util.{Classpath, Frame, Printer}
 

@@ -7,7 +7,7 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.compiler.{Parsers, Preprocessor}
+import ammonite.compiler.Parsers
 import ammonite.compiler.iface.CodeWrapper
 import ammonite.interp.Interpreter
 import coursierapi.Dependency

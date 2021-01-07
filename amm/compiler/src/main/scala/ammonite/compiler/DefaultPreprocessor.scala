@@ -1,6 +1,6 @@
 package ammonite.compiler
 
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.{CodeWrapper, Preprocessor}
 import ammonite.util._
 import ammonite.util.Util.{CodeSource, newLine}
 
@@ -38,10 +38,10 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
     assert(codeSource.pkgName.head == Name("ammonite"))
     for{
       Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
-      (wrappedCode, importsLength, userCodeNestingLevel) = Preprocessor.wrapCode(
+      (wrappedCode, importsLength, userCodeNestingLevel) = codeWrapper.wrapCode(
         codeSource, indexedWrapperName, leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
-        imports, extraCode, markScript, codeWrapper
+        imports, extraCode, markScript
       )
     } yield Preprocessor.Output(wrappedCode, importsLength, userCodeNestingLevel)
   }

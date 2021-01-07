@@ -3,6 +3,7 @@ package ammonite.compiler
 
 import java.io.OutputStream
 
+import ammonite.compiler.iface.Preprocessor
 import ammonite.util.{Classpath, ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
