@@ -1,10 +1,8 @@
 package ammonite.interp.script
 
-import ammonite.compiler.{
-  Compiler => AmmCompiler,
-  MakeReporter
-}
+import ammonite.compiler.{Compiler => AmmCompiler, MakeReporter}
 import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.Compiler.{Output => CompilerOutput}
 import ammonite.interp.Interpreter
 import ammonite.runtime.{Frame, Storage}
 import ammonite.util.{Classpath, Imports, Name, Printer, Res}
@@ -194,7 +192,7 @@ class SingleScriptCompiler(
     scriptImports: Imports,
     block: Script.Block,
     blockIdx: Int
-  ): Res[(Imports, Int, String, AmmCompiler.Output)] = {
+  ): Res[(Imports, Int, String, CompilerOutput)] = {
 
     val indexedWrapperName = Interpreter.indexWrapperName(
       module.codeSource.wrapperName,
@@ -262,8 +260,8 @@ class SingleScriptCompiler(
     } yield (scriptImports ++ output.imports, offset, processedCode, output) // :: acc)
   }
 
-  private def compileBlocks(): Res[Seq[(Int, String, AmmCompiler.Output)]] = {
-    val start = (Imports(), List.empty[(Int, String, AmmCompiler.Output)])
+  private def compileBlocks(): Res[Seq[(Int, String, CompilerOutput)]] = {
+    val start = (Imports(), List.empty[(Int, String, CompilerOutput)])
     val res = Res.fold(start, module.blocks.zipWithIndex) {
       case ((scriptImports, acc), (block, blockIdx)) =>
         compileBlock(scriptImports, block, blockIdx).map {

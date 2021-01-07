@@ -3,7 +3,7 @@ package ammonite.compiler
 
 import java.io.OutputStream
 
-import ammonite.compiler.iface.Preprocessor
+import ammonite.compiler.iface.{Compiler => ICompiler, Preprocessor}
 import ammonite.util.{Classpath, ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
@@ -34,15 +34,8 @@ import scala.tools.nsc.plugins.Plugin
  * classfile per source-string (e.g. inner classes, or lambdas). Also lets
  * you query source strings using an in-built presentation compiler
  */
-trait Compiler{
+trait Compiler extends ICompiler {
   def compiler: nsc.Global
-  def compile(src: Array[Byte],
-              printer: Printer,
-              importsLen0: Int,
-              userCodeNestingLevel: Int,
-              fileName: String): Option[Compiler.Output]
-
-  def preprocessor(fileName: String, markGeneratedSections: Boolean = false): Preprocessor
   var importsLen = 0
   var userCodeNestingLevel = -1
 
@@ -75,15 +68,6 @@ object Compiler{
     // should catch this and return before getting here
     case Nil => ???
   }
-  /**
-   * If the Option is None, it means compilation failed
-   * Otherwise it's a Traversable of (filename, bytes) tuples
-   */
-  case class Output(
-    classFiles: Vector[(String, Array[Byte])],
-    imports: Imports,
-    usedEarlierDefinitions: Option[Seq[String]]
-  )
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
@@ -285,7 +269,7 @@ object Compiler{
                 printer: Printer,
                 importsLen0: Int,
                 userCodeNestingLevel: Int,
-                fileName: String): Option[Output] = {
+                fileName: String): Option[ICompiler.Output] = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
@@ -322,7 +306,7 @@ object Compiler{
         }
 
         val imports = lastImports.toList
-        Some(Output(files, Imports(imports), usedEarlierDefinitions))
+        Some(ICompiler.Output(files, Imports(imports), usedEarlierDefinitions))
 
       }
     }

@@ -1,6 +1,6 @@
 package ammonite.compiler
 
-import ammonite.compiler.iface.Preprocessor
+import ammonite.compiler.iface.{Compiler => ICompiler, Preprocessor}
 import ammonite.util.Util._
 import ammonite.util.{Classpath, Frame, Printer}
 
@@ -125,7 +125,7 @@ class CompilerLifecycleManager(
 
   def compileClass(processed: Preprocessor.Output,
                    printer: Printer,
-                   fileName: String): Option[Compiler.Output] = synchronized{
+                   fileName: String): Option[ICompiler.Output] = synchronized{
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be

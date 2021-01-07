@@ -2,8 +2,7 @@ package ammonite.interp.script
 
 import java.util.concurrent.ConcurrentHashMap
 
-import ammonite.compiler.{Compiler => AmmCompiler}
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.{CodeWrapper, Compiler => AmmCompiler}
 import ammonite.runtime.Storage
 import ammonite.util.{Imports, Printer}
 

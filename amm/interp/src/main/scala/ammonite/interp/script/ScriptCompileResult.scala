@@ -1,8 +1,8 @@
 package ammonite.interp.script
 
-import ammonite.compiler.{Compiler => AmmCompiler}
+import ammonite.compiler.iface.Compiler.Output
 
 final case class ScriptCompileResult(
   diagnostics: Seq[Diagnostic],
-  errorOrOutput: Either[String, Seq[AmmCompiler.Output]]
+  errorOrOutput: Either[String, Seq[Output]]
 )
