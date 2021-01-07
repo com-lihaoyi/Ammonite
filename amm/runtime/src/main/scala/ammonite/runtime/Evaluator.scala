@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException
 import ammonite._
 import ammonite.interp.api.AmmoniteExit
 import util.Util.{ClassFiles, newLine}
-import ammonite.util._
+import ammonite.util.{Frame => _, _}
 
 import scala.util.Try
 

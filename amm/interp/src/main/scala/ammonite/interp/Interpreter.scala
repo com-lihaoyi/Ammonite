@@ -13,7 +13,7 @@ import annotation.tailrec
 import ammonite.runtime.tools.IvyThing
 import ammonite.util.ImportTree
 import ammonite.util.Util._
-import ammonite.util._
+import ammonite.util.{Frame => _, _}
 import coursierapi.{Dependency, Fetch, Repository}
 
 /**

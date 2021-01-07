@@ -2,7 +2,7 @@ package ammonite.interp
 
 import ammonite.runtime._
 import ammonite.util.Util._
-import ammonite.util.{Classpath, Printer}
+import ammonite.util.{Classpath, Frame, Printer}
 
 import java.nio.file.Path
 
@@ -24,7 +24,7 @@ import scala.tools.nsc.Settings
   */
 class CompilerLifecycleManager(
   rtCacheDir: Option[Path],
-  headFrame: => ammonite.repl.api.Frame,
+  headFrame: => ammonite.util.Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader

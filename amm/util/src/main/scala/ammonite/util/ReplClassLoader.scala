@@ -1,4 +1,4 @@
-package ammonite.repl.api
+package ammonite.util
 
 import java.net.{URL, URLClassLoader}
 

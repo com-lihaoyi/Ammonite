@@ -5,7 +5,7 @@ import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Location, Session, S
 import ammonite.repl.tools.{Desugared, SourceRuntime}
 import ammonite.runtime._
 import ammonite.util.Util._
-import ammonite.util._
+import ammonite.util.{Frame => _, _}
 
 import java.awt.Toolkit
 import java.awt.datatransfer.{DataFlavor, StringSelection}
