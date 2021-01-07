@@ -1,6 +1,10 @@
 package ammonite.compiler
 
-import ammonite.compiler.iface.{Compiler => ICompiler, Preprocessor}
+import ammonite.compiler.iface.{
+  Compiler => ICompiler,
+  CompilerLifecycleManager => ICompilerLifecycleManager,
+  Preprocessor
+}
 import ammonite.util.Util._
 import ammonite.util.{Classpath, Frame, Printer}
 
@@ -28,8 +32,9 @@ class CompilerLifecycleManager(
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader
-){
+) extends ICompilerLifecycleManager {
 
+  def scalaVersion = scala.util.Properties.versionNumberString
 
 
   private[this] object Internal{
