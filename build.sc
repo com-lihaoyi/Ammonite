@@ -186,7 +186,19 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
-  object compiler extends Cross[CompilerModule](fullCrossScalaVersions:_*)
+  object compiler extends Cross[CompilerModule](fullCrossScalaVersions:_*) {
+    object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions:_*)
+    class CompilerInterfaceModule(val crossScalaVersion: String) extends AmmModule{
+      def artifactName = "ammonite-compiler-interface"
+      def moduleDeps = Seq(amm.util())
+      def exposedClassPath = T{
+        runClasspath() ++
+          externalSources() ++
+          transitiveJars() ++
+          transitiveSourceJars()
+      }
+    }
+  }
   class CompilerModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), amm.repl.api())
     def crossFullScalaVersion = true
