@@ -112,8 +112,6 @@ class TestRepl {
         def history = new History(Vector())
         val colors = Ref(Colors.BlackWhite)
         def newCompiler() = interp.compilerManager.init(force = true)
-        def compiler = interp.compilerManager.compiler.compiler
-        def interactiveCompiler = interp.compilerManager.pressy.compiler
         def fullImports = interp.predefImports ++ imports
         def imports = frames().head.imports
         def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
@@ -155,6 +153,8 @@ class TestRepl {
               else
                 super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
           }
+
+        def _compilerManager = interp.compilerManager
       }
     ),
     (

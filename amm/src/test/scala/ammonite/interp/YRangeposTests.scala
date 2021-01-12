@@ -23,7 +23,10 @@ object YRangeposTests extends TestSuite {
       // This tests shows that enabling Yrangepos does not mess with ammonite's
       // behaviour. The compiler not crashing is the test itself.
       val storage = Storage.InMemory()
-      val interp = createTestInterp(storage)
+      val interp = createTestInterp(
+        storage,
+        predefImports = Interpreter.predefImports
+      )
       val res = Scripts.runScript(os.pwd, scriptFolderPath / "yRangepos.sc", interp)
       assert(res.isSuccess)
     }

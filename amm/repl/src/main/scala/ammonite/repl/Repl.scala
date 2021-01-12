@@ -104,8 +104,6 @@ class Repl(input: InputStream,
         def fullHistory = storage.fullHistory()
         def history = repl.history
         def newCompiler() = interp.compilerManager.init(force = true)
-        def compiler = interp.compilerManager.compiler.compiler
-        def interactiveCompiler = interp.compilerManager.pressy.compiler
         def fullImports = repl.fullImports
         def imports = repl.imports
         def usedEarlierDefinitions = repl.usedEarlierDefinitions
@@ -127,6 +125,8 @@ class Repl(input: InputStream,
             apply(normalizeNewlines(os.read(file)))
           }
         }
+
+        def _compilerManager = interp.compilerManager
       }
     ),
     (

@@ -660,14 +660,6 @@ class Interpreter(val printer: Printer,
     def watch(p: os.Path) = interp.watch(p)
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}
 
-    def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
-      compilerManager.configureCompiler(callback)
-    }
-
-    def preConfigureCompiler(callback: scala.tools.nsc.Settings => Unit) = {
-      compilerManager.preConfigureCompiler(callback)
-    }
-
     val beforeExitHooks = interp.beforeExitHooks
 
     val repositories = interp.repositories
@@ -707,6 +699,8 @@ class Interpreter(val printer: Printer,
       }
 
     }
+
+    def _compilerManager = interp.compilerManager
   }
 
 }
@@ -719,6 +713,10 @@ object Interpreter{
       "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
       importType = ImportData.Type
     ),
+    ImportData("""ammonite.compiler.CompilerExtensions.{
+      CompilerInterpAPIExtensions,
+      CompilerReplAPIExtensions
+    }"""),
     ImportData("ammonite.runtime.tools.{browse, grep, time}"),
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
     ImportData("ammonite.compiler.tools.{desugar, source}"),
