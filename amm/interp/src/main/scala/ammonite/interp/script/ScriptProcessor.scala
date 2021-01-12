@@ -3,7 +3,7 @@ package ammonite.interp.script
 import java.io.File
 
 import ammonite.compiler.{DefaultCodeWrapper, Parsers}
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.{CodeWrapper, Parser}
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{ImportTree, Name, Util}
@@ -30,7 +30,7 @@ final case class ScriptProcessor(
 
     val rawCode = Interpreter.skipSheBangLine(code)
     lazy val offsetToPos = PositionOffsetConversion.offsetToPos(rawCode)
-    val splittedScript = Parsers.splitScriptWithStart(
+    val splittedScript = Parsers.scriptBlocksWithStartIndices(
       rawCode,
       codeSource.fileName
     ).left.map { f =>
@@ -40,8 +40,7 @@ final case class ScriptProcessor(
         val actualEndIdx = if (endIdx < 0) rawCode.length else endIdx
         offsetToPos(actualEndIdx)
       }
-      val expected = f.trace().failure.label
-      Seq(Diagnostic("ERROR", startPos, endPos, s"Expected $expected"))
+      Seq(Diagnostic("ERROR", startPos, endPos, s"Expected ${f.expected}"))
     }
 
     def hookFor(tree: ImportTree): Either[Diagnostic, (Seq[String], ImportHook)] = {
@@ -84,7 +83,7 @@ final case class ScriptProcessor(
 
     val blocks = for {
       elems <- splittedScript.right.toSeq
-      (startIdx, leadingSpaces, statements) <- elems
+      Parser.ScriptBlock(startIdx, leadingSpaces, statements) <- elems
     } yield {
       val (statements0, importTrees) = Parsers.parseImportHooksWithIndices(codeSource, statements)
       val importResults =

@@ -151,7 +151,7 @@ class Repl(input: InputStream,
     // running the user code directly. Could be made longer to better warm more
     // code paths, but then the fixed overhead gets larger so not really worth it
     val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
-    val stmts = Parsers.split(code).get.get.value
+    val stmts = Parsers.split(code).get.toOption.get
     interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/)
   }
 

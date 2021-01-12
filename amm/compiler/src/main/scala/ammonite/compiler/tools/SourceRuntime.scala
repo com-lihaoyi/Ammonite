@@ -4,7 +4,6 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
 
 import ammonite.compiler.Highlighter
-import ammonite.compiler.tools.HighlightJava
 import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
 import ammonite.util.Util.{Location, newLine}
@@ -260,7 +259,7 @@ object SourceRuntime{
   def desugarImpl(s: String)(implicit colors: ammonite.util.CodeColors): Desugared = {
 
     new Desugared(
-      ammonite.compiler.Highlighter.defaultHighlight(
+      ammonite.compiler.Parsers.defaultHighlight(
         s.toVector,
         colors.comment,
         colors.`type`,

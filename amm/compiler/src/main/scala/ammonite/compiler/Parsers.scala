@@ -1,11 +1,12 @@
 package ammonite.compiler
 
+import ammonite.compiler.iface.{Parser => IParser, _}
 import ammonite.util.ImportTree
 import ammonite.util.Util.{CodeSource, newLine, windowsPlatform}
 
 import scala.collection.mutable
 
-object Parsers {
+object Parsers extends IParser {
 
   import fastparse._
 
@@ -71,24 +72,37 @@ object Parsers {
    * Attempts to break a code blob into multiple statements. Returns `None` if
    * it thinks the code blob is "incomplete" and requires more input
    */
-  def split(code: String): Option[Parsed[Seq[String]]] = {
-    // We use `instrument` to detect when the parser has reached the end of the
-    // input, any time during the parse. If it has done so, and failed, we
-    // consider the input incomplete.
-    var furthest = 0
-    val instrument = new fastparse.internal.Instrument {
-      def beforeParse(parser: String, index: Int): Unit = ()
-      def afterParse(parser: String, index: Int, success: Boolean): Unit = {
-        if (index > furthest) furthest = index
+  def split(
+    code: String,
+    ignoreIncomplete: Boolean,
+    fileName: String
+  ): Option[Either[String, Seq[String]]] =
+    if (ignoreIncomplete) {
+      // We use `instrument` to detect when the parser has reached the end of the
+      // input, any time during the parse. If it has done so, and failed, we
+      // consider the input incomplete.
+      var furthest = 0
+      val instrument = new fastparse.internal.Instrument {
+        def beforeParse(parser: String, index: Int): Unit = ()
+        def afterParse(parser: String, index: Int, success: Boolean): Unit = {
+          if (index > furthest) furthest = index
+        }
       }
-    }
 
-    parse(code, Splitter(_), instrument = instrument) match{
-      case Parsed.Failure(_, index, extra) if furthest == code.length => None
-      case f @ Parsed.Failure(_, _, _) => Some(f)
-      case Parsed.Success(value, index) => Some(Parsed.Success(value.map(_._2), index))
-    }
-  }
+      parse(code, Splitter(_), instrument = instrument) match{
+        case Parsed.Failure(_, index, extra) if furthest == code.length => None
+        case f @ Parsed.Failure(_, _, _) => Some(Left(
+          formatFastparseError(fileName, code, f)
+        ))
+        case Parsed.Success(value, index) => Some(Right(value.map(_._2)))
+      }
+    } else
+      parse(code, Splitter(_)) match{
+        case f @ Parsed.Failure(_, _, _) => Some(Left(
+          formatFastparseError(fileName, code, f)
+        ))
+        case Parsed.Success(value, index) => Some(Right(value.map(_._2)))
+      }
 
   def isObjDef(code: String): Boolean = {
     parse(code, ObjParser(_))
@@ -114,8 +128,6 @@ object Parsers {
       case f: Parsed.Failure => stringWrap(s)
     }
   }
-  def parseImportHooks(source: CodeSource, stmts: Seq[String]): (Seq[String], Seq[ImportTree]) =
-    parseImportHooksWithIndices(source, stmts.map((0, _)))
   def parseImportHooksWithIndices(
     source: CodeSource,
     stmts: Seq[(Int, String)]
@@ -174,7 +186,7 @@ object Parsers {
     rawCode: String,
     fileName: String
   ): Either[String, IndexedSeq[(String, Seq[String])]] = {
-    Parsers.splitScript(rawCode) match {
+    parse(rawCode, ScriptSplitter(_)) match {
       case f: Parsed.Failure =>
         Left(formatFastparseError(fileName, rawCode, f))
 
@@ -225,4 +237,41 @@ object Parsers {
         Right(blocks)
     }
   }
+
+  def scriptBlocksWithStartIndices(
+    rawCode: String,
+    fileName: String
+  ): Either[IParser.ScriptSplittingError, Seq[IParser.ScriptBlock]] = {
+    splitScriptWithStart(rawCode, fileName) match {
+      case Left(f) =>
+        Left(new IParser.ScriptSplittingError(
+          formatFastparseError(fileName, rawCode, f),
+          f.index,
+          f.trace().failure.label
+        ))
+      case Right(blocks) =>
+        val blocks0 = blocks.map {
+          case (startIdx, ncomment, code) =>
+            IParser.ScriptBlock(startIdx, ncomment, code)
+        }
+        Right(blocks0)
+    }
+  }
+
+  def defaultHighlight(buffer: Vector[Char],
+                       comment: fansi.Attrs,
+                       `type`: fansi.Attrs,
+                       literal: fansi.Attrs,
+                       keyword: fansi.Attrs,
+                       reset: fansi.Attrs) = {
+    Highlighter.defaultHighlight0(Splitter(_), buffer, comment, `type`, literal, keyword, reset)
+  }
+  def defaultHighlightIndices(buffer: Vector[Char],
+                              comment: fansi.Attrs,
+                              `type`: fansi.Attrs,
+                              literal: fansi.Attrs,
+                              keyword: fansi.Attrs,
+                              reset: fansi.Attrs) = Highlighter.defaultHighlightIndices0(
+    Splitter(_), buffer, comment, `type`, literal, keyword, reset
+  )
 }

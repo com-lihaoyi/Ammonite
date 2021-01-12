@@ -56,7 +56,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         }
         val details2 = for (d <- details) yield {
 
-          Highlighter.defaultHighlight(
+          Parsers.defaultHighlight(
             d.toVector,
             colors.comment(),
             colors.`type`(),
@@ -134,7 +134,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       displayTransform = { (buffer, cursor) =>
 
 
-        val indices = Highlighter.defaultHighlightIndices(
+        val indices = Parsers.defaultHighlightIndices(
           buffer,
           colors.comment(),
           colors.`type`(),

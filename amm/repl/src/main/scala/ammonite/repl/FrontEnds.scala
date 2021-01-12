@@ -5,14 +5,14 @@ import java.io.{InputStream, OutputStream}
 import scala.collection.JavaConverters._
 import fastparse.Parsed
 import fastparse.ParserInput
-import org.jline.reader.{Highlighter => _, _}
+import org.jline.reader._
 import org.jline.reader.impl.history.DefaultHistory
 
 import org.jline.terminal._
 import org.jline.utils.AttributedString
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.repl.api.FrontEnd
-import ammonite.compiler.{Highlighter, Parsers}
+import ammonite.compiler.Parsers
 import org.jline.reader.impl.DefaultParser
 
 
@@ -81,7 +81,7 @@ object FrontEnds {
   }
 }
 
-class AmmCompleter(highlighter: org.jline.reader.Highlighter) extends Completer {
+class AmmCompleter(highlighter: Highlighter) extends Completer {
   // completion varies from action to action
   var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
     (x, y) => (0, Seq.empty, Seq.empty)
@@ -144,7 +144,7 @@ class AmmParser extends Parser {
     val wordCursor = defParLine.wordCursor // cursor position within the current word
     
     Parsers.split(line) match {
-      case Some(Parsed.Success(stmts, idx)) =>
+      case Some(Right(stmts)) =>
         addHistory(line)
         // if ENTER and not at the end of input -> newline
         if (context == Parser.ParseContext.ACCEPT_LINE && cursor != line.length) {
@@ -152,14 +152,12 @@ class AmmParser extends Parser {
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor, stmts)
         }
-      case Some(f @ Parsed.Failure(p, idx, extra)) =>
+      case Some(Left(err)) =>
         // we "accept the failure" only when ENTER is pressed, loops forever otherwise...
         // https://groups.google.com/d/msg/jline-users/84fPur0oHKQ/bRnjOJM4BAAJ
         if (context == Parser.ParseContext.ACCEPT_LINE) {
           addHistory(line)
-          throw new SyntaxError(
-            Parsers.formatFastparseError("(console)", line, f)
-          )
+          throw new SyntaxError(err)
         } else {
           new AmmoniteParsedLine(line, words, wordIndex, wordCursor, cursor)
         }
@@ -177,13 +175,13 @@ class AmmParser extends Parser {
 
 class SyntaxError(val msg: String) extends RuntimeException
 
-class AmmHighlighter extends org.jline.reader.Highlighter {
+class AmmHighlighter extends Highlighter {
 
   var colors: Colors = Colors.Default
   def setErrorIndex(x$1: Int): Unit = ()
   def setErrorPattern(x$1: java.util.regex.Pattern): Unit = ()
   override def highlight(reader: LineReader, buffer: String): AttributedString = {
-    val hl = Highlighter.defaultHighlight(
+    val hl = Parsers.defaultHighlight(
       buffer.toVector,
       colors.comment(),
       colors.`type`(),

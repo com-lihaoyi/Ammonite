@@ -322,7 +322,7 @@ class TestRepl {
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
-    val splitted = ammonite.compiler.Parsers.split(input).get.get.value
+    val splitted = ammonite.compiler.Parsers.split(input).get.toOption.get
     val processed = interp.processLine(
       input,
       splitted,

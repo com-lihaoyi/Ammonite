@@ -26,14 +26,6 @@ object Highlighter {
       }.reduce(_ ++ _).render.toVector
   }
 
-  def defaultHighlight(buffer: Vector[Char],
-                       comment: fansi.Attrs,
-                       `type`: fansi.Attrs,
-                       literal: fansi.Attrs,
-                       keyword: fansi.Attrs,
-                       reset: fansi.Attrs) = {
-    defaultHighlight0(Parsers.Splitter(_), buffer, comment, `type`, literal, keyword, reset)
-  }
 
   def defaultHighlight0(parser: P[_] => P[Any],
                         buffer: Vector[Char],
@@ -47,14 +39,6 @@ object Highlighter {
 
     flattenIndices(boundedIndices, buffer)
   }
-  def defaultHighlightIndices(buffer: Vector[Char],
-                              comment: fansi.Attrs,
-                              `type`: fansi.Attrs,
-                              literal: fansi.Attrs,
-                              keyword: fansi.Attrs,
-                              reset: fansi.Attrs) = Highlighter.defaultHighlightIndices0(
-    Parsers.Splitter(_), buffer, comment, `type`, literal, keyword, reset
-  )
   def defaultHighlightIndices0(parser: P[_] => P[Any],
                                buffer: Vector[Char],
                                comment: fansi.Attrs,
