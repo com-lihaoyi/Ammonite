@@ -73,6 +73,8 @@ class Repl(input: InputStream,
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
   val interp = new Interpreter(
+    ammonite.compiler.CompilerBuilder,
+    ammonite.compiler.Parsers,
     printer,
     storage,
     wd,

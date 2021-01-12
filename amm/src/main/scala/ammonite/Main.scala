@@ -162,6 +162,8 @@ case class Main(predefCode: String = "",
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
       val interp = new Interpreter(
+        ammonite.compiler.CompilerBuilder,
+        ammonite.compiler.Parsers,
         printer,
         storageBackend,
         wd,
@@ -291,6 +293,9 @@ object Main{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
+            ???,
+            ammonite.compiler.Parsers,
+            ammonite.compiler.DefaultCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
               Seq("ammonite.interp.api.InterpBridge" -> "interp")

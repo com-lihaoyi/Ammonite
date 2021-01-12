@@ -3,8 +3,13 @@ package ammonite.interp
 import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
-import ammonite.compiler._
-import ammonite.compiler.iface.{CodeWrapper, Preprocessor}
+import ammonite.compiler.iface.{
+  CodeWrapper,
+  CompilerBuilder,
+  CompilerLifecycleManager,
+  Parser,
+  Preprocessor
+}
 import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
 
 import scala.collection.mutable
@@ -12,7 +17,6 @@ import ammonite.runtime._
 
 import annotation.tailrec
 import ammonite.runtime.tools.IvyThing
-import ammonite.util.ImportTree
 import ammonite.util.Util._
 import ammonite.util.{Frame => _, _}
 import coursierapi.{Dependency, Fetch, Repository}
@@ -22,7 +26,10 @@ import coursierapi.{Dependency, Fetch, Repository}
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(val printer: Printer,
+class Interpreter(compilerBuilder: CompilerBuilder,
+                  // by-name, so that fastparse isn't loaded when we don't need it
+                  parser: => Parser,
+                  val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
                   colors: Ref[Colors],
@@ -53,7 +60,7 @@ class Interpreter(val printer: Printer,
   def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories(), verbose = verboseOutput)
 
-  val compilerManager = new CompilerLifecycleManager(
+  val compilerManager = compilerBuilder.newManager(
     storage.dirOpt.map(_.toNIO),
     headFrame,
     Some(dependencyComplete),
@@ -237,7 +244,7 @@ class Interpreter(val printer: Printer,
       Seq(Name("ammonite"), Name("$sess")),
       Some(wd/"(console)")
     )
-    val (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -377,7 +384,7 @@ class Interpreter(val printer: Printer,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = Parsers.splitScript(
+        lazy val splittedScript = parser.splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.fileName
         )
@@ -422,7 +429,7 @@ class Interpreter(val printer: Printer,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(Parsers.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(parser.splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -571,7 +578,7 @@ class Interpreter(val printer: Printer,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )

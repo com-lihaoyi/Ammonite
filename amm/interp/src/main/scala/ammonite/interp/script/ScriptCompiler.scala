@@ -2,15 +2,15 @@ package ammonite.interp.script
 
 import java.util.concurrent.ConcurrentHashMap
 
-import ammonite.compiler.iface.{CodeWrapper, Compiler => AmmCompiler}
+import ammonite.compiler.iface.{CodeWrapper, Compiler => AmmCompiler, CompilerBuilder}
 import ammonite.runtime.Storage
 import ammonite.util.{Imports, Printer}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.tools.nsc.Settings
 
 final class ScriptCompiler(
+  compilerBuilder: CompilerBuilder,
   storage: Storage,
   printer: Printer, // TODO Remove this
   codeWrapper: CodeWrapper,
@@ -77,11 +77,7 @@ final class ScriptCompiler(
     module: Script,
     dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult =
-    settingsOrError(module) match {
-      case Left(errors) => ScriptCompileResult(Nil, Left(errors.mkString(", ")))
-      case Right((settings, settingsArgs)) =>
-        compileIfNeeded(settings, settingsArgs, module, dependencies)
-    }
+    compileIfNeeded(moduleSettings(module), module, dependencies)
 
   /**
    * Reads compilation output from cache.
@@ -119,30 +115,11 @@ final class ScriptCompiler(
     else
       Nil
 
-  private def settingsOrError(module: Script): Either[Seq[String], (Settings, Seq[String])] = {
-
-    val args = moduleSettings(module)
-
-    val errors = new mutable.ListBuffer[String]
-    val settings0 = new Settings(err => errors += err)
-    val (_, unparsed) = settings0.processArguments(args, true)
-    for (arg <- unparsed)
-      errors += s"Unrecognized argument: $arg"
-
-    if (errors.isEmpty)
-      Right((settings0, args))
-    else
-      Left(errors.toList)
-  }
-
   /** Writes on disk the source passed to scalac, corresponding to this script */
   def preCompile(module: Script): Unit = {
 
-    val settings = settingsOrError(module)
-      .map(_._1)
-      .getOrElse(new Settings(_ => ()))
-
     val compiler = new SingleScriptCompiler(
+      compilerBuilder,
       initialClassLoader,
       storage,
       printer,
@@ -151,7 +128,7 @@ final class ScriptCompiler(
       codeWrapper,
       wd,
       generateSemanticDbs,
-      settings,
+      moduleSettings(module),
       module,
       Script.ResolvedDependencies(Nil, Nil, Nil),
       moduleTarget(module),
@@ -208,7 +185,6 @@ final class ScriptCompiler(
       None
 
   private def compileIfNeeded(
-    settings0: Settings,
     settingsArgs: Seq[String],
     script: Script,
     dependencies: Script.ResolvedDependencies
@@ -217,20 +193,21 @@ final class ScriptCompiler(
       val key = InMemoryCacheKey(settingsArgs, script, dependencies)
       Option(cache.get(key)).getOrElse {
         cleanUpCache()
-        val res = doCompile(settings0, script, dependencies)
+        val res = doCompile(settingsArgs, script, dependencies)
         Option(cache.putIfAbsent(key, res))
           .getOrElse(res)
       }
     } else
-      doCompile(settings0, script, dependencies)
+      doCompile(settingsArgs, script, dependencies)
 
   private def doCompile(
-    settings0: Settings,
+    settingsArgs: Seq[String],
     module: Script,
     dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult = {
 
     val compiler = new SingleScriptCompiler(
+      compilerBuilder,
       initialClassLoader,
       storage,
       printer,
@@ -239,7 +216,7 @@ final class ScriptCompiler(
       codeWrapper,
       wd,
       generateSemanticDbs,
-      settings0,
+      settingsArgs,
       module,
       dependencies,
       moduleTarget(module),

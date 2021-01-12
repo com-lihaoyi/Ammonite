@@ -670,7 +670,12 @@ object AmmoniteBuildServerTests extends TestSuite {
     def this(script: os.Path*) =
       this(wd, script)
 
-    val server = new AmmoniteBuildServer(initialScripts = script)
+    val server = new AmmoniteBuildServer(
+      ammonite.compiler.CompilerBuilder,
+      ammonite.compiler.Parsers,
+      ammonite.compiler.DefaultCodeWrapper,
+      initialScripts = script
+    )
 
     val client = new TestBuildClient
     server.onConnectWithClient(client)

@@ -7,8 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{CompletableFuture, Executors, ThreadFactory}
 import java.util.UUID
 
-import ammonite.compiler._
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.api.InterpAPI
 import ammonite.interp.DependencyLoader
 import ammonite.runtime.{ImportHook, Storage}
@@ -23,10 +22,12 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
+  compilerBuilder: CompilerBuilder,
+  parser: Parser,
+  codeWrapper: CodeWrapper,
   initialScripts: Seq[os.Path] = Nil,
   initialImports: Imports = AmmoniteBuildServer.defaultImports,
   defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
-  codeWrapper: CodeWrapper = DefaultCodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) extends BuildServer with ScalaBuildServer with DummyBuildServerImplems {
 
@@ -60,6 +61,8 @@ class AmmoniteBuildServer(
   private lazy val proc =
     withRoot { root =>
       ScriptProcessor(
+        parser,
+        codeWrapper,
         dependencyLoader,
         defaultRepositories,
         Seq(
@@ -70,13 +73,13 @@ class AmmoniteBuildServer(
           )
         ),
         root,
-        codeWrapper,
         importHooks
       )
   }
   private lazy val compiler =
     withRoot { root =>
       new ScriptCompiler(
+        compilerBuilder,
         storage,
         printer,
         codeWrapper,

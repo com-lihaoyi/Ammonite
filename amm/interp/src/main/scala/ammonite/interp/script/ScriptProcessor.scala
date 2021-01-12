@@ -2,7 +2,6 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.compiler.{DefaultCodeWrapper, Parsers}
 import ammonite.compiler.iface.{CodeWrapper, Parser}
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
@@ -13,11 +12,12 @@ import coursierapi.{Dependency, Repository}
 import scala.collection.mutable
 
 final case class ScriptProcessor(
+  parser: Parser,
+  codeWrapper: CodeWrapper,
   dependencyLoader: DependencyLoader,
   defaultRepositories: Seq[Repository],
   extraPluginDependencies: Seq[Dependency] = Nil,
   wd: os.Path = os.pwd,
-  codeWrapper: CodeWrapper = DefaultCodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) {
 
@@ -30,7 +30,7 @@ final case class ScriptProcessor(
 
     val rawCode = Interpreter.skipSheBangLine(code)
     lazy val offsetToPos = PositionOffsetConversion.offsetToPos(rawCode)
-    val splittedScript = Parsers.scriptBlocksWithStartIndices(
+    val splittedScript = parser.scriptBlocksWithStartIndices(
       rawCode,
       codeSource.fileName
     ).left.map { f =>
@@ -85,7 +85,7 @@ final case class ScriptProcessor(
       elems <- splittedScript.right.toSeq
       Parser.ScriptBlock(startIdx, leadingSpaces, statements) <- elems
     } yield {
-      val (statements0, importTrees) = Parsers.parseImportHooksWithIndices(codeSource, statements)
+      val (statements0, importTrees) = parser.parseImportHooksWithIndices(codeSource, statements)
       val importResults =
         for {
           tree <- importTrees

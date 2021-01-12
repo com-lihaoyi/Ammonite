@@ -66,6 +66,8 @@ class TestRepl {
   var currentLine = 0
   val interp = try {
     new Interpreter(
+      ammonite.compiler.CompilerBuilder,
+      ammonite.compiler.Parsers,
       printer0,
       storage = storage,
       wd = os.pwd,

@@ -24,6 +24,8 @@ object TestUtils {
     val startFrame = Frame.createInitial(initialClassLoader)
     val printStream = new PrintStream(System.out)
     val interp = new Interpreter(
+      ammonite.compiler.CompilerBuilder,
+      ammonite.compiler.Parsers,
 
       printer = Printer(
         printStream, new PrintStream(System.err), printStream,
