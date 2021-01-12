@@ -10,15 +10,19 @@ class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
 
+  val compilerBuilder = ammonite.compiler.CompilerBuilder
   val repls = Seq(
-    new TestRepl {
+    new TestRepl(compilerBuilder) {
       override def predef = dual.predef
     },
-    new TestRepl {
+    new TestRepl(compilerBuilder) {
       override def predef = dual.predef
       override def codeWrapper = CodeClassWrapper
     }
   )
+
+  def scalaVersion = compilerBuilder.scalaVersion
+  def scala2 = scalaVersion.startsWith("2.")
 
   def interps = repls.map(_.interp)
 

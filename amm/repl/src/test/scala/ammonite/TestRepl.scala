@@ -2,8 +2,8 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.DefaultCodeWrapper
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.{CompilerBuilder, DefaultCodeWrapper}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder => ICompilerBuilder}
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.repl._
@@ -22,7 +22,7 @@ import ammonite.runtime.ImportHook
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl { self =>
+class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
@@ -63,7 +63,6 @@ class TestRepl { self =>
   )
   val customPredefs = Seq()
 
-  val compilerBuilder = ammonite.compiler.CompilerBuilder
   val parser = ammonite.compiler.Parsers
 
   var currentLine = 0
