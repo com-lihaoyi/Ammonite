@@ -199,6 +199,13 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ivy"com.github.javaparser:javaparser-core:3.2.5"
       )
     }
+
+    def exposedClassPath = T{
+      runClasspath() ++
+        externalSources() ++
+        transitiveJars() ++
+        transitiveSourceJars()
+    }
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
@@ -282,6 +289,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def thinWhitelist = T{
         generateApiWhitelist(
           amm.repl.api().exposedClassPath() ++
+          amm.compiler().exposedClassPath() ++
           Seq(compile().classes) ++
           resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
         )
@@ -346,7 +354,8 @@ class MainModule(val crossScalaVersion: String)
 
   def thinWhitelist = T{
     generateApiWhitelist(
-      amm.repl.api().exposedClassPath()
+      amm.repl.api().exposedClassPath() ++
+      amm.compiler().exposedClassPath()
     )
   }
   def localClasspath = T{
@@ -398,6 +407,7 @@ class MainModule(val crossScalaVersion: String)
     def thinWhitelist = T{
       generateApiWhitelist(
         amm.repl.api().exposedClassPath() ++
+        amm.compiler().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
@@ -459,6 +469,7 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
     def thinWhitelist = T{
       generateApiWhitelist(
         amm.repl.api().exposedClassPath() ++
+        amm.compiler().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
