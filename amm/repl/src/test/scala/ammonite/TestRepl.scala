@@ -63,12 +63,13 @@ class TestRepl { self =>
   )
   val customPredefs = Seq()
 
+  val compilerBuilder = ammonite.compiler.CompilerBuilder
   val parser = ammonite.compiler.Parsers
 
   var currentLine = 0
   val interp = try {
     new Interpreter(
-      ammonite.compiler.CompilerBuilder,
+      compilerBuilder,
       parser,
       printer0,
       storage = storage,
@@ -144,18 +145,19 @@ class TestRepl { self =>
             def colors = replApi.colors
             def replArgs: IndexedSeq[Bind[_]] = replArgs0
 
-            override def print[T: TPrint](
+            override def print[T](
               value: => T,
               ident: String,
               custom: Option[String]
             )(implicit
               tcolors: TPrintColors,
-              classTagT: ClassTag[T]
+              classTagT: ClassTag[T],
+              tprint: TPrint[T]
             ): Iterator[String] =
               if (classTagT == scala.reflect.classTag[ammonite.Nope])
                 Iterator()
               else
-                super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
+                super.print(value, ident, custom)(tcolors, classTagT, tprint)
           }
 
         def _compilerManager = interp.compilerManager
@@ -266,11 +268,23 @@ class TestRepl { self =>
       }else {
         processed match {
           case Res.Success(str) =>
+            val noTypes = compilerBuilder.scalaVersion.startsWith("3.")
             // Strip trailing whitespace
             def normalize(s: String) =
               Predef.augmentString(s)
                 .lines
                 .map(_.replaceAll(" *$", ""))
+                .map { line =>
+                  if (noTypes && !line.startsWith(" ")) {
+                    val colonIdx = line.indexOf(':')
+                    val equalMatchOpt = TestRepl.equalPattern.findFirstMatchIn(line)
+                    val equalIdx = equalMatchOpt.map(_.start).getOrElse(-1)
+                    if (colonIdx > 0 && equalIdx > colonIdx)
+                      line.take(colonIdx + 2) + "???" + line.drop(equalIdx)
+                    else line
+                  } else
+                    line
+                }
                 .mkString(Util.newLine)
                 .trim()
 
@@ -390,4 +404,11 @@ class TestRepl { self =>
       throw e
     }
 
+}
+
+object TestRepl {
+  // We want to match the right '=' in
+  //   res0: Int => String = …
+  // while also accepting it to be followed by a new line.
+  val equalPattern = " =($|\\s)".r
 }
