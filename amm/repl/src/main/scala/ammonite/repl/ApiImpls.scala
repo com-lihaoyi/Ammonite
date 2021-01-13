@@ -140,9 +140,9 @@ object ClipboardImpl extends Clipboard {
 trait FrontEndAPIImpl extends FrontEndAPI {
   def apply(name: String): FrontEnd =
     name.toLowerCase(Locale.ROOT) match {
-      case "ammonite" => AmmoniteFrontEnd()
-      case "windows" => FrontEnds.JLineWindows
-      case "unix" => FrontEnds.JLineUnix
+      case "ammonite" => AmmoniteFrontEnd(ammonite.compiler.Parsers)
+      case "windows" => new FrontEnds.JLineWindows(ammonite.compiler.Parsers)
+      case "unix" => new FrontEnds.JLineUnix(ammonite.compiler.Parsers)
       case _ => throw new NoSuchElementException(s"Front-end $name")
     }
 }

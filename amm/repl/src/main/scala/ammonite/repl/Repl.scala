@@ -37,9 +37,9 @@ class Repl(input: InputStream,
 
   val frontEnd = Ref[FrontEnd](
     if (scala.util.Properties.isWin)
-      ammonite.repl.FrontEnds.JLineWindows
+      new ammonite.repl.FrontEnds.JLineWindows(ammonite.compiler.Parsers)
     else
-      AmmoniteFrontEnd(Filter.empty)
+      AmmoniteFrontEnd(ammonite.compiler.Parsers, Filter.empty)
   )
 
   var lastException: Throwable = null

@@ -6,11 +6,11 @@ import ammonite.util.Util.newLine
  * Created by haoyi on 8/29/15.
  */
 object FrontEndUtils {
-  def width = 
-    if (scala.util.Properties.isWin) ammonite.repl.FrontEnds.JLineWindows.width
+  def width =
+    if (scala.util.Properties.isWin) ammonite.repl.FrontEnds.width
     else ammonite.terminal.ConsoleDim.width()
   def height =
-    if (scala.util.Properties.isWin) ammonite.repl.FrontEnds.JLineWindows.width
+    if (scala.util.Properties.isWin) ammonite.repl.FrontEnds.height
     else ammonite.terminal.ConsoleDim.height()
   def tabulate(snippetsRaw: Seq[fansi.Str], width: Int): Iterator[String] = {
     val gap = 2

@@ -10,23 +10,23 @@ import org.jline.reader.impl.history.DefaultHistory
 
 import org.jline.terminal._
 import org.jline.utils.AttributedString
+import ammonite.compiler.iface.{Parser => IParser}
 import ammonite.util.{Catching, Colors, Res}
 import ammonite.repl.api.FrontEnd
-import ammonite.compiler.Parsers
 import org.jline.reader.impl.DefaultParser
 
 
 object FrontEnds {
-  object JLineUnix extends JLineTerm
-  object JLineWindows extends JLineTerm
-  class JLineTerm() extends FrontEnd {
+  class JLineUnix(codeParser: IParser) extends JLineTerm(codeParser)
+  class JLineWindows(codeParser: IParser) extends JLineTerm(codeParser)
+  class JLineTerm(codeParser: IParser) extends FrontEnd {
 
     private val term = TerminalBuilder.builder().build()
     
     private val readerBuilder = LineReaderBuilder.builder().terminal(term)
-    private val ammHighlighter = new AmmHighlighter()
+    private val ammHighlighter = new AmmHighlighter(codeParser)
     private val ammCompleter = new AmmCompleter(ammHighlighter)
-    private val ammParser = new AmmParser()
+    private val ammParser = new AmmParser(codeParser)
     readerBuilder.highlighter(ammHighlighter)
     readerBuilder.completer(ammCompleter)
     readerBuilder.parser(ammParser)
@@ -79,6 +79,9 @@ object FrontEnds {
       } yield res
     }
   }
+
+  def width = TerminalBuilder.builder().build().getWidth
+  def height = TerminalBuilder.builder().build().getHeight
 }
 
 class AmmCompleter(highlighter: Highlighter) extends Completer {
@@ -125,7 +128,7 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
   }
 }
 
-class AmmParser extends Parser {
+class AmmParser(codeParser: IParser) extends Parser {
   class AmmoniteParsedLine(line: String, words: java.util.List[String],
                             wordIndex: Int, wordCursor: Int, cursor: Int,
                             val stmts: Seq[String] = Seq.empty // needed for interpreter
@@ -142,8 +145,8 @@ class AmmParser extends Parser {
     val words = defParLine.words
     val wordIndex = defParLine.wordIndex // index of the current word in the list of words
     val wordCursor = defParLine.wordCursor // cursor position within the current word
-    
-    Parsers.split(line) match {
+
+    codeParser.split(line) match {
       case Some(Right(stmts)) =>
         addHistory(line)
         // if ENTER and not at the end of input -> newline
@@ -175,13 +178,13 @@ class AmmParser extends Parser {
 
 class SyntaxError(val msg: String) extends RuntimeException
 
-class AmmHighlighter extends Highlighter {
+class AmmHighlighter(codeParser: IParser) extends Highlighter {
 
   var colors: Colors = Colors.Default
   def setErrorIndex(x$1: Int): Unit = ()
   def setErrorPattern(x$1: java.util.regex.Pattern): Unit = ()
   override def highlight(reader: LineReader, buffer: String): AttributedString = {
-    val hl = Parsers.defaultHighlight(
+    val hl = codeParser.defaultHighlight(
       buffer.toVector,
       colors.comment(),
       colors.`type`(),
