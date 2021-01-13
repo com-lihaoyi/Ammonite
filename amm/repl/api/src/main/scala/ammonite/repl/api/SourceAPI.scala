@@ -3,8 +3,7 @@ package ammonite.repl.api
 import ammonite.interp.api.APIHolder
 import ammonite.repl.tools.Desugared
 import ammonite.util.CodeColors
-
-case class Location(fileName: String, lineNum: Int, fileContent: String)
+import ammonite.util.Util.Location
 
 trait SourceAPI {
 

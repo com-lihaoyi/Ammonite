@@ -1,8 +1,8 @@
 package ammonite.repl.tools
 
-import ammonite.repl.api.Location
 import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
+import ammonite.util.Util.Location
 import sourcecode.Compat._
 
 import scala.annotation.tailrec

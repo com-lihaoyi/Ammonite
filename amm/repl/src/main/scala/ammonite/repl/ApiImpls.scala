@@ -1,7 +1,7 @@
 package ammonite.repl
 
 import ammonite.ops.Internals
-import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Location, Session, SourceAPI}
+import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Session, SourceAPI}
 import ammonite.repl.tools.{Desugared, SourceRuntime}
 import ammonite.runtime._
 import ammonite.util.Util._

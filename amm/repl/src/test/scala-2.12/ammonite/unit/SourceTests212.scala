@@ -2,10 +2,11 @@ package ammonite.unit
 
 
 import ammonite.repl.SourceAPIImpl
-import ammonite.repl.api.{Location, SourceBridge}
+import ammonite.repl.api.SourceBridge
 import utest._
 import ammonite.repl.tools.source.load
 import ammonite.util.Util
+import ammonite.util.Util.Location
 //import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
 object SourceTests212 extends TestSuite{

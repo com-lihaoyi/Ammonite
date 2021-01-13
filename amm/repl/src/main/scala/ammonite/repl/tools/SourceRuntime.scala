@@ -4,10 +4,9 @@ import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
 
 import ammonite.repl.Highlighter
-import ammonite.repl.api.Location
 import ammonite.runtime.tools.browse.Strings
 import ammonite.util.CodeColors
-import ammonite.util.Util.newLine
+import ammonite.util.Util.{Location, newLine}
 import scala.collection.mutable
 import scala.language.experimental.macros
 
