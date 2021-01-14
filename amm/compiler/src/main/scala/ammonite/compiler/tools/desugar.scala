@@ -1,4 +1,4 @@
-package ammonite.repl.tools
+package ammonite.compiler.tools
 
 import sourcecode.Compat._
 import scala.language.experimental.macros
@@ -11,7 +11,7 @@ object desugar{
   def transformer(c: Context)(expr: c.Expr[Any]): c.Expr[Desugared] = {
     import c.universe._
     c.Expr[Desugared](
-      q"ammonite.repl.api.SourceBridge.value.desugarImpl(${c.universe.showCode(expr.tree)})"
+      q"ammonite.compiler.tools.SourceRuntime.desugarImpl(${c.universe.showCode(expr.tree)})"
     )
   }
 

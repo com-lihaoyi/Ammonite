@@ -1,4 +1,4 @@
-package ammonite.repl.tools
+package ammonite.compiler.tools
 
 import javassist.{ByteArrayClassPath, CtClass, CtMethod}
 
@@ -252,5 +252,23 @@ object SourceRuntime{
     }
   }
 
+  def failLoudly[T](res: Either[String, T]): T = res match{
+    case Left(s) => throw new Exception(s)
+    case Right(r) => r
+  }
+
+  def desugarImpl(s: String)(implicit colors: ammonite.util.CodeColors): Desugared = {
+
+    new Desugared(
+      ammonite.compiler.Highlighter.defaultHighlight(
+        s.toVector,
+        colors.comment,
+        colors.`type`,
+        colors.literal,
+        colors.keyword,
+        fansi.Attr.Reset
+      ).mkString
+    )
+  }
 
 }

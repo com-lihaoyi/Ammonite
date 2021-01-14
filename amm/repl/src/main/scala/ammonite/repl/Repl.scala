@@ -129,11 +129,6 @@ class Repl(input: InputStream,
       }
     ),
     (
-      "ammonite.repl.api.SourceBridge",
-      "source",
-      new SourceAPIImpl {}
-    ),
-    (
       "ammonite.repl.api.FrontEndBridge",
       "frontEnd",
       new FrontEndAPIImpl {}
