@@ -5,7 +5,7 @@ import java.net.URLClassLoader
 import java.nio.file.NoSuchFileException
 
 import ammonite.compiler.{CodeClassWrapper, DefaultCodeWrapper}
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
@@ -76,6 +76,9 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+                compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder,
+                // by-name, so that fastparse isn't loaded when we don't need it
+                parser: () => Parser = () => ammonite.compiler.Parsers,
                 classPathWhitelist: Set[Seq[String]] = Set.empty){
 
   def loadedPredefFile = predefFile match{
@@ -137,6 +140,8 @@ case class Main(predefCode: String = "",
         scriptCodeWrapper = scriptCodeWrapper,
         alreadyLoadedDependencies = alreadyLoadedDependencies,
         importHooks = importHooks,
+        compilerBuilder = compilerBuilder,
+        parser = parser(),
         initialClassLoader = initialClassLoader,
         classPathWhitelist = classPathWhitelist
       )
@@ -161,9 +166,10 @@ case class Main(predefCode: String = "",
       val customPredefs = predefFileInfoOpt.toSeq ++ Seq(
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
+      lazy val parser0 = parser()
       val interp = new Interpreter(
         ammonite.compiler.CompilerBuilder,
-        ammonite.compiler.Parsers,
+        parser0,
         printer,
         storageBackend,
         wd,
@@ -182,7 +188,9 @@ case class Main(predefCode: String = "",
         (
           "ammonite.repl.api.FrontEndBridge",
           "frontEnd",
-          new FrontEndAPIImpl {}
+          new FrontEndAPIImpl {
+            def parser = parser0
+          }
         )
       )
       interp.initializePredef(Seq(), customPredefs, bridges, augmentedImports) match{
@@ -454,6 +462,7 @@ class MainRunner(cliConfig: Config,
       new Storage.Folder(cliConfig.core.home, isRepl)
     }
 
+    lazy val parser = ammonite.compiler.Parsers
     val codeWrapper =
       if (cliConfig.repl.classBased.value) CodeClassWrapper
       else DefaultCodeWrapper
@@ -473,6 +482,7 @@ class MainRunner(cliConfig: Config,
       colors = colors,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
+      parser = () => parser,
       alreadyLoadedDependencies =
         Defaults.alreadyLoadedDependencies(),
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.core.thin.value)

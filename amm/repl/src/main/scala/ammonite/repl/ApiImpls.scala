@@ -138,11 +138,12 @@ object ClipboardImpl extends Clipboard {
 }
 
 trait FrontEndAPIImpl extends FrontEndAPI {
+  protected def parser: ammonite.compiler.iface.Parser
   def apply(name: String): FrontEnd =
     name.toLowerCase(Locale.ROOT) match {
-      case "ammonite" => AmmoniteFrontEnd(ammonite.compiler.Parsers)
-      case "windows" => new FrontEnds.JLineWindows(ammonite.compiler.Parsers)
-      case "unix" => new FrontEnds.JLineUnix(ammonite.compiler.Parsers)
+      case "ammonite" => AmmoniteFrontEnd(parser)
+      case "windows" => new FrontEnds.JLineWindows(parser)
+      case "unix" => new FrontEnds.JLineUnix(parser)
       case _ => throw new NoSuchElementException(s"Front-end $name")
     }
 }

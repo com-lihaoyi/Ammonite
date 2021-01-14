@@ -283,7 +283,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       ops(), amm.util(),
       amm.runtime(), amm.interp(),
       terminal(),
-      amm.compiler()
+      amm.compiler.interface()
     )
     def ivyDeps = Agg(
       ivy"org.jline:jline-terminal:3.14.1",
@@ -296,6 +296,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.crossScalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
+      def moduleDeps = super.moduleDeps ++ Seq(amm.compiler())
 
       def thinWhitelist = T{
         generateApiWhitelist(
@@ -316,7 +317,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ReplModule.this.externalSources() ++
         resolveDeps(ivyDeps, sources = true)()).distinct
       }
-      def ivyDeps = super.ivyDeps() ++ Agg(
+      def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
         ivy"org.scalaz::scalaz-core:7.2.27"
       )
     }
@@ -337,7 +338,8 @@ class MainModule(val crossScalaVersion: String)
     amm.util(), amm.runtime(),
     amm.interp.api(),
     amm.repl.api(),
-    amm.interp(), amm.repl()
+    amm.interp(), amm.repl(),
+    amm.compiler()
   )
 
   def runClasspath =

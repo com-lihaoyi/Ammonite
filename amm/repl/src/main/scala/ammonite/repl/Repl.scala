@@ -7,8 +7,7 @@ import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.compiler.Parsers
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.Interpreter
 import coursierapi.Dependency
 
@@ -29,6 +28,8 @@ class Repl(input: InputStream,
            scriptCodeWrapper: CodeWrapper,
            alreadyLoadedDependencies: Seq[Dependency],
            importHooks: Map[Seq[String], ImportHook],
+           compilerBuilder: CompilerBuilder,
+           parser: Parser,
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
            classPathWhitelist: Set[Seq[String]]) { repl =>
@@ -37,9 +38,9 @@ class Repl(input: InputStream,
 
   val frontEnd = Ref[FrontEnd](
     if (scala.util.Properties.isWin)
-      new ammonite.repl.FrontEnds.JLineWindows(ammonite.compiler.Parsers)
+      new ammonite.repl.FrontEnds.JLineWindows(parser)
     else
-      AmmoniteFrontEnd(ammonite.compiler.Parsers, Filter.empty)
+      AmmoniteFrontEnd(parser, Filter.empty)
   )
 
   var lastException: Throwable = null
@@ -73,8 +74,8 @@ class Repl(input: InputStream,
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
   val interp = new Interpreter(
-    ammonite.compiler.CompilerBuilder,
-    ammonite.compiler.Parsers,
+    compilerBuilder,
+    parser,
     printer,
     storage,
     wd,
@@ -134,7 +135,9 @@ class Repl(input: InputStream,
     (
       "ammonite.repl.api.FrontEndBridge",
       "frontEnd",
-      new FrontEndAPIImpl {}
+      new FrontEndAPIImpl {
+        def parser = repl.parser
+      }
     )
   )
 
@@ -153,7 +156,7 @@ class Repl(input: InputStream,
     // running the user code directly. Could be made longer to better warm more
     // code paths, but then the fixed overhead gets larger so not really worth it
     val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
-    val stmts = Parsers.split(code).get.toOption.get
+    val stmts = parser.split(code).get.toOption.get
     interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/)
   }
 

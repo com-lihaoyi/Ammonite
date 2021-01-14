@@ -22,7 +22,7 @@ import ammonite.runtime.ImportHook
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl {
+class TestRepl { self =>
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
@@ -63,11 +63,13 @@ class TestRepl {
   )
   val customPredefs = Seq()
 
+  val parser = ammonite.compiler.Parsers
+
   var currentLine = 0
   val interp = try {
     new Interpreter(
       ammonite.compiler.CompilerBuilder,
-      ammonite.compiler.Parsers,
+      parser,
       printer0,
       storage = storage,
       wd = os.pwd,
@@ -162,7 +164,9 @@ class TestRepl {
     (
       "ammonite.repl.api.FrontEndBridge",
       "frontEnd",
-      new FrontEndAPIImpl {}
+      new FrontEndAPIImpl {
+        def parser = self.parser
+      }
     )
   )
 
