@@ -64,7 +64,7 @@ class AmmoniteBuildServer(
           Dependency.of(
             "org.scalameta",
             "semanticdb-scalac_" + scala.util.Properties.versionNumberString,
-            "4.4.0"
+            "4.4.6"
           )
         ),
         root,

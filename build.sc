@@ -21,12 +21,12 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.12", "2.13.4")
+val binCrossScalaVersions = Seq("2.12.13", "2.13.4")
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
 val fullCrossScalaVersions = Seq(
-  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12",
+  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13",
   "2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4"
 )
 
@@ -65,12 +65,10 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
     val extraDir =
       if (sv.startsWith("2.12.")) {
         val patch = sv.stripPrefix("2.12.").takeWhile(_.isDigit).toInt
-        val dirName =
-          if (patch <= 8)
-            "scala-2.12.0_8"
-          else
-            "scala-2.12.9+"
-        Seq(PathRef(millSourcePath / "src" / "main" / dirName))
+        val dirName0 = if (patch <= 8) "scala-2.12.0_8" else "scala-2.12.9+"
+        val dirName1 = if (patch <= 12) "scala-2.12.0_12" else "scala-2.12.13+"
+        val dirNames = Seq(dirName0, dirName1)
+        dirNames.map(dirName => PathRef(millSourcePath / "src" / "main" / dirName))
       } else
         Nil
 
@@ -79,10 +77,12 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
       else millSourcePath / "src" / "main" / "scala-not-2.12.10-2.13.1+"
     )
     val extraDir3 =
-      if (!sv.startsWith("2.13.") || sv == "2.13.0")
-        PathRef(millSourcePath / "src" / "main" / "scala-not-2.13.1+")
-      else
+      if (sv.startsWith("2.13.") && sv != "2.13.0")
         PathRef(millSourcePath / "src" / "main" / "scala-2.13.1+")
+      else if (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").toInt >= 13)
+        PathRef(millSourcePath / "src" / "main" / "scala-2.12.13+")
+      else
+        PathRef(millSourcePath / "src" / "main" / "scala-not-2.12.13+-2.13.1+")
 
     super.sources() ++ extraDir ++ Seq(extraDir2, extraDir3)
   }
@@ -212,7 +212,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
-      ivy"org.scalameta::trees:4.4.0",
+      ivy"org.scalameta::trees:4.4.6",
       ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
       ivy"com.lihaoyi::scalaparse:2.3.0",
