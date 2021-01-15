@@ -66,8 +66,8 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
       if (sv.startsWith("2.12.")) {
         val patch = sv.stripPrefix("2.12.").takeWhile(_.isDigit).toInt
         val dirName0 = if (patch <= 8) "scala-2.12.0_8" else "scala-2.12.9+"
-        val dirName1 = if (patch <= 12) "scala-2.12.0_12" else "scala-2.12.13+"
-        val dirNames = Seq(dirName0, dirName1)
+        val dirNames1 = if (patch <= 12) Seq("scala-2.12.0_12") else Nil
+        val dirNames = Seq(dirName0) ++ dirNames1
         dirNames.map(dirName => PathRef(millSourcePath / "src" / "main" / dirName))
       } else
         Nil
