@@ -7,7 +7,7 @@ on:
     branches:
       - master
 jobs:
-  unit-11-2_12_12:
+  unit-11-2_12_13:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,8 +16,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - run: ./mill -i unitTest 2.12.12
-  unit-8-2_12_12:
+      - run: ./mill -i unitTest 2.12.13
+  unit-8-2_12_13:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
-      - run: ./mill -i unitTest 2.12.12
+      - run: ./mill -i unitTest 2.12.13
 
   unit-8-2_13_4:
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
           java-version: '8'
       - run: ./mill -i unitTest 2.13.4
 
-  integration-11-2_12_12:
+  integration-11-2_12_13:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -48,8 +48,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '11'
-      - run: ./mill -i integrationTest 2.12.12
-  integration-8-2_12_12:
+      - run: ./mill -i integrationTest 2.12.13
+  integration-8-2_12_13:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
-      - run: ./mill -i integrationTest 2.12.12
+      - run: ./mill -i integrationTest 2.12.13
 
   integration-8-2_13_4:
     runs-on: ubuntu-latest
