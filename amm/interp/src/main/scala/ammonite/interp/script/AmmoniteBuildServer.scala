@@ -7,10 +7,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{CompletableFuture, Executors, ThreadFactory}
 import java.util.UUID
 
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.api.InterpAPI
-import ammonite.interp.{CodeWrapper, DependencyLoader}
-import ammonite.runtime.{Classpath, ImportHook, Storage}
-import ammonite.util.{Imports, Printer}
+import ammonite.interp.DependencyLoader
+import ammonite.runtime.{ImportHook, Storage}
+import ammonite.util.{Classpath, Imports, Printer}
 import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher
@@ -21,10 +22,12 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
+  compilerBuilder: CompilerBuilder,
+  parser: Parser,
+  codeWrapper: CodeWrapper,
   initialScripts: Seq[os.Path] = Nil,
   initialImports: Imports = AmmoniteBuildServer.defaultImports,
   defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
-  codeWrapper: CodeWrapper = CodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) extends BuildServer with ScalaBuildServer with DummyBuildServerImplems {
 
@@ -52,12 +55,14 @@ class AmmoniteBuildServer(
       classOf[InterpAPI].getClassLoader
     else
       Thread.currentThread().getContextClassLoader
-  private def initialClassPath = Classpath.classpath(initialClassLoader, storage)
-    .map(_.toURI)
+  private def initialClassPath =
+    Classpath.classpath(initialClassLoader, storage.dirOpt.map(_.toNIO)).map(_.toURI)
 
   private lazy val proc =
     withRoot { root =>
       ScriptProcessor(
+        parser,
+        codeWrapper,
         dependencyLoader,
         defaultRepositories,
         Seq(
@@ -68,13 +73,13 @@ class AmmoniteBuildServer(
           )
         ),
         root,
-        codeWrapper,
         importHooks
       )
   }
   private lazy val compiler =
     withRoot { root =>
       new ScriptCompiler(
+        compilerBuilder,
         storage,
         printer,
         codeWrapper,

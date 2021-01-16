@@ -23,7 +23,14 @@ object CompilerSettingsTests extends TestSuite {
         val interp = createTestInterp(storage)
         Scripts.runScript(os.pwd, scriptPath / "configureCompiler.sc", interp)
 
-        assert(interp.compilerManager.compiler.compiler.useOffsetPositions)
+        assert(
+          interp
+            .compilerManager
+            .asInstanceOf[ammonite.compiler.CompilerLifecycleManager]
+            .compiler
+            .compiler
+            .useOffsetPositions
+        )
       }
     }
 
@@ -32,10 +39,20 @@ object CompilerSettingsTests extends TestSuite {
       // which is called BEFORE the compiler instantiates, resulting in
       // useOffsetPositions initializing as false, as expected
       val storage = Storage.InMemory()
-      val interp = createTestInterp(storage)
+      val interp = createTestInterp(
+        storage,
+        predefImports = Interpreter.predefImports
+      )
       Scripts.runScript(os.pwd, scriptPath / "preConfigureCompiler.sc", interp)
 
-      assert(!interp.compilerManager.compiler.compiler.useOffsetPositions)
+      assert(
+        !interp
+          .compilerManager
+          .asInstanceOf[ammonite.compiler.CompilerLifecycleManager]
+          .compiler
+          .compiler
+          .useOffsetPositions
+      )
     }
   }
 }

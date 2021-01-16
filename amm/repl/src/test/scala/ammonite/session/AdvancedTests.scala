@@ -2,7 +2,7 @@ package ammonite.session
 
 import ammonite.TestUtils._
 import ammonite.DualTestRepl
-import ammonite.util.{Res, Util}
+import ammonite.util.Res
 import utest._
 
 
@@ -373,7 +373,7 @@ object AdvancedTests extends TestSuite{
     test("desugar"){
       check.session("""
         @ desugar{1 + 2 max 3}
-        res0: ammonite.repl.tools.Desugared = scala.Predef.intWrapper(3).max(3)
+        res0: compiler.tools.Desugared = scala.Predef.intWrapper(3).max(3)
       """)
     }
     test("loadingModulesInPredef"){

@@ -1,19 +1,12 @@
 package ammonite.interp.script
 
-import ammonite.interp.{
-  CodeWrapper,
-  Compiler => AmmCompiler,
-  DefaultPreprocessor,
-  Interpreter,
-  MakeReporter
-}
-import ammonite.runtime.{Classpath, Frame, Storage}
-import ammonite.util.{Imports, Name, Printer, Res}
+import ammonite.compiler.iface.{CodeWrapper, Compiler, CompilerBuilder}
+import ammonite.compiler.iface.Compiler.{Output => CompilerOutput}
+import ammonite.interp.Interpreter
+import ammonite.runtime.{Frame, Storage}
+import ammonite.util.{Classpath, Imports, Name, Printer, Res}
 
 import scala.collection.mutable
-import scala.reflect.internal.util.{NoPosition, Position => SPosition}
-import scala.reflect.io.VirtualDirectory
-import scala.tools.nsc.Settings
 
 /**
  * Helper class to compile a single script
@@ -22,6 +15,7 @@ import scala.tools.nsc.Settings
  * discarded right after having called `apply` or `writeSources`.
  */
 class SingleScriptCompiler(
+  compilerBuilder: CompilerBuilder,
   initialClassLoader: ClassLoader,
   storage: Storage,
   printer: Printer,
@@ -30,27 +24,12 @@ class SingleScriptCompiler(
   codeWrapper: CodeWrapper,
   wd: Option[os.Path],
   generateSemanticDbs: Boolean,
-  settings: Settings,
+  settings: Seq[String],
   module: Script,
   dependencies: Script.ResolvedDependencies,
   moduleTarget: Option[os.Path],
   moduleSources: Option[os.Path]
 ) {
-
-  private val dynamicClasspath = {
-    val vd = new VirtualDirectory("(memory)", None)
-    AmmCompiler.addToClasspath(dependencies.byteCode, vd)
-    vd
-  }
-
-  private val frame = {
-    val f = Frame.createInitial(initialClassLoader)
-    f.addClasspath(dependencies.jars.map(_.toNIO.toUri.toURL))
-    f.addPluginClasspath(dependencies.pluginJars.map(_.toNIO.toUri.toURL))
-    for ((clsName, byteCode) <- dependencies.byteCode)
-      f.classloader.addClassFile(clsName, byteCode)
-    f
-  }
 
   private var messages = new mutable.ListBuffer[Diagnostic]
   private var newMessages = new mutable.ListBuffer[(String, Int, Int, String)]
@@ -64,43 +43,48 @@ class SingleScriptCompiler(
     newMessages.clear()
   }
 
-  private val compiler = {
+  private val compiler: Compiler = {
 
-    val reporter = {
-      def add(pos: SPosition, msg: String, severity: String) =
-        if (pos == NoPosition)
-          newMessages.append((severity, 0, 0, msg))
-        else
-          newMessages.append((severity, pos.start, pos.end, msg))
-      MakeReporter.makeReporter(
-        (pos, msg) => add(pos, msg, "ERROR"),
-        (pos, msg) => add(pos, msg, "WARNING"),
-        (pos, msg) => add(pos, msg, "INFO"),
-        settings
-      )
+    val frame = {
+      val f = Frame.createInitial(initialClassLoader)
+      f.addClasspath(dependencies.jars.map(_.toNIO.toUri.toURL))
+      f.addPluginClasspath(dependencies.pluginJars.map(_.toNIO.toUri.toURL))
+      for ((clsName, byteCode) <- dependencies.byteCode)
+        f.classloader.addClassFile(clsName, byteCode)
+      f
     }
 
-    val initialClassPath = Classpath.classpath(initialClassLoader, storage)
-    val classPath = Classpath.classpath(frame.classloader, storage)
+    val reporter: CompilerBuilder.Message => Unit = {
+      msg =>
+        newMessages.append((msg.severity, msg.start, msg.end, msg.message))
+    }
 
-    AmmCompiler(
+    val initialClassPath = Classpath.classpath(
+      initialClassLoader,
+      storage.dirOpt.map(_.toNIO)
+    )
+    val classPath = Classpath.classpath(
+      frame.classloader,
+      storage.dirOpt.map(_.toNIO)
+    )
+
+    compilerBuilder.create(
+      initialClassPath,
       classPath,
-      dynamicClasspath,
+      dependencies.byteCode,
       frame.classloader,
       frame.pluginClassloader,
-      () => (),
       Some(reporter),
       settings,
       classPathWhitelist,
-      initialClassPath,
-      lineNumberModifier = false
+      false
     )
   }
 
   private val dependencyImports = initialImports ++ module.dependencyImports
 
-  private val preprocessor = new DefaultPreprocessor(
-    compiler.parse(module.codeSource.fileName, _),
+  private val preprocessor = compiler.preprocessor(
+    module.codeSource.fileName,
     markGeneratedSections = true
   )
 
@@ -189,7 +173,7 @@ class SingleScriptCompiler(
     scriptImports: Imports,
     block: Script.Block,
     blockIdx: Int
-  ): Res[(Imports, Int, String, AmmCompiler.Output)] = {
+  ): Res[(Imports, Int, String, Compiler.Output)] = {
 
     val indexedWrapperName = Interpreter.indexWrapperName(
       module.codeSource.wrapperName,
@@ -257,8 +241,8 @@ class SingleScriptCompiler(
     } yield (scriptImports ++ output.imports, offset, processedCode, output) // :: acc)
   }
 
-  private def compileBlocks(): Res[Seq[(Int, String, AmmCompiler.Output)]] = {
-    val start = (Imports(), List.empty[(Int, String, AmmCompiler.Output)])
+  private def compileBlocks(): Res[Seq[(Int, String, CompilerOutput)]] = {
+    val start = (Imports(), List.empty[(Int, String, CompilerOutput)])
     val res = Res.fold(start, module.blocks.zipWithIndex) {
       case ((scriptImports, acc), (block, blockIdx)) =>
         compileBlock(scriptImports, block, blockIdx).map {

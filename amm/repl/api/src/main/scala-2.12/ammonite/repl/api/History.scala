@@ -1,9 +1,5 @@
 package ammonite.repl.api
 
-
-import ammonite.util._
-import ammonite.util.Util._
-
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{IndexedSeqLike, mutable}
 

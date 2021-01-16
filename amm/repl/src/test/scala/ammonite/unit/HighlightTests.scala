@@ -1,11 +1,11 @@
 package ammonite.unit
 
-import ammonite.repl.Highlighter
+import ammonite.compiler.Parsers
 import utest._
 
 object HighlightTests extends TestSuite{
 
-  def testHighlight(buffer: Vector[Char]) = Highlighter.defaultHighlight(
+  def testHighlight(buffer: Vector[Char]) = Parsers.defaultHighlight(
     buffer,
     fansi.Color.Blue,
     fansi.Color.Green,
@@ -33,7 +33,7 @@ object HighlightTests extends TestSuite{
         val paths = os.walk(os.pwd).filter(_.ext == "scala")
         for(path <- paths){
           val code = os.read(path)
-          val out = Highlighter.defaultHighlight(
+          val out = Parsers.defaultHighlight(
             code.toVector,
             fansi.Underlined.On,
             fansi.Underlined.On,

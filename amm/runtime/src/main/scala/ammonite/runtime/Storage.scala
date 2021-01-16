@@ -31,6 +31,8 @@ trait Storage{
                          tag: Tag): Unit
   def classFilesListLoad(filePathPrefix: os.SubPath, tag: Tag): Option[ScriptOutput]
   def getSessionId: Long
+
+  def dirOpt: Option[os.Path] = None
 }
 
 object Storage{
@@ -339,5 +341,7 @@ object Storage{
       try Some((os.read(predef), predef))
       catch { case e: java.nio.file.NoSuchFileException => Some(("", predef))}
     }
+
+    override def dirOpt: Option[os.Path] = Some(dir)
   }
 }

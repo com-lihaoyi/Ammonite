@@ -159,8 +159,14 @@ object CachingTests extends TestSuite{
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
       )
 
-      val interp1 = createTestInterp(new Storage.Folder(tempDir))
-      val interp2 = createTestInterp(new Storage.Folder(tempDir))
+      val interp1 = createTestInterp(
+        new Storage.Folder(tempDir),
+        predefImports = Interpreter.predefImports
+      )
+      val interp2 = createTestInterp(
+        new Storage.Folder(tempDir),
+        predefImports = Interpreter.predefImports
+      )
 
       runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp1)
       runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp2)
@@ -182,7 +188,7 @@ object CachingTests extends TestSuite{
         """)
       val scriptFile = os.temp("""div("<('.'<)", y).render""")
 
-      def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) ={
+      def processAndCheckCompiler(f: ammonite.compiler.iface.Compiler => Boolean) ={
         val interp = createTestInterp(
           new Storage.Folder(tempDir){
             override val predef = predefFile

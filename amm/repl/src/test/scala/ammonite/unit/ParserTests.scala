@@ -1,6 +1,5 @@
 package ammonite.unit
 
-import ammonite.repl.Highlighter
 import ammonite.util.Util
 import utest._
 
@@ -68,14 +67,14 @@ object ParserTests extends TestSuite{
     // Not nearly comprehensive, but hopefully if someone really borks this
     // somewhat-subtle logic around the parsers, one of these will catch it
     test("endOfCommandDetection"){
-      def assertResult(x: String, pred: Option[fastparse.Parsed[_]] => Boolean) = {
-        val res = ammonite.interp.Parsers.split(x)
+      def assertResult(x: String, pred: Option[Either[String, _]] => Boolean) = {
+        val res = ammonite.compiler.Parsers.split(x)
         assert(pred(res))
       }
       def assertIncomplete(x: String) = assertResult(x, _.isEmpty)
       def assertComplete(x: String) = assertResult(x, _.isDefined)
       def assertInvalid(x: String) =
-        assertResult(x, res => res.isDefined && res.get.isInstanceOf[fastparse.Parsed.Failure])
+        assertResult(x, res => res.isDefined && res.get.isLeft)
 
       test("endOfCommand"){
         test - assertComplete("{}")

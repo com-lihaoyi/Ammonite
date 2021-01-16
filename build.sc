@@ -103,12 +103,6 @@ trait AmmModule extends AmmInternalModule with PublishModule{
     )
   )
 
-  def transitiveSources: T[Seq[PathRef]] = T{
-    mill.define.Task.traverse(this +: moduleDeps)(m =>
-      T.task{m.sources()}
-    )().flatten
-  }
-
   def transitiveJars: T[Agg[PathRef]] = T{
     mill.define.Task.traverse(this +: moduleDeps)(m =>
       T.task{m.jar()}
@@ -123,7 +117,6 @@ trait AmmModule extends AmmInternalModule with PublishModule{
 
 }
 trait AmmDependenciesResourceFileModule extends JavaModule{
-  def crossScalaVersion: String
   def dependencyResourceFileName: String
   def dependencyFileResources = T{
     val deps0 = T.task{compileIvyDeps() ++ transitiveIvyDeps()}()
@@ -136,7 +129,6 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 
     Seq(PathRef(generateDependenciesFile(
-      crossScalaVersion,
       dependencyResourceFileName,
       res.minDependencies.toSeq
     )))
@@ -194,29 +186,59 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
   }
 
+  object compiler extends Cross[CompilerModule](fullCrossScalaVersions:_*) {
+    object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions:_*)
+    class CompilerInterfaceModule(val crossScalaVersion: String) extends AmmModule{
+      def artifactName = "ammonite-compiler-interface"
+      def moduleDeps = Seq(amm.util())
+      def exposedClassPath = T{
+        runClasspath() ++
+          externalSources() ++
+          transitiveJars() ++
+          transitiveSourceJars()
+      }
+    }
+  }
+  class CompilerModule(val crossScalaVersion: String) extends AmmModule{
+    def moduleDeps = Seq(amm.compiler.interface(), amm.util(), amm.repl.api())
+    def crossFullScalaVersion = true
+    def ivyDeps = T {
+      Agg(
+        ivy"org.scala-lang:scala-compiler:${scalaVersion()}",
+        ivy"com.lihaoyi::scalaparse:2.3.0",
+        ivy"org.scala-lang.modules::scala-xml:2.0.0-M3",
+        ivy"org.javassist:javassist:3.21.0-GA",
+        ivy"com.github.javaparser:javaparser-core:3.2.5"
+      )
+    }
+
+    def exposedClassPath = T{
+      runClasspath() ++
+        externalSources() ++
+        transitiveJars() ++
+        transitiveSourceJars()
+    }
+  }
+
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
     class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-      def moduleDeps = Seq(ops(), amm.util())
+      def moduleDeps = Seq(amm.compiler.interface(), ops(), amm.util())
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
-        ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
         ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
         ivy"io.get-coursier:interface:0.0.21"
       )
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), amm.runtime())
+    def moduleDeps = Seq(ops(), amm.util(), amm.runtime(), amm.compiler.interface())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       ivy"ch.epfl.scala:bsp4j:$bspVersion",
       ivy"org.scalameta::trees:4.4.6",
-      ivy"org.scala-lang:scala-compiler:$crossScalaVersion",
       ivy"org.scala-lang:scala-reflect:$crossScalaVersion",
-      ivy"com.lihaoyi::scalaparse:2.3.0",
-      ivy"org.javassist:javassist:3.21.0-GA",
       ivy"org.scala-lang.modules::scala-xml:1.2.0"
     )
   }
@@ -260,13 +282,13 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(
       ops(), amm.util(),
       amm.runtime(), amm.interp(),
-      terminal()
+      terminal(),
+      amm.compiler.interface()
     )
     def ivyDeps = Agg(
       ivy"org.jline:jline-terminal:3.14.1",
       ivy"org.jline:jline-terminal-jna:3.14.1",
       ivy"org.jline:jline-reader:3.14.1",
-      ivy"com.github.javaparser:javaparser-core:3.2.5",
 //      ivy"com.github.scopt::scopt:3.7.1"
     )
 
@@ -274,10 +296,12 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.crossScalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
+      def moduleDeps = super.moduleDeps ++ Seq(amm.compiler())
 
       def thinWhitelist = T{
         generateApiWhitelist(
           amm.repl.api().exposedClassPath() ++
+          amm.compiler().exposedClassPath() ++
           Seq(compile().classes) ++
           resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
         )
@@ -293,7 +317,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ReplModule.this.externalSources() ++
         resolveDeps(ivyDeps, sources = true)()).distinct
       }
-      def ivyDeps = super.ivyDeps() ++ Agg(
+      def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
         ivy"org.scalaz::scalaz-core:7.2.27"
       )
     }
@@ -314,7 +338,8 @@ class MainModule(val crossScalaVersion: String)
     amm.util(), amm.runtime(),
     amm.interp.api(),
     amm.repl.api(),
-    amm.interp(), amm.repl()
+    amm.interp(), amm.repl(),
+    amm.compiler()
   )
 
   def runClasspath =
@@ -342,7 +367,8 @@ class MainModule(val crossScalaVersion: String)
 
   def thinWhitelist = T{
     generateApiWhitelist(
-      amm.repl.api().exposedClassPath()
+      amm.repl.api().exposedClassPath() ++
+      amm.compiler().exposedClassPath()
     )
   }
   def localClasspath = T{
@@ -394,6 +420,7 @@ class MainModule(val crossScalaVersion: String)
     def thinWhitelist = T{
       generateApiWhitelist(
         amm.repl.api().exposedClassPath() ++
+        amm.compiler().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
@@ -455,6 +482,7 @@ class ShellModule(val crossScalaVersion: String) extends AmmModule{
     def thinWhitelist = T{
       generateApiWhitelist(
         amm.repl.api().exposedClassPath() ++
+        amm.compiler().exposedClassPath() ++
         Seq(amm.repl().test.compile().classes, compile().classes) ++
         resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
       )
@@ -548,8 +576,7 @@ def generateConstantsFile(version: String = buildVersion,
   ctx.dest/"Constants.scala"
 }
 
-def generateDependenciesFile(scalaVersion: String,
-                             fileName: String,
+def generateDependenciesFile(fileName: String,
                              deps: Seq[coursier.Dependency])
                             (implicit ctx: mill.util.Ctx.Dest) = {
 
