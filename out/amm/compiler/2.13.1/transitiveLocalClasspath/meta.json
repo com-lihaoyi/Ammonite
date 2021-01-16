@@ -1,0 +1,18 @@
+{
+    "value": [
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/resources",
+        "ref:be354ebd:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/resources",
+        "ref:eb411256:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.4/compile/dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/ops/src/main/resources",
+        "ref:cb33621d:/home/runner/work/Ammonite/Ammonite/out/ops/2.13.4/compile/dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/resources",
+        "ref:d64a8faa:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/dependencyFileResources/dest/extra-resources",
+        "ref:044b0f51:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/resources",
+        "ref:a77a758d:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/dependencyFileResources/dest/extra-resources",
+        "ref:da82c8b2:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes"
+    ],
+    "valueHash": -1059766350,
+    "inputsHash": -1751833368
+}
