@@ -17,7 +17,7 @@ import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
@@ -458,6 +458,15 @@ class AmmoniteBuildServer(
       new CleanCacheResult("", true)
     }
 
+  private val shutdownPromise = Promise[Unit]()
+  def buildShutdown(): CompletableFuture[Object] =
+    nonBlocking {
+      if (!shutdownPromise.isCompleted)
+        shutdownPromise.success(())
+      null
+    }
+
+  def initiateShutdown: Future[Unit] = shutdownPromise.future
 }
 
 object AmmoniteBuildServer {
@@ -537,12 +546,29 @@ object AmmoniteBuildServer {
         .map(_.split('/').toSeq)
         .toSet
 
+  private def naiveJavaFutureToScalaFuture[T](
+    f: java.util.concurrent.Future[T]
+  ): Future[T] = {
+    val p = Promise[T]()
+    val t = new Thread {
+      setDaemon(true)
+      setName("ammonite-bsp-wait-for-exit")
+      override def run(): Unit =
+        p.complete {
+          try Success(f.get())
+          catch { case t: Throwable => Failure(t) }
+        }
+    }
+    t.start()
+    p.future
+  }
+
   def start(
     server: AmmoniteBuildServer,
     input: InputStream = System.in,
     output: OutputStream = System.out
-  ): Launcher[BuildClient] = {
-    val ec = Executors.newFixedThreadPool(4) // FIXME Daemon threads
+  ): (Launcher[BuildClient], Future[Unit]) = {
+    val ec = Executors.newFixedThreadPool(4, threadFactory("ammonite-bsp-jsonrpc"))
     val launcher = new Launcher.Builder[BuildClient]()
       .setExecutorService(ec)
       .setInput(input)
@@ -552,7 +578,14 @@ object AmmoniteBuildServer {
       .create()
     val client = launcher.getRemoteProxy
     server.onConnectWithClient(client)
-    launcher
-  }
+    val f = launcher.startListening()
 
+    val scalaEc = ExecutionContext.fromExecutorService(ec)
+    val futures = Seq(
+      naiveJavaFutureToScalaFuture(f).map(_ => ())(scalaEc),
+      server.initiateShutdown
+    )
+    val shutdownFuture = Future.firstCompletedOf(futures)(scalaEc)
+    (launcher, shutdownFuture)
+  }
 }
