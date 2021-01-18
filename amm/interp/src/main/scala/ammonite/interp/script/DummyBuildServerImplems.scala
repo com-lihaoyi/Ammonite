@@ -6,9 +6,6 @@ import scala.collection.JavaConverters._
 
 private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuildServer {
 
-  def buildShutdown(): CompletableFuture[Object] =
-    CompletableFuture.completedFuture(null)
-
   def buildTargetResources(params: ResourcesParams): CompletableFuture[ResourcesResult] = {
     val items = params.getTargets.asScala.toList.map { target =>
       new ResourcesItem(target, List.empty[String].asJava)

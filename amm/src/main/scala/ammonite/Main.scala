@@ -17,6 +17,8 @@ import ammonite.util._
 import scala.annotation.tailrec
 import ammonite.runtime.ImportHook
 import coursierapi.Dependency
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 
 
@@ -301,7 +303,7 @@ object Main{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
-            ???,
+            ammonite.compiler.CompilerBuilder,
             ammonite.compiler.Parsers,
             ammonite.compiler.DefaultCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
@@ -309,12 +311,10 @@ object Main{
               Seq("ammonite.interp.api.InterpBridge" -> "interp")
             ) ++ AmmoniteBuildServer.defaultImports
           )
-          val launcher = AmmoniteBuildServer.start(buildServer)
           printErr.println("Starting BSP server")
-          val f = launcher.startListening()
-          f.get()
+          val (launcher, shutdownFuture) = AmmoniteBuildServer.start(buildServer)
+          Await.result(shutdownFuture, Duration.Inf)
           printErr.println("BSP server done")
-          // FIXME Doesn't exit for now
           true
         }else{
 
