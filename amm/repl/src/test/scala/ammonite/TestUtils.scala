@@ -44,12 +44,26 @@ object TestUtils {
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
     // Provide a custom predef so we can verify in tests that the predef gets cached
-    interp.initializePredef(
-      Seq(),
-      Seq(PredefInfo(Name("predef"), predef, false, None)),
-      Seq(),
-      predefImports
-    )
+    for {
+      (error, _) <- interp.initializePredef(
+        Seq(),
+        Seq(PredefInfo(Name("predef"), predef, false, None)),
+        Seq(),
+        predefImports
+      )
+    } {
+      val (msgOpt, causeOpt) = error match {
+        case r: Res.Exception => (Some(r.msg), Some(r.t))
+        case r: Res.Failure => (Some(r.msg), None)
+        case _ => (None, None)
+      }
+
+      throw new Exception(
+        s"Error during predef initialization${msgOpt.fold("")(": " + _)}",
+        causeOpt.orNull
+      )
+    }
+
     interp
   }
 

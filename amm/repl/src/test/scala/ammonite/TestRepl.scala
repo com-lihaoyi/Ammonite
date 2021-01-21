@@ -328,7 +328,11 @@ class TestRepl { self =>
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
-    val splitted = ammonite.compiler.Parsers.split(input).get.toOption.get
+    val splitted = ammonite.compiler.Parsers.split(input) match {
+      case None => sys.error(s"No result when splitting input '$input'")
+      case Some(Left(error)) => sys.error(s"Error when splitting input '$input': $error")
+      case Some(Right(stmts)) => stmts
+    }
     val processed = interp.processLine(
       input,
       splitted,
