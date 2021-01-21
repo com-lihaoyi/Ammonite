@@ -243,7 +243,7 @@ object AdvancedTests extends TestSuite{
       """)
     }
     test("private"){
-      test("vals") - check.session("""
+      test("vals") - check.session(s"""
         @ private val x = 1; val y = x + 1
         y: Int = 2
 
@@ -251,7 +251,7 @@ object AdvancedTests extends TestSuite{
         res1: Int = 2
 
         @ x
-        error: not found: value x
+        error: ${check.notFound("x")}
 
         @ {
         @ private[this] val a = 3
@@ -259,7 +259,7 @@ object AdvancedTests extends TestSuite{
         @ }
 
         @ a
-        error: not found: value a
+        error: ${check.notFound("a")}
 
         @ b
         

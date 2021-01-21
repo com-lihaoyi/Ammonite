@@ -30,6 +30,11 @@ object AmmoniteBuildServerTests extends TestSuite {
 
   val sbv = ammonite.compiler.CompilerBuilder.scalaVersion.split('.').take(2).mkString(".")
   val compatSbv = if (sbv.startsWith("3.")) "2.13" else sbv
+  val isScala2 = sbv.startsWith("2.")
+
+  def notFound(name: String): String =
+    if (isScala2) s"not found: value $name"
+    else s"Not found: $name"
 
   override def utestAfterAll(): Unit =
     os.remove.all(wd)
@@ -259,7 +264,7 @@ object AmmoniteBuildServerTests extends TestSuite {
           val expectedDiagnostics = List(
             new BDiagnostic(
               new Range(new BPosition(0, 12), new BPosition(0, 14)),
-              "not found: value zz"
+              notFound("zz")
             )
           )
           expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
@@ -381,11 +386,11 @@ object AmmoniteBuildServerTests extends TestSuite {
         val expectedDiagnostics = List(
           new BDiagnostic(
             new Range(new BPosition(0, 0), new BPosition(0, 2)),
-            "not found: value aa"
+            notFound("aa")
           ),
           new BDiagnostic(
             new Range(new BPosition(3, 0), new BPosition(3, 2)),
-            "not found: value zz"
+            notFound("zz")
           )
         )
         expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
@@ -434,7 +439,7 @@ object AmmoniteBuildServerTests extends TestSuite {
           ),
           new BDiagnostic(
             new Range(new BPosition(2, 0), new BPosition(2, 2)),
-            "not found: value zz"
+            notFound("zz")
           )
         )
         expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))

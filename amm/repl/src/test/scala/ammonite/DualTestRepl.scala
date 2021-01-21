@@ -33,4 +33,7 @@ class DualTestRepl { dual =>
   def fail(input: String,
            failureCheck: String => Boolean = _ => true): Unit =
     repls.foreach(_.fail(input, failureCheck))
+
+  def notFound(name: String): String =
+    repls.headOption.fold("")(_.notFound(name))
 }

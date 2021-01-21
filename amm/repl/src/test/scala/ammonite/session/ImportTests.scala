@@ -59,14 +59,14 @@ object ImportTests extends TestSuite{
       }
 
       test("renaming"){
-        check.session("""
+        check.session(s"""
           @ import math.{abs => sba}
 
           @ sba(-123)
           res1: Int = 123
 
           @ abs
-          error: not found: value abs
+          error: ${check.notFound("abs")}
 
           @ import math.{abs, max => xam}
 
@@ -82,7 +82,7 @@ object ImportTests extends TestSuite{
           res6: Int = 3
 
           @ min
-          error: not found: value min
+          error: ${check.notFound("min")}
         """)
       }
     }

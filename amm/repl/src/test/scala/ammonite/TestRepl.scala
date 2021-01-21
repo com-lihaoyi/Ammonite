@@ -23,6 +23,8 @@ import ammonite.runtime.ImportHook
  * you feed in lines or sessions programmatically and have it execute them.
  */
 class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
+  def scala2 = compilerBuilder.scalaVersion.startsWith("2.")
+
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
@@ -403,6 +405,9 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
       throw e
     }
 
+  def notFound(name: String): String =
+    if (scala2) s"not found: value $name"
+    else s"Not found: $name"
 }
 
 object TestRepl {

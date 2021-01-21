@@ -16,7 +16,7 @@ object ProjectTests extends TestSuite{
             check.session(
               s"""
           @ import scalatags.Text.all._
-          error: not found: value scalatags
+          error: ${check.notFound("scalatags")}
 
           @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
 
