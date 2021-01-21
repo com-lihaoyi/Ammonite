@@ -240,7 +240,10 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
-        assert(error.contains(strippedExpected))
+        val error0 =
+          if (scala2) error
+          else error.stripMargin('|')
+        assert(error0.contains(strippedExpected))
 
       }else if (expected.startsWith("warning: ")){
         val strippedExpected = expected.stripPrefix("warning: ")
