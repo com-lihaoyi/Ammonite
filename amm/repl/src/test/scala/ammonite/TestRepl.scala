@@ -223,7 +223,7 @@ class TestRepl { self =>
       // ...except for the empty 0-line fragment, and the entire fragment,
       // both of which are complete.
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(ammonite.compiler.Parsers.split(incomplete.mkString(Util.newLine)).isEmpty)
+        assert(ammonite.compiler.Parsers.split(incomplete.mkString(Util.newLine)).forall(_.isLeft))
       }
 
       // Finally, actually run the complete command text through the
@@ -328,7 +328,11 @@ class TestRepl { self =>
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
-    val splitted = ammonite.compiler.Parsers.split(input).get.toOption.get
+    val splitted = ammonite.compiler.Parsers.split(input) match {
+      case None => sys.error(s"No result when splitting input '$input'")
+      case Some(Left(error)) => sys.error(s"Error when splitting input '$input': $error")
+      case Some(Right(stmts)) => stmts
+    }
     val processed = interp.processLine(
       input,
       splitted,
