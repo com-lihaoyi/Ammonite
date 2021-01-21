@@ -265,6 +265,7 @@ object SourceRuntime{
         colors.`type`,
         colors.literal,
         colors.keyword,
+        colors.error,
         fansi.Attr.Reset
       ).mkString
     )

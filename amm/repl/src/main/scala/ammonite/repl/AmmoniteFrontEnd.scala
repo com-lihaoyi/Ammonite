@@ -60,6 +60,7 @@ case class AmmoniteFrontEnd(
             colors.`type`(),
             colors.literal(),
             colors.keyword(),
+            colors.error(),
             fansi.Attr.Reset
           ).mkString
         }
@@ -138,6 +139,7 @@ case class AmmoniteFrontEnd(
           colors.`type`(),
           colors.literal(),
           colors.keyword(),
+          colors.error(),
           fansi.Attr.Reset
         ).mkString)
         val (newBuffer, offset) = SelectionFilter.mangleBuffer(
