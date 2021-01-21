@@ -263,6 +263,7 @@ object Parsers extends IParser {
                        `type`: fansi.Attrs,
                        literal: fansi.Attrs,
                        keyword: fansi.Attrs,
+                       notImplemented: fansi.Attrs,
                        reset: fansi.Attrs) = {
     Highlighter.defaultHighlight0(Splitter(_), buffer, comment, `type`, literal, keyword, reset)
   }

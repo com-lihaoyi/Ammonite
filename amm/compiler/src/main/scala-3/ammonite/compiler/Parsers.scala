@@ -290,6 +290,7 @@ class Parsers extends IParser {
                        `type`: fansi.Attrs,
                        literal: fansi.Attrs,
                        keyword: fansi.Attrs,
+                       notImplemented: fansi.Attrs,
                        reset: fansi.Attrs): Vector[Char] = {
     val valDef = reset
     val annotation = reset
@@ -301,6 +302,7 @@ class Parsers extends IParser {
       literal,
       `type`,
       annotation,
+      notImplemented
     ).highlight(buffer.mkString)(using initCtx).toVector
   }
 

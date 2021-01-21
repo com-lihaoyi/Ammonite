@@ -11,6 +11,7 @@ object HighlightTests extends TestSuite{
     fansi.Color.Green,
     fansi.Color.Green,
     fansi.Color.Yellow,
+    fansi.Color.Red,
     fansi.Attr.Reset
   )
 
@@ -35,6 +36,7 @@ object HighlightTests extends TestSuite{
           val code = os.read(path)
           val out = Parsers.defaultHighlight(
             code.toVector,
+            fansi.Underlined.On,
             fansi.Underlined.On,
             fansi.Underlined.On,
             fansi.Underlined.On,

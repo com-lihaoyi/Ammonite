@@ -77,6 +77,7 @@ trait ReplApiImpl extends FullReplAPI{
     def `type` = colors().`type`()
     def literal = colors().literal()
     def keyword = colors().keyword()
+    def error = colors().error()
     def ident = colors().ident()
   }
 

@@ -27,6 +27,7 @@ class SyntaxHighlighting(
   literalAttrs: fansi.Attrs,
   typeAttrs: fansi.Attrs,
   annotationAttrs: fansi.Attrs,
+  notImplementedAttrs: fansi.Attrs
 ) {
 
   def highlight(in: String)(using Context): String = {
@@ -71,7 +72,7 @@ class SyntaxHighlighting(
             highlightRange(start, end, keywordAttrs)
 
           case IDENTIFIER if name == nme.??? =>
-            highlightRange(start, end, fansi.Color.Red)
+            highlightRange(start, end, notImplementedAttrs)
 
           case _ =>
         }

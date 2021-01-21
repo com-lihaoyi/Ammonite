@@ -174,6 +174,7 @@ trait CodeColors{
   def literal: fansi.Attrs
   def comment: fansi.Attrs
   def keyword: fansi.Attrs
+  def error: fansi.Attrs
 }
 
 /**
