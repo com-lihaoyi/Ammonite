@@ -144,7 +144,7 @@ object BasicTests extends TestSuite{
       // so it's probably fine if this doesn't work.
       //
       // Also disabled on Java 9 due to unavailability of Java lib sources
-      if (!Util.windowsPlatform && !Util.java9OrAbove) {
+      if (!Util.windowsPlatform && !Util.java9OrAbove && isScala2) {
         os.proc(
           executable,
           "--thin",
@@ -164,7 +164,11 @@ object BasicTests extends TestSuite{
     // Ensure we can load the source code of external libraries, which needs to
     // get pulled down together with the library code when you `import $ivy`
     test("sourceExternal"){
-      exec(os.rel/'basic / "SourceDownload.sc")
+      // Re-enable when source support is added in Scala 3
+      if (isScala2)
+        exec(os.rel/'basic / "SourceDownload.sc")
+      else
+        "Disabled in Scala 3"
     }
 
     test("classloaders"){
