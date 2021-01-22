@@ -79,9 +79,11 @@ object ImportHook{
   def resolveFiles(tree: ImportTree, currentScriptPath: os.Path, extensions: Seq[String])
                   : (Seq[(os.RelPath, Option[String])], Seq[os.Path], Seq[os.Path]) = {
     val relative =
-      tree.prefix
-        .map{case ammonite.util.Util.upPathSegment => os.up; case x => os.rel/x}
-        .reduce(_/_)
+      if (tree.prefix.isEmpty) os.rel
+      else
+        tree.prefix
+          .map{case ammonite.util.Util.upPathSegment => os.up; case x => os.rel/x}
+          .reduce(_/_)
 
     val relativeModules = tree.mappings match{
       case None => Seq(relative -> None)
@@ -292,7 +294,10 @@ object ImportHook{
                         tree: ImportTree,
                         interp: InterpreterInterface,
                         wrapperPath: Seq[Name]) = {
-      tree.prefix.headOption match {
+      val urlOpt = (tree.prefix.iterator ++ tree.mappings.iterator.flatMap(_.map(_._1).iterator))
+        .toStream
+        .headOption
+      urlOpt match {
         case Some(url) if url.startsWith("ivy:") =>
           val repo = IvyRepository.of(url.drop(4)) // dropping `ivy:` prefix
           Right(Seq(Result.Repo(repo)))
