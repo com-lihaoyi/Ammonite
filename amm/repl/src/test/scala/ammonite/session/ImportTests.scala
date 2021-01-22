@@ -231,7 +231,8 @@ object ImportTests extends TestSuite{
         // Prefix things properly in Scala-2.10 where the type printer is dumb
         test("paulp"){
 
-          check.session(s"""
+          if (!check.scala2) "disabled in Scala 3"
+          else check.session(s"""
           @ import ammonite.testcode.paulp1._, ammonite.testcode.paulp2._
 
           @ new Paulp; Paulp // Paulp's example in #199
@@ -302,7 +303,8 @@ object ImportTests extends TestSuite{
           """)
         }
         test("paulpTypeRegression"){
-          check.session(s"""
+          if (!check.scala2) "disabled in Scala 3"
+          else check.session(s"""
           @ type Paulp = Int
 
           @ import ammonite.testcode.paulp3.Paulp
