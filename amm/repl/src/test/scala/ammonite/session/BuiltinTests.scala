@@ -73,13 +73,13 @@ object BuiltinTests extends TestSuite{
       check.session("""
         @ import ammonite.ops._, ImplicitWd._
 
-        @ val javaSrc = pwd/'amm/'src/'test/'resources/'loadable/'hello/"Hello.java"
+        @ val javaSrc = pwd/"amm"/"src"/"test"/"resources"/"loadable"/"hello"/"Hello.java"
 
-        @ mkdir! pwd/'target/'loadCP/'hello
+        @ mkdir! pwd/"target"/"loadCP"/"hello"
 
-        @ cp.over(javaSrc, pwd/'target/'loadCP/'hello/"Hello.java")
+        @ cp.over(javaSrc, pwd/"target"/"loadCP"/"hello"/"Hello.java")
 
-        @ %javac 'target/'loadCP/'hello/"Hello.java"  //This line causes problems in windows
+        @ %javac "target"/"loadCP"/"hello"/"Hello.java"  //This line causes problems in windows
 
         @ import $cp.target.loadCP  //This line causes problems in windows
 
