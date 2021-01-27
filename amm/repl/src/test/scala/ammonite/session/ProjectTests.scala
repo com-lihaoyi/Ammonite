@@ -148,7 +148,9 @@ object ProjectTests extends TestSuite{
       if (!scala2_12) check.session("""
         @ import ammonite.ops._
 
-        @ val path = resource/'org/'apache/'jackrabbit/'oak/'plugins/'blob/"blobstore.properties"
+        @ val path = {
+        @   resource/"org"/"apache"/"jackrabbit"/"oak"/"plugins"/"blob"/"blobstore.properties"
+        @ }
 
         @ read! path
         error: ResourceNotFoundException

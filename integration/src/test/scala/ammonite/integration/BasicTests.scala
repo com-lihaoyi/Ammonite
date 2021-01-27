@@ -120,7 +120,7 @@ object BasicTests extends TestSuite{
         "-c",
         """val x = wd
         |@
-        |cd! 'amm/'src
+        |cd! "amm"/"src"
         |@
         |println(wd relativeTo x)""".stripMargin,
         "-s"
