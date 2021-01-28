@@ -1,2 +1,2 @@
 // Show compiler warnings
-interp.configureCompiler(_.settings.nowarnings.value = false)
+interp.configureCompiler(c => println(c))
