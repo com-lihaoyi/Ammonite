@@ -9,7 +9,7 @@ import utest._
   * Tests around Ammonite's CLI handling of main methods, argument parsing,
   * and the associated error behavior if the caller messes up.
  */
-object MainTests extends TestSuite{
+class MainTests extends TestSuite{
   def exec(p: String, args: String*) =
     new InProcessMainMethodRunner(os.rel / 'mains / p, Nil, args)
 
@@ -19,7 +19,7 @@ object MainTests extends TestSuite{
     lines.map(_.drop(leftMargin)).mkString(Util.newLine)
   }
 
-  val tests = Tests {
+  def tests = Tests {
     println("Running MainTests")
 
     test("hello"){
@@ -254,4 +254,14 @@ object MainTests extends TestSuite{
       }
     }
   }
+}
+
+object MainTests extends MainTests {
+  val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
+  override def tests =
+    if (isScala2) super.tests
+    else
+      Tests {
+        test("Disabled in Scala 3") - "Disabled in Scala 3"
+      }
 }

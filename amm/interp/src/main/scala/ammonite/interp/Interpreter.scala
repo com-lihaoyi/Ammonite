@@ -26,7 +26,7 @@ import coursierapi.{Dependency, Fetch, Repository}
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(compilerBuilder: CompilerBuilder,
+class Interpreter(val compilerBuilder: CompilerBuilder,
                   // by-name, so that fastparse isn't loaded when we don't need it
                   parser: => Parser,
                   val printer: Printer,

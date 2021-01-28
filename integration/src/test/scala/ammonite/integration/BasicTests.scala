@@ -254,13 +254,13 @@ object BasicTests extends TestSuite{
     // in our unit test suite, but test a few cases as integration tests
     // to make sure things work end-to-end
     test("multiMain"){
-      test("positiveArgs"){
+      def positiveArgsTest() = {
         val evaled = exec(os.rel / 'basic/"MultiMain.sc", "functionB", "2", "foo")
 
         val out = evaled.out.string
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
-      test("specifyMain"){
+      def specifyMainTest() = {
         val evaled = intercept[os.SubprocessException](exec(os.rel / 'basic/"MultiMain.sc"))
 
         val out = evaled.result.err.string
@@ -268,6 +268,14 @@ object BasicTests extends TestSuite{
           s"""Need to specify a sub command: mainA, functionB""".stripMargin
         )
         assert(out.contains(expected))
+      }
+      test("positiveArgs"){
+        if (isScala2) positiveArgsTest()
+        else "Disabled in Scala 3"
+      }
+      test("specifyMain"){
+        if (isScala2) specifyMainTest()
+        else "Disabled in Scala 3"
       }
     }
 
