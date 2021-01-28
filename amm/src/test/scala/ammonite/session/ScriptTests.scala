@@ -71,31 +71,57 @@ object ScriptTests extends TestSuite{
       }
       test("failures"){
         test("syntaxError"){
+          val errorChunk =
+            if (check.scala2)
+          """
+            @ val r = res
+            error: not found: value res
+            val r = res
+                    ^
+            Compilation Failed
+          """
+            else
+          """
+            @ val r = res
+            error: val r = res
+                    ^^^
+                    Not found: res
+            Compilation Failed
+          """
           check.session(s"""
             @ import os._
 
             @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
+            $errorChunk
+            """)
+        }
+        test("compilationError"){
+          val errorChunk =
+            if (check.scala2)
+          """
             @ val r = res
             error: not found: value res
             val r = res
                     ^
             Compilation Failed
-            """)
-        }
-        test("compilationError"){
+          """
+            else
+          """
+            @ val r = res
+            error: val r = res
+                    ^^^
+                    Not found: res
+            Compilation Failed
+          """
           check.session(s"""
             @  import os._
 
             @ repl.load.exec($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
-            @ val r = res
-            error: not found: value res
-            val r = res
-                    ^
-            Compilation Failed
+            $errorChunk
             """)
         }
         test("nofile"){
@@ -108,17 +134,30 @@ object ScriptTests extends TestSuite{
           )
         }
         test("multiBlockError"){
+          val errorChunk =
+            if (check.scala2)
+          """
+            @ val r2 = res2
+            error: not found: value res2
+            val r2 = res2
+                     ^
+            Compilation Failed
+          """
+            else
+          """
+            @ val r2 = res2
+            error: val r2 = res2
+                     ^^^^
+                     Not found: res2
+            Compilation Failed
+          """
           check.session(s"""
             @ import os._
 
             @ repl.load.exec($printedScriptPath/"MultiBlockError.sc")
             error: Compilation Failed
 
-            @ val r2 = res2
-            error: not found: value res2
-            val r2 = res2
-                     ^
-            Compilation Failed
+            $errorChunk
             """)
         }
       }
@@ -218,31 +257,57 @@ object ScriptTests extends TestSuite{
       }
       test("failures"){
         test("syntaxError"){
+          val errorChunk =
+            if (check.scala2)
+              """
+            @ val r = res
+            error: not found: value res
+            val r = res
+                    ^
+            Compilation Failed
+              """
+            else
+              """
+            @ val r = res
+            error: val r = res
+                    ^^^
+                    Not found: res
+            Compilation Failed
+              """
           check.session(s"""
             @ import os._
 
             @ repl.load.exec($printedScriptPath/"SyntaxError.sc")
             error: CompilationError
 
+            $errorChunk
+            """)
+        }
+        test("compilationError"){
+          val errorChunk =
+            if (check.scala2)
+              """
             @ val r = res
             error: not found: value res
             val r = res
                     ^
             Compilation Failed
-            """)
-        }
-        test("compilationError"){
+              """
+            else
+              """
+            @ val r = res
+            error: val r = res
+                    ^^^
+                    Not found: res
+            Compilation Failed
+              """
           check.session(s"""
             @ import os._
 
             @ interp.load.module($printedScriptPath/"CompilationError.sc")
             error: Compilation Failed
 
-            @ val r = res
-            error: not found: value res
-            val r = res
-                    ^
-            Compilation Failed""")
+            $errorChunk""")
         }
         test("nofile"){
           check.session(s"""
@@ -266,18 +331,29 @@ object ScriptTests extends TestSuite{
           assert(msg.contains("Script file not found"))
         }
         test("multiBlockError"){
+          val errorCheck =
+            if (check.scala2)
+              """
+                @ val r2 = res2
+                error: not found: value res2
+                val r2 = res2
+                         ^
+                Compilation Failed
+              """
+            else
+              s"""
+                @ val r2 = res2
+                error: val r2 = res2
+                         ^^^^
+                         Not found: res2
+                Compilation Failed
+              """
           check.session(s"""
-            @ import os._
+                @ import os._
 
-            @ interp.load.module($printedScriptPath/"MultiBlockError.sc")
-            error: Compilation Failed
-
-            @ val r2 = res2
-            error: not found: value res2
-            val r2 = res2
-                     ^
-            Compilation Failed
-            """)
+                @ interp.load.module($printedScriptPath/"MultiBlockError.sc")
+                error: Compilation Failed
+          """ + errorCheck)
         }
       }
       test("encapsulation"){
