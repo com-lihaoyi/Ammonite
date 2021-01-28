@@ -12,6 +12,7 @@ import coursierapi.{Dependency, Repository}
 import scala.collection.mutable
 
 final case class ScriptProcessor(
+  scalaVersion: String,
   parser: Parser,
   codeWrapper: CodeWrapper,
   dependencyLoader: DependencyLoader,
@@ -19,7 +20,7 @@ final case class ScriptProcessor(
   extraPluginDependencies: Seq[Dependency] = Nil,
   wd: os.Path = os.pwd,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
-) {
+) { self =>
 
   import ScriptProcessor._
 
@@ -63,7 +64,7 @@ final case class ScriptProcessor(
       val r = hook.handle(
         codeSource,
         tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
-        ScriptProcessor.dummyInterpreterInterface,
+        dummyInterpreterInterface,
         codeWrapper.wrapperPath
       )
       r.left.map { error =>
@@ -172,6 +173,13 @@ final case class ScriptProcessor(
         }
     }
 
+  private val dummyInterpreterInterface =
+    new ImportHook.InterpreterInterface {
+      def loadIvy(coordinates: Dependency*): Either[String, Seq[File]] = Right(Nil)
+      def watch(p: os.Path): Unit = ()
+      def scalaVersion = self.scalaVersion
+    }
+
 }
 
 object ScriptProcessor {
@@ -202,10 +210,4 @@ object ScriptProcessor {
         Left(lefts.toList)
     }
   }
-
-  private val dummyInterpreterInterface =
-    new ImportHook.InterpreterInterface {
-      def loadIvy(coordinates: Dependency*): Either[String, Seq[File]] = Right(Nil)
-      def watch(p: os.Path): Unit = ()
-    }
 }

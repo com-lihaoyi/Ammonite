@@ -18,7 +18,7 @@ object ProjectTests extends TestSuite{
           @ import scalatags.Text.all._
           error: not found: value scalatags
 
-          @ import $$ivy.`com.lihaoyi::scalatags:0.7.0`
+          @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
 
           @ import scalatags.Text.all._
           import scalatags.Text.all._
@@ -119,7 +119,7 @@ object ProjectTests extends TestSuite{
 
     test("scalaz"){
       check.session(s"""
-        @ import $$ivy.`org.scalaz::scalaz-core:7.2.27`, scalaz._, Scalaz._
+        @ import $$ivy.`org.scalaz::scalaz-core:7.2.27 compat`, scalaz._, Scalaz._
 
         @ (Option(1) |@| Option(2))(_ + _)
         res1: Option[Int] = ${Print.Some(value = 3)}
@@ -127,7 +127,7 @@ object ProjectTests extends TestSuite{
     }
     test("cats"){
       check.session("""
-        @ import $ivy.`org.typelevel::cats-core:2.0.0-M4`, cats._
+        @ import $ivy.`org.typelevel::cats-core:2.0.0-M4 compat`, cats._
 
       """)
     }
@@ -327,7 +327,7 @@ object ProjectTests extends TestSuite{
 
         @ // should only add the shapeless-specific JARs
 
-        @ import $ivy.`com.chuusai::shapeless:2.3.3`
+        @ import $ivy.`com.chuusai::shapeless:2.3.3 compat`
         import $ivy.$
 
         @ val addedAfterShapeless = scalaLibJarCount() - initCount
@@ -424,7 +424,7 @@ object ProjectTests extends TestSuite{
 
       val core =
         s"""
-            @ import $$ivy.`com.github.alexarchambault::case-app:2.0.0-M9`
+            @ import $$ivy.`com.github.alexarchambault::case-app:2.0.0-M9 compat`
 
             @ val cp = {
             @   repl.sess

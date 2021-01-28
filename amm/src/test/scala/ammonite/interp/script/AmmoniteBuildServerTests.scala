@@ -28,7 +28,8 @@ object AmmoniteBuildServerTests extends TestSuite {
   for (elem <- os.list(scriptBase))
     os.copy(elem, wd / elem.last, createFolders = true)
 
-  val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+  val sbv = ammonite.compiler.CompilerBuilder.scalaVersion.split('.').take(2).mkString(".")
+  val compatSbv = if (sbv.startsWith("3.")) "2.13" else sbv
 
   override def utestAfterAll(): Unit =
     os.remove.all(wd)
@@ -39,8 +40,8 @@ object AmmoniteBuildServerTests extends TestSuite {
       val runner = new BspScriptRunner(wd / "simple" / "main.sc")
 
       val expectedClassPath = List(
-        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
-        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+        s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$compatSbv/1.0.2/core_$compatSbv-1.0.2.jar"
       ).map("https/repo1.maven.org/maven2/" + _)
 
       for {
@@ -64,8 +65,8 @@ object AmmoniteBuildServerTests extends TestSuite {
       val runner = new BspScriptRunner(wd / "simple" / "main.sc")
 
       val expectedClassPath = List(
-        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
-        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+        s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$compatSbv/1.0.2/core_$compatSbv-1.0.2.jar"
       ).map("https/repo1.maven.org/maven2/" + _)
 
       for {
@@ -310,7 +311,10 @@ object AmmoniteBuildServerTests extends TestSuite {
         notifications1 = runner.client.didChangeNotifications()
         _ = assert(notifications1.isEmpty)
 
-        _ = os.write.over(script, "import $ivy.`com.chuusai::shapeless:2.3.3`; val value = 3")
+        _ = os.write.over(
+          script,
+          "import $ivy.`com.chuusai::shapeless:2.3.3 compat`; val value = 3"
+        )
         _ <- runner.compile(StatusCode.OK)
 
         notifications = runner.client.didChangeNotifications()
@@ -318,7 +322,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
         _ = os.write.over(
           script,
-          "import $ivy.`com.chuusai::shapeless:2.3.3`; import sys.process._"
+          "import $ivy.`com.chuusai::shapeless:2.3.3 compat`; import sys.process._"
         )
         _ <- runner.compile(StatusCode.OK)
 
@@ -454,11 +458,11 @@ object AmmoniteBuildServerTests extends TestSuite {
       val runner = new BspScriptRunner(scriptNames.map(n => dir / s"$n.sc"): _*)
 
       val expectedClassPath = List(
-        s"io/circe/circe-core_$sbv/0.12.3/circe-core_$sbv-0.12.3.jar",
-        s"io/circe/circe-generic_$sbv/0.12.3/circe-generic_$sbv-0.12.3.jar",
-        s"io/circe/circe-parser_$sbv/0.12.3/circe-parser_$sbv-0.12.3.jar",
-        s"io/circe/circe-numbers_$sbv/0.12.3/circe-numbers_$sbv-0.12.3.jar",
-        s"io/circe/circe-jawn_$sbv/0.12.3/circe-jawn_$sbv-0.12.3.jar"
+        s"io/circe/circe-core_$compatSbv/0.12.3/circe-core_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-generic_$compatSbv/0.12.3/circe-generic_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-parser_$compatSbv/0.12.3/circe-parser_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-numbers_$compatSbv/0.12.3/circe-numbers_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-jawn_$compatSbv/0.12.3/circe-jawn_$compatSbv-0.12.3.jar"
       ).map("https/repo1.maven.org/maven2/" + _) ++ List(
         "https/jitpack.io/com/github/jupyter/jvm-repr/0.4.0/jvm-repr-0.4.0.jar"
       )
@@ -542,8 +546,8 @@ object AmmoniteBuildServerTests extends TestSuite {
       val runner = new BspScriptRunner(wd / scriptPath, wd / otherScriptPath)
 
       val expectedClassPath = List(
-        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
-        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+        s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$compatSbv/1.0.2/core_$compatSbv-1.0.2.jar"
       ).map("https/repo1.maven.org/maven2/" + _)
 
       val otherScriptUri = (wd / otherScriptPath).toNIO.toUri.toASCIIString

@@ -53,6 +53,7 @@ object ImportHook{
   trait InterpreterInterface {
     def loadIvy(coordinates: Dependency*): Either[String, Seq[File]]
     def watch(p: os.Path): Unit
+    def scalaVersion: String
   }
 
   /**
@@ -175,13 +176,27 @@ object ImportHook{
       signatures: Seq[String]
     ): Either[String, (Seq[Dependency], Seq[File])] = {
       val splitted = for (signature <- signatures) yield {
-        signature.split(':') match{
+        val (dottyCompat, coords) =
+          if (signature.endsWith(" compat")) (true, signature.stripSuffix(" compat"))
+          else (false, signature)
+        coords.split(':') match{
           case Array(a, b, c) =>
             Right(Dependency.of(a, b, c))
           case Array(a, "", b, c) =>
-            Right(Dependency.of(a, b + "_" + IvyConstructor.scalaBinaryVersion, c))
+            val sbv =
+              if (dottyCompat && interp.scalaVersion.startsWith("3.")) "2.13"
+              else IvyConstructor.scalaBinaryVersion(interp.scalaVersion)
+            Right(Dependency.of(a, b + "_" + sbv, c))
           case Array(a, "", "", b, c) =>
-            Right(Dependency.of(a, b + "_" + IvyConstructor.scalaFullBinaryVersion, c))
+            val sv =
+              // FIXME We may need to bump that version from time to time, or
+              // to use a different one, depending on the 3.x version.
+              if (dottyCompat && interp.scalaVersion.startsWith("3."))
+                // Should be the 2.13 version we want
+                scala.util.Properties.versionNumberString
+              else
+                interp.scalaVersion
+            Right(Dependency.of(a, b + "_" + sv, c))
           case _ => Left(signature)
         }
       }

@@ -10,7 +10,7 @@ import ammonite.compiler.iface.{
   Parser,
   Preprocessor
 }
-import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
+import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar, ScalaVersion}
 
 import scala.collection.mutable
 import ammonite.runtime._
@@ -56,6 +56,8 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   def handleImports(i: Imports) = headFrame.addImports(i)
   def frameImports = headFrame.imports
   def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
+
+  def scalaVersion = compilerBuilder.scalaVersion
 
   def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories(), verbose = verboseOutput)
@@ -707,6 +709,8 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 
     }
 
+    def scalaVersion = ScalaVersion(interp.scalaVersion)
+
     def _compilerManager = interp.compilerManager
   }
 
@@ -716,6 +720,7 @@ object Interpreter{
 
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpBridge.value.exit"),
+    ImportData("ammonite.interp.api.InterpBridge.value.scalaVersion"),
     ImportData(
       "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
       importType = ImportData.Type

@@ -61,6 +61,8 @@ trait InterpAPI {
     */
   val beforeExitHooks: mutable.Buffer[Any => Any]
 
+  implicit def scalaVersion: ScalaVersion
+
   def _compilerManager: ammonite.compiler.iface.CompilerLifecycleManager
 }
 
