@@ -37,15 +37,21 @@ object ImportHookTests extends TestSuite{
           res1: Int = 31337
         """)
 
-        test("multiImport") - check.session("""
-          @ import $file.amm.src.test.resources.importHooks.{Basic, BasicTwo}
+        test("multiImport") - {
+          def run(extra: String = "") = check.session(s"""
+            @ import $$file.amm.src.test.resources.importHooks.{Basic, BasicTwo$extra}
 
-          @ Basic.basicValue
-          res1: Int = 31337
+            @ Basic.basicValue
+            res1: Int = 31337
 
-          @ BasicTwo.basicValueTwo
-          res2: Int = 1337
-        """)
+            @ BasicTwo.basicValueTwo
+            res2: Int = 1337
+          """)
+
+          test - run()
+          test - run("  ")
+          test - run("\n            @ ")
+        }
 
         test("rename") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
