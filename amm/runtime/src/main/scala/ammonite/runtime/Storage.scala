@@ -289,7 +289,7 @@ object Storage{
           createFolders = true
       )
       data.classFiles.foreach{ case (name, bytes) =>
-        os.write.over(tagCacheDir/s"$name.class", bytes, createFolders = true)
+        os.write.over(tagCacheDir/name.split('/'), bytes, createFolders = true)
       }
 
     }
@@ -310,10 +310,10 @@ object Storage{
     }
 
     def loadClassFiles(cacheDir: os.Path): Option[ClassFiles] = {
-      val classFiles = os.list(cacheDir).filter(_.ext == "class").toVector
+      val classFiles = os.walk(cacheDir).filter(os.isFile(_)).toVector
       Try{
         val data = classFiles.map{ case file =>
-          val className = (file relativeTo cacheDir).toString.stripSuffix(".class")
+          val className = (file relativeTo cacheDir).toString
           (className, os.read.bytes(file))
         }
         data

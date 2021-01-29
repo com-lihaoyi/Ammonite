@@ -75,8 +75,8 @@ object Evaluator{
     def loadClass(fullName: String, classFiles: ClassFiles): Res[Class[_]] = {
       Res[Class[_]](
         Try {
-          for ((name, bytes) <- classFiles.sortBy(_._1)) {
-            headFrame.classloader.addClassFile(name, bytes)
+          for ((name, bytes) <- classFiles.sortBy(_._1) if name.endsWith(".class")) {
+            headFrame.classloader.addClassFile(name.stripSuffix(".class").replace('/', '.'), bytes)
           }
 
           headFrame.classloader.findClass(fullName)
