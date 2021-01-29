@@ -147,15 +147,19 @@ object BuiltinTests extends TestSuite{
       """)
     }
     test("infoLogging"){
-      check.session("""
-        @ 1 + 1
-        res0: Int = 2
+      if (check.scala2)
+        check.session("""
+          @ 1 + 1
+          res0: Int = 2
 
-        @ repl.compiler.settings.debug.value = true
+          @ repl.compiler.settings.debug.value = true
 
-        @ 1 + 1
-        info: running phase parser on
-      """)
+          @ 1 + 1
+          info: running phase parser on
+        """)
+      else
+        // couldn't get XshowPhases or Ydebug to do that…
+        "Disabled in Scala 3"
     }
 
 
