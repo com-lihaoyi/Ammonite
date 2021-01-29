@@ -49,8 +49,8 @@ class SingleScriptCompiler(
       val f = Frame.createInitial(initialClassLoader)
       f.addClasspath(dependencies.jars.map(_.toNIO.toUri.toURL))
       f.addPluginClasspath(dependencies.pluginJars.map(_.toNIO.toUri.toURL))
-      for ((clsName, byteCode) <- dependencies.byteCode)
-        f.classloader.addClassFile(clsName, byteCode)
+      for ((clsName, byteCode) <- dependencies.byteCode if clsName.endsWith(".class"))
+        f.classloader.addClassFile(clsName.stripSuffix(".class").replace('/', '.'), byteCode)
       f
     }
 
@@ -118,8 +118,7 @@ class SingleScriptCompiler(
     for (dest <- moduleTarget) {
       os.makeDir.all(dest)
       for ((name, b) <- byteCode) {
-        val parts = name.split('.').toSeq
-        val dest0 = dest / parts.init / s"${parts.last}.class"
+        val dest0 = dest / name.split('/').toSeq
         os.write.over(dest0, b, createFolders = true)
       }
     }
