@@ -23,6 +23,7 @@ class DualTestRepl { dual =>
 
   def scalaVersion = compilerBuilder.scalaVersion
   def scala2 = scalaVersion.startsWith("2.")
+  def scala2_12 = scalaVersion.startsWith("2.12.")
 
   def interps = repls.map(_.interp)
 
