@@ -6,7 +6,7 @@ import ammonite.terminal._
 import Filter._
 import ammonite.repl.FrontEndUtils
 import ammonite.util.Colors
-import ammonite.compiler.{Highlighter, Parsers}
+import ammonite.compiler.Parsers
 import ammonite.terminal._
 import ammonite.terminal.LazyList.~:
 /**
@@ -53,8 +53,7 @@ object PathComplete {
    * @return `None` if no autocomplete is possible, otherwise a [[PathLiteralInfo]]
    */
   def findPathLiteral(snippet: String, cursor: Int): Option[PathLiteralInfo] = {
-    val indices = Highlighter.highlightIndices(
-      Parsers.Splitter(_),
+    val indices = Parsers.highlightIndices(
       snippet.toVector,
       {
         case "Id" => Interval.Id
@@ -199,7 +198,7 @@ object PathComplete {
   }
 
   /**
-   * Enum used to tag the indices being returned by [[Highlighter]]
+   * Enum used to tag the indices being returned by [[Parsers]]
    */
   sealed trait Interval
   object Interval{
@@ -211,7 +210,7 @@ object PathComplete {
 
   /**
    * More-convenient data-structures to work with, compared to the raw
-   * tuple-output of [[Highlighter]]
+   * tuple-output of [[Parsers]]
    */
   sealed trait Span{
     def parseStart: Int;

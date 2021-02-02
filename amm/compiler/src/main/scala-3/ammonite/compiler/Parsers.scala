@@ -306,6 +306,12 @@ class Parsers extends IParser {
 
   def isObjDef(code: String): Boolean =
     false // TODO
+
+  def highlightIndices[T](buffer: Vector[Char],
+                          ruleColors: PartialFunction[String, T],
+                          endColor: T): Seq[(Int, T)] =
+    // Not available in Scala 3
+    Seq((0, endColor), (999999999, endColor))
 }
 
 object Parsers extends Parsers
