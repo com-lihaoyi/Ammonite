@@ -167,9 +167,7 @@ object PathComplete {
       else {
         val fragPrefix = frag.getOrElse("")
 
-        def wrap(s: String) =
-          if(fragPrefix.startsWith("\"")) Parsers.stringWrap(s)
-          else Parsers.stringSymWrap(s)
+        def wrap(s: String) = "\"" + pprint.Util.literalize(s) + "\""
         val options = (
           ls ! path | (x => (x, wrap(x.last)))
                     |? (_._2.startsWith(fragPrefix))
