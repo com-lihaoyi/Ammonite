@@ -30,6 +30,7 @@ import dotc.fromtasty.TastyFileUtil
 import dotc.interactive.Completion
 import dotc.report
 import dotc.reporting
+import dotc.semanticdb
 import dotc.transform.{PostTyper, Staging}
 import dotc.typer.FrontEnd
 import dotc.util.{Property, SourceFile, SourcePosition}
@@ -139,6 +140,7 @@ class Compiler(
     new DottyCompiler:
       override protected def frontendPhases: List[List[Phase]] = List(
         List(new FrontEnd), // List(new REPLFrontEnd),
+        List(new semanticdb.ExtractSemanticDB),
         List(new AmmonitePhase(userCodeNestingLevel, userCodeNestingLevel == 2)),
         List(new Staging),
         List(new PostTyper)
@@ -166,7 +168,6 @@ class Compiler(
     userCodeNestingLevel: Int,
     fileName: String
   ): Option[ICompiler.Output] =
-    val sourceFile = SourceFile.virtual(fileName, new String(src, StandardCharsets.UTF_8))
     // println(s"Compiling\n${new String(src, StandardCharsets.UTF_8)}\n")
 
     self.userCodeNestingLevel = userCodeNestingLevel
@@ -193,6 +194,16 @@ class Compiler(
         reporting.Reporter.fromSimpleReporter(simpleReporter)
     }
     val run = new Run(compiler, initialCtx.fresh.setReporter(reporter0))
+
+    val semanticDbEnabled = run.runContext.settings.Ysemanticdb.value(using run.runContext)
+    val sourceFile =
+      if (semanticDbEnabled) {
+        // semanticdb needs the sources to be written on disk, so we assume they're there already
+        val root = run.runContext.settings.sourceroot.value(using run.runContext)
+        SourceFile(AbstractFile.getFile(Paths.get(root).resolve(fileName)), "UTF-8")
+      } else
+        SourceFile.virtual(fileName, new String(src, StandardCharsets.UTF_8))
+
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =

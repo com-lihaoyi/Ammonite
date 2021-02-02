@@ -104,15 +104,23 @@ final class ScriptCompiler(
 
   /** Arguments passed to scalac to compile this script */
   def moduleSettings(module: Script): List[String] =
-    if (generateSemanticDbs)
-      List(
-        "-Yrangepos",
-        "-P:semanticdb:failures:warning",
-        "-P:semanticdb:synthetics:on"
-      ) ++
-        moduleSources(module).map(d => s"-P:semanticdb:sourceroot:${d.toNIO.toAbsolutePath}") ++
-        moduleTarget(module).map(d => s"-P:semanticdb:targetroot:${d.toNIO.toAbsolutePath}")
-    else
+    if (generateSemanticDbs) {
+      val isScala2 = compilerBuilder.scalaVersion.startsWith("2.")
+      if (isScala2)
+        List(
+          "-Yrangepos",
+          "-P:semanticdb:failures:warning",
+          "-P:semanticdb:synthetics:on"
+        ) ++
+          moduleSources(module).map(d => s"-P:semanticdb:sourceroot:${d.toNIO.toAbsolutePath}") ++
+          moduleTarget(module).map(d => s"-P:semanticdb:targetroot:${d.toNIO.toAbsolutePath}")
+      else
+        List("-Ysemanticdb") ++
+          moduleSources(module).toList
+            .flatMap(d => Seq("-sourceroot", d.toNIO.toAbsolutePath.toString)) ++
+          moduleTarget(module).toList
+            .flatMap(d => Seq("-semanticdb-target", d.toNIO.toAbsolutePath.toString))
+    } else
       Nil
 
   /** Writes on disk the source passed to scalac, corresponding to this script */
