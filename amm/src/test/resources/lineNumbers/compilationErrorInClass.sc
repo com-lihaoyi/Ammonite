@@ -12,7 +12,7 @@ class numPair(a: Int, b: Int){
   val num2 = b
 }
 
-def functionSwap(nums: numPair) {
+def functionSwap(nums: numPair) = {
 
   val temp = nums.a ^ nums.b
   nums.a = nums.a ^ nums.b
