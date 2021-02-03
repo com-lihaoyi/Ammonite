@@ -166,9 +166,10 @@ object AutocompleteTests extends TestSuite{
         complete( """scala.Option.option2<caret>""",
           Set() ^ _
         )
-        complete( """val x = 1; x + x.<from>><caret>""",
-          Set(">>", ">>>") -- _,
-          Set(
+
+        val expected =
+          if (complete.check.scala2)
+            Set(
             "def >(x: Double): Boolean",
             "def >(x: Float): Boolean",
             "def >(x: Int): Boolean",
@@ -176,7 +177,17 @@ object AutocompleteTests extends TestSuite{
             "def >(x: Long): Boolean",
             "def >(x: Char): Boolean",
             "def >(x: Byte): Boolean"
-          ) ^ _
+          )
+        else
+          Set(
+            "def >>>(x: Long): Int",
+            "def >=(x: Double): Boolean",
+            "def >(x: Double): Boolean",
+            "def >>(x: Long): Int"
+          )
+        complete( """val x = 1; x + x.<from>><caret>""",
+          Set(">>", ">>>") -- _,
+          expected ^ _
         )
 
 
