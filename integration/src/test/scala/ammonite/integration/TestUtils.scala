@@ -8,8 +8,8 @@ import ImplicitWd._
   * Created by haoyi on 6/4/16.
   */
 object TestUtils {
-  val scalaVersion = scala.util.Properties.versionNumberString
-  val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
+  val scalaVersion = ammonite.compiler.CompilerBuilder.scalaVersion
+  val isScala2 = scalaVersion.startsWith("2.")
   val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version
   val executable = {
