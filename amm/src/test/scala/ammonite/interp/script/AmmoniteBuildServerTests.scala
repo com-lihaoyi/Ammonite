@@ -762,7 +762,7 @@ object AmmoniteBuildServerTests extends TestSuite {
             assert(options.exists(_.startsWith("-P:semanticdb:sourceroot:")))
             assert(options.exists(_.startsWith("-P:semanticdb:targetroot:")))
           } else {
-            assert(options.contains("-Ysemanticdb") || options.contains("-Xsemanticdb"))
+            assert(options.contains("-Xsemanticdb") || options.contains("-Xsemanticdb"))
             assert(options.contains("-sourceroot"))
             assert(options.contains("-semanticdb-target"))
           }

@@ -115,7 +115,7 @@ final class ScriptCompiler(
           moduleSources(module).map(d => s"-P:semanticdb:sourceroot:${d.toNIO.toAbsolutePath}") ++
           moduleTarget(module).map(d => s"-P:semanticdb:targetroot:${d.toNIO.toAbsolutePath}")
       else
-        List("-Ysemanticdb") ++
+        List("-Xsemanticdb") ++
           moduleSources(module).toList
             .flatMap(d => Seq("-sourceroot", d.toNIO.toAbsolutePath.toString)) ++
           moduleTarget(module).toList

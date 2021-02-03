@@ -25,10 +25,10 @@ import dotc.core.StdNames.{nme, tpnme}
 import dotc.core.TypeError
 import dotc.core.Types.{NameFilter, NamedType, NoType, Type}
 import dotc.interactive._
+import dotc.util.Chars.{isOperatorPart, isScalaLetter}
 import dotc.util.{NameTransformer, NoSourcePosition, SourcePosition}
 
 import scala.collection.mutable
-import scala.internal.Chars.{isOperatorPart, isScalaLetter}
 
 /**
  * One of the results of a completion query.
@@ -270,7 +270,7 @@ object Completion {
      * considered.
      */
     def addMemberCompletions(qual: Tree)(using Context): Unit =
-      if (!qual.tpe.widenDealias.isNothing) {
+      if (!qual.tpe.widenDealias.isExactlyNothing) {
         addAccessibleMembers(qual.tpe)
         if (!mode.is(Mode.Import) && !qual.tpe.isNullType)
           // Implicit conversions do not kick in when importing

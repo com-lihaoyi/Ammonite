@@ -1,5 +1,6 @@
 import mill._, scalalib._, publish._
 import ammonite.ops._, ImplicitWd._
+import coursier.mavenRepositoryString
 import $file.ci.upload
 
 import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
@@ -27,8 +28,8 @@ val commitsSinceTaggedVersion = {
 // Beware that this requires both versions to have the same tasty format
 // version. For example, 2.13.4 and 3.0.0-M1 do, while 2.13.4 and 3.0.0-M{2,3}
 // don't.
-val scala3 = "3.0.0-M1"
-val cross2_3Version = "2.13.4"
+val scala3 = "3.0.0-M3"
+val cross2_3Version = "2.13.5-bin-aab85b1"
 
 
 // Same as https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/Dep.scala/#L55,
@@ -181,6 +182,9 @@ trait AmmInternalModule extends CrossSbtModule{
     if (crossScalaVersion == scala3 && !supports3) cross2_3Version
     else crossScalaVersion
   }
+  def repositories = super.repositories ++ Seq(
+    mvn"https://scala-ci.typesafe.com/artifactory/scala-integration"
+  )
 }
 trait AmmModule extends AmmInternalModule with PublishModule{
   def publishVersion = buildVersion

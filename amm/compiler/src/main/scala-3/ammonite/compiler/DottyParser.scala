@@ -17,7 +17,7 @@ class DottyParser(source: SourceFile)(using Context) extends Parser(source) {
   // From
   // https://github.com/lampepfl/dotty/blob/3.0.0-M3/
   //   compiler/src/dotty/tools/dotc/parsing/Parsers.scala/#L67-L71
-  extension (buf: mutable.ListBuffer[untpd.Tree]):
+  extension (buf: mutable.ListBuffer[untpd.Tree])
     def +++=(x: untpd.Tree) = x match {
       case x: untpd.Thicket => buf ++= x.trees
       case x => buf += x

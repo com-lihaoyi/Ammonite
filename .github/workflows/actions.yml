@@ -39,7 +39,7 @@ jobs:
           java-version: '8'
       - run: ./mill -i unitTest 2.13.4
 
-  unit-8-3_0_0_M1:
+  unit-8-3_0_0_M3:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
-      - run: ./mill -i unitTest 3.0.0-M1
+      - run: ./mill -i unitTest 3.0.0-M3
 
   integration-11-2_12_13:
     runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
           java-version: '8'
       - run: ./mill -i integrationTest 2.13.4
 
-  integration-8-3_0_0_M1:
+  integration-8-3_0_0_M3:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -91,4 +91,4 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
-      - run: ./mill -i integrationTest 3.0.0-M1
+      - run: ./mill -i integrationTest 3.0.0-M3

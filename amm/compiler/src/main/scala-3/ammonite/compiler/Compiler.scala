@@ -83,7 +83,7 @@ class Compiler(
   // https://github.com/lampepfl/dotty/blob/3.0.0-M3/
   //   compiler/src/dotty/tools/dotc/Driver.scala/#L67-L81
   private def setup(args: Array[String], rootCtx: Context): (List[String], Context) =
-    given ictx as FreshContext = rootCtx.fresh
+    given ictx: FreshContext = rootCtx.fresh
     val summary = CompilerCommand.distill(args)
     ictx.setSettings(summary.sstate)
     ictx.setProperty(MacroClassLoaderKey, macroClassLoader)
@@ -195,7 +195,7 @@ class Compiler(
     }
     val run = new Run(compiler, initialCtx.fresh.setReporter(reporter0))
 
-    val semanticDbEnabled = run.runContext.settings.Ysemanticdb.value(using run.runContext)
+    val semanticDbEnabled = run.runContext.settings.Xsemanticdb.value(using run.runContext)
     val sourceFile =
       if (semanticDbEnabled) {
         // semanticdb needs the sources to be written on disk, so we assume they're there already
