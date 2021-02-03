@@ -64,26 +64,37 @@ object BasicTests extends TestSuite{
         os.rel/'basic/"Print.sc",
         tmpDir
       )
-      val count1 = substrCount(evaled1.out.trim, "scala.tools.nsc")
-      val count2 = substrCount(evaled2.out.trim, "scala.tools.nsc")
+      val compilerPackage =
+        if (isScala2) "scala.tools.nsc"
+        else "dotty.tools.dotc"
+      val count1 = substrCount(evaled1.out.trim, compilerPackage)
+      val count2 = substrCount(evaled2.out.trim, compilerPackage)
       //These numbers might fail in future but basic point is to keep count2
       //very low whereas count1 will be inevitably bit higher
-      assert(count1 > 10)
-      assert(count2 < 5)
+      if (isScala2) {
+        assert(count1 > 10)
+        assert(count2 < 5)
+      } else {
+        assert(count1 > 100)
+        assert(count2 < 15)
+      }
     }
     test("fastparseNotLoadedByCachedScritps"){
+      val parserPackage =
+        if (isScala2) "fastparse"
+        else "dotty.tools.dotc.parsing"
       val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
         os.rel/'basic/"Print.sc",
         tmpDir
       )
-      assert(evaled1.out.trim.contains("fastparse"))
+      assert(evaled1.out.trim.contains(parserPackage))
 
       val evaled2 = execWithJavaOptsSet(
         os.rel/'basic/"Print.sc",
         tmpDir
         )
-      assert(!evaled2.out.trim.contains("fastparse"))
+      assert(!evaled2.out.trim.contains(parserPackage))
     }
 
 
