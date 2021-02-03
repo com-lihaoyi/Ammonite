@@ -238,7 +238,7 @@ object AutocompleteTests extends TestSuite{
     }
 
     test("dependencies"){
-      checking { complete =>
+      def dependenciesTests(complete: Completer) = {
         complete(
           """import $ivy.<from>`io.get-c<caret>`""",
           Set("`io.get-coursier") ^ _
@@ -270,6 +270,10 @@ object AutocompleteTests extends TestSuite{
                 c.filter(!_.startsWith("`io.get-coursier::coursier-cache:1.0."))
           )
         }
+      }
+      checking { complete =>
+        if (complete.check.scala2) dependenciesTests(complete)
+        else "Disabled in Scala 3"
       }
     }
   }
