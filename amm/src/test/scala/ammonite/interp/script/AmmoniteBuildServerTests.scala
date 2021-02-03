@@ -457,7 +457,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       }
     }
 
-    "multi" - {
+    def multiTest(): Unit = {
       val dir = wd / "multi"
       val scriptNames = Seq("main", "lib1", "lib2", "lib3")
       val runner = new BspScriptRunner(scriptNames.map(n => dir / s"$n.sc"): _*)
@@ -543,6 +543,12 @@ object AmmoniteBuildServerTests extends TestSuite {
         _ = assert(diagnostics.isEmpty)
 
       } yield ()
+    }
+    "multi" - {
+      // Disabled in Scala 3  as the test involves Scala 2 macros.
+      // TODO Re-enable once we switch to a Scala 3 version that has circe artifacts
+      if (isScala2) multiTest()
+      else "Temporarily disabled in Scala 3"
     }
 
     "semanticdb" - {
@@ -751,9 +757,15 @@ object AmmoniteBuildServerTests extends TestSuite {
           val classPath = item.getClasspath.asScala.toList
           val classDir = os.Path(Paths.get(new URI(item.getClassDirectory)))
 
-          assert(options.contains("-Yrangepos"))
-          assert(options.exists(_.startsWith("-P:semanticdb:sourceroot:")))
-          assert(options.exists(_.startsWith("-P:semanticdb:targetroot:")))
+          if (isScala2) {
+            assert(options.contains("-Yrangepos"))
+            assert(options.exists(_.startsWith("-P:semanticdb:sourceroot:")))
+            assert(options.exists(_.startsWith("-P:semanticdb:targetroot:")))
+          } else {
+            assert(options.contains("-Xsemanticdb") || options.contains("-Xsemanticdb"))
+            assert(options.contains("-sourceroot"))
+            assert(options.contains("-semanticdb-target"))
+          }
           assert(classDir.startsWith(wd / ".ammonite"))
         }
 
