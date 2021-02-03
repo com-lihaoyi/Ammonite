@@ -154,9 +154,14 @@ object LineNumberTests extends TestSuite{
       )
     )
 
-    test("RuntimeCompilationErrorLineNumberTest") - checkErrorMessage(
-      file = os.rel / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
-      expected = "(RuntimeCompilationErrorLineNumberTest.sc:6)"
-    )
+    test("RuntimeCompilationErrorLineNumberTest") - {
+      if (isScala2)
+        checkErrorMessage(
+          file = os.rel / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
+          expected = s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
+        )
+      else
+        "Temporarily disabled in Scala 3"
+    }
   }
 }
