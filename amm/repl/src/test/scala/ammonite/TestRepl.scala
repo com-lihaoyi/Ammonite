@@ -24,6 +24,7 @@ import ammonite.runtime.ImportHook
  */
 class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
   def scala2 = compilerBuilder.scalaVersion.startsWith("2.")
+  def scalaVersion = compilerBuilder.scalaVersion
 
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
