@@ -31,21 +31,33 @@ object ErrorTruncationTests extends TestSuite{
     test("compileError") - checkErrorMessage(
       file = 'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
-        s"""compileError.sc:1: not found: value doesntexist
-          |val res = doesntexist
-          |          ^
-          |Compilation Failed
-          |""".stripMargin
+        if (isScala2)
+          s"""compileError.sc:1: not found: value doesntexist
+            |val res = doesntexist
+            |          ^
+            |Compilation Failed
+            |""".stripMargin
+        else
+          s"""|   |val res = doesntexist
+              |   |          ^^^^^^^^^^^
+              |   |          Not found: doesntexist
+              |Compilation Failed""".stripMargin
       )
     )
     test("multiExpressionError") - checkErrorMessage(
       file = 'errorTruncation/"compileErrorMultiExpr.sc",
       expected = Util.normalizeNewlines(
-        s"""compileErrorMultiExpr.sc:11: not found: value doesntexist
-          |val res_4 = doesntexist
-          |            ^
-          |Compilation Failed
-          |""".stripMargin
+        if (isScala2)
+          s"""compileErrorMultiExpr.sc:11: not found: value doesntexist
+            |val res_4 = doesntexist
+            |            ^
+            |Compilation Failed
+            |""".stripMargin
+        else
+          s"""|   |val res_4 = doesntexist
+              |   |            ^^^^^^^^^^^
+              |   |            Not found: doesntexist
+              |Compilation Failed""".stripMargin
       )
     )
 
@@ -54,10 +66,15 @@ object ErrorTruncationTests extends TestSuite{
         checkErrorMessage(
           file = 'errorTruncation/"parseError.sc",
           expected = Util.normalizeNewlines(
-            """parseError.sc:1:1 expected end-of-input
-              |}
-              |^
-              |""".stripMargin
+            if (isScala2)
+              """parseError.sc:1:1 expected end-of-input
+                |}
+                |^
+                |""".stripMargin
+            else
+              """|  |}
+                 |  |^
+                 |  |eof expected, but '}' found""".stripMargin
           )
         )
       }
@@ -69,14 +86,19 @@ object ErrorTruncationTests extends TestSuite{
     test("runtimeError") - checkErrorMessage(
       file = 'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
-        if (scala.util.Properties.versionNumberString.startsWith("2.12"))
+        if (scalaVersion.startsWith("2.12"))
           s"""java.lang.ArithmeticException: / by zero
              |  $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
              |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
              |""".stripMargin
-        else
+        else if (isScala2)
           s"""java.lang.ArithmeticException: / by zero
              |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc:1)
+             |""".stripMargin
+        else
+          // FIXME Line number is wrong
+          s"""java.lang.ArithmeticException: / by zero
+             |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc:42)
              |""".stripMargin
       )
     )
