@@ -148,7 +148,7 @@ object AutocompleteTests extends TestSuite{
 
       }
 
-      test("deep") - checking{ complete =>
+      def deepTests(complete: Completer) = {
         complete( """<from>fromN<caret>""",
           Set("scala.concurrent.duration.fromNow") ^ _
         )
@@ -192,6 +192,13 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
+      }
+
+      test("deep") - checking{ complete =>
+        if (complete.check.scala2)
+          deepTests(complete)
+        else
+          "Disabled in Scala 3"
       }
 
       test("defTab") - checking{ complete =>
