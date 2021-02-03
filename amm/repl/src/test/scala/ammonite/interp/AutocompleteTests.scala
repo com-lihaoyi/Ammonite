@@ -54,7 +54,8 @@ object AutocompleteTests extends TestSuite{
         "getClass", "asInstanceOf", "isInstanceOf"
       )
       test("import") - checking{ complete =>
-        if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
+        // these fail on Java 9, need investigation
+        if (!Util.java9OrAbove && complete.check.scala2) {
           complete("""import <from><caret>""", Set("java", "javax", "scala") -- _)
           complete("""import <from>j<caret>""", Set("java", "javax") -- _)
           complete(
@@ -93,7 +94,8 @@ object AutocompleteTests extends TestSuite{
       }
 
       test("scope") - checking{ complete =>
-        if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
+        // these fail on Java 9, need investigation
+        if (!Util.java9OrAbove && complete.check.scala2) {
           complete( """<caret>""", Set("scala") -- _)
           complete( """Seq(1, 2, 3).map(argNameLol => <from><caret>)""", Set("argNameLol") -- _)
           complete( """object Zomg{ <from><caret> }""", Set("Zomg") -- _)
@@ -111,7 +113,8 @@ object AutocompleteTests extends TestSuite{
         //      )
       }
       test("scopePrefix") - checking{ complete =>
-        if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
+        // these fail on Java 9, need investigation
+        if (!Util.java9OrAbove && complete.check.scala2) {
           complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
 
           complete(
