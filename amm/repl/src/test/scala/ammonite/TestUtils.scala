@@ -12,8 +12,9 @@ import ammonite.runtime.ImportHook
 import scala.language.dynamics
 
 object TestUtils {
-  def scala2_11 = scala.util.Properties.versionNumberString.startsWith("2.11")
-  def scala2_12 = scala.util.Properties.versionNumberString.startsWith("2.12")
+  def scala2_11 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.11.")
+  def scala2_12 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.12.")
+  def scala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
 
   def createTestInterp(
     storage: Storage,
