@@ -300,7 +300,10 @@ object ExampleTests extends TestSuite{
             | longLines
             |? (_._2.length > 0)
             |? (!_._1.segments.contains("src_managed"))
-      )
+      ).map {
+        case (path, lines) =>
+          (path relativeTo ammonite.ops.pwd, lines.map(_ + 1))
+      }
 
       assert(filesWithTooLongLines.length == 0)
     }
