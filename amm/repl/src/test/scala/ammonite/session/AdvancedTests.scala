@@ -82,38 +82,75 @@ object AdvancedTests extends TestSuite{
     test("predefSettings"){
       val check2 = new DualTestRepl{
         override def predef = (
-          """
-          interp.configureCompiler(_.settings.Xexperimental.value = true)
-          """,
+          if (scala2)
+            """
+            interp.configureCompiler(_.settings.Xexperimental.value = true)
+            """
+          else
+            """
+            interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.showPlugins, true))
+            """,
           None
         )
       }
-      check2.session("""
-        @ repl.compiler.settings.Xexperimental.value
+      val getSetting =
+        if (check2.scala2) "repl.compiler.settings.Xexperimental.value"
+        else "repl.initialContext.settings.showPlugins.value(using repl.initialContext)"
+      check2.session(s"""
+        @ $getSetting
         res0: Boolean = true
       """)
 
     }
     test("macros"){
-      check.session("""
-        @ import language.experimental.macros
+      if (check.scala2)
+        check.session("""
+          @ import language.experimental.macros
 
-        @ import reflect.macros.Context
+          @ import reflect.macros.Context
 
-        @ object Macro {
-        @   def impl(c: Context): c.Expr[String] = {
-        @    import c.universe._
-        @    c.Expr[String](Literal(Constant("Hello!")))
-        @   }
-        @ }
-        defined object Macro
+          @ object Macro {
+          @   def impl(c: Context): c.Expr[String] = {
+          @    import c.universe._
+          @    c.Expr[String](Literal(Constant("Hello!")))
+          @   }
+          @ }
+          defined object Macro
 
-        @ def m: String = macro Macro.impl
-        defined function m
+          @ def m: String = macro Macro.impl
+          defined function m
 
-        @ m
-        res4: String = "Hello!"
-      """)
+          @ m
+          res4: String = "Hello!"
+        """)
+      else
+        check.session("""
+          @ inline def assert1(cond: Boolean, msg: => String) =
+          @   if !cond then
+          @     throw new Exception(msg)
+          @ //
+          defined function assert1
+
+          @ assert1(true, "error1"); val n = 2
+          n: Int = 2
+
+          @ assert1(false, "error1"); val m = 3
+          error: java.lang.Exception: error1
+
+          @ val ammStackTrace = {
+          @   scala.util.Try(assert1(false, "error1"))
+          @     .toEither
+          @     .left
+          @     .get
+          @     .getStackTrace
+          @     .map(_.toString)
+          @     .filter(_.startsWith("ammonite.$sess."))
+          @ }
+
+          @ assert(ammStackTrace.nonEmpty)
+
+          @ assert(ammStackTrace.forall(_.contains("cmd3.sc")))
+        """)
     }
     test("typeScope"){
       // Fancy type-printing isn't implemented at all in 2.10.x
@@ -352,23 +389,27 @@ object AdvancedTests extends TestSuite{
         }
         else
           "interp.configureCompiler(_.settings.YmacroAnnotations.value = true)"
-      check.session(s"""
-        @ $init
 
-        @ import $$ivy.`io.github.alexarchambault::data-class:0.2.3`
+      if (check.scala2)
+        check.session(s"""
+          @ $init
 
-        @ import dataclass._
-        import dataclass._
+          @ import $$ivy.`io.github.alexarchambault::data-class:0.2.3`
 
-        @ @data class Foo(n: Int = 0)
+          @ import dataclass._
+          import dataclass._
 
-        @ val foo = Foo()
-        foo: Foo = ${Print.Foo(n = 0)}
+          @ @data class Foo(n: Int = 0)
 
-        @ val foo2 = foo.withN(3)
-        foo2: Foo = ${Print.Foo(n = 3)}
+          @ val foo = Foo()
+          foo: Foo = ${Print.Foo(n = 0)}
 
-      """)
+          @ val foo2 = foo.withN(3)
+          foo2: Foo = ${Print.Foo(n = 3)}
+
+        """)
+      else
+        "Disabled in Scala 3"
     }
     test("desugar"){
       if (check.scala2)
@@ -518,7 +559,7 @@ object AdvancedTests extends TestSuite{
     }
 
     test("accessPressy"){
-      check.session("""
+      if (check.scala2) check.session("""
         @ def typeAt(code: String, pos: Int) = {
         @   import scala.tools.nsc.interactive.Response
         @   import scala.reflect.internal.util.{BatchSourceFile, OffsetPosition}
@@ -540,7 +581,7 @@ object AdvancedTests extends TestSuite{
         t: String = ?
 
         @ assert(t.endsWith(".List"))
-      """)
+      """) else "N/A in Scala 3"
     }
 
     test("accessInMemoryClassMap"){
