@@ -271,8 +271,8 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    withDottyCompat(ivy"com.lihaoyi::os-lib:0.7.1", scalaVersion()).maybeBinScala(scalaVersion()),
-    withDottyCompat(ivy"org.scala-lang.modules::scala-collection-compat:2.3.1", scalaVersion()).maybeBinScala(scalaVersion())
+    withDottyCompat(ivy"com.lihaoyi::os-lib:0.7.2", scalaVersion()).maybeBinScala(scalaVersion()),
+    withDottyCompat(ivy"org.scala-lang.modules::scala-collection-compat:2.4.1", scalaVersion()).maybeBinScala(scalaVersion())
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
@@ -282,7 +282,7 @@ object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
     withDottyCompat(ivy"com.lihaoyi::sourcecode:0.2.1", scalaVersion()).maybeBinScala(scalaVersion()),
-    withDottyCompat(ivy"com.lihaoyi::fansi:0.2.8", scalaVersion()).maybeBinScala(scalaVersion())
+    withDottyCompat(ivy"com.lihaoyi::fansi:0.2.10", scalaVersion()).maybeBinScala(scalaVersion())
   )
   def compileIvyDeps = Agg(
     ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
@@ -296,8 +296,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
-      withDottyCompat(ivy"com.lihaoyi::pprint:0.6.0", scalaVersion()).maybeBinScala(scalaVersion()),
-      withDottyCompat(ivy"com.lihaoyi::fansi:0.2.9", scalaVersion()).maybeBinScala(scalaVersion())
+      withDottyCompat(ivy"com.lihaoyi::pprint:0.6.1", scalaVersion()).maybeBinScala(scalaVersion()),
+      withDottyCompat(ivy"com.lihaoyi::fansi:0.2.10", scalaVersion()).maybeBinScala(scalaVersion())
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
