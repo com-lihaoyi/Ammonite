@@ -297,8 +297,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops())
     def ivyDeps = Agg(
       withDottyCompat(ivy"com.lihaoyi::pprint:0.6.0", scalaVersion()).maybeBinScala(scalaVersion()),
-      withDottyCompat(ivy"com.lihaoyi::fansi:0.2.9", scalaVersion()).maybeBinScala(scalaVersion()),
-      withDottyCompat(ivy"org.scala-lang.modules::scala-collection-compat:2.3.1", scalaVersion()).maybeBinScala(scalaVersion())
+      withDottyCompat(ivy"com.lihaoyi::fansi:0.2.9", scalaVersion()).maybeBinScala(scalaVersion())
     )
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
@@ -402,8 +401,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         interp.api()
       )
       def ivyDeps = Agg(
-        withDottyCompat(ivy"com.lihaoyi::mainargs:0.1.4", scalaVersion()).maybeBinScala(scalaVersion()),
-        withDottyCompat(ivy"com.lihaoyi::pprint:0.6.0", scalaVersion()).maybeBinScala(scalaVersion())
+        withDottyCompat(ivy"com.lihaoyi::mainargs:0.1.4", scalaVersion()).maybeBinScala(scalaVersion())
       )
 
       def generatedSources = T{
