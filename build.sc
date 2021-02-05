@@ -280,10 +280,19 @@ class OpsModule(val crossScalaVersion: String) extends AmmModule{
 
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(
-    withDottyCompat(ivy"com.lihaoyi::sourcecode:0.2.1", scalaVersion()).maybeBinScala(scalaVersion()),
-    withDottyCompat(ivy"com.lihaoyi::fansi:0.2.10", scalaVersion()).maybeBinScala(scalaVersion())
-  )
+  def ivyDeps = T{
+    val fansi =
+      if (crossScalaVersion == scala3)
+        Agg(
+          ivy"com.lihaoyi:fansi_$crossScalaVersion:0.2.10",
+          ivy"org.scala-lang:scala3-library_$crossScalaVersion:$crossScalaVersion"
+        )
+      else
+        Agg(ivy"com.lihaoyi::fansi:0.2.10")
+    fansi ++ Agg(
+      withDottyCompat(ivy"com.lihaoyi::sourcecode:0.2.1", scalaVersion()).maybeBinScala(scalaVersion())
+    )
+  }
   def compileIvyDeps = Agg(
     ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
   )
@@ -295,10 +304,19 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object util extends Cross[UtilModule](binCrossScalaVersions:_*)
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
-    def ivyDeps = Agg(
-      withDottyCompat(ivy"com.lihaoyi::pprint:0.6.1", scalaVersion()).maybeBinScala(scalaVersion()),
-      withDottyCompat(ivy"com.lihaoyi::fansi:0.2.10", scalaVersion()).maybeBinScala(scalaVersion())
-    )
+    def ivyDeps = T{
+      if (crossScalaVersion == scala3)
+        Agg(
+          ivy"com.lihaoyi:pprint_$crossScalaVersion:0.6.1",
+          ivy"com.lihaoyi:fansi_$crossScalaVersion:0.2.10",
+          ivy"org.scala-lang:scala3-library_$crossScalaVersion:$crossScalaVersion"
+        )
+      else
+        Agg(
+          ivy"com.lihaoyi::pprint:0.6.1",
+          ivy"com.lihaoyi::fansi:0.2.10"
+        )
+    }
     def compileIvyDeps = Agg(
       ivy"org.scala-lang:scala-reflect:${scalaVersion()}"
     )
