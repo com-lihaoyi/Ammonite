@@ -58,12 +58,11 @@ object FullReplAPI {
            .drop(1)
     }
 
-    def print[T](value: => T,
-                 ident: String,
-                 custom: Option[String])
-                (implicit tcolors: pprint.TPrintColors,
-                 classTagT: ClassTag[T] = null,
-                 tprint: pprint.TPrint[T] = null) = {
+    def print[T: pprint.TPrint](value: => T,
+                                ident: String,
+                                custom: Option[String])
+                               (implicit tcolors: pprint.TPrintColors,
+                                classTagT: ClassTag[T] = null) = {
       // Here we use ClassTag to detect if T is an Unit.
       //
       // The default value null suppresses the compilation error when T is a singleton type,
@@ -90,7 +89,7 @@ object FullReplAPI {
         val prefix = new pprint.Truncated(
           Iterator(
             colors().ident()(ident).render, ": ",
-            Option(tprint).fold("???")(_.render(tcolors)), " = "
+            implicitly[pprint.TPrint[T]].render(tcolors), " = "
           ),
           pprinter().defaultWidth,
           pprinter().defaultHeight
