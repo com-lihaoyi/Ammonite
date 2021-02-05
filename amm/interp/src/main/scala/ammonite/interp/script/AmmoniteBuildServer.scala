@@ -60,6 +60,17 @@ class AmmoniteBuildServer(
 
   private lazy val proc =
     withRoot { root =>
+      val sv = {
+        val sv0 = scala.util.Properties.versionNumberString
+        if (sv0.contains("-bin-"))
+          sv0.takeWhile(_ != '-').split('.') match {
+            case Array(maj, min, rev) if rev.nonEmpty && rev.forall(_.isDigit) =>
+              val rev0 = rev.toInt
+              s"$maj.$min.${if (rev0 > 0) rev0 - 1 else rev0}"
+          }
+        else
+          sv0
+      }
       ScriptProcessor(
         compilerBuilder.scalaVersion,
         parser,
@@ -69,7 +80,7 @@ class AmmoniteBuildServer(
         Seq(
           Dependency.of(
             "org.scalameta",
-            "semanticdb-scalac_" + scala.util.Properties.versionNumberString,
+            "semanticdb-scalac_" + sv,
             "4.4.6"
           )
         ),
