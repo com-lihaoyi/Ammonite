@@ -26,7 +26,6 @@ object Defaults{
     ImportData("""ammonite.repl.ReplBridge.value.{
       codeColorsImplicit,
       tprintColorsImplicit,
-      pprinterImplicit,
       show,
       typeOf
     }""")
