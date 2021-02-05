@@ -153,18 +153,22 @@ object AdvancedTests extends TestSuite{
         """)
     }
     test("typeScope"){
-      // Fancy type-printing isn't implemented at all in 2.10.x
-      check.session("""
+      // TPrint issue in Scala 3?
+      val cmBufferType =
+        if (check.scala2) "collection.mutable.Buffer" else "Buffer"
+      val mBufferType =
+        if (check.scala2) "mutable.Buffer" else "Buffer"
+      check.session(s"""
         @ collection.mutable.Buffer(1)
-        res0: collection.mutable.Buffer[Int] = ArrayBuffer(1)
+        res0: $cmBufferType[Int] = ArrayBuffer(1)
 
         @ import collection.mutable
 
         @ collection.mutable.Buffer(1)
-        res2: mutable.Buffer[Int] = ArrayBuffer(1)
+        res2: $mBufferType[Int] = ArrayBuffer(1)
 
         @ mutable.Buffer(1)
-        res3: mutable.Buffer[Int] = ArrayBuffer(1)
+        res3: $mBufferType[Int] = ArrayBuffer(1)
 
         @ import collection.mutable.Buffer
 

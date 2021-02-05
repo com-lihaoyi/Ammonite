@@ -268,12 +268,15 @@ object ProjectTests extends TestSuite{
         """)
           }
     test("pegdown"){
+      val expectedType =
+        // probably a TPrint bug in Scala 3…
+        if (check.scala2) "org.pegdown.ast.SimpleNode.Type" else "Type"
       check.session(
         s"""
            @ import $$ivy.`org.pegdown:pegdown:1.6.0`
 
            @ org.pegdown.ast.SimpleNode.Type.HRule
-           res1: org.pegdown.ast.SimpleNode.Type = HRule
+           res1: $expectedType = HRule
          """)
     }
 

@@ -167,6 +167,8 @@ object ImportTests extends TestSuite{
         // Make sure that you can have a term and a type of the same name
         // coming from different places and they don't stomp over each other
         // (#199) and both are accessible.
+        val aliasedType =
+          if (check.scala2) "Foo" else "Int"
         test - check.session(s"""
           @ val Foo = 1
 
@@ -176,11 +178,12 @@ object ImportTests extends TestSuite{
           res2: Int = 1
 
           @ 2: Foo
-          res3: Foo = 2
+          res3: $aliasedType = 2
         """)
 
         test{
-
+          val aliasedType =
+            if (check.scala2) "Order" else "Seq"
           check.session(s"""
             @ object pkg1{ val Order = "lolz" }
 
@@ -194,10 +197,10 @@ object ImportTests extends TestSuite{
             @ import pkg2._
 
             @ Seq(1): Order[Int]
-            res5: Order[Int] = List(1)
+            res5: $aliasedType[Int] = List(1)
 
             @ Seq(Order): Order[String]
-            res6: Order[String] = List("lolz")
+            res6: $aliasedType[String] = List("lolz")
           """)
         }
 

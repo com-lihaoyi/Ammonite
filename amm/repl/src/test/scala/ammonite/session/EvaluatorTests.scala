@@ -102,18 +102,22 @@ object EvaluatorTests extends TestSuite{
       """)
     }
     test("types"){
+      val aliasedType =
+        if (check.scala2) "Funky" else "Array[Array[String]]"
+      val aliasedType2 =
+        if (check.scala2) "Funky2[Int]" else "Array[Array[Int]]"
       check.session(s"""
         @ type Funky = Array[Array[String]]
         defined type Funky
 
         @ val arr: Funky = Array(Array("Hello!"))
-        arr: Funky = Array(Array("Hello!"))
+        arr: $aliasedType = Array(Array("Hello!"))
 
         @ type Funky2[T] = Array[Array[T]]
         defined type Funky2
 
         @ val arr: Funky2[Int] = Array(Array(123))
-        arr: Funky2[Int] = Array(Array(123))
+        arr: $aliasedType2 = Array(Array(123))
       """)
     }
     test("library"){
@@ -132,7 +136,13 @@ object EvaluatorTests extends TestSuite{
     }
 
     test("classes"){
-      check.session(s"""
+      val objWrapperPrefix =
+        if (check.scala2) "" else "ammonite.$sess.cmd2."
+      val classWrapperCmd3Prefix =
+        if (check.scala2) "" else "cmd3.this.cmd2."
+      val classWrapperCmd6Prefix =
+        if (check.scala2) "" else "cmd6.this.cmd2."
+      def session(cmd3Prefix: String, cmd6Prefix: String = null) = s"""
         @ class C{override def toString() = "Ceee"}
         defined class C
 
@@ -143,7 +153,7 @@ object EvaluatorTests extends TestSuite{
         defined object CO
 
         @ CO
-        res3: CO.type = CO
+        res3: ${cmd3Prefix}CO.type = CO
 
         @ case class CC()
         defined class CC
@@ -152,7 +162,7 @@ object EvaluatorTests extends TestSuite{
         res5: CC = CC()
 
         @ CO
-        res6: CO.type = CO
+        res6: ${Option(cmd6Prefix).getOrElse(cmd3Prefix)}CO.type = CO
 
         @ case class CO()
         defined class CO
@@ -164,7 +174,11 @@ object EvaluatorTests extends TestSuite{
 
         @ CO == res3
         res10: Boolean = false
-      """)
+      """
+      check.session(
+        session(objWrapperPrefix),
+        session(classWrapperCmd3Prefix, classWrapperCmd6Prefix)
+      )
 
       // there used to be a
       //     @ CO
