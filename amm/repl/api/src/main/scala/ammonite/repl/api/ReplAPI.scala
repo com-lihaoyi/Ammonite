@@ -108,9 +108,7 @@ trait ReplAPI {
 
   implicit def codeColorsImplicit: CodeColors
 
-  val pprinter: Ref[pprint.PPrinter]
-
-  implicit def pprinterImplicit = pprinter()
+  def pprinter: Ref[pprint.PPrinter]
 
   /**
    * Current width of the terminal
