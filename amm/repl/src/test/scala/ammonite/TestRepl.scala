@@ -2,8 +2,8 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.DefaultCodeWrapper
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.{CompilerBuilder, DefaultCodeWrapper}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder => ICompilerBuilder}
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.repl._
@@ -22,7 +22,9 @@ import ammonite.runtime.ImportHook
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl { self =>
+class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
+  def scala2 = compilerBuilder.scalaVersion.startsWith("2.")
+
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
@@ -68,7 +70,7 @@ class TestRepl { self =>
   var currentLine = 0
   val interp = try {
     new Interpreter(
-      ammonite.compiler.CompilerBuilder,
+      compilerBuilder,
       parser,
       printer0,
       storage = storage,
@@ -390,4 +392,7 @@ class TestRepl { self =>
       throw e
     }
 
+  def notFound(name: String): String =
+    if (scala2) s"not found: value $name"
+    else s"Not found: $name"
 }

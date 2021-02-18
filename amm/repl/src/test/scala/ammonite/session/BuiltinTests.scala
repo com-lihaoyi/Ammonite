@@ -161,7 +161,7 @@ object BuiltinTests extends TestSuite{
 
     test("saveLoad"){
       check.session(
-        """
+        s"""
         @ val veryImportant = 1
         veryImportant: Int = 1
 
@@ -172,7 +172,7 @@ object BuiltinTests extends TestSuite{
 
         @ // Let's try this new cool new library
 
-        @ import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`
+        @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
 
         @ veryImportant
         res4: Int = 1
@@ -193,10 +193,10 @@ object BuiltinTests extends TestSuite{
         res9: Int = 1
 
         @ oopsDontWantThis
-        error: not found: value oopsDontWantThis
+        error: ${check.notFound("oopsDontWantThis")}
 
         @ import scalatags.Text.all._
-        error: not found: value scalatags
+        error: ${check.notFound("scalatags")}
         """)
     }
     test("saveLoad2"){
@@ -234,13 +234,13 @@ object BuiltinTests extends TestSuite{
                     """)
     }
     test("discardLoadCommandResult"){
-      test - check.session("""
+      test - check.session(s"""
         @ repl.sess.save("foo")
 
         @ val a = repl.sess.load("foo")
 
         @ a
-        error: not found: value a
+        error: ${check.notFound("a")}
       """)
 
       test - check.session("""

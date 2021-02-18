@@ -65,7 +65,7 @@ object ScriptTests extends TestSuite{
             @ repl.load.exec($printedScriptPath/"LimitImports.sc")
 
             @ res
-            error: not found: value res
+            error: ${check.notFound("res")}
             """)
         }
       }
@@ -129,7 +129,7 @@ object ScriptTests extends TestSuite{
           @ repl.load.exec($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
-          error: not found: value asd
+          error: ${check.notFound("asd")}
 
           @ val b = asd2
           b: Int = 1
@@ -212,7 +212,7 @@ object ScriptTests extends TestSuite{
             @ interp.load.module($printedScriptPath/"LimitImports.sc")
 
             @ res
-            error: not found: value res
+            error: ${check.notFound("res")}
             """)
         }
       }
@@ -287,7 +287,7 @@ object ScriptTests extends TestSuite{
             @ val asd = "asd"
 
             @ interp.load.module($printedScriptPath/"Encapsulation.sc")
-            error: not found: value asd
+            error: ${check.notFound("asd")}
             """
         )
       }
@@ -298,7 +298,7 @@ object ScriptTests extends TestSuite{
           @ interp.load.module($printedScriptPath/"NestedScripts.sc")
 
           @ val a = asd
-          error: not found: value asd
+          error: ${check.notFound("asd")}
 
           @ val b = asd2
           b: Int = 1
@@ -314,7 +314,7 @@ object ScriptTests extends TestSuite{
           res2: String = "foo def"
 
           @ wrappedValue
-          error: not found: value wrappedValue
+          error: ${check.notFound("wrappedValue")}
         """)
       }
       test("resolverWithinScript"){

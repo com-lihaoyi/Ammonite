@@ -77,11 +77,11 @@ object ImportHookTests extends TestSuite{
       }
       test("ivy"){
         test("basic"){
-          check.session("""
+          check.session(s"""
             @ import scalatags.Text.all._
-            error: not found: value scalatags
+            error: ${check.notFound("scalatags")}
 
-            @ import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`
+            @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
 
             @ import scalatags.Text.all._
 
@@ -96,7 +96,7 @@ object ImportHookTests extends TestSuite{
             else IvyConstructor.scalaBinaryVersion(check.scalaVersion)
           check.session(s"""
             @ import scalatags.Text.all._
-            error: not found: value scalatags
+            error: ${check.notFound("scalatags")}
 
             @ import $$ivy.`com.lihaoyi:scalatags_$sbv:0.7.0`
 
@@ -108,11 +108,11 @@ object ImportHookTests extends TestSuite{
         }
 
         test("inline"){
-          check.session("""
+          check.session(s"""
             @ import scalatags.Text.all._
-            error: not found: value scalatags
+            error: ${check.notFound("scalatags")}
 
-            @ import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`, scalatags.Text.all._
+            @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`, scalatags.Text.all._
 
             @ div("Hello").render
             res1: String = "<div>Hello</div>"

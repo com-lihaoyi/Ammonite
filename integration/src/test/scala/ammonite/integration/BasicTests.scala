@@ -185,7 +185,10 @@ object BasicTests extends TestSuite{
         exec(os.rel / 'basic/"Failure.sc")
       }.result.err.string
 
-      assert(errorMsg.contains("not found: value x"))
+      val expected =
+        if (isScala2) "not found: value x"
+        else "Not found: x"
+      assert(errorMsg.contains(expected))
     }
     test("testSilentIvyExceptions"){
       val errorMsg = intercept[os.SubprocessException]{
