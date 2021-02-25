@@ -37,7 +37,7 @@ Ammonite source code itself.
 If you are interested in living more "on the edge", we also publish artifacts 
 and the doc-site every commit; the doc-site is available at
 
-- http://www.lihaoyi.com/Ammonite/#UnstableVersions
+- https://ammonite.io/#UnstableVersions
 
 And contains instructions on how to download the per-commit executable or 
 depend on the per-commit maven artifact.
@@ -118,12 +118,12 @@ While working on an arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after
 - Publishing is automatic, controlled by scripts in the `ci/` folder.
 
 - Every commit that lands in master will publish a new
-  [unstable version](http://www.lihaoyi.com/Ammonite/#UnstableVersions),
+  [unstable version](https://ammonite.io/#UnstableVersions),
   that you can already use and download. This includes publishing the unstable version
   to maven central to the
   [snapshot-commit-uploads](https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads)
   tag, and updating the documentation-site so it's
-  [Unstable Version](http://www.lihaoyi.com/Ammonite/#UnstableVersions) download
+  [Unstable Version](https://ammonite.io/#UnstableVersions) download
   instructions to point to it, though the "main" download/install instructions
   in the doc-site will not be changed.
 
@@ -134,7 +134,7 @@ While working on an arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after
 
 In general, if you land a change in master, once CI completes (1-2hrs) you
 should be able to download it via the
-[Unstable Version](http://www.lihaoyi.com/Ammonite/#UnstableVersions)
+[Unstable Version](https://ammonite.io/#UnstableVersions)
 instructions and make use of your changes standalone or in an SBT project.
 
 Occasionally, the CI job building and publishing one of the above steps
