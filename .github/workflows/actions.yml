@@ -7,7 +7,12 @@ on:
     branches:
       - master
 jobs:
-  unit-11-2_12_13:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [8, 11]
+        scala-version: [2.12.13, 2.13.5]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -15,9 +20,14 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v1
         with:
-          java-version: '11'
-      - run: ./mill -i unitTest 2.12.13
-  unit-8-2_12_13:
+          java-version: ${{ matrix.java-version }}
+      - run: ./mill -i unitTest "${{ matrix.scala-version }}"
+  itest:
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [8, 11]
+        scala-version: [2.12.13, 2.13.5]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,48 +35,5 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v1
         with:
-          java-version: '8'
-      - run: ./mill -i unitTest 2.12.13
-
-  unit-8-2_13_4:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '8'
-      - run: ./mill -i unitTest 2.13.4
-
-  integration-11-2_12_13:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '11'
-      - run: ./mill -i integrationTest 2.12.13
-  integration-8-2_12_13:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '8'
-      - run: ./mill -i integrationTest 2.12.13
-
-  integration-8-2_13_4:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '8'
-      - run: ./mill -i integrationTest 2.13.4
+          java-version: ${{ matrix.java-version }}
+      - run: ./mill -i integrationTest ${{ matrix.scala-version }}

@@ -5,7 +5,7 @@ import $file.ci.upload
 import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
 val isMasterCommit =
-  sys.env.get("GITHUB_REPOSITORY") == Some("lihaoyi/Ammonite") &&
+  sys.env.get("GITHUB_REPOSITORY") == Some("com-lihaoyi/Ammonite") &&
   sys.env.get("GITHUB_REF").exists(x => x.endsWith("/master"))
 
 val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
@@ -21,14 +21,14 @@ val commitsSinceTaggedVersion = {
 }
 
 
-val binCrossScalaVersions = Seq("2.12.13", "2.13.4")
+val scala2_12Versions = Seq("2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13")
+val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5")
+
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
-val fullCrossScalaVersions = Seq(
-  "2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13",
-  "2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5"
-)
+val fullCrossScalaVersions = scala2_12Versions ++ scala2_13Versions
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
