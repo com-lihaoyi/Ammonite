@@ -1,4 +1,4 @@
-name: ci-push-validation
+name: Tests
 on:
   push:
     branches:
