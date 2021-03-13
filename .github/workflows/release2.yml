@@ -1,4 +1,4 @@
-name: ci-push-validation
+name: Release (2)
 on:
   push:
     branches:
