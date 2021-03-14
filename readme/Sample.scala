@@ -51,7 +51,7 @@ object Sample{
       args = Map("JAVA_OPTS" -> "-Xmx600m")
     )
 //    val out = read! wd/'target/'cache/"-1080873603"
-    val lines = Predef.augmentString(out).lines.toSeq.drop(4).dropRight(2).mkString("\n")
+    val lines = Predef.augmentString(out).lines.toSeq.drop(2).dropRight(3).mkString("\n")
 //    println("ammSample " + lines)
 //    val ammOutput = lines.split("\u001b")
 
