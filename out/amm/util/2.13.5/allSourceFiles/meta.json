@@ -1,0 +1,15 @@
+{
+    "value": [
+        "ref:473c89b9:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala",
+        "ref:1a545f60:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/ReplClassLoader.scala",
+        "ref:ce155243:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Frame.scala",
+        "ref:cffc69e5:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Model.scala",
+        "ref:ac4d1e91:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Util.scala",
+        "ref:3f938495:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Imports.scala",
+        "ref:2d94300e:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Classpath.scala",
+        "ref:f974352d:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/java/io/github/retronym/java9rtexport/Copy.java",
+        "ref:49b97862:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/java/io/github/retronym/java9rtexport/Export.java"
+    ],
+    "valueHash": -67902084,
+    "inputsHash": 127562798
+}

@@ -1,0 +1,13 @@
+[info] Compiling 13 Scala sources to /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.5/compile/dest/classes ...
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/HistoryFilter.scala:61:59: match may not be exhaustive.
+[warn] It would fail on the following input: Some(_)
+[warn]     val (newHistoryIndex, newBuffer, newMsg, newCursor) = searchTerm match{
+[warn]                                                           ^
+[warn] /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala:125:16: match may not be exhaustive.
+[warn] It would fail on the following input: TermInfo(_, _)
+[warn]     Filter.wrap{
+[warn]                ^
+[warn] 10 deprecations (since 2.13.0); re-run with -deprecation for details
+[warn] 3 feature warnings; re-run with -feature for details
+[warn] four warnings found
+[info] Done compiling.
