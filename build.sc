@@ -47,6 +47,7 @@ val (buildVersion, unstable) = scala.util.Try(
 }
 
 val bspVersion = "2.0.0-M6"
+val scalametaVersion = "4.4.10"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi::acyclic:0.2.0"
@@ -73,12 +74,12 @@ object Deps {
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
   val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.0-M3"
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.27"
-  val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:4.4.10"
+  val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.2.1"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
-  val trees = ivy"org.scalameta::trees:4.4.6"
+  val trees = ivy"org.scalameta::trees:$scalametaVersion"
   val upickle = ivy"com.lihaoyi::upickle:1.3.0"
   val utest = ivy"com.lihaoyi::utest:0.7.3"
 }
