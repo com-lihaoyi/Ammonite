@@ -34,35 +34,43 @@
     @sect.ref("Ammonite Cookbook", "fun and interesting things")!
 
 
-  @p
-    If you want to use Ammonite as a plain Scala shell, download the standalone
-    Ammonite @ammonite.Constants.version executable for Scala 2.12 (also
-    available for @sect.ref{Older Scala Versions}):
+  @sect{Installation on Linux}
+    @p
+      If you want to use Ammonite as a plain Scala shell, download the standalone
+      Ammonite @ammonite.Constants.version executable for Scala 2.12 (also
+      available for @sect.ref{Older Scala Versions}):
 
-  @hl.sh
-    @replCurl
+    @hl.sh
+      @replCurl
 
-  @p
-    Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
-    @sect.ref("Unstable Versions", "Unstable Release")
-    @ammonite.Constants.unstableVersion:
+    @p
+      Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
+      @sect.ref("Unstable Versions", "Unstable Release")
+      @ammonite.Constants.unstableVersion:
 
-  @hl.sh
-    @readme.Sample.unstableCurl
+    @hl.sh
+      @readme.Sample.unstableCurl
 
-  @p
-    Alternatively, on macOS you can install Ammonite via brew:
+    @p
+      You can also download a bootstrap script, that can be downloaded and committed
+      to version control as a file `amm`:
 
-  @hl.sh
-    $ brew install ammonite-repl
+    @hl.sh
+      curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-bootstrap > amm && chmod +x amm
 
-  @p
-    You can also download a bootstrap script, that can be downloaded and committed
-    to version control as a file `amm`:
+  @sect{Installation on macOS}
+    @p
+      Same as @sect.ref("Installation on Linux", "Installation on Linux").
+      Or you can install it via brew:
 
-  @hl.sh
-    curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-bootstrap > amm && chmod +x amm
+    @hl.sh
+      $ brew install ammonite-repl
 
+  @sect{Installation on Windows}
+    @p
+      Download the @lnk("Latest version", "https://github.com/com-lihaoyi/Ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version")
+      and rename it to @code{amm.bat}
+  
   @p
     You can then run Ammonite via the `./amm` command.
 
@@ -143,12 +151,6 @@
     "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.Main").
     If you want Ammonite to be available in all projects, simply add the
     above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
-
-  @p
-    Note: Ammonite-REPL does @i{not} support Windows, even though
-    @sect.ref{Ammonite-Ops} does. See @lnk("#119",
-    "https://github.com/lihaoyi/Ammonite/issues/119") if you are interested
-    in details or want to try your hand at making it work.
 
   @sect{Features}
     @p
