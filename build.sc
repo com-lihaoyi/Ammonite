@@ -7,7 +7,7 @@ import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
 val masterBranch = "master"
-val homePage = "http://ammonite.io"
+val homePage = "https://ammonite.io"
 
 val isMasterCommit =
   sys.env.get("GITHUB_REPOSITORY") == Some(s"${ghOrg}/${ghRepo}") &&
