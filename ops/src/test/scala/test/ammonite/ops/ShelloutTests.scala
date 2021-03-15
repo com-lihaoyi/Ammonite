@@ -63,7 +63,7 @@ object ShelloutTests extends TestSuite{
         if(Unix()){
           val res = %%('which, 'echo)
           val echoRoot = Path(res.out.string.trim)
-          assert(echoRoot == root/'bin/'echo)
+          assert(echoRoot == root/'bin/'echo || echoRoot == root/'usr/'bin/'echo)
 
           assert(%%(echoRoot, 'HELLO).out.lines == Seq("HELLO"))
         }

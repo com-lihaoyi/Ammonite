@@ -3,7 +3,7 @@ import scalatex.ScalatexReadme
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
-  url = "https://github.com/lihaoyi/ammonite/tree/master",
+  url = "https://github.com/com-lihaoyi/Ammonite/tree/master",
   source = "Index"
 ).settings(
   scalaVersion := "2.12.3",
