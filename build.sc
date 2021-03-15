@@ -4,9 +4,14 @@ import $file.ci.upload
 
 import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
+val ghOrg = "com-lihaoyi"
+val ghRepo = "Ammonite"
+val masterBranch = "master"
+val homePage = "http://ammonite.io/"
+
 val isMasterCommit =
-  sys.env.get("GITHUB_REPOSITORY") == Some("com-lihaoyi/Ammonite") &&
-  sys.env.get("GITHUB_REF").exists(x => x.endsWith("/master"))
+  sys.env.get("GITHUB_REPOSITORY") == Some(s"${ghOrg}/${ghRepo}") &&
+  sys.env.get("GITHUB_REF").exists(x => x.endsWith(s"/${masterBranch}"))
 
 val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
 
@@ -131,9 +136,9 @@ trait AmmModule extends AmmInternalModule with PublishModule{
   def pomSettings = PomSettings(
     description = artifactName(),
     organization = "com.lihaoyi",
-    url = "https://github.com/com-lihaoyi/Ammonite",
+    url = s"https://github.com/${ghOrg}/${ghRepo}",
     licenses = Seq(License.MIT),
-    versionControl = VersionControl.github("lihaoyi", "ammonite"),
+    versionControl = VersionControl.github(ghOrg, ghRepo),
     developers = Seq(
       Developer("lihaoyi", "Li Haoyi","https://github.com/lihaoyi")
     )
@@ -662,12 +667,12 @@ def publishExecutable() = {
     println("MASTER COMMIT: Creating a release")
     if (!unstable){
       requests.post(
-        "https://api.github.com/repos/lihaoyi/Ammonite/releases",
+        s"https://api.github.com/repos/${ghOrg}/${ghRepo}/releases",
         data = ujson.write(
           ujson.Obj(
             "tag_name" -> buildVersion,
             "name" -> buildVersion,
-            "body" -> s"http://www.lihaoyi.com/Ammonite/#$buildVersion"
+            "body" -> s"${homePage}/#${buildVersion}"
           )
         ),
         headers = Seq("Authorization" -> s"token ${sys.env("AMMONITE_BOT_AUTH_TOKEN")}")
@@ -680,19 +685,23 @@ def publishExecutable() = {
 
       val scalaBinaryVersion = version.take(version.lastIndexOf("."))
       upload(
-        jar.path,
-        latestTaggedVersion,
-        s"$scalaBinaryVersion-$buildVersion",
-        sys.env("AMMONITE_BOT_AUTH_TOKEN")
+        uploadedFile = jar.path,
+        tagName = latestTaggedVersion,
+        uploadName = s"$scalaBinaryVersion-$buildVersion",
+        authKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
+        ghOrg = ghOrg,
+        ghRepo = ghRepo
       )
       upload(
-        os.temp(
+        uploadedFile = os.temp(
           os.read(os.pwd / "amm-template.sh")
             .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
         ),
-        latestTaggedVersion,
-        s"$scalaBinaryVersion-$buildVersion-bootstrap",
-        sys.env("AMMONITE_BOT_AUTH_TOKEN")
+        tagName = latestTaggedVersion,
+        uploadName = s"$scalaBinaryVersion-$buildVersion-bootstrap",
+        authKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
+        ghOrg = ghOrg,
+        ghRepo = ghRepo
       )
     }
   }
@@ -741,12 +750,12 @@ def publishDocs() = {
       latestTaggedVersion,
       buildVersion,
       bspVersion,
-      s"https://github.com/lihaoyi/Ammonite/releases/download/$stableKey",
-      s"https://github.com/lihaoyi/Ammonite/releases/download/$unstableKey",
+      s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$stableKey",
+      s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$unstableKey",
       for(k <- oldStableKeys)
-        yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k"),
+        yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k"),
       for(k <- oldUnstableKeys)
-        yield (k, s"https://github.com/lihaoyi/Ammonite/releases/download/$k")
+        yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k")
     )
 
     %sbt(
