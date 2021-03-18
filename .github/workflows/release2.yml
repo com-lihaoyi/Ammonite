@@ -1,4 +1,4 @@
-name: Release (1)
+name: Release (2)
 on:
   push:
     branches:
@@ -7,7 +7,7 @@ on:
     branches:
       - master
 jobs:
-  release1:
+  release2:
     runs-on: ubuntu-latest
     env:
       SONATYPE_PGP_SECRET: ${{ secrets.SONATYPE_PGP_SECRET }}
@@ -25,4 +25,4 @@ jobs:
         with:
           java-version: '8'
       - run: test -z "$SONATYPE_PGP_SECRET" || echo "$SONATYPE_PGP_SECRET" | base64 --decode | gpg --import --no-tty --batch --yes
-      - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts 1 5
+      - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts 2 5
