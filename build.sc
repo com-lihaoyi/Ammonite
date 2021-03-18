@@ -85,7 +85,7 @@ object Deps {
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.2.1"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
-  val upickle = ivy"com.lihaoyi::upickle:1.3.0"
+  val upickle = ivy"com.lihaoyi::upickle:1.3.7"
   val utest = ivy"com.lihaoyi::utest:0.7.3"
 }
 
