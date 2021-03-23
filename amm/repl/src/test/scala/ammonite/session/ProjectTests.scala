@@ -71,7 +71,7 @@ object ProjectTests extends TestSuite{
               error: Failed to resolve ivy dependencies
 
               @ interp.repositories() ++= Seq(coursierapi.IvyRepository.of(
-              @    "https://repo.typesafe.com/typesafe/ivy-releases/[defaultPattern]"
+              @   "https://repo.typesafe.com/typesafe/ivy-releases/[defaultPattern]"
               @ ))
 
               @ import $ivy.`com.lightbend::emoji:1.2.1`

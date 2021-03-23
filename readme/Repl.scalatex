@@ -952,7 +952,7 @@
 
       @hl.scala
         import ammonite.ops._
-        repl.prompt.bind(pwd.toString + " @ ")
+        repl.prompt.bind(pwd.toString + " @@ ")
 
       @p
         As is common practice in other shells. Further modifications to make it
