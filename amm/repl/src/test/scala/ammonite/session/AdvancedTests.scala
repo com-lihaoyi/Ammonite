@@ -292,10 +292,10 @@ object AdvancedTests extends TestSuite{
       }
     }
     test("compilerPlugin") - retry(3){
-      if (scala2_11) check.session("""
+      check.session("""
         @ // Compiler plugins imported without `.$plugin` are not loaded
 
-        @ import $ivy.`org.spire-math::kind-projector:0.6.3`
+        @ import $ivy.`org.typelevel::kind-projector:0.10.3`
 
         @ trait TC0[F[_]]
         defined trait TC0
@@ -305,7 +305,7 @@ object AdvancedTests extends TestSuite{
 
         @ // You need to use `import $plugin.$ivy`
 
-        @ import $plugin.$ivy.`org.spire-math::kind-projector:0.6.3`
+        @ import $plugin.$ivy.`org.typelevel::kind-projector:0.10.3`
 
         @ trait TC[F[_]]
         defined trait TC

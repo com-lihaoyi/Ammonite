@@ -43,9 +43,7 @@ trait InterpAPI {
     * Functions that will be chained and called on the coursier
     * Fetch object right before they are run
     */
-  val resolutionHooks: mutable.Buffer[
-    Fetch => Fetch
-  ]
+  val resolutionHooks: mutable.Buffer[Fetch => Fetch]
 
   /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit

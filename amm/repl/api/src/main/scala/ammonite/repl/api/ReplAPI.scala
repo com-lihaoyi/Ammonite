@@ -10,13 +10,12 @@ import scala.reflect.runtime.universe._
 
 trait ReplAPI {
 
-
-
   /**
    * Read/writable prompt for the shell. Use this to change the
    * REPL prompt at any time!
    */
   val prompt: Ref[String]
+
   /**
    * The front-end REPL used to take user input. Modifiable!
    */
@@ -36,6 +35,7 @@ trait ReplAPI {
     * when a Ctrl-C interrupt happened) via `lastException.printStackTrace`.
     */
   def lastException: Throwable
+
   /**
    * History of commands that have been entered into the shell, including
    * previous sessions
@@ -116,22 +116,24 @@ trait ReplAPI {
    * Current width of the terminal
    */
   def width: Int
+
   /**
    * Current height of the terminal
    */
   def height: Int
 
   def show(t: Any): Unit
+
   /**
    * Lets you configure the pretty-printing of a value. By default, it simply
    * disables truncation and prints the entire thing, but you can set other
    * parameters as well if you want.
    */
-
   def show(t: Any,
            width: Integer = null,
            height: Integer = null,
            indent: Integer = null): Unit
+
   /**
     * Functions that can be used to manipulate the current REPL session:
     * check-pointing progress, reverting to earlier checkpoints, or deleting
@@ -155,7 +157,9 @@ trait ReplAPI {
 
   def _compilerManager: ammonite.compiler.iface.CompilerLifecycleManager
 }
+
 trait ReplLoad{
+
   /**
     * Loads a command into the REPL and
     * evaluates them one after another
@@ -168,13 +172,15 @@ trait ReplLoad{
     * If an error happens it prints an error message to the console.
     */
   def exec(path: os.Path): Unit
-
 }
+
 trait Session{
+
   /**
     * The current stack of frames
     */
   def frames: List[Frame]
+
   /**
     * Checkpoints your current work, placing all future work into its own
     * frames. If a name is provided, it can be used to quickly recover
@@ -194,19 +200,23 @@ trait Session{
     * you to that many savepoints since the last one.
     */
   def pop(num: Int = 1): SessionChanged
+
   /**
     * Deletes a named checkpoint, allowing it to be garbage collected if it
     * is no longer accessible.
     */
   def delete(name: String): Unit
 }
+
 trait Clipboard{
+
   /**
     * Reads contents from the system clipboard.
     * @return System clipboard contents if they are readable as `String`,
     *         empty string otherwise.
     */
   def read: String
+  
   /**
     * Sets the contents of the system clipboard.
     *
