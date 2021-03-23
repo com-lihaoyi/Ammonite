@@ -15,7 +15,7 @@
     or "project". Scala Scripts are useful for writing small pieces of code,
     and are much quicker to write and deploy than a full-fledged SBT project.
 
-  @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322)
+  @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322, loadingLazy)
 
   @p
     Creating an Ammonite Script is just a matter of creating a
@@ -528,7 +528,7 @@
         To let it use only up to 1024 megabytes of memory
 
     @sect{Watch and Reload}
-      @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322)
+      @img(src:="Watch.gif", display.block, marginLeft.auto, marginRight.auto, height := 322, loadingLazy)
       @p
         Ammonite provides the @code{-w}/@code{--watch} flag, which tells it to
         not exit when a script completes, but instead watch the files that were
@@ -544,7 +544,7 @@
         the script depends on, and you want to
 
     @sect{Script Debug REPL}
-      @img(src:="ScriptRepl.gif", display.block, marginLeft.auto, marginRight.auto, height := 432)
+      @img(src:="ScriptRepl.gif", display.block, marginLeft.auto, marginRight.auto, height := 432, loadingLazy)
       @p
         When a script is not working as intended, it is useful to be able to
         poke around in a REPL after the script has run, in order to see what

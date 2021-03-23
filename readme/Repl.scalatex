@@ -77,7 +77,7 @@
   @p
     This will give you access to the Ammonite-REPL:
 
-  @img(src:="GettingStarted.png", width:="100%")
+  @img(src:="GettingStarted.png", width:="100%", loadingLazy)
 
   @p
     With @sect.ref("Pretty-printed output", "Pretty Printing"),
@@ -186,7 +186,7 @@
         provides...
 
       @sect{Syntax Highlighting}
-        @img(src:="Highlighting.png", width:="100%")
+        @img(src:="Highlighting.png", width:="100%", loadingLazy)
         @p
           Ammonite syntax highlights both the code you're entering as well as any
           output being echoed in response. This should make it much easier to
@@ -197,7 +197,7 @@
         @p
           Stack traces are similarly highlighted, for easier reading:
 
-        @img(src:="ColoredTraces.png", width:="100%")
+        @img(src:="ColoredTraces.png", width:="100%", loadingLazy)
       @sect{Multi-line editing}
 
         @p
@@ -216,7 +216,7 @@
           line by individual line out of the history so you can run it again!
 
       @sect{Desktop key-bindings}
-        @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
+        @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172, loadingLazy)
         @p
           You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one
           word at a time or hold down @b{Shift} to select text to delete. These
@@ -240,7 +240,7 @@
 
       @sect{History Search}
 
-        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
+        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block, loadingLazy)
 
         @p
           Apart from browsing your command-line history with @code{UP}, you can
@@ -282,7 +282,7 @@
         @hl.ref(advancedTests, Seq("""test("forceWrapping")""", "@"))
 
       @sect{Undo & Redo}
-        @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154)
+        @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154, loadingLazy)
         @p
           The Ammonite command-line editor allows you to undo and re-do portions
           of your edits:
@@ -600,7 +600,7 @@
           These tools are useful but not strictly necessary;
 
         @sect{source}
-          @img(src:="Source.gif", display.block, marginLeft.auto, marginRight.auto, height := 364)
+          @img(src:="Source.gif", display.block, marginLeft.auto, marginRight.auto, height := 364, loadingLazy)
 
           @p
             Ammonite provides the @code{src} built-in, which lets you easily
@@ -722,7 +722,7 @@
 
         @sect{browse}
 
-          @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278)
+          @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278, loadingLazy)
 
           @p
             @hl.scala{browse} is a utility that lets you open up far-too-large
@@ -760,7 +760,7 @@
             as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
 
         @sect{desugar}
-          @img(src:="Desugar.png", display.block, marginLeft.auto, marginRight.auto, height := 495)
+          @img(src:="Desugar.png", display.block, marginLeft.auto, marginRight.auto, height := 495, loadingLazy)
 
           @p
             @hl.scala{desugar} allows you to easily see what the compiler is
@@ -869,7 +869,7 @@
         public package repositories and find the name and version of a dependency
         that you want:
 
-      @img(src:="IvyComplete.gif", display.block, marginLeft.auto, marginRight.auto, height := 400)
+      @img(src:="IvyComplete.gif", display.block, marginLeft.auto, marginRight.auto, height := 400, loadingLazy)
 
 
       @p
@@ -1041,7 +1041,7 @@
         Here's an example of it being used to debug changes to the
         @lnk("WootJS webserver", "https://github.com/d6y/wootjs"):
 
-      @img(src:="Debugging.png", width:="100%")
+      @img(src:="Debugging.png", width:="100%", loadingLazy)
       @p
       In this case, we added the @hl.scala{debug} statement within the
       websocket frame handler, so we can inspect the values that are taking
@@ -1104,7 +1104,7 @@
         embedded in the @lnk("Akka HTTP microservice example",
         "https://github.com/theiterators/akka-http-microservice"):
 
-      @img(src:="DebuggingViaSshd.png", width:="100%")
+      @img(src:="DebuggingViaSshd.png", width:="100%", loadingLazy)
 
       @p
         Here we can interact with code live, inspecting values or calling
