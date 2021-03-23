@@ -12,7 +12,7 @@ import collection.mutable
 object Sample{
   println("Initializing Sample")
 
-  val loading = attr("Sample")
+  val loading = attr("loading")
   val loadingLazy = loading := "lazy"
 
   def curlCommand(curlUrl: String) =
