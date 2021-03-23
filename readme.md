@@ -9,13 +9,13 @@
 [patreon-badge]: https://img.shields.io/badge/patreon-sponsor-ff69b4.svg
 [patreon-link]: https://www.patreon.com/lihaoyi
 
-This is where the code for the [Ammonite](https://lihaoyi.github.io/Ammonite) 
+This is where the code for the [Ammonite](https://ammonite.io) 
 project lives:
 
-- [Ammonite-REPL](https://lihaoyi.github.io/Ammonite), the improved Scala REPL
-- [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), the Scala 
+- [Ammonite-REPL](https://ammonite.io), the improved Scala REPL
+- [Ammonite-Ops](https://ammonite.io/#Ammonite-Ops), the Scala 
   file-system library
-- [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell), the 
+- [Ammonite-Shell](https://ammonite.io/#Ammonite-Shell), the 
   Bash-replacement system shell
 
 
@@ -50,20 +50,20 @@ If you use Ammonite and like it, please support us by donating to our Patreon:
 
 The layout of the repository is roughly:
 
-- `ops/` is [Ammonite-Ops](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops)
-- `amm/` is [Ammonite](https://lihaoyi.github.io/Ammonite)'s core, REPL and script runner
-- `shell/` is [Ammonite-Shell](https://lihaoyi.github.io/Ammonite/#Ammonite-Shell)
+- `ops/` is [Ammonite-Ops](https://ammonite.io/#Ammonite-Ops)
+- `amm/` is [Ammonite](https://ammonite.io)'s core, REPL and script runner
+- `shell/` is [Ammonite-Shell](https://ammonite.io/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide 
   syntax highlighting and multiline editing
-- `readme/` is the source code for the [Documentation](https://lihaoyi.github.io/Ammonite/#Ammonite-Ops), 
-  written in [Scalatex](https://lihaoyi.github.io/Scalatex/).
+- `readme/` is the source code for the [Documentation](https://ammonite.io/#Ammonite-Ops), 
+  written in [Scalatex](https://www.lihaoyi.com/Scalatex/).
 - `published/` is a synthetic project used for publishing, excluding the readme 
   and integration tests
 
 For more detailed information, check out the internals documentation for 
 high-level overviews of some interesting facets of the codebase
 
-- [Internals Documentation](https://github.com/lihaoyi/Ammonite/tree/master/internals-docs)
+- [Internals Documentation](https://github.com/com-lihaoyi/Ammonite/tree/master/internals-docs)
 
 ## Common Commands
 
@@ -90,7 +90,7 @@ Although most features should be unit tested, it's still useful to fire up a REP
   This uses `readme/resources/example-predef.scala` instead of your default 
   predef, for easier experimentation and development.
   
-- `sbt -i -w integration[2.12.6].test.run` runs the trivial main method in the
+- `mill -i -w integration[2.12.6].test.run` runs the trivial main method in the
   `integration` subproject, letting you manually test running Ammonite
   programmatically, whether through `run` or `debug`
 
@@ -105,7 +105,8 @@ Although most features should be unit tested, it's still useful to fire up a REP
 
 ### Automated Testing
 
-While working on an arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after every change. `amm/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `amm/test-only -- ammonite.TestObject.path.to.test`.
+While working on an arbitrary `xyz` subproject, `mill -w xyz.test` runs tests after every change.  
+`amm/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `amm/test-only -- ammonite.TestObject.path.to.test`.
 
 - `ops/test` tests the filesystem operations, without any REPL present
 - `amm/test` tests the Ammonite-REPL/Script-runner, without filesystem-shell integration.
@@ -121,7 +122,7 @@ While working on an arbitrary `xyz` subproject, `sbt ~xyz/test` runs tests after
   [unstable version](https://ammonite.io/#UnstableVersions),
   that you can already use and download. This includes publishing the unstable version
   to maven central to the
-  [snapshot-commit-uploads](https://github.com/lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads)
+  [snapshot-commit-uploads](https://github.com/com-lihaoyi/Ammonite/releases/tag/snapshot-commit-uploads)
   tag, and updating the documentation-site so it's
   [Unstable Version](https://ammonite.io/#UnstableVersions) download
   instructions to point to it, though the "main" download/install instructions
@@ -158,7 +159,7 @@ And possibly:
 
 - **All code PRs should come with**: a meaningful description, inline-comments for important things, unit tests (positive and negative), and a green build in [CI](https://travis-ci.org/lihaoyi/Ammonite)
 - **Try to keep lines below 80 characters width**, with a hard limit of 100 characters.
-- **PRs for features should generally come with *something* added to the [Documentation](https://lihaoyi.github.io/Ammonite)**, so people can discover that it exists
+- **PRs for features should generally come with *something* added to the [Documentation](https://ammonite.io)**, so people can discover that it exists
 - **Be prepared to discuss/argue-for your changes if you want them merged**! You will probably need to refactor so your changes fit into the larger codebase
 - **If your code is hard to unit test, and you don't want to unit test it, that's ok**. But be prepared to argue why that's the case!
 - **It's entirely possible your changes won't be merged**, or will get ripped out later. This is also the case for my changes, as the Author!
