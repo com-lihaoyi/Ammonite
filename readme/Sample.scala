@@ -12,6 +12,8 @@ import collection.mutable
 object Sample{
   println("Initializing Sample")
 
+  val loading = attr("loading")
+  val loadingLazy = loading := "lazy"
 
   def curlCommand(curlUrl: String) =
     s"""$$ sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L """ +

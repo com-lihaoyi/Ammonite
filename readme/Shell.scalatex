@@ -34,7 +34,7 @@
   @p
     You can then start using Ammonite as a replacement for Bash:
 
-  @img(src:="SystemShell.png", width:="100%")
+  @img(src:="SystemShell.png", width:="100%", loadingLazy)
 
   @sect{Shell Basics}
     @p
