@@ -21,7 +21,7 @@
     Creating an Ammonite Script is just a matter of creating a
     @code{MyScript.sc} with some Scala code in it, and running it
     @sect.ref("Running Scripts", "from your terminal"). Deploying the script is
-    a matter of copying the script file to where-ever you want to run it, and
+    a matter of copying the script file to wherever you want to run it, and
     running it. No @code{project/} folder, no worrying about @code{.jar} files
     or uber-jars. No worrying about compiling your code: scripts are
     automatically compiled the first time they are run, and subsequently start
@@ -99,7 +99,7 @@
       @p
         No code stands alone; scripts depend on other scripts. Often they depend
         on third party libraries, as there's so much code out there already
-        written it doesn't make sense to re-invent everything yourself.
+        written it doesn't make sense to reinvent everything yourself.
 
       @p
         Ammonite Scripts allow you to import @sect.ref{Other Scripts}, just like
@@ -154,7 +154,7 @@
 
       @sect{Ivy Dependencies}
         @p
-          You can easily make use of external Ivy artifacts right in your
+          You can easily make use of external Ivy/Maven artifacts right in your
           scripts, without needing to set up a separate build file. Simply use a
           @sect.ref{import $ivy}, just as you would in the
           @sect.ref{Ammonite-REPL}, and it will be available in the script for you
@@ -180,12 +180,12 @@
       @p
         By default, everything in a script is compiled and executed as a single
         block. While you can use @sect.ref{Magic Imports} to load other scripts
-        or Ivy artifacts before your script runs, those can only load "hardcoded"
+        or Ivy/Maven artifacts before your script runs, those can only load "hardcoded"
         scripts or artifacts, and cannot e.g. load different scripts depending on
         some runtime variables.
 
       @p
-        If you want to load different scripts or ivy artifacts depending on
+        If you want to load different scripts or Ivy/Maven artifacts depending on
         runtime values, you can use the runtime-equivalent of magic imports:
 
       @ul
@@ -198,7 +198,7 @@
 
       @p
         These are plain-old-Scala-functions that let you pass in a
-        @hl.scala{Path} to a script to load, or load different Ivy artifacts
+        @hl.scala{Path} to a script to load, or load different Ivy/Maven artifacts
         depending on runtime values. Additionally, there is an overloaded
         version of @hl.scala{interp.load.cp} which takes a @hl.scala{Seq[Path]}
         of classpath entries. This variant is much more efficient for adding
@@ -213,7 +213,7 @@
       @hl.scala
         // print banner
         println("Welcome to the XYZ custom REPL!!")
-        val scalazVersion = "7.2.7"
+        val scalazVersion = "7.2.27"
         interp.load.ivy("org.scalaz" %% "scalaz-core" % scalazVersion)
 
         // This @@ is necessary for Ammonite to process the `interp.load.ivy` 
@@ -274,8 +274,8 @@
 
       @p
         Default arguments behave as you would expect (i.e. they allow you to
-        omit it when calling) and arguments are parsed using the
-        @hl.scala{scopt.Read} typeclass, which provides parsers for primitives
+        omit it when calling). Arguments are parsed using the
+        @hl.scala{mainargs.Parser*} parsers, which provides parsers for primitives
         like @code{Int}, @code{Double}, @code{String}, as well as basic
         data-structures like @code{Seq}s (taken as a comma-separated list) and
         common types like @sect.ref{Paths}.
@@ -293,11 +293,7 @@
       @p
         @hl.scala{vararg*} arguments work as you would expect as well, allowing one or
         more arguments to be passed from the command-line and aggregated into
-        a @code{Seq} for your function to use. This also allows you to use a
-        custom argument-parser (e.g. @lnk("Eugene Yokota",
-        "https://github.com/eed3si9n")'s excellent @lnk("Scopt",
-        "https://github.com/scopt/scopt")) library by defining your function
-        as taking @hl.scala{String*}:
+        a @code{Seq} for your function to use:
 
       @hl.scala
         @@main
@@ -306,8 +302,8 @@
         }
 
       @p
-        In which case Ammonite will take all arguments and forward them to your
-        main method un-checked and un-validated, from which point you can deal
+        in which case Ammonite will take all arguments and forward them to your
+        main method unchecked and unvalidated, from which point you can deal
         with the raw @code{Seq[String]} however you wish. Note that
         @hl.scala{vararg*} arguments cannot be passed by-name, e.g. via
         @code{--args foo}
@@ -322,6 +318,11 @@
         $ amm --predef-code 'println("welcome!")' Args.sc 3 Moo
         welcome!
         "Hello! MooMooMoo Ammonite."
+      
+      @p
+        Note that on Windows you have to escape the quotes differently:
+        @hl.sh
+          C:\> amm --predef-code "println(\"welcome!\")" Args.sc 3 Moo
 
       @p
         Here, "Ammonite Arguments" go on the @i{left} of the @code{Args.sc}, while
@@ -436,27 +437,20 @@
 
       @hl.sh
         > amm HttpApi.sc
-        Need to specify a main method to call when running HttpApi.sc
-
-        Available main methods:
-
-        def shorten(longUrl: String)
-        def listReleases(project: String)
+        Need to specify a sub command: addPost, comments
+      
       @p
         And you can run the two functions (after using @code{chmod +x} to make
         the file executable) via
 
       @hl.sh
-        > ./HttpApi.sc shorten https://www.github.com
-        https://git.io/vDN6Ig
+        > ./HttpApi.sc addPost MyTitle MyContent
       @p
         Or
 
       @hl.sh
-        > ./HttpApi.sc listReleases lihaoyi/Ammonite
-        0.7.0,Snaphot Commit Uploads,0.6.2,0.6.1,0.6.0,0.5.9,0.5.8,
-        0.5.7,0.5.6,0.5.5,0.5.4,0.5.3,0.5.2,0.5.1,0.5.0,0.4.9,0.4.8,
-        0.4.7,0.4.6,0.4.5,0.4.4,0.4.3,0.4.2,0.4.0
+        > ./HttpApi.sc comments 100
+        "et occaecati asperiores quas voluptas ipsam nostrum,doloribus dolores ut dolores occaecati,dolores minus aut libero,excepturi sunt cum a et rerum quo voluptatibus quia,ex eaque eum natus"
 
     @sect{Script Builtins}
       @p
@@ -474,9 +468,7 @@
       @p
         If you want code to be loaded before you run any script, you can place
         it in @code{~/.ammonite/predefScript.sc}. This is distinct from the REPL
-        pre-defined code which lives in @code{~/.ammonite/predef.sc}. If you want
-        code that is pre-initialized in both the REPL and in scripts, you can place
-        it in @code{~/.ammonite/predefShared.sc}.
+        pre-defined code which lives in @code{~/.ammonite/predef.sc}.
 
   @sect{Running Scripts}
     @p
@@ -680,7 +672,7 @@
           scripts, to be handled separately/sequentially.
         @li
           Any @sect.ref{Magic Imports} are resolved: any
-          @sect.ref("import $ivy", "Ivy dependencies are downloaded"), or any
+          @sect.ref("import $ivy", "Ivy/Maven dependencies are downloaded"), or any
           @sect.ref("import $file", "imported scripts") are themselves run.
           Any imported scripts are themselves handled in the same way, as are
           any scripts @i{they} import, etc.
