@@ -14,7 +14,7 @@ lazy val jsonPlaceHolderBase =
 @main
 def addPost(title: String, body: String) = {
   ujson.read(
-    requests.get(
+    requests.post(
       s"$jsonPlaceHolderBase/posts",
       data = Seq(
         "title"  -> title,
