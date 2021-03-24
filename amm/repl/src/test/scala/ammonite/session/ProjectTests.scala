@@ -66,17 +66,17 @@ object ProjectTests extends TestSuite{
         test("resolvers"){
           retry(2){
             // ivy flakyness...
-            if (scala2_11) check.session("""
-              @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
+            check.session("""
+              @ import $ivy.`com.lightbend::emoji:1.2.1`
               error: Failed to resolve ivy dependencies
 
               @ interp.repositories() ++= Seq(coursierapi.IvyRepository.of(
-              @   "https://ambiata-oss.s3-ap-southeast-2.amazonaws.com/[defaultPattern]"
+              @   "https://repo.typesafe.com/typesafe/ivy-releases/[defaultPattern]"
               @ ))
 
-              @ import $ivy.`com.ambiata::mundane:1.2.1-20141230225616-50fc792`
+              @ import $ivy.`com.lightbend::emoji:1.2.1`
 
-              @ import com.ambiata.mundane._
+              @ import com.lightbend.emoji._
             """)
           }
         }
@@ -177,8 +177,8 @@ object ProjectTests extends TestSuite{
 
     test("finagle"){
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      if (scala2_11) check.session("""
-        @ import $ivy.`com.twitter::finagle-httpx:6.26.0`
+      check.session("""
+        @ import $ivy.`com.twitter::finagle-http:21.2.0`
 
         @ import com.twitter.finagle._, com.twitter.util._
 
@@ -186,27 +186,27 @@ object ProjectTests extends TestSuite{
 
         @ var clientResponse = 0
 
-        @ val service = new Service[httpx.Request, httpx.Response] {
-        @   def apply(req: httpx.Request): Future[httpx.Response] = {
+        @ val service = new Service[http.Request, http.Response] {
+        @   def apply(req: http.Request): Future[http.Response] = {
         @     serverCount += 1
         @     Future.value(
-        @       httpx.Response(req.version, httpx.Status.Ok)
+        @       http.Response(req.version, http.Status.Ok)
         @     )
         @   }
         @ }
 
-        @ val server = Httpx.serve(":8080", service)
+        @ val server = Http.serve(":8080", service)
 
-        @ val client: Service[httpx.Request, httpx.Response] = Httpx.newService(":8080")
+        @ val client: Service[http.Request, http.Response] = Http.client.newService(":8080")
 
-        @ val request = httpx.Request(httpx.Method.Get, "/")
+        @ val request = http.Request(http.Method.Get, "/")
 
         @ request.host = "www.scala-lang.org"
 
-        @ val response: Future[httpx.Response] = client(request)
+        @ val response: Future[http.Response] = client(request)
 
-        @ response.onSuccess { resp: httpx.Response =>
-        @   clientResponse = resp.getStatusCode
+        @ response.onSuccess { resp: http.Response =>
+        @   clientResponse = resp.statusCode
         @ }
 
         @ Await.ready(response)
