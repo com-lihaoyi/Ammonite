@@ -25,7 +25,7 @@ trait FullReplAPI extends ReplAPI{ replApi =>
       |to replace. Hit <tab> to autocomplete possible names.
       |
       |For a list of REPL built-ins and configuration, use `repl.<tab>`. For a more detailed
-      |description of how to use the REPL, check out https://lihaoyi.github.io/Ammonite
+      |description of how to use the REPL, check out https://ammonite.io
     """.stripMargin.trim
 
 
