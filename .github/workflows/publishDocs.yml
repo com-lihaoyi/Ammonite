@@ -18,4 +18,5 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '8'
+      - shell: 'script -q -e -c "bash {0}"'
       - run: echo "Hello World" && ./mill -i publishDocs
