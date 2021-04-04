@@ -1,0 +1,2401 @@
+Script started on 2021-04-04 14:33:57+00:00 [<not executed on terminal>]
+Hello World
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   140  100   140    0     0   2641      0 --:--:-- --:--:-- --:--:--  2641
+100   622  100   622    0     0   5504      0 --:--:-- --:--:-- --:--:--  5504
+ 16 57.8M   16 9501k    0     0  20.0M      0  0:00:02 --:--:--  0:00:02 20.0M100 57.8M  100 57.8M    0     0  75.6M      0 --:--:-- --:--:-- --:--:--  161M
+[34mCompiling /home/runner/work/Ammonite/Ammonite/ci/upload.sc[39m
+Downloading https://repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.0.0-RC6-10/coursier-launcher_2.13-2.0.0-RC6-10.pom
+Downloaded https://repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.0.0-RC6-10/coursier-launcher_2.13-2.0.0-RC6-10.pom
+Downloading https://repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.0.0-RC6-10/coursier-launcher_2.13-2.0.0-RC6-10.jar
+Downloading https://repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.0.0-RC6-10/coursier-launcher_2.13-2.0.0-RC6-10-sources.jar
+Downloaded https://repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.0.0-RC6-10/coursier-launcher_2.13-2.0.0-RC6-10-sources.jar
+Downloaded https://repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.0.0-RC6-10/coursier-launcher_2.13-2.0.0-RC6-10.jar
+[34mCompiling /home/runner/work/Ammonite/Ammonite/build.sc[39m
+GITHUB REF Some(refs/heads/master)
+fatal: no tag exactly matches '0f0d597f04e62e86cbf76d3bd16deb6965331470'
+[34m[1/398] shell[2.13.1].resources [39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath [39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [1/1] artifacts (~0/2696 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [1/1] artifacts (~1371/2696 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [1/1] artifacts (~2696/2696 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [1/1] artifacts (~2696/2696 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [2/2] artifacts (~2696/2696 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [2/2] artifacts (~2696/5471 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [2/2] artifacts (~4067/5471 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [2/2] artifacts (~5438/5471 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [2/2] artifacts (~5471/5471 bytes)[39m
+[1A[2K[9999D[34m[2/398] mill.scalalib.ZincWorkerModule.compilerInterfaceClasspath | Downloading [2/2] artifacts (~5471/5471 bytes)[39m
+[1A[2K[9999D[34m[3/398] mill.scalalib.ZincWorkerModule.classpath [39m
+[1A[2K[9999D[34m[4/398] mill.scalalib.ZincWorkerModule.worker [39m
+[1A[2K[9999D[34m[5/398] ops[2.13.5].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[6/398] ops[2.13.5].scalaVersion [39m
+[1A[2K[9999D[34m[7/398] ops[2.13.5].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[8/398] ops[2.13.5].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[9/398] ops[2.13.5].sources [39m
+[1A[2K[9999D[34m[10/398] ops[2.13.5].generatedSources [39m
+[1A[2K[9999D[34m[11/398] ops[2.13.5].allSources [39m
+[1A[2K[9999D[34m[12/398] ops[2.13.5].allSourceFiles [39m
+[1A[2K[9999D[34m[13/398] ops[2.13.5].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[14/398] ops[2.13.5].resources [39m
+[1A[2K[9999D[34m[15/398] ops[2.13.5].unmanagedClasspath [39m
+[1A[2K[9999D[34m[16/398] ops[2.13.5].platformSuffix [39m
+[1A[2K[9999D[34m[17/398] ops[2.13.5].compileIvyDeps [39m
+[1A[2K[9999D[34m[18/398] ops[2.13.5].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[19/398] ops[2.13.5].scalaOrganization [39m
+[1A[2K[9999D[34m[20/398] ops[2.13.5].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[21/398] ops[2.13.5].ivyDeps [39m
+[1A[2K[9999D[34m[22/398] ops[2.13.5].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~0/1989 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~1989/1989 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~1989/1989 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~1989/3279 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~1989/4879 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~3279/4879 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~3279/4879 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~4879/4879 bytes)[39m
+[1A[2K[9999D[34m[23/398] ops[2.13.5].resolvedIvyDeps | Downloading [3/3] artifacts (~4879/4879 bytes)[39m
+[1A[2K[9999D[34m[24/398] ops[2.13.5].compileClasspath [39m
+[1A[2K[9999D[34m[25/398] ops[2.13.5].javacOptions [39m
+[1A[2K[9999D[34m[26/398] ops[2.13.5].scalacOptions.overriden.ammonite.$file.build.AmmInternalModule.scalacOptions [39m
+[1A[2K[9999D[34m[27/398] ops[2.13.5].scalacOptions [39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~0/1824 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~1824/1824 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~1824/1824 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~1824/4162 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~4162/4162 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [2/2] artifacts (~4162/4162 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [3/3] artifacts (~4162/4162 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~4162/4162 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~4162/21752 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~20546/21752 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~21752/21752 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~21752/21752 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~21752/23332 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~23332/23332 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [4/4] artifacts (~23332/23332 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [5/5] artifacts (~23332/23332 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [5/5] artifacts (~23332/46887 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [5/5] artifacts (~39716/46887 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [5/5] artifacts (~46887/46887 bytes)[39m
+[1A[2K[9999D[34m[28/398] ops[2.13.5].scalaCompilerClasspath | Downloading [5/5] artifacts (~46887/46887 bytes)[39m
+[1A[2K[9999D[34m[29/398] ops[2.13.5].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[30/398] ops[2.13.5].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[31/398] ops[2.13.5].compile [39m
+[34mCompiling compiler interface...[39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 6 Scala sources to /home/runner/work/Ammonite/Ammonite/out/ops/2.13.5/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m8 deprecations (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m21 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[32/398] terminal[2.13.5].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[33/398] terminal[2.13.5].scalaVersion [39m
+[1A[2K[9999D[34m[34/398] terminal[2.13.5].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[35/398] terminal[2.13.5].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[36/398] terminal[2.13.5].sources [39m
+[1A[2K[9999D[34m[37/398] terminal[2.13.5].generatedSources [39m
+[1A[2K[9999D[34m[38/398] terminal[2.13.5].allSources [39m
+[1A[2K[9999D[34m[39/398] terminal[2.13.5].allSourceFiles [39m
+[1A[2K[9999D[34m[40/398] terminal[2.13.5].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[41/398] terminal[2.13.5].resources [39m
+[1A[2K[9999D[34m[42/398] terminal[2.13.5].unmanagedClasspath [39m
+[1A[2K[9999D[34m[43/398] terminal[2.13.5].platformSuffix [39m
+[1A[2K[9999D[34m[44/398] terminal[2.13.5].compileIvyDeps [39m
+[1A[2K[9999D[34m[45/398] terminal[2.13.5].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[46/398] terminal[2.13.5].scalaOrganization [39m
+[1A[2K[9999D[34m[47/398] terminal[2.13.5].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[48/398] terminal[2.13.5].ivyDeps [39m
+[1A[2K[9999D[34m[49/398] terminal[2.13.5].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~0/1245 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~0/2773 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~1245/2773 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~2616/2773 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~2616/2773 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~2773/2773 bytes)[39m
+[1A[2K[9999D[34m[50/398] terminal[2.13.5].resolvedIvyDeps | Downloading [2/2] artifacts (~2773/2773 bytes)[39m
+[1A[2K[9999D[34m[51/398] terminal[2.13.5].compileClasspath [39m
+[1A[2K[9999D[34m[52/398] terminal[2.13.5].javacOptions [39m
+[1A[2K[9999D[34m[53/398] terminal[2.13.5].scalacOptions [39m
+[1A[2K[9999D[34m[54/398] terminal[2.13.5].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[55/398] terminal[2.13.5].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[56/398] terminal[2.13.5].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[57/398] terminal[2.13.5].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 13 Scala sources to /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.5/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/HistoryFilter.scala:61:59: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Some(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val (newHistoryIndex, newBuffer, newMsg, newCursor) = searchTerm match{[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala:125:16: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: TermInfo(_, _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    Filter.wrap{[0m
+[0m[[0m[33mwarn[0m] [0m[0m               ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m10 deprecations (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m3 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[58/398] amm.util[2.13.5].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[59/398] amm.util[2.13.5].scalaVersion [39m
+[1A[2K[9999D[34m[60/398] amm.util[2.13.5].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[61/398] amm.util[2.13.5].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[62/398] amm.util[2.13.5].sources [39m
+[1A[2K[9999D[34m[63/398] amm.util[2.13.5].generatedSources [39m
+[1A[2K[9999D[34m[64/398] amm.util[2.13.5].allSources [39m
+[1A[2K[9999D[34m[65/398] amm.util[2.13.5].allSourceFiles [39m
+[1A[2K[9999D[34m[66/398] ops[2.13.5].localClasspath [39m
+[1A[2K[9999D[34m[67/398] amm.util[2.13.5].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[68/398] amm.util[2.13.5].resources [39m
+[1A[2K[9999D[34m[69/398] amm.util[2.13.5].unmanagedClasspath [39m
+[1A[2K[9999D[34m[70/398] amm.util[2.13.5].platformSuffix [39m
+[1A[2K[9999D[34m[71/398] amm.util[2.13.5].compileIvyDeps [39m
+[1A[2K[9999D[34m[72/398] amm.util[2.13.5].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[73/398] amm.util[2.13.5].scalaOrganization [39m
+[1A[2K[9999D[34m[74/398] amm.util[2.13.5].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[75/398] amm.util[2.13.5].ivyDeps [39m
+[1A[2K[9999D[34m[76/398] amm.util[2.13.5].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[77/398] amm.util[2.13.5].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[77/398] amm.util[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[77/398] amm.util[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~0/1901 bytes)[39m
+[1A[2K[9999D[34m[77/398] amm.util[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~1371/1901 bytes)[39m
+[1A[2K[9999D[34m[77/398] amm.util[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~1901/1901 bytes)[39m
+[1A[2K[9999D[34m[77/398] amm.util[2.13.5].resolvedIvyDeps | Downloading [1/1] artifacts (~1901/1901 bytes)[39m
+[1A[2K[9999D[34m[78/398] amm.util[2.13.5].compileClasspath [39m
+[1A[2K[9999D[34m[79/398] amm.util[2.13.5].javacOptions [39m
+[1A[2K[9999D[34m[80/398] amm.util[2.13.5].scalacOptions [39m
+[1A[2K[9999D[34m[81/398] amm.util[2.13.5].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[82/398] amm.util[2.13.5].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[83/398] amm.util[2.13.5].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[84/398] amm.util[2.13.5].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 7 Scala sources and 2 Java sources to /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.5/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:32:35: abstract type pattern T is unchecked since it is eliminated by erasure[0m
+[0m[[0m[33mwarn[0m] [0m[0m      case (Res.Success(prev), x: T) => f(prev, x)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:30:47: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: (Success(_), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    inputs.foldLeft[Res[V]](Res.Success(init)){[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m3 deprecations (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m2 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[85/398] amm.compiler.interface[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[86/398] amm.compiler.interface[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[87/398] amm.compiler.interface[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[88/398] amm.compiler.interface[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[89/398] amm.compiler.interface[2.13.1].sources [39m
+[1A[2K[9999D[34m[90/398] amm.compiler.interface[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[91/398] amm.compiler.interface[2.13.1].allSources [39m
+[1A[2K[9999D[34m[92/398] amm.compiler.interface[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[93/398] amm.util[2.13.5].localClasspath [39m
+[1A[2K[9999D[34m[94/398] amm.compiler.interface[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[95/398] amm.compiler.interface[2.13.1].resources [39m
+[1A[2K[9999D[34m[96/398] amm.compiler.interface[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[97/398] amm.compiler.interface[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[98/398] amm.compiler.interface[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[99/398] amm.compiler.interface[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[100/398] amm.compiler.interface[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[101/398] amm.compiler.interface[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[102/398] amm.compiler.interface[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[103/398] amm.compiler.interface[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[104/398] amm.compiler.interface[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[105/398] amm.compiler.interface[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[106/398] amm.compiler.interface[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[107/398] amm.compiler.interface[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[108/398] amm.compiler.interface[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[109/398] amm.compiler.interface[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[110/398] amm.compiler.interface[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[111/398] amm.compiler.interface[2.13.1].compile [39m
+[34mCompiling compiler interface...[39m
+8 warnings found
+[0m[[0m[0minfo[0m] [0m[0mCompiling 6 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[112/398] amm.interp.api[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[113/398] amm.interp.api[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[114/398] amm.interp.api[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[115/398] amm.interp.api[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[116/398] amm.interp.api[2.13.1].sources [39m
+[1A[2K[9999D[34m[117/398] amm.interp.api[2.13.1].generatedSources.overriden.mill.scalalib.JavaModule.generatedSources [39m
+[1A[2K[9999D[34m[118/398] amm.interp.api[2.13.1].constantsFile [39m
+[1A[2K[9999D[34m[119/398] amm.interp.api[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[120/398] amm.interp.api[2.13.1].allSources [39m
+[1A[2K[9999D[34m[121/398] amm.interp.api[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[122/398] amm.compiler.interface[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[123/398] amm.interp.api[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[124/398] amm.interp.api[2.13.1].resources [39m
+[1A[2K[9999D[34m[125/398] amm.interp.api[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[126/398] amm.interp.api[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[127/398] amm.interp.api[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[128/398] amm.interp.api[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[129/398] amm.interp.api[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[130/398] amm.interp.api[2.13.1].dependencyFileResources [39m
+Writing /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/dependencyFileResources/dest/extra-resources/amm-interp-api-dependencies.txt
+[34m[131/398] amm.interp.api[2.13.1].resources [39m
+[1A[2K[9999D[34m[132/398] amm.interp.api[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[133/398] amm.interp.api[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[134/398] amm.interp.api[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[135/398] amm.interp.api[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[136/398] amm.interp.api[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[137/398] amm.interp.api[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[138/398] amm.interp.api[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[139/398] amm.interp.api[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[140/398] amm.interp.api[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[141/398] amm.interp.api[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[142/398] amm.interp.api[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 6 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[143/398] amm.repl.api[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[144/398] amm.repl.api[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[145/398] amm.repl.api[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[146/398] amm.repl.api[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[147/398] amm.repl.api[2.13.1].sources [39m
+[1A[2K[9999D[34m[148/398] amm.repl.api[2.13.1].generatedSources [39m
+Writing Constants.scala
+[34m[149/398] amm.repl.api[2.13.1].allSources [39m
+[1A[2K[9999D[34m[150/398] amm.repl.api[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[151/398] amm.interp.api[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[152/398] amm.repl.api[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[153/398] amm.repl.api[2.13.1].resources [39m
+[1A[2K[9999D[34m[154/398] amm.repl.api[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[155/398] amm.repl.api[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[156/398] amm.repl.api[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[157/398] amm.repl.api[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[158/398] amm.repl.api[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[159/398] amm.repl.api[2.13.1].dependencyFileResources [39m
+Writing /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/dependencyFileResources/dest/extra-resources/amm-dependencies.txt
+[34m[160/398] amm.repl.api[2.13.1].resources [39m
+[1A[2K[9999D[34m[161/398] amm.repl.api[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[162/398] amm.repl.api[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[163/398] amm.repl.api[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[164/398] amm.repl.api[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[165/398] amm.repl.api[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[166/398] amm.repl.api[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[167/398] amm.repl.api[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[168/398] amm.repl.api[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[169/398] amm.repl.api[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[170/398] amm.repl.api[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[171/398] amm.repl.api[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 10 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were three deprecation warnings (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 5 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[172/398] amm.runtime[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[173/398] amm.runtime[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[174/398] amm.runtime[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[175/398] amm.runtime[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[176/398] amm.runtime[2.13.1].sources [39m
+[1A[2K[9999D[34m[177/398] amm.runtime[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[178/398] amm.runtime[2.13.1].allSources [39m
+[1A[2K[9999D[34m[179/398] amm.runtime[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[180/398] amm.repl.api[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[181/398] amm.runtime[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[182/398] amm.runtime[2.13.1].resources [39m
+[1A[2K[9999D[34m[183/398] amm.runtime[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[184/398] amm.runtime[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[185/398] amm.runtime[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[186/398] amm.runtime[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[187/398] amm.runtime[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[188/398] amm.runtime[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[189/398] amm.runtime[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[190/398] amm.runtime[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~0/1423 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~1371/1423 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~1423/1423 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~1423/1423 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~1423/3717 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~3717/3717 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~3717/3717 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~3717/3717 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~3717/3717 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~3717/3717 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~3717/5479 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~5479/5479 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~5479/6782 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~5479/6782 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~6782/6782 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~6782/6782 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~6782/8085 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~8085/8085 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~8085/8085 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [6/6] artifacts (~8085/8085 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [6/6] artifacts (~8085/9401 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [6/6] artifacts (~9401/9401 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [6/6] artifacts (~9401/9401 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [7/7] artifacts (~9401/9401 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [7/7] artifacts (~9401/10510 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [7/7] artifacts (~10510/10510 bytes)[39m
+[1A[2K[9999D[34m[191/398] amm.runtime[2.13.1].resolvedIvyDeps | Downloading [7/7] artifacts (~10510/10510 bytes)[39m
+[1A[2K[9999D[34m[192/398] amm.runtime[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[193/398] amm.runtime[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[194/398] amm.runtime[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[195/398] amm.runtime[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[196/398] amm.runtime[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[197/398] amm.runtime[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[198/398] amm.runtime[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 5 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 12 deprecation warnings (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[199/398] amm.interp[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[200/398] amm.interp[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[201/398] amm.interp[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[202/398] amm.interp[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[203/398] amm.interp[2.13.1].sources [39m
+[1A[2K[9999D[34m[204/398] amm.interp[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[205/398] amm.interp[2.13.1].allSources [39m
+[1A[2K[9999D[34m[206/398] amm.interp[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[207/398] amm.runtime[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[208/398] amm.interp[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[209/398] amm.interp[2.13.1].resources [39m
+[1A[2K[9999D[34m[210/398] amm.interp[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[211/398] amm.interp[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[212/398] amm.interp[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[213/398] amm.interp[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[214/398] amm.interp[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[215/398] amm.interp[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[216/398] amm.interp[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[217/398] amm.interp[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~0/2872 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~1371/2872 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~2742/2872 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~2872/2872 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~2872/2872 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~2872/5042 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~4243/5042 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~5042/5042 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~5042/5042 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~5042/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~6413/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~7784/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [5/5] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [6/6] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [7/7] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~8849/8849 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~8849/11479 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~10220/11479 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~11479/11479 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~11479/11479 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~11479/13841 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~12850/13841 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~13841/13841 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~13841/13841 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~13841/17134 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~15212/17134 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~16583/17134 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~17134/17134 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~17134/17134 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~17134/19690 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~18505/19690 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~19690/19690 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~19690/19690 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~19690/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~21061/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~22432/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [8/8] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [9/9] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [10/10] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [11/11] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [12/12] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [13/13] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~22961/22961 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~22961/25158 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~24332/25158 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~25158/25158 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~25158/25158 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~25158/27051 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~26529/27051 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~27051/27051 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~27051/27051 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~27051/28629 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~28422/28629 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~28629/28629 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [14/14] artifacts (~28629/28629 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~28629/28629 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~28629/33882 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~30000/33882 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~31371/33882 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~32742/33882 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~33882/33882 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~33882/35535 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~33882/35535 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~33882/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~35253/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~35535/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~36906/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~37403/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~37403/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~37403/37403 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~37403/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~38774/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~40145/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~41516/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~42887/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~42967/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [15/15] artifacts (~42967/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [16/16] artifacts (~42967/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [17/17] artifacts (~42967/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~42967/42967 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~42967/46645 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~44338/46645 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~45709/46645 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~46645/46645 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~46645/54321 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~46645/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~48016/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~49387/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~50758/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~52129/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~53500/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~54321/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~54321/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~54321/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~55692/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~57063/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~58434/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~59805/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~61176/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~62547/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~63918/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~65289/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~66660/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~67702/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [18/18] artifacts (~67702/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [19/19] artifacts (~67702/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~67702/67702 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~67702/72526 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~69073/72526 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~70444/72526 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~71815/72526 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~72526/72526 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~72526/72526 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~72526/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~73897/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~75268/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~76069/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [20/20] artifacts (~76069/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [21/21] artifacts (~76069/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~76069/76069 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~76069/81152 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~77440/81152 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~78811/81152 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~80182/81152 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~81152/81152 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~81152/81152 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~81152/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~82523/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~83894/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~85265/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~86143/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [22/22] artifacts (~86143/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~86143/86143 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~86143/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~87514/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~88885/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~90256/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~91627/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~92998/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~93149/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [23/23] artifacts (~93149/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~93149/93149 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~93149/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~94520/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~95891/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~97262/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~98633/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~100004/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~101375/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~102746/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~102814/102814 bytes)[39m
+[1A[2K[9999D[34m[218/398] amm.interp[2.13.1].resolvedIvyDeps | Downloading [24/24] artifacts (~102814/102814 bytes)[39m
+[1A[2K[9999D[34m[219/398] amm.interp[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[220/398] amm.interp[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[221/398] amm.interp[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[222/398] amm.interp[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[223/398] amm.interp[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[224/398] amm.interp[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[225/398] amm.interp[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 17 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 40 deprecation warnings (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere was one unchecked warning; re-run with -unchecked for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[226/398] amm.repl[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[227/398] amm.repl[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[228/398] amm.repl[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[229/398] amm.repl[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[230/398] amm.repl[2.13.1].sources [39m
+[1A[2K[9999D[34m[231/398] amm.repl[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[232/398] amm.repl[2.13.1].allSources [39m
+[1A[2K[9999D[34m[233/398] amm.repl[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[234/398] amm.interp[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[235/398] terminal[2.13.5].localClasspath [39m
+[1A[2K[9999D[34m[236/398] amm.repl[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[237/398] amm.repl[2.13.1].resources [39m
+[1A[2K[9999D[34m[238/398] amm.repl[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[239/398] amm.repl[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[240/398] amm.repl[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[241/398] amm.repl[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[242/398] amm.repl[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[243/398] amm.repl[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[244/398] amm.repl[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[245/398] amm.repl[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~0/1144 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~1144/1144 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~1144/2255 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~1144/2255 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~2255/2255 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~2255/4015 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~4015/4015 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~4015/4015 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~4015/4015 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~4015/4015 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~4015/25115 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~20399/25115 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~25115/25115 bytes)[39m
+[1A[2K[9999D[34m[246/398] amm.repl[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~25115/25115 bytes)[39m
+[1A[2K[9999D[34m[247/398] amm.repl[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[248/398] amm.repl[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[249/398] amm.repl[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[250/398] amm.repl[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[251/398] amm.repl[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[252/398] amm.repl[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[253/398] amm.repl[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 9 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two deprecation warnings[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were three deprecation warnings (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 5 deprecation warnings in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthree warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[254/398] amm.compiler[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[255/398] amm.compiler[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[256/398] amm.compiler[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[257/398] amm.compiler[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[258/398] amm.compiler[2.13.1].sources [39m
+[1A[2K[9999D[34m[259/398] amm.compiler[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[260/398] amm.compiler[2.13.1].allSources [39m
+[1A[2K[9999D[34m[261/398] amm.compiler[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[262/398] amm.compiler[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[263/398] amm.compiler[2.13.1].resources [39m
+[1A[2K[9999D[34m[264/398] amm.compiler[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[265/398] amm.compiler[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[266/398] amm.compiler[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[267/398] amm.compiler[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[268/398] amm.compiler[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[269/398] amm.compiler[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[270/398] amm.compiler[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[271/398] amm.compiler[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [1/1] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [2/2] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~0/0 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~0/7028 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~7028/7028 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~7028/7028 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~7028/8299 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~8299/8299 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~8299/8299 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~8299/18133 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~18133/18133 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [3/3] artifacts (~18133/18133 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~18133/18133 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~18133/27554 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~27554/27554 bytes)[39m
+[1A[2K[9999D[34m[272/398] amm.compiler[2.13.1].resolvedIvyDeps | Downloading [4/4] artifacts (~27554/27554 bytes)[39m
+[1A[2K[9999D[34m[273/398] amm.compiler[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[274/398] amm.compiler[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[275/398] amm.compiler[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[276/398] amm.compiler[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[277/398] amm.compiler[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[278/398] amm.compiler[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[279/398] amm.compiler[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 21 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.13.1+/ammonite/compiler/MakeReporter.scala:31:9: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: ERROR, INFO, Severity(), WARNING[0m
+[0m[[0m[33mwarn[0m] [0m[0m        severity match{[0m
+[0m[[0m[33mwarn[0m] [0m[0m        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were three deprecation warnings (since 2.11.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 23 deprecation warnings (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 26 deprecation warnings in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m5 warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[280/398] amm[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[281/398] amm[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[282/398] amm[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[283/398] amm[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[284/398] amm[2.13.1].sources [39m
+[1A[2K[9999D[34m[285/398] amm[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[286/398] amm[2.13.1].allSources [39m
+[1A[2K[9999D[34m[287/398] amm[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[288/398] amm.repl[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[289/398] amm.compiler[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[290/398] amm[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[291/398] amm[2.13.1].resources [39m
+[1A[2K[9999D[34m[292/398] amm[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[293/398] amm[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[294/398] amm[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[295/398] amm[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[296/398] amm[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[297/398] amm[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[298/398] amm[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[299/398] amm[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[300/398] amm[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[301/398] amm[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[302/398] amm[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[303/398] amm[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[304/398] amm[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[305/398] amm[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[306/398] amm[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[307/398] amm[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 5 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/Main.scala:437:19: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Exit(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val success = res match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 5 deprecation warnings (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[308/398] shell[2.13.1].upstreamCompileOutput [39m
+[1A[2K[9999D[34m[309/398] shell[2.13.1].scalaVersion [39m
+[1A[2K[9999D[34m[310/398] shell[2.13.1].sources.overriden.mill.scalalib.MavenModule.sources [39m
+[1A[2K[9999D[34m[311/398] shell[2.13.1].sources.overriden.mill.scalalib.CrossSbtModule.sources [39m
+[1A[2K[9999D[34m[312/398] shell[2.13.1].sources [39m
+[1A[2K[9999D[34m[313/398] shell[2.13.1].generatedSources [39m
+[1A[2K[9999D[34m[314/398] shell[2.13.1].allSources [39m
+[1A[2K[9999D[34m[315/398] shell[2.13.1].allSourceFiles [39m
+[1A[2K[9999D[34m[316/398] amm[2.13.1].localClasspath.overriden.mill.scalalib.JavaModule.localClasspath [39m
+[1A[2K[9999D[34m[317/398] amm.repl.api[2.13.1].runIvyDeps [39m
+[1A[2K[9999D[34m[318/398] amm.repl.api[2.13.1].resolvedRunIvyDeps [39m
+[1A[2K[9999D[34m[319/398] amm.repl.api[2.13.1].upstreamAssemblyClasspath [39m
+[1A[2K[9999D[34m[320/398] amm.repl.api[2.13.1].runClasspath [39m
+[1A[2K[9999D[34m[321/398] amm.repl.api[2.13.1].allIvyDeps [39m
+[1A[2K[9999D[34m[322/398] amm.repl.api[2.13.1].externalSources [39m
+[1A[2K[9999D[34m[323/398] amm.repl.api[2.13.1].mainClass [39m
+[1A[2K[9999D[34m[324/398] amm.repl.api[2.13.1].finalMainClassOpt [39m
+[1A[2K[9999D[34m[325/398] amm.repl.api[2.13.1].manifest [39m
+[1A[2K[9999D[34m[326/398] amm.repl.api[2.13.1].jar [39m
+[1A[2K[9999D[34m[327/398] ops[2.13.5].mainClass [39m
+[1A[2K[9999D[34m[328/398] ops[2.13.5].finalMainClassOpt [39m
+[1A[2K[9999D[34m[329/398] ops[2.13.5].manifest [39m
+[1A[2K[9999D[34m[330/398] ops[2.13.5].jar [39m
+[1A[2K[9999D[34m[331/398] amm.util[2.13.5].mainClass [39m
+[1A[2K[9999D[34m[332/398] amm.util[2.13.5].finalMainClassOpt [39m
+[1A[2K[9999D[34m[333/398] amm.util[2.13.5].manifest [39m
+[1A[2K[9999D[34m[334/398] amm.util[2.13.5].jar [39m
+[1A[2K[9999D[34m[335/398] amm.interp.api[2.13.1].mainClass [39m
+[1A[2K[9999D[34m[336/398] amm.interp.api[2.13.1].finalMainClassOpt [39m
+[1A[2K[9999D[34m[337/398] amm.interp.api[2.13.1].manifest [39m
+[1A[2K[9999D[34m[338/398] amm.interp.api[2.13.1].jar [39m
+[1A[2K[9999D[34m[339/398] amm.repl.api[2.13.1].transitiveJars [39m
+[1A[2K[9999D[34m[340/398] amm.repl.api[2.13.1].sourceJar [39m
+[1A[2K[9999D[34m[341/398] ops[2.13.5].sourceJar [39m
+[1A[2K[9999D[34m[342/398] amm.util[2.13.5].sourceJar [39m
+[1A[2K[9999D[34m[343/398] amm.interp.api[2.13.1].sourceJar [39m
+[1A[2K[9999D[34m[344/398] amm.repl.api[2.13.1].transitiveSourceJars [39m
+[1A[2K[9999D[34m[345/398] amm.repl.api[2.13.1].exposedClassPath [39m
+[1A[2K[9999D[34m[346/398] amm.compiler[2.13.1].runIvyDeps [39m
+[1A[2K[9999D[34m[347/398] amm.compiler[2.13.1].resolvedRunIvyDeps [39m
+[1A[2K[9999D[34m[348/398] amm.compiler[2.13.1].upstreamAssemblyClasspath [39m
+[1A[2K[9999D[34m[349/398] amm.compiler[2.13.1].runClasspath [39m
+[1A[2K[9999D[34m[350/398] amm.compiler[2.13.1].allIvyDeps [39m
+[1A[2K[9999D[34m[351/398] amm.compiler[2.13.1].externalSources [39m
+[1A[2K[9999D[34m[352/398] amm.compiler[2.13.1].mainClass [39m
+[1A[2K[9999D[34m[353/398] amm.compiler[2.13.1].finalMainClassOpt [39m
+[1A[2K[9999D[34m[354/398] amm.compiler[2.13.1].manifest [39m
+[1A[2K[9999D[34m[355/398] amm.compiler[2.13.1].jar [39m
+[1A[2K[9999D[34m[356/398] amm.compiler.interface[2.13.1].mainClass [39m
+[1A[2K[9999D[34m[357/398] amm.compiler.interface[2.13.1].finalMainClassOpt [39m
+[1A[2K[9999D[34m[358/398] amm.compiler.interface[2.13.1].manifest [39m
+[1A[2K[9999D[34m[359/398] amm.compiler.interface[2.13.1].jar [39m
+[1A[2K[9999D[34m[360/398] amm.compiler[2.13.1].transitiveJars [39m
+[1A[2K[9999D[34m[361/398] amm.compiler[2.13.1].sourceJar [39m
+[1A[2K[9999D[34m[362/398] amm.compiler.interface[2.13.1].sourceJar [39m
+[1A[2K[9999D[34m[363/398] amm.compiler[2.13.1].transitiveSourceJars [39m
+[1A[2K[9999D[34m[364/398] amm.compiler[2.13.1].exposedClassPath [39m
+[1A[2K[9999D[34m[365/398] amm[2.13.1].thinWhitelist [39m
+[1A[2K[9999D[34m[366/398] amm[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[367/398] shell[2.13.1].transitiveLocalClasspath [39m
+[1A[2K[9999D[34m[368/398] shell[2.13.1].unmanagedClasspath [39m
+[1A[2K[9999D[34m[369/398] shell[2.13.1].platformSuffix [39m
+[1A[2K[9999D[34m[370/398] shell[2.13.1].compileIvyDeps [39m
+[1A[2K[9999D[34m[371/398] shell[2.13.1].transitiveCompileIvyDeps [39m
+[1A[2K[9999D[34m[372/398] shell[2.13.1].scalaOrganization [39m
+[1A[2K[9999D[34m[373/398] shell[2.13.1].scalaLibraryIvyDeps [39m
+[1A[2K[9999D[34m[374/398] shell[2.13.1].ivyDeps [39m
+[1A[2K[9999D[34m[375/398] shell[2.13.1].transitiveIvyDeps [39m
+[1A[2K[9999D[34m[376/398] shell[2.13.1].resolvedIvyDeps [39m
+[1A[2K[9999D[34m[377/398] shell[2.13.1].compileClasspath [39m
+[1A[2K[9999D[34m[378/398] shell[2.13.1].javacOptions [39m
+[1A[2K[9999D[34m[379/398] shell[2.13.1].scalacOptions [39m
+[1A[2K[9999D[34m[380/398] shell[2.13.1].scalaCompilerClasspath [39m
+[1A[2K[9999D[34m[381/398] shell[2.13.1].scalacPluginIvyDeps [39m
+[1A[2K[9999D[34m[382/398] shell[2.13.1].scalacPluginClasspath [39m
+[1A[2K[9999D[34m[383/398] shell[2.13.1].compile [39m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 3 Scala sources to /home/runner/work/Ammonite/Ammonite/out/shell/2.13.1/compile/dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mone warning found[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[34m[384/398] shell[2.13.1].localClasspath [39m
+[1A[2K[9999D[34m[385/398] shell[2.13.1].mainClass [39m
+[1A[2K[9999D[34m[386/398] shell[2.13.1].finalMainClassOpt [39m
+[1A[2K[9999D[34m[387/398] shell[2.13.1].manifest [39m
+[1A[2K[9999D[34m[388/398] shell[2.13.1].jar [39m
+[1A[2K[9999D[34m[389/398] amm[2.13.1].mainClass [39m
+[1A[2K[9999D[34m[390/398] amm[2.13.1].finalMainClassOpt [39m
+[1A[2K[9999D[34m[391/398] amm[2.13.1].manifest [39m
+[1A[2K[9999D[34m[392/398] amm[2.13.1].prependShellScript [39m
+[1A[2K[9999D[34m[393/398] amm[2.13.1].runIvyDeps [39m
+[1A[2K[9999D[34m[394/398] amm[2.13.1].resolvedRunIvyDeps [39m
+[1A[2K[9999D[34m[395/398] amm[2.13.1].upstreamAssemblyClasspath [39m
+[1A[2K[9999D[34m[396/398] amm[2.13.1].upstreamAssembly [39m
+[1A[2K[9999D[34m[397/398] amm[2.13.1].assembly [39m
+[1A[2K[9999D[34m[398/398] publishDocs [39m
+MASTER COMMIT: Updating version and publishing to Github Pages
+(stableKey, unstableKey)
+(2.3.8/2.13-2.3.8,2.3.8/2.13-2.3.8-65-0f0d597f)
+Writing Constants.scala
+[info] [launcher] getting org.scala-sbt sbt 0.13.17  (this may take some time)...
+downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.10.7/scala-library-2.10.7.jar ...
+:: loading settings :: url = jar:file:/usr/share/sbt/bin/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt/0.13.17/jars/sbt.jar ...
+:: loading settings :: url = jar:file:/usr/share/sbt/bin/sbt-launch.jar!/org/apache/ivy/core/settings/ivysettings.xml
+	[SUCCESSFUL ] org.scala-lang#scala-library;2.10.7!scala-library.jar (544ms)
+	[SUCCESSFUL ] org.scala-sbt#sbt;0.13.17!sbt.jar (701ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-interface/0.13.17/jars/compiler-interface.jar ...
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/main/0.13.17/jars/main.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-interface;0.13.17!compiler-interface.jar (844ms)
+	[SUCCESSFUL ] org.scala-sbt#main;0.13.17!main.jar (1086ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/actions/0.13.17/jars/actions.jar ...
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/main-settings/0.13.17/jars/main-settings.jar ...
+	[SUCCESSFUL ] org.scala-sbt#actions;0.13.17!actions.jar (786ms)
+	[SUCCESSFUL ] org.scala-sbt#main-settings;0.13.17!main-settings.jar (792ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/interface/0.13.17/jars/interface.jar ...
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/io/0.13.17/jars/io.jar ...
+	[SUCCESSFUL ] org.scala-sbt#interface;0.13.17!interface.jar (687ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/ivy/0.13.17/jars/ivy.jar ...
+	[SUCCESSFUL ] org.scala-sbt#io;0.13.17!io.jar (794ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/logging/0.13.17/jars/logging.jar ...
+	[SUCCESSFUL ] org.scala-sbt#ivy;0.13.17!ivy.jar (806ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/logic/0.13.17/jars/logic.jar ...
+	[SUCCESSFUL ] org.scala-sbt#logging;0.13.17!logging.jar (780ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/process/0.13.17/jars/process.jar ...
+	[SUCCESSFUL ] org.scala-sbt#logic;0.13.17!logic.jar (699ms)
+	[SUCCESSFUL ] org.scala-sbt#process;0.13.17!process.jar (640ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/run/0.13.17/jars/run.jar ...
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/command/0.13.17/jars/command.jar ...
+	[SUCCESSFUL ] org.scala-sbt#run;0.13.17!run.jar (635ms)
+downloading https://repo1.maven.org/maven2/org/scala-sbt/launcher-interface/1.0.1/launcher-interface-1.0.1.jar ...
+	[SUCCESSFUL ] org.scala-sbt#launcher-interface;1.0.1!launcher-interface.jar (50ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/classpath/0.13.17/jars/classpath.jar ...
+	[SUCCESSFUL ] org.scala-sbt#command;0.13.17!command.jar (795ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/completion/0.13.17/jars/completion.jar ...
+	[SUCCESSFUL ] org.scala-sbt#classpath;0.13.17!classpath.jar (533ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/api/0.13.17/jars/api.jar ...
+	[SUCCESSFUL ] org.scala-sbt#completion;0.13.17!completion.jar (792ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-integration/0.13.17/jars/compiler-integration.jar ...
+	[SUCCESSFUL ] org.scala-sbt#api;0.13.17!api.jar (802ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compiler-ivy-integration/0.13.17/jars/compiler-ivy-integration.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-integration;0.13.17!compiler-integration.jar (770ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/relation/0.13.17/jars/relation.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compiler-ivy-integration;0.13.17!compiler-ivy-integration.jar (623ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/task-system/0.13.17/jars/task-system.jar ...
+	[SUCCESSFUL ] org.scala-sbt#relation;0.13.17!relation.jar (529ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/tasks/0.13.17/jars/tasks.jar ...
+	[SUCCESSFUL ] org.scala-sbt#task-system;0.13.17!task-system.jar (775ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/tracking/0.13.17/jars/tracking.jar ...
+	[SUCCESSFUL ] org.scala-sbt#tasks;0.13.17!tasks.jar (609ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/testing/0.13.17/jars/testing.jar ...
+	[SUCCESSFUL ] org.scala-sbt#tracking;0.13.17!tracking.jar (531ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.10.7/scala-compiler-2.10.7.jar ...
+	[SUCCESSFUL ] org.scala-sbt#testing;0.13.17!testing.jar (613ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.10.7/scala-reflect-2.10.7.jar ...
+	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.10.7!scala-compiler.jar (387ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/control/0.13.17/jars/control.jar ...
+	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.10.7!scala-reflect.jar (253ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/collections/0.13.17/jars/collections.jar ...
+	[SUCCESSFUL ] org.scala-sbt#control;0.13.17!control.jar (528ms)
+downloading https://repo1.maven.org/maven2/jline/jline/2.14.5/jline-2.14.5.jar ...
+	[SUCCESSFUL ] jline#jline;2.14.5!jline.jar (64ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/classfile/0.13.17/jars/classfile.jar ...
+	[SUCCESSFUL ] org.scala-sbt#collections;0.13.17!collections.jar (788ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/incremental-compiler/0.13.17/jars/incremental-compiler.jar ...
+	[SUCCESSFUL ] org.scala-sbt#classfile;0.13.17!classfile.jar (733ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/compile/0.13.17/jars/compile.jar ...
+	[SUCCESSFUL ] org.scala-sbt#incremental-compiler;0.13.17!incremental-compiler.jar (800ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/persist/0.13.17/jars/persist.jar ...
+	[SUCCESSFUL ] org.scala-sbt#compile;0.13.17!compile.jar (787ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-tools.sbinary/sbinary_2.10/0.4.2/jars/sbinary_2.10.jar ...
+	[SUCCESSFUL ] org.scala-sbt#persist;0.13.17!persist.jar (848ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/cross/0.13.17/jars/cross.jar ...
+	[SUCCESSFUL ] org.scala-tools.sbinary#sbinary_2.10;0.4.2!sbinary_2.10.jar (853ms)
+downloading https://repo1.maven.org/maven2/org/scala-sbt/ivy/ivy/2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310/ivy-2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310.jar ...
+	[SUCCESSFUL ] org.scala-sbt.ivy#ivy;2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310!ivy.jar (96ms)
+downloading https://repo1.maven.org/maven2/com/jcraft/jsch/0.1.50/jsch-0.1.50.jar ...
+	[SUCCESSFUL ] org.scala-sbt#cross;0.13.17!cross.jar (531ms)
+downloading https://repo1.maven.org/maven2/org/scala-sbt/serialization_2.10/0.1.2/serialization_2.10-0.1.2.jar ...
+	[SUCCESSFUL ] com.jcraft#jsch;0.1.50!jsch.jar (59ms)
+downloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-pickling_2.10/0.10.1/scala-pickling_2.10-0.10.1.jar ...
+	[SUCCESSFUL ] org.scala-sbt#serialization_2.10;0.1.2!serialization_2.10.jar (64ms)
+downloading https://repo1.maven.org/maven2/org/json4s/json4s-core_2.10/3.2.10/json4s-core_2.10-3.2.10.jar ...
+	[SUCCESSFUL ] org.scala-lang.modules#scala-pickling_2.10;0.10.1!scala-pickling_2.10.jar (78ms)
+downloading https://repo1.maven.org/maven2/org/spire-math/jawn-parser_2.10/0.6.0/jawn-parser_2.10-0.6.0.jar ...
+	[SUCCESSFUL ] org.json4s#json4s-core_2.10;3.2.10!json4s-core_2.10.jar (58ms)
+downloading https://repo1.maven.org/maven2/org/spire-math/json4s-support_2.10/0.6.0/json4s-support_2.10-0.6.0.jar ...
+	[SUCCESSFUL ] org.spire-math#jawn-parser_2.10;0.6.0!jawn-parser_2.10.jar (54ms)
+downloading https://repo1.maven.org/maven2/org/scalamacros/quasiquotes_2.10/2.0.1/quasiquotes_2.10-2.0.1.jar ...
+	[SUCCESSFUL ] org.spire-math#json4s-support_2.10;0.6.0!json4s-support_2.10.jar (52ms)
+downloading https://repo1.maven.org/maven2/org/json4s/json4s-ast_2.10/3.2.10/json4s-ast_2.10-3.2.10.jar ...
+	[SUCCESSFUL ] org.scalamacros#quasiquotes_2.10;2.0.1!quasiquotes_2.10.jar (77ms)
+downloading https://repo1.maven.org/maven2/com/thoughtworks/paranamer/paranamer/2.6/paranamer-2.6.jar ...
+	[SUCCESSFUL ] org.json4s#json4s-ast_2.10;3.2.10!json4s-ast_2.10.jar (54ms)
+	[SUCCESSFUL ] com.thoughtworks.paranamer#paranamer;2.6!paranamer.jar (50ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/cache/0.13.17/jars/cache.jar ...
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/test-agent/0.13.17/jars/test-agent.jar ...
+	[SUCCESSFUL ] org.scala-sbt#cache;0.13.17!cache.jar (550ms)
+downloading https://repo1.maven.org/maven2/org/scala-sbt/test-interface/1.0/test-interface-1.0.jar ...
+	[SUCCESSFUL ] org.scala-sbt#test-agent;0.13.17!test-agent.jar (534ms)
+	[SUCCESSFUL ] org.scala-sbt#test-interface;1.0!test-interface.jar (53ms)
+downloading https://repo1.maven.org/maven2/org/scala-sbt/template-resolver/0.1/template-resolver-0.1.jar ...
+	[SUCCESSFUL ] org.scala-sbt#template-resolver;0.1!template-resolver.jar (52ms)
+downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/apply-macro/0.13.17/jars/apply-macro.jar ...
+	[SUCCESSFUL ] org.scala-sbt#apply-macro;0.13.17!apply-macro.jar (533ms)
+:: retrieving :: org.scala-sbt#boot-app
+	confs: [default]
+	49 artifacts copied, 0 already retrieved
+[info] [launcher] getting Scala 2.10.7 (for sbt)...
+downloading https://repo1.maven.org/maven2/org/scala-lang/jline/2.10.7/jline-2.10.7.jar ...
+downloading https://repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.4/jansi-1.4.jar ...
+	[SUCCESSFUL ] org.fusesource.jansi#jansi;1.4!jansi.jar (53ms)
+	[SUCCESSFUL ] org.scala-lang#jline;2.10.7!jline.jar (55ms)
+:: retrieving :: org.scala-sbt#boot-scala
+	confs: [default]
+	5 artifacts copied, 0 already retrieved
+[0m[[0minfo[0m] [0mLoading project definition from /home/runner/work/Ammonite/Ammonite/project[0m
+[0m[[0minfo[0m] [0mUpdating {file:/home/runner/work/Ammonite/Ammonite/project/}ammonite-build...[0m
+[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatex-sbt-plugin;0.3.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatex-sbt-plugin;0.3.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.10.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#sbt;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#main;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#actions;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#classpath;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.10.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.10.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#interface;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#io;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#control;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#launcher-interface;1.0.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#completion;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#collections;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving jline#jline;2.14.5 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#api;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#classfile;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#logging;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#process;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#compiler-integration;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#incremental-compiler;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#relation;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#compile;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#persist;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-tools.sbinary#sbinary_2.10;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#compiler-ivy-integration;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#ivy;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#cross;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt.ivy#ivy;2.3.0-sbt-b18f59ea3bc914a297bb6f1a4f7fb0ace399e310 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.jcraft#jsch;0.1.50 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#serialization_2.10;0.1.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-pickling_2.10;0.10.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scalamacros#quasiquotes_2.10;2.0.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.json4s#json4s-core_2.10;3.2.10 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.json4s#json4s-ast_2.10;3.2.10 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.thoughtworks.paranamer#paranamer;2.6 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.spire-math#jawn-parser_2.10;0.6.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.spire-math#json4s-support_2.10;0.6.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#run;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#task-system;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#tasks;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#tracking;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#cache;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#testing;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#test-agent;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#test-interface;1.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#main-settings;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#apply-macro;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#command;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#template-resolver;0.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#logic;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-sbt#compiler-interface;0.13.17 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#jline;2.10.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.fusesource.jansi#jansi;1.4 ...[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/scalatex-sbt-plugin_2.10_0.13/0.3.7/scalatex-sbt-plugin-0.3.7.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#scalatex-sbt-plugin;0.3.7!scalatex-sbt-plugin.jar (327ms)[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[0minfo[0m] [0mSet current project to ammonite (in build file:/home/runner/work/Ammonite/Ammonite/)[0m
+Generating Scalatex Sources...
+[0m[[0minfo[0m] [0mUpdating {file:/home/runner/work/Ammonite/Ammonite/}readme...[0m
+[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.12.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-library;2.12.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatex-api_2.12;0.3.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatex-api_2.12;0.3.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalaparse_2.12;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalaparse_2.12;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#fastparse_2.12;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#fastparse_2.12;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#fastparse-utils_2.12;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#fastparse-utils_2.12;0.4.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#sourcecode_2.12;0.1.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#sourcecode_2.12;0.1.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatags_2.12;0.6.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatags_2.12;0.6.2 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.12.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-reflect;2.12.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatex-site_2.12;0.3.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#scalatex-site_2.12;0.3.7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#ammonite-ops_2.12;0.8.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#ammonite-ops_2.12;0.8.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#geny_2.12;0.1.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#geny_2.12;0.1.1 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.webjars#highlightjs;9.7.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.webjars#highlightjs;9.7.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.sonatype.oss#oss-parent;7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.sonatype.oss#oss-parent;7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.webjars#font-awesome;4.7.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.webjars#font-awesome;4.7.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.sonatype.oss#oss-parent;7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.webjars#pure;0.6.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.webjars#pure;0.6.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.sonatype.oss#oss-parent;7 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#upickle_2.12;0.4.4 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#upickle_2.12;0.4.4 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#derive_2.12;0.4.4 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#derive_2.12;0.4.4 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.spire-math#jawn-parser_2.12;0.10.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.spire-math#jawn-parser_2.12;0.10.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scalaj#scalaj-http_2.12;2.3.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scalaj#scalaj-http_2.12;2.3.0 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#fansi_2.12;0.2.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#fansi_2.12;0.2.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#os-lib_2.12;0.7.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#os-lib_2.12;0.7.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#geny_2.12;0.6.5 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving com.lihaoyi#geny_2.12;0.6.5 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.12.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang#scala-compiler;2.12.3 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-xml_2.12;1.0.6 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.scala-lang.modules#scala-xml_2.12;1.0.6 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving jline#jline;2.14.4 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving jline#jline;2.14.4 ...[0m
+[A[2K[0m[[0minfo[0m] [0mResolving org.sonatype.oss#oss-parent;9 ...[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.12.3/scala-library-2.12.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-library;2.12.3!scala-library.jar (437ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/scalatex-api_2.12/0.3.7/scalatex-api_2.12-0.3.7.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#scalatex-api_2.12;0.3.7!scalatex-api_2.12.jar (59ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/scalatex-site_2.12/0.3.7/scalatex-site_2.12-0.3.7.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#scalatex-site_2.12;0.3.7!scalatex-site_2.12.jar (55ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/fansi_2.12/0.2.3/fansi_2.12-0.2.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#fansi_2.12;0.2.3!fansi_2.12.jar (62ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/os-lib_2.12/0.7.3/os-lib_2.12-0.7.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#os-lib_2.12;0.7.3!os-lib_2.12.jar (68ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.12/0.4.2/scalaparse_2.12-0.4.2.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#scalaparse_2.12;0.4.2!scalaparse_2.12.jar (70ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/scalatags_2.12/0.6.2/scalatags_2.12-0.6.2.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#scalatags_2.12;0.6.2!scalatags_2.12.jar (72ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.12.3/scala-reflect-2.12.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-reflect;2.12.3!scala-reflect.jar (163ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/fastparse_2.12/0.4.2/fastparse_2.12-0.4.2.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#fastparse_2.12;0.4.2!fastparse_2.12.jar (58ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.12/0.1.3/sourcecode_2.12-0.1.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#sourcecode_2.12;0.1.3!sourcecode_2.12.jar (52ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/fastparse-utils_2.12/0.4.2/fastparse-utils_2.12-0.4.2.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#fastparse-utils_2.12;0.4.2!fastparse-utils_2.12.jar (52ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/ammonite-ops_2.12/0.8.1/ammonite-ops_2.12-0.8.1.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#ammonite-ops_2.12;0.8.1!ammonite-ops_2.12.jar (57ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/webjars/highlightjs/9.7.0/highlightjs-9.7.0.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.webjars#highlightjs;9.7.0!highlightjs.jar (66ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/webjars/font-awesome/4.7.0/font-awesome-4.7.0.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.webjars#font-awesome;4.7.0!font-awesome.jar (66ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/webjars/pure/0.6.0/pure-0.6.0.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.webjars#pure;0.6.0!pure.jar (59ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/upickle_2.12/0.4.4/upickle_2.12-0.4.4.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#upickle_2.12;0.4.4!upickle_2.12.jar (59ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/scalaj/scalaj-http_2.12/2.3.0/scalaj-http_2.12-2.3.0.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scalaj#scalaj-http_2.12;2.3.0!scalaj-http_2.12.jar (53ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/derive_2.12/0.4.4/derive_2.12-0.4.4.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#derive_2.12;0.4.4!derive_2.12.jar (62ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/spire-math/jawn-parser_2.12/0.10.3/jawn-parser_2.12-0.10.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.spire-math#jawn-parser_2.12;0.10.3!jawn-parser_2.12.jar (57ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/com/lihaoyi/geny_2.12/0.6.5/geny_2.12-0.6.5.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] com.lihaoyi#geny_2.12;0.6.5!geny_2.12.jar (53ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.12.3/scala-compiler-2.12.3.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.12.3!scala-compiler.jar (254ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] org.scala-lang.modules#scala-xml_2.12;1.0.6!scala-xml_2.12.jar(bundle) (73ms)[0m
+[0m[[0minfo[0m] [0mdownloading https://repo1.maven.org/maven2/jline/jline/2.14.4/jline-2.14.4.jar ...[0m
+[0m[[0minfo[0m] [0m	[SUCCESSFUL ] jline#jline;2.14.4!jline.jar (53ms)[0m
+[0m[[0minfo[0m] [0mDone updating.[0m
+[0m[[33mwarn[0m] [0mFound version conflict(s) in library dependencies; some are suspected to be binary incompatible:[0m
+[0m[[33mwarn[0m] [0m[0m
+[0m[[33mwarn[0m] [0m	* com.lihaoyi:geny_2.12:0.6.5 is selected over 0.1.1[0m
+[0m[[33mwarn[0m] [0m	    +- com.lihaoyi:os-lib_2.12:0.7.3                      (depends on 0.6.5)[0m
+[0m[[33mwarn[0m] [0m	    +- com.lihaoyi:ammonite-ops_2.12:0.8.1                (depends on 0.1.1)[0m
+[0m[[33mwarn[0m] [0m[0m
+[0m[[33mwarn[0m] [0mRun 'evicted' to see detailed eviction warnings[0m
+[0m[[0minfo[0m] [0mCompiling 11 Scala sources to /home/runner/work/Ammonite/Ammonite/readme/target/scala-2.12/classes...[0m
+[0m[[0minfo[0m] [0m'compiler-interface' not yet compiled for Scala 2.12.3. Compiling...[0m
+[0m[[0minfo[0m] [0m  Compilation completed in 10.514 s[0m
+[0m[[33mwarn[0m] [0m/home/runner/work/Ammonite/Ammonite/readme/Sample.scala:28: This catches all Throwables. If this is really intended, use `case e : Throwable` to clear this warning.[0m
+[0m[[33mwarn[0m] [0m    catch{ case e =>[0m
+[0m[[33mwarn[0m] [0m                ^[0m
+[0m[[33mwarn[0m] [0mthere was one deprecation warning[0m
+[0m[[33mwarn[0m] [0mthere were two deprecation warnings (since 0.7.5)[0m
+[0m[[33mwarn[0m] [0mthere were three deprecation warnings in total; re-run with -deprecation for details[0m
+[0m[[33mwarn[0m] [0mfour warnings found[0m
+[0m[[0minfo[0m] [0mRunning scalatex.Main [0m
+[0m[[0minfo[0m] [0mInitializing Sample[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mtime ls -a[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__time ls -a[0m
+[0m[[31merror[0m] [0m[0m
+[0m[[31merror[0m] [0mreal	0m0.002s[0m
+[0m[[31merror[0m] [0muser	0m0.002s[0m
+[0m[[31merror[0m] [0msys	0m0.000s[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m.[0m
+[0m[[0minfo[0m] [0m..[0m
+[0m[[0minfo[0m] [0m.git[0m
+[0m[[0minfo[0m] [0m.github[0m
+[0m[[0minfo[0m] [0m.gitignore[0m
+[0m[[0minfo[0m] [0m.travis.yml[0m
+[0m[[0minfo[0m] [0mLICENSE[0m
+[0m[[0minfo[0m] [0mamm[0m
+[0m[[0minfo[0m] [0mamm-template.sh[0m
+[0m[[0minfo[0m] [0mappveyor.yml[0m
+[0m[[0minfo[0m] [0mbuild.sbt[0m
+[0m[[0minfo[0m] [0mbuild.sc[0m
+[0m[[0minfo[0m] [0mci[0m
+[0m[[0minfo[0m] [0mdeploy_key[0m
+[0m[[0minfo[0m] [0mintegration[0m
+[0m[[0minfo[0m] [0minternals-docs[0m
+[0m[[0minfo[0m] [0mmill[0m
+[0m[[0minfo[0m] [0mops[0m
+[0m[[0minfo[0m] [0mout[0m
+[0m[[0minfo[0m] [0mproject[0m
+[0m[[0minfo[0m] [0mreadme[0m
+[0m[[0minfo[0m] [0mreadme.md[0m
+[0m[[0minfo[0m] [0mshell[0m
+[0m[[0minfo[0m] [0msshd[0m
+[0m[[0minfo[0m] [0mterminal[0m
+[0m[[0minfo[0m] [0mtypescript[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mtime{ls!}[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mCompiling /home/runner/work/Ammonite/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc[39m[0m
+[0m[[31merror[0m] [0m[34mCompiling /home/runner/work/Ammonite/Ammonite/shell/src/main/resources/ammonite/shell/example-predef-bare.sc #2[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mtime{ls!} [9999D[9C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: ([32mLsSeq[39m, [32mconcurrent[39m.[32mduration[39m.[32mFiniteDuration[39m) = ([0m
+[0m[[0minfo[0m] [0m  [0m
+[0m[[0minfo[0m] [0m[32m".git"[39m              [32m"appveyor.yml"[39m      [32m'mill[39m               [32m'sshd[39m[0m
+[0m[[0minfo[0m] [0m[32m".github"[39m           [32m"build.sbt"[39m         [32m'ops[39m                [32m'target[39m[0m
+[0m[[0minfo[0m] [0m[32m".gitignore"[39m        [32m"build.sc"[39m          [32m'out[39m                [32m'terminal[39m[0m
+[0m[[0minfo[0m] [0m[32m".travis.yml"[39m       [32m'ci[39m                 [32m'project[39m            [32m'typescript[39m[0m
+[0m[[0minfo[0m] [0m[32m'LICENSE[39m            [32m'deploy_key[39m         [32m'readme[39m[0m
+[0m[[0minfo[0m] [0m[32m'amm[39m                [32m'integration[39m        [32m"readme.md"[39m[0m
+[0m[[0minfo[0m] [0m[32m"amm-template.sh"[39m   [32m"internals-docs"[39m    [32m'shell[39m[0m
+[0m[[0minfo[0m] [0m,[0m
+[0m[[0minfo[0m] [0m  17186419 nanoseconds[0m
+[0m[[0minfo[0m] [0m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mls -a . | grep re[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__ls -a . | grep re[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m.gitignore[0m
+[0m[[0minfo[0m] [0mreadme[0m
+[0m[[0minfo[0m] [0mreadme.md[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls! wd || grep! "re"[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! wd || grep! [32m"re"[39m [9999D[20C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mSeq[39m[[32mruntime[39m.[32mtools[39m.[32mGrepResult[39m] = [33mList[39m([0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/.gitigno[34m[43mre[39m[49m,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/[34m[43mre[39m[49madme,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/[34m[43mre[39m[49madme.md[0m
+[0m[[0minfo[0m] [0m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls! wd |? grep! "re"[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! wd |? grep! [32m"re"[39m [9999D[20C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mSeq[39m[[32mPath[39m] = [33mList[39m([0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/.gitignore,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/readme,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/readme.md[0m
+[0m[[0minfo[0m] [0m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mls -a . | grep -G "re[a-z]\+"[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__ls -a . | grep -G "re[a-z]\+"[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mreadme[0m
+[0m[[0minfo[0m] [0mreadme.md[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls! wd || grep! "re[a-z]+".r[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! wd || grep! [32m"re[a-z]+"[39m.r [9999D[28C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mSeq[39m[[32mruntime[39m.[32mtools[39m.[32mGrepResult[39m] = [33mList[39m([0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/[34m[43mreadme[39m[49m,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/[34m[43mreadme[39m[49m.md[0m
+[0m[[0minfo[0m] [0m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0m// I'm only interested in OS-related properties, show them to me![0m
+[0m[[0minfo[0m] [0msys.props || grep! "os|OS".r[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[31mcmd0.sc:1: value || is not a member of scala.sys.SystemProperties[0m
+[0m[[31merror[0m] [0mval res0 = sys.props || grep! "os|OS".r[0m
+[0m[[31merror[0m] [0m                     ^[39m[0m
+[0m[[31merror[0m] [0m[31mCompilation Failed[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[34m// I'm only interested in OS-related properties, show them to me![39m [9999D[65C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39msys.props || grep! [32m"os|OS"[39m.r [9999D[28C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mtypeOf(repl.compiler).members.size // Too many methods to dig through![0m
+[0m[[0minfo[0m] [0m// I forgot what I want but I think it has Raw in the name[0m
+[0m[[0minfo[0m] [0mtypeOf(repl.compiler).members || grep! "Raw"[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[31mcmd1.sc:1: value || is not a member of reflect.runtime.universe.MemberScope[0m
+[0m[[31merror[0m] [0mval res1 = typeOf(repl.compiler).members || grep! "Raw"[0m
+[0m[[31merror[0m] [0m                                         ^[39m[0m
+[0m[[31merror[0m] [0m[31mCompilation Failed[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mtypeOf(repl.compiler).members.size [34m// Too many methods to dig through![39m [9999D[70C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mInt[39m = [32m1592[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[34m// I forgot what I want but I think it has Raw in the name[39m [9999D[58C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mtypeOf(repl.compiler).members || grep! [32m"Raw"[39m [9999D[44C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mpwd[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__pwd[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m/home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mwd[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mwd [9999D[2C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mPath[39m = /home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mpwd[0m
+[0m[[0minfo[0m] [0mcd target[0m
+[0m[[0minfo[0m] [0mpwd[0m
+[0m[[0minfo[0m] [0mcd ..[0m
+[0m[[0minfo[0m] [0mpwd[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__pwd[0m
+[0m[[31merror[0m] [0m__bash__cd target[0m
+[0m[[31merror[0m] [0m__bash__pwd[0m
+[0m[[31merror[0m] [0m__bash__cd ..[0m
+[0m[[31merror[0m] [0m__bash__pwd[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m/home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m/home/runner/work/Ammonite/Ammonite/target[0m
+[0m[[0minfo[0m] [0m/home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mwd[0m
+[0m[[0minfo[0m] [0mcd! 'target[0m
+[0m[[0minfo[0m] [0mwd[0m
+[0m[[0minfo[0m] [0mcd! up[0m
+[0m[[0minfo[0m] [0mwd[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mwd [9999D[2C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mPath[39m = /home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mcd! [32m'target[39m [9999D[11C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres1[39m: [32mPath[39m = /home/runner/work/Ammonite/Ammonite/target[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mwd [9999D[2C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres2[39m: [32mPath[39m = /home/runner/work/Ammonite/Ammonite/target[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mcd! up [9999D[6C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres3[39m: [32mPath[39m = /home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mwd [9999D[2C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres4[39m: [32mPath[39m = /home/runner/work/Ammonite/Ammonite[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mls[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__ls[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mLICENSE[0m
+[0m[[0minfo[0m] [0mamm[0m
+[0m[[0minfo[0m] [0mamm-template.sh[0m
+[0m[[0minfo[0m] [0mappveyor.yml[0m
+[0m[[0minfo[0m] [0mbuild.sbt[0m
+[0m[[0minfo[0m] [0mbuild.sc[0m
+[0m[[0minfo[0m] [0mci[0m
+[0m[[0minfo[0m] [0mdeploy_key[0m
+[0m[[0minfo[0m] [0mintegration[0m
+[0m[[0minfo[0m] [0minternals-docs[0m
+[0m[[0minfo[0m] [0mmill[0m
+[0m[[0minfo[0m] [0mops[0m
+[0m[[0minfo[0m] [0mout[0m
+[0m[[0minfo[0m] [0mproject[0m
+[0m[[0minfo[0m] [0mreadme[0m
+[0m[[0minfo[0m] [0mreadme.md[0m
+[0m[[0minfo[0m] [0mshell[0m
+[0m[[0minfo[0m] [0msshd[0m
+[0m[[0minfo[0m] [0mtarget[0m
+[0m[[0minfo[0m] [0mterminal[0m
+[0m[[0minfo[0m] [0mtypescript[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls![0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! [9999D[3C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m".git"[39m              [32m"appveyor.yml"[39m      [32m'mill[39m               [32m'sshd[39m[0m
+[0m[[0minfo[0m] [0m[32m".github"[39m           [32m"build.sbt"[39m         [32m'ops[39m                [32m'target[39m[0m
+[0m[[0minfo[0m] [0m[32m".gitignore"[39m        [32m"build.sc"[39m          [32m'out[39m                [32m'terminal[39m[0m
+[0m[[0minfo[0m] [0m[32m".travis.yml"[39m       [32m'ci[39m                 [32m'project[39m            [32m'typescript[39m[0m
+[0m[[0minfo[0m] [0m[32m'LICENSE[39m            [32m'deploy_key[39m         [32m'readme[39m[0m
+[0m[[0minfo[0m] [0m[32m'amm[39m                [32m'integration[39m        [32m"readme.md"[39m[0m
+[0m[[0minfo[0m] [0m[32m"amm-template.sh"[39m   [32m"internals-docs"[39m    [32m'shell[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mls project[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__ls project[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mbuild.properties[0m
+[0m[[0minfo[0m] [0mplugins.sbt[0m
+[0m[[0minfo[0m] [0mproject[0m
+[0m[[0minfo[0m] [0mtarget[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls! 'project[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! [32m'project[39m [9999D[12C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m"build.properties"[39m  [32m"plugins.sbt"[39m       [32m'project[39m            [32m'target[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mls project/target[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__ls project/target[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mconfig-classes[0m
+[0m[[0minfo[0m] [0mscala-2.10[0m
+[0m[[0minfo[0m] [0mstreams[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls! 'project/'target[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! [32m'project[39m/[32m'target[39m [9999D[20C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m"config-classes"[39m    [32m"scala-2.10"[39m        [32m'streams[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mfind ops/src/main[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__find ops/src/main[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mops/src/main[0m
+[0m[[0minfo[0m] [0mops/src/main/scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala/ammonite[0m
+[0m[[0minfo[0m] [0mops/src/main/scala/ammonite/ops[0m
+[0m[[0minfo[0m] [0mops/src/main/scala/ammonite/ops/package.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala/ammonite/ops/FileOps.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala/ammonite/ops/Extensions.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala/ammonite/ops/Shellout.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.13[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.13/ammonite[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.13/ammonite/ops[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.13/ammonite/ops/LsSeq.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.13/ammonite/ops/FilterMapExt.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.12[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.12/ammonite[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.12/ammonite/ops[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.12/ammonite/ops/LsSeq.scala[0m
+[0m[[0minfo[0m] [0mops/src/main/scala-2.12/ammonite/ops/FilterMapExt.scala[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls.rec! 'ops/'src/'main[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls.rec! [32m'ops[39m/[32m'src[39m/[32m'main[39m [9999D[23C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m'scala[39m[0m
+[0m[[0minfo[0m] [0m[32m"scala-2.12"[39m[0m
+[0m[[0minfo[0m] [0m[32m"scala-2.13"[39m[0m
+[0m[[0minfo[0m] [0m[32m'scala[39m/[32m'ammonite[39m[0m
+[0m[[0minfo[0m] [0m[32m"scala-2.12"[39m/[32m'ammonite[39m[0m
+[0m[[0minfo[0m] [0m[32m"scala-2.13"[39m/[32m'ammonite[39m[0m
+[0m[[0minfo[0m] [0m[32m'scala[39m/[32m'ammonite[39m/[32m'ops[39m[0m
+[0m[[0minfo[0m] [0m[32m"scala-2.12"[39m/[32m'ammonite[39m/[32m'ops[39m[0m
+[0m[[0minfo[0m] [0m[32m"scala-2.13"[39m/[32m'ammonite[39m/[32m'ops[39m[0m
+[0m[[0minfo[0m] [0m[32m'scala[39m/[32m'ammonite[39m/[32m'ops[39m/[32m"Extensions.scala"[39m[0m
+[0m[[0minfo[0m] [0m...[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mmkdir target/test[0m
+[0m[[0minfo[0m] [0mecho "hello" > target/test/hello.txt[0m
+[0m[[0minfo[0m] [0mcat target/test/hello.txt[0m
+[0m[[0minfo[0m] [0mls target/test[0m
+[0m[[0minfo[0m] [0mcp target/test/hello.txt target/test/hello2.txt[0m
+[0m[[0minfo[0m] [0mls target/test[0m
+[0m[[0minfo[0m] [0mmv target/test/hello.txt target/test/hello3.txt[0m
+[0m[[0minfo[0m] [0mls target/test[0m
+[0m[[0minfo[0m] [0mrm -rf target/test[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__mkdir target/test[0m
+[0m[[31merror[0m] [0m__bash__echo "hello" > target/test/hello.txt[0m
+[0m[[31merror[0m] [0m__bash__cat target/test/hello.txt[0m
+[0m[[31merror[0m] [0m__bash__ls target/test[0m
+[0m[[31merror[0m] [0m__bash__cp target/test/hello.txt target/test/hello2.txt[0m
+[0m[[31merror[0m] [0m__bash__ls target/test[0m
+[0m[[31merror[0m] [0m__bash__mv target/test/hello.txt target/test/hello3.txt[0m
+[0m[[31merror[0m] [0m__bash__ls target/test[0m
+[0m[[31merror[0m] [0m__bash__rm -rf target/test[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mhello[0m
+[0m[[0minfo[0m] [0mhello.txt[0m
+[0m[[0minfo[0m] [0mhello.txt[0m
+[0m[[0minfo[0m] [0mhello2.txt[0m
+[0m[[0minfo[0m] [0mhello2.txt[0m
+[0m[[0minfo[0m] [0mhello3.txt[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mmkdir! 'target/'test[0m
+[0m[[0minfo[0m] [0mwrite('target/'test/"hello.txt", "hello")[0m
+[0m[[0minfo[0m] [0mread('target/'test/"hello.txt")[0m
+[0m[[0minfo[0m] [0mls! 'target/'test[0m
+[0m[[0minfo[0m] [0mcp('target/'test/"hello.txt", 'target/'test/"hello2.txt")[0m
+[0m[[0minfo[0m] [0mls! 'target/'test[0m
+[0m[[0minfo[0m] [0mmv('target/'test/"hello.txt", 'target/'test/"hello3.txt")[0m
+[0m[[0minfo[0m] [0mls! 'target/'test[0m
+[0m[[0minfo[0m] [0mrm! 'target/'test[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mmkdir! [32m'target[39m/[32m'test[39m [9999D[20C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mwrite([32m'target[39m/[32m'test[39m/[32m"hello.txt"[39m, [32m"hello"[39m) [9999D[41C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mread([32m'target[39m/[32m'test[39m/[32m"hello.txt"[39m) [9999D[31C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres2[39m: [32mString[39m = [32m"hello"[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! [32m'target[39m/[32m'test[39m [9999D[17C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres3[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m"hello.txt"[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mcp([32m'target[39m/[32m'test[39m/[32m"hello.txt"[39m, [32m'target[39m/[32m'test[39m/[32m"hello2.txt"[39m) [9999D[57C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! [32m'target[39m/[32m'test[39m [9999D[17C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres5[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m"hello.txt"[39m     [32m"hello2.txt"[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mmv([32m'target[39m/[32m'test[39m/[32m"hello.txt"[39m, [32m'target[39m/[32m'test[39m/[32m"hello3.txt"[39m) [9999D[57C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! [32m'target[39m/[32m'test[39m [9999D[17C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres7[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m"hello2.txt"[39m    [32m"hello3.txt"[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mrm! [32m'target[39m/[32m'test[39m [9999D[17C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mls -a | grep "^\."[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__ls -a | grep "^\."[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m.[0m
+[0m[[0minfo[0m] [0m..[0m
+[0m[[0minfo[0m] [0m.git[0m
+[0m[[0minfo[0m] [0m.github[0m
+[0m[[0minfo[0m] [0m.gitignore[0m
+[0m[[0minfo[0m] [0m.travis.yml[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls! pwd |? (_.last(0) == '.')[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls! pwd |? ([33m_[39m.last([32m0[39m) == [32m'.'[39m) [9999D[29C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mSeq[39m[[32mPath[39m] = [33mList[39m([0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/.git,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/.github,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/.gitignore,[0m
+[0m[[0minfo[0m] [0m  /home/runner/work/Ammonite/Ammonite/.travis.yml[0m
+[0m[[0minfo[0m] [0m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mfind ./repl/src -ls | sort -nrk 7 | head -3[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__find ./repl/src -ls | sort -nrk 7 | head -3[0m
+[0m[[31merror[0m] [0mfind: ‘./repl/src’: No such file or directory[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls.rec! wd/'amm/'src | (x => x.size -> x.last) sortBy (-_._1) take 3[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls.rec! wd/[32m'amm[39m/[32m'src[39m | (x => x.size -> x.last) sortBy (-[33m_[39m._1) take [32m3[39m [9999D[68C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mSeq[39m[([32mLong[39m, [32mString[39m)] = [33mList[39m([0m
+[0m[[0minfo[0m] [0m  ([32m340324L[39m, [32m"Resume.docx"[39m),[0m
+[0m[[0minfo[0m] [0m  ([32m227570L[39m, [32m"SystemShell.png"[39m),[0m
+[0m[[0minfo[0m] [0m  ([32m208328L[39m, [32m"Highlighting.png"[39m)[0m
+[0m[[0minfo[0m] [0m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mfind ./ops/src/main -name '*.scala' | xargs wc -l[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__find ./ops/src/main -name '*.scala' | xargs wc -l[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m  134 ./ops/src/main/scala/ammonite/ops/package.scala[0m
+[0m[[0minfo[0m] [0m  148 ./ops/src/main/scala/ammonite/ops/FileOps.scala[0m
+[0m[[0minfo[0m] [0m  128 ./ops/src/main/scala/ammonite/ops/Extensions.scala[0m
+[0m[[0minfo[0m] [0m  214 ./ops/src/main/scala/ammonite/ops/Shellout.scala[0m
+[0m[[0minfo[0m] [0m   24 ./ops/src/main/scala-2.13/ammonite/ops/LsSeq.scala[0m
+[0m[[0minfo[0m] [0m   67 ./ops/src/main/scala-2.13/ammonite/ops/FilterMapExt.scala[0m
+[0m[[0minfo[0m] [0m   11 ./ops/src/main/scala-2.12/ammonite/ops/LsSeq.scala[0m
+[0m[[0minfo[0m] [0m   59 ./ops/src/main/scala-2.12/ammonite/ops/FilterMapExt.scala[0m
+[0m[[0minfo[0m] [0m  785 total[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mls.rec! wd/'ops/'src/'main |? (_.ext == "scala") | read.lines | (_.size) sum[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls.rec! wd/[32m'ops[39m/[32m'src[39m/[32m'main[39m |? ([33m_[39m.ext == [32m"scala"[39m) | read.lines | ([33m_[39m.size) sum [9999D[76C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mInt[39m = [32m788[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mbash ops/src/test/resources/scripts/echo HELLO[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__bash ops/src/test/resources/scripts/echo HELLO[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mHELLO[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0m%bash('ops/'src/'test/'resources/'scripts/'echo, "HELLO")[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m%bash([32m'ops[39m/[32m'src[39m/[32m'test[39m/[32m'resources[39m/[32m'scripts[39m/[32m'echo[39m, [32m"HELLO"[39m) [9999D[57C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mHELLO[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mgit branch[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__git branch[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0m* master[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0m%git 'branch[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m%git [32m'branch[39m [9999D[12C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m* master[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(bash, -i)[0m
+[0m[[0minfo[0m] [0mPS1=__bash__[0m
+[0m[[0minfo[0m] [0mdate[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap()[0m
+[0m[[31merror[0m] [0m]0;runner@fv-az189-703: ~/work/Ammonite/Ammonite[01;32mrunner@fv-az189-703[00m:[01;34m~/work/Ammonite/Ammonite[00m$ PS1=__bash__[0m
+[0m[[31merror[0m] [0m__bash__date[0m
+[0m[[31merror[0m] [0m__bash__exit[0m
+[0m[[31merror[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mSun Apr  4 14:39:23 UTC 2021[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0m%date[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m%date [9999D[5C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mSun Apr  4 14:39:28 UTC 2021[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0m(1 + 2) * 3[0m
+[0m[[0minfo[0m] [0mmath.pow(4, 4)[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m([32m1[39m + [32m2[39m) * [32m3[39m [9999D[11C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres0[39m: [32mInt[39m = [32m9[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mmath.pow([32m4[39m, [32m4[39m) [9999D[14C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres1[39m: [32mDouble[39m = [32m256.0[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval x = (1 + 2) * 3[0m
+[0m[[0minfo[0m] [0mx + x[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m x = ([32m1[39m + [32m2[39m) * [32m3[39m [9999D[19C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mx[39m: [32mInt[39m = [32m9[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mx + x [9999D[5C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres1[39m: [32mInt[39m = [32m18[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mdef addMul(x: Int) = (x + 2) * 3[0m
+[0m[[0minfo[0m] [0maddMul(5)[0m
+[0m[[0minfo[0m] [0maddMul(5) + 1[0m
+[0m[[0minfo[0m] [0maddMul(5 + 1)[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mdef[39m addMul(x: [32mInt[39m) = (x + [32m2[39m) * [32m3[39m [9999D[32C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mdefined [32mfunction[39m [36maddMul[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39maddMul([32m5[39m) [9999D[9C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres1[39m: [32mInt[39m = [32m21[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39maddMul([32m5[39m) + [32m1[39m [9999D[13C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres2[39m: [32mInt[39m = [32m22[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39maddMul([32m5[39m + [32m1[39m) [9999D[13C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres3[39m: [32mInt[39m = [32m24[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mvar total = 0[0m
+[0m[[0minfo[0m] [0mfor(i <- 0 until 100){ if (i % 2 == 0) total += 1 }[0m
+[0m[[0minfo[0m] [0mtotal[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mvar[39m total = [32m0[39m [9999D[13C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mtotal[39m: [32mInt[39m = [32m0[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mfor[39m(i <- [32m0[39m until [32m100[39m){ [33mif[39m (i % [32m2[39m == [32m0[39m) total += [32m1[39m } [9999D[51C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mtotal [9999D[5C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres2[39m: [32mInt[39m = [32m50[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval files = ls! wd[0m
+[0m[[0minfo[0m] [0mval count = files.length[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m files = ls! wd [9999D[18C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mfiles[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m".git"[39m              [32m"appveyor.yml"[39m      [32m'mill[39m               [32m'sshd[39m[0m
+[0m[[0minfo[0m] [0m[32m".github"[39m           [32m"build.sbt"[39m         [32m'ops[39m                [32m'target[39m[0m
+[0m[[0minfo[0m] [0m[32m".gitignore"[39m        [32m"build.sc"[39m          [32m'out[39m                [32m'terminal[39m[0m
+[0m[[0minfo[0m] [0m[32m".travis.yml"[39m       [32m'ci[39m                 [32m'project[39m            [32m'typescript[39m[0m
+[0m[[0minfo[0m] [0m[32m'LICENSE[39m            [32m'deploy_key[39m         [32m'readme[39m[0m
+[0m[[0minfo[0m] [0m[32m'amm[39m                [32m'integration[39m        [32m"readme.md"[39m[0m
+[0m[[0minfo[0m] [0m[32m"amm-template.sh"[39m   [32m"internals-docs"[39m    [32m'shell[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m count = files.length [9999D[24C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mcount[39m: [32mInt[39m = [32m25[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval files: LsSeq = ls! wd[0m
+[0m[[0minfo[0m] [0mval count: Int = files.length[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m files: [32mLsSeq[39m = ls! wd [9999D[25C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mfiles[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m".git"[39m              [32m"appveyor.yml"[39m      [32m'mill[39m               [32m'sshd[39m[0m
+[0m[[0minfo[0m] [0m[32m".github"[39m           [32m"build.sbt"[39m         [32m'ops[39m                [32m'target[39m[0m
+[0m[[0minfo[0m] [0m[32m".gitignore"[39m        [32m"build.sc"[39m          [32m'out[39m                [32m'terminal[39m[0m
+[0m[[0minfo[0m] [0m[32m".travis.yml"[39m       [32m'ci[39m                 [32m'project[39m            [32m'typescript[39m[0m
+[0m[[0minfo[0m] [0m[32m'LICENSE[39m            [32m'deploy_key[39m         [32m'readme[39m[0m
+[0m[[0minfo[0m] [0m[32m'amm[39m                [32m'integration[39m        [32m"readme.md"[39m[0m
+[0m[[0minfo[0m] [0m[32m"amm-template.sh"[39m   [32m"internals-docs"[39m    [32m'shell[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m count: [32mInt[39m = files.length [9999D[29C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mcount[39m: [32mInt[39m = [32m25[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval files = ls! wd[0m
+[0m[[0minfo[0m] [0mls + 123[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[31mcmd1.sc:1: type mismatch;[0m
+[0m[[31merror[0m] [0m found   : Int(123)[0m
+[0m[[31merror[0m] [0m required: String[0m
+[0m[[31merror[0m] [0mval res1 = ls + 123[0m
+[0m[[31merror[0m] [0m                ^[39m[0m
+[0m[[31merror[0m] [0m[31mCompilation Failed[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m files = ls! wd [9999D[18C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mfiles[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m".git"[39m              [32m"appveyor.yml"[39m      [32m'mill[39m               [32m'sshd[39m[0m
+[0m[[0minfo[0m] [0m[32m".github"[39m           [32m"build.sbt"[39m         [32m'ops[39m                [32m'target[39m[0m
+[0m[[0minfo[0m] [0m[32m".gitignore"[39m        [32m"build.sc"[39m          [32m'out[39m                [32m'terminal[39m[0m
+[0m[[0minfo[0m] [0m[32m".travis.yml"[39m       [32m'ci[39m                 [32m'project[39m            [32m'typescript[39m[0m
+[0m[[0minfo[0m] [0m[32m'LICENSE[39m            [32m'deploy_key[39m         [32m'readme[39m[0m
+[0m[[0minfo[0m] [0m[32m'amm[39m                [32m'integration[39m        [32m"readme.md"[39m[0m
+[0m[[0minfo[0m] [0m[32m"amm-template.sh"[39m   [32m"internals-docs"[39m    [32m'shell[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mls + [32m123[39m [9999D[8C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval numbers = Array(1, 3, 6, 10)[0m
+[0m[[0minfo[0m] [0mnumbers(0)[0m
+[0m[[0minfo[0m] [0mnumbers(3)[0m
+[0m[[0minfo[0m] [0mnumbers.sum[0m
+[0m[[0minfo[0m] [0mnumbers(3) = 100[0m
+[0m[[0minfo[0m] [0mnumbers.sum[0m
+[0m[[0minfo[0m] [0mval scores = Map("txt" -> 5, "scala" -> 0)[0m
+[0m[[0minfo[0m] [0mscores("txt")[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m numbers = Array([32m1[39m, [32m3[39m, [32m6[39m, [32m10[39m) [9999D[32C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mnumbers[39m: [32mArray[39m[[32mInt[39m] = [33mArray[39m([32m1[39m, [32m3[39m, [32m6[39m, [32m10[39m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers([32m0[39m) [9999D[10C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres1[39m: [32mInt[39m = [32m1[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers([32m3[39m) [9999D[10C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres2[39m: [32mInt[39m = [32m10[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers.sum [9999D[11C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres3[39m: [32mInt[39m = [32m20[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers([32m3[39m) = [32m100[39m [9999D[16C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers.sum [9999D[11C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres5[39m: [32mInt[39m = [32m110[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m scores = Map([32m"txt"[39m -> [32m5[39m, [32m"scala"[39m -> [32m0[39m) [9999D[42C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mscores[39m: [32mMap[39m[[32mString[39m, [32mInt[39m] = [33mMap[39m([32m"txt"[39m -> [32m5[39m, [32m"scala"[39m -> [32m0[39m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mscores([32m"txt"[39m) [9999D[13C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres7[39m: [32mInt[39m = [32m5[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval numbers = Array(1, 3, 6, 10)[0m
+[0m[[0minfo[0m] [0mval myValue = "3"[0m
+[0m[[0minfo[0m] [0mnumbers(myValue) // Doesn't work[0m
+[0m[[0minfo[0m] [0mnumbers(1) = myValue // Also doesn't work[0m
+[0m[[0minfo[0m] [0m // Need to convert the string to an Int[0m
+[0m[[0minfo[0m] [0mnumbers(myValue.toInt)[0m
+[0m[[0minfo[0m] [0mnumbers(1) = myValue.toInt[0m
+[0m[[0minfo[0m] [0mnumbers(1) = "2".toInt[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[31mcmd2.sc:1: type mismatch;[0m
+[0m[[31merror[0m] [0m found   : String[0m
+[0m[[31merror[0m] [0m required: Int[0m
+[0m[[31merror[0m] [0mval res2 = numbers(myValue) // Doesn't work[0m
+[0m[[31merror[0m] [0m                   ^[39m[0m
+[0m[[31merror[0m] [0m[31mCompilation Failed[39m[0m
+[0m[[31merror[0m] [0m[31mcmd2.sc:1: type mismatch;[0m
+[0m[[31merror[0m] [0m found   : String[0m
+[0m[[31merror[0m] [0m required: Int[0m
+[0m[[31merror[0m] [0mval res2 = numbers(1) = myValue // Also doesn't work[0m
+[0m[[31merror[0m] [0m                        ^[39m[0m
+[0m[[31merror[0m] [0m[31mCompilation Failed[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m numbers = Array([32m1[39m, [32m3[39m, [32m6[39m, [32m10[39m) [9999D[32C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mnumbers[39m: [32mArray[39m[[32mInt[39m] = [33mArray[39m([32m1[39m, [32m3[39m, [32m6[39m, [32m10[39m)[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m myValue = [32m"3"[39m [9999D[17C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mmyValue[39m: [32mString[39m = [32m"3"[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers(myValue) [34m// Doesn't work[39m [9999D[32C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers([32m1[39m) = myValue // Also doesn't work [9999D[41C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m [34m// Need to convert the string to an Int[39m [9999D[40C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers(myValue.toInt) [9999D[22C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres2[39m: [32mInt[39m = [32m10[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers([32m1[39m) = myValue.toInt [9999D[26C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mnumbers([32m1[39m) = [32m"2"[39m.toInt [9999D[22C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mval allFiles = ls.rec! 'ops/'src/'test/'resources[0m
+[0m[[0minfo[0m] [0mval extensionCounts = allFiles.groupBy(_.ext).mapValues(_.length)[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m allFiles = ls.rec! [32m'ops[39m/[32m'src[39m/[32m'test[39m/[32m'resources[39m [9999D[49C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mallFiles[39m: [32mLsSeq[39m = [0m
+[0m[[0minfo[0m] [0m[32m'scripts[39m[0m
+[0m[[0minfo[0m] [0m[32m'test[39m[0m
+[0m[[0minfo[0m] [0m[32m'testdata[39m[0m
+[0m[[0minfo[0m] [0m[32m'scripts[39m/[32m'echo[39m[0m
+[0m[[0minfo[0m] [0m[32m'scripts[39m/[32m'echo_with_wd[39m[0m
+[0m[[0minfo[0m] [0m[32m'test[39m/[32m'ammonite[39m[0m
+[0m[[0minfo[0m] [0m[32m'testdata[39m/[32m"File.txt"[39m[0m
+[0m[[0minfo[0m] [0m[32m'testdata[39m/[32m'folder1[39m[0m
+[0m[[0minfo[0m] [0m[32m'testdata[39m/[32m'folder2[39m[0m
+[0m[[0minfo[0m] [0m[32m'test[39m/[32m'ammonite[39m/[32m'ops[39m[0m
+[0m[[0minfo[0m] [0m...[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m extensionCounts = allFiles.groupBy([33m_[39m.ext).mapValues([33m_[39m.length) [9999D[65C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mextensionCounts[39m: [32mcollection[39m.[32mMapView[39m[[32mString[39m, [32mInt[39m] = [33mMapView[39m(([32m""[39m, [32m12[39m), ([32m"txt"[39m, [32m5[39m))[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mSystem.out.println("Hello from Java!")[0m
+[0m[[0minfo[0m] [0mimport java.util._[0m
+[0m[[0minfo[0m] [0mval date = new Date()[0m
+[0m[[0minfo[0m] [0mdate.getDay()[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mSystem.out.println([32m"Hello from Java!"[39m) [9999D[38C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mHello from Java![0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mimport[39m java.util.[33m_[39m [9999D[18C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[32mimport [39m[36mjava.util._[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m date = [33mnew[39m [32mDate[39m() [9999D[21C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mdate[39m: [32mDate[39m = Sun Apr 04 14:40:40 UTC 2021[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mdate.getDay() [9999D[13C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres3[39m: [32mInt[39m = [32m0[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mimport com.google.common.collect.ImmutableBiMap // Doesn't work[0m
+[0m[[0minfo[0m] [0mimport $ivy.`com.google.guava:guava:18.0` // Load from Maven Central[0m
+[0m[[0minfo[0m] [0mimport com.google.common.collect.ImmutableBiMap // Works now[0m
+[0m[[0minfo[0m] [0mval bimap = ImmutableBiMap.of(1, "one", 2, "two", 3, "three")[0m
+[0m[[0minfo[0m] [0mbimap.get(1)[0m
+[0m[[0minfo[0m] [0mbimap.inverse.get("two")[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.pom[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.pom[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/com/google/guava/guava-parent/18.0/guava-parent-18.0.pom[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0-sources.jar[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mimport[39m com.google.common.collect.ImmutableBiMap // Doesn't work [9999D[63C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[32mimport [39m[36mcom.google.common.collect.ImmutableBiMap // Doesn't work[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mimport[39m $ivy.`com.google.guava:guava:18.0` // Load from Maven Central [9999D[68C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[32mimport [39m[36m$ivy.$                             // Load from Maven Central[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mimport[39m com.google.common.collect.ImmutableBiMap // Works now [9999D[60C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[32mimport [39m[36mcom.google.common.collect.ImmutableBiMap // Works now[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m bimap = ImmutableBiMap.of([32m1[39m, [32m"one"[39m, [32m2[39m, [32m"two"[39m, [32m3[39m, [32m"three"[39m) [9999D[61C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mbimap[39m: [32mImmutableBiMap[39m[[32mInt[39m, [32mString[39m] = {1=one, 2=two, 3=three}[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mbimap.get([32m1[39m) [9999D[12C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres4[39m: [32mString[39m = [32m"one"[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mbimap.inverse.get([32m"two"[39m) [9999D[24C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres5[39m: [32mInt[39m = [32m2[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0m====================EXECUTING====================[0m
+[0m[[0minfo[0m] [0mList(/home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/assembly/dest/out.jar, --color, true, --no-remote-logging, --no-home-predef, --predef, shell/src/main/resources/ammonite/shell/example-predef-bare.sc)[0m
+[0m[[0minfo[0m] [0mimport $ivy.`joda-time:joda-time:2.8.2`[0m
+[0m[[0minfo[0m] [0mimport org.joda.time.{DateTime, Period, Duration}[0m
+[0m[[0minfo[0m] [0mval dt = new DateTime(2005, 3, 26, 12, 0, 0, 0)[0m
+[0m[[0minfo[0m] [0mval plusPeriod = dt.plus(Period.days(1))[0m
+[0m[[0minfo[0m] [0mdt.plus(new Duration(24L*60L*60L*1000L))[0m
+[0m[[0minfo[0m] [0mexit[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0mMap(JAVA_OPTS -> -Xmx600m)[0m
+[0m[[31merror[0m] [0m[34mLoading...[39m[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.pom[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar[0m
+[0m[[31merror[0m] [0mDownloading https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2.jar[0m
+[0m[[31merror[0m] [0mDownloaded https://repo1.maven.org/maven2/joda-time/joda-time/2.8.2/joda-time-2.8.2-sources.jar[0m
+[0m[[31merror[0m] [0m[34mBye![39m[0m
+[0m[[0minfo[0m] [0m====================RESULT====================[0m
+[0m[[0minfo[0m] [0mWelcome to the Ammonite Repl 2.3.8-65-0f0d597f (Scala 2.13.1 Java 1.8.0_282)[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mimport[39m $ivy.`joda-time:joda-time:2.8.2` [9999D[39C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[32mimport [39m[36m$ivy.$                          [39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mimport[39m org.joda.time.{DateTime, Period, Duration} [9999D[49C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[32mimport [39m[36morg.joda.time.{DateTime, Period, Duration}[39m[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m dt = [33mnew[39m [32mDateTime[39m([32m2005[39m, [32m3[39m, [32m26[39m, [32m12[39m, [32m0[39m, [32m0[39m, [32m0[39m) [9999D[47C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mdt[39m: [32mDateTime[39m = 2005-03-26T12:00:00.000Z[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39m[33mval[39m plusPeriod = dt.plus(Period.days([32m1[39m)) [9999D[40C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mplusPeriod[39m: [32mDateTime[39m = 2005-03-27T12:00:00.000Z[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mdt.plus([33mnew[39m [32mDuration[39m([32m24L[39m*[32m60L[39m*[32m60L[39m*[32m1000L[39m)) [9999D[40C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[36mres4[39m: [32mDateTime[39m = 2005-03-27T12:00:00.000Z[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m[9999D[0J[35m@ [39mexit [9999D[4C[2C[0m
+[0m[[0minfo[0m] [0m[0m
+[0m[[0minfo[0m] [0m========================================[0m
+[0m[[0minfo[0m] [0mSome(Ammonite)[0m
+[0m[[32msuccess[0m] [0mTotal time: 251 s, completed Apr 4, 2021 2:41:00 PM[0m
+
+# Mangle ssh-key stuff to work with the deploy_key written by python
+eval "$(ssh-agent -s)"
+++ ssh-agent -s
++ eval 'SSH_AUTH_SOCK=/tmp/ssh-yYJwriBiRZWI/agent.6755; export SSH_AUTH_SOCK;
+SSH_AGENT_PID=6756; export SSH_AGENT_PID;
+echo Agent pid 6756;'
+SSH_AUTH_SOCK=/tmp/ssh-yYJwriBiRZWI/agent.6755; export SSH_AUTH_SOCK;
+++ SSH_AUTH_SOCK=/tmp/ssh-yYJwriBiRZWI/agent.6755
+++ export SSH_AUTH_SOCK
+SSH_AGENT_PID=6756; export SSH_AGENT_PID;
+++ SSH_AGENT_PID=6756
+++ export SSH_AGENT_PID
+echo Agent pid 6756;
+++ echo Agent pid 6756
+Agent pid 6756
+chmod 600 deploy_key
++ chmod 600 deploy_key
+ssh-add deploy_key
++ ssh-add deploy_key
+Identity added: deploy_key (deploy_key)
+rm deploy_key
++ rm deploy_key
+
+# Set up git so we can actually do things with it
+git config --global user.email "haoyi.sg+travis@gmail.com"
++ git config --global user.email haoyi.sg+travis@gmail.com
+git config --global user.name "Ammonite Travis Bot"
++ git config --global user.name 'Ammonite Travis Bot'
+git fetch origin gh-pages:gh-pages
++ git fetch origin gh-pages:gh-pages
+From https://github.com/com-lihaoyi/Ammonite
+ * [new branch]        gh-pages   -> gh-pages
+
+# Do all the git-foo to push the readme to the relevant gh-pages folder
+git checkout -f gh-pages
++ git checkout -f gh-pages
+Updating files:  18% (2052/11309)Updating files:  19% (2149/11309)Updating files:  20% (2262/11309)Updating files:  20% (2344/11309)Updating files:  21% (2375/11309)Updating files:  22% (2488/11309)Updating files:  23% (2602/11309)Updating files:  24% (2715/11309)Updating files:  25% (2828/11309)Updating files:  26% (2941/11309)Updating files:  27% (3054/11309)Updating files:  28% (3167/11309)Updating files:  29% (3280/11309)Updating files:  30% (3393/11309)Updating files:  31% (3506/11309)Updating files:  32% (3619/11309)Updating files:  33% (3732/11309)Updating files:  34% (3846/11309)Updating files:  35% (3959/11309)Updating files:  36% (4072/11309)Updating files:  37% (4185/11309)Updating files:  38% (4298/11309)Updating files:  39% (4411/11309)Updating files:  40% (4524/11309)Updating files:  41% (4637/11309)Updating files:  42% (4750/11309)Updating files:  43% (4863/11309)Updating files:  44% (4976/11309)Updating files:  45% (5090/11309)Updating files:  46% (5203/11309)Updating files:  47% (5316/11309)Updating files:  48% (5429/11309)Updating files:  49% (5542/11309)Updating files:  50% (5655/11309)Updating files:  51% (5768/11309)Updating files:  52% (5881/11309)Updating files:  53% (5994/11309)Updating files:  54% (6107/11309)Updating files:  55% (6220/11309)Updating files:  56% (6334/11309)Updating files:  57% (6447/11309)Updating files:  58% (6560/11309)Updating files:  59% (6673/11309)Updating files:  60% (6786/11309)Updating files:  61% (6899/11309)Updating files:  62% (7012/11309)Updating files:  63% (7125/11309)Updating files:  64% (7238/11309)Updating files:  65% (7351/11309)Updating files:  66% (7464/11309)Updating files:  67% (7578/11309)Updating files:  68% (7691/11309)Updating files:  69% (7804/11309)Updating files:  70% (7917/11309)Updating files:  71% (8030/11309)Updating files:  72% (8143/11309)Updating files:  73% (8256/11309)Updating files:  74% (8369/11309)Updating files:  75% (8482/11309)Updating files:  76% (8595/11309)Updating files:  77% (8708/11309)Updating files:  78% (8822/11309)Updating files:  79% (8935/11309)Updating files:  80% (9048/11309)Updating files:  81% (9161/11309)Updating files:  82% (9274/11309)Updating files:  83% (9387/11309)Updating files:  84% (9500/11309)Updating files:  85% (9613/11309)Updating files:  86% (9726/11309)Updating files:  87% (9839/11309)Updating files:  88% (9952/11309)Updating files:  89% (10066/11309)Updating files:  90% (10179/11309)Updating files:  91% (10292/11309)Updating files:  92% (10405/11309)Updating files:  93% (10518/11309)Updating files:  94% (10631/11309)Updating files:  95% (10744/11309)Updating files:  96% (10857/11309)Updating files:  97% (10970/11309)Updating files:  98% (11083/11309)Updating files:  99% (11196/11309)Updating files: 100% (11309/11309)Updating files: 100% (11309/11309), done.
+Switched to branch 'gh-pages'
+cp -r readme/target/scalatex/* .
++ cp -r readme/target/scalatex/Browse.gif readme/target/scalatex/ColoredTraces.png readme/target/scalatex/
