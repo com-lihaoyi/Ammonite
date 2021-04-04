@@ -8,6 +8,7 @@ lazy val readme = ScalatexReadme(
 ).settings(
   scalaVersion := "2.12.3",
   libraryDependencies += "com.lihaoyi" %% "fansi" % "0.2.3",
+  libraryDependencies += "com.lihaoyi" %% "os-lib" % "0.7.3",
   envVars in Test := Map(
     "AMMONITE_ASSEMBLY" -> sys.env("AMMONITE_ASSEMBLY"),
     "AMMONITE_SHELL" -> sys.env("AMMONITE_SHELL")
