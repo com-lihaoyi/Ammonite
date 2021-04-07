@@ -65,9 +65,18 @@ object Sample{
     println(args)
 
     try {
-      val p = os.proc(command)
-          .call(cwd = os.pwd, env = args, stdin = input)
-      val resultString = p.out.string
+      //val p = os.proc(command)
+      //    .call(cwd = os.pwd, env = args, stdin = input)
+      //val resultString = p.out.string
+      
+      // GH Actions is quirky, so we go line by line...
+      val sub = os.proc(command).spawn(cwd = os.pwd, env = args)
+      val inputLines = input.split("\n")
+      inputLines.foreach(sub.stdin.writeLine)
+      sub.stdin.flush()
+      sub.waitFor()
+      sub.destroy()
+      val resultString = new String(sub.stdout.readAllBytes())
 
       println(s"====================RESULT====================")
       println(resultString)
