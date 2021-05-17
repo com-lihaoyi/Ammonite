@@ -263,6 +263,7 @@ object Parsers extends IParser {
                        `type`: fansi.Attrs,
                        literal: fansi.Attrs,
                        keyword: fansi.Attrs,
+                       notImplemented: fansi.Attrs,
                        reset: fansi.Attrs) = {
     Highlighter.defaultHighlight0(Splitter(_), buffer, comment, `type`, literal, keyword, reset)
   }
@@ -274,4 +275,9 @@ object Parsers extends IParser {
                               reset: fansi.Attrs) = Highlighter.defaultHighlightIndices0(
     Splitter(_), buffer, comment, `type`, literal, keyword, reset
   )
+
+  def highlightIndices[T](buffer: Vector[Char],
+                          ruleColors: PartialFunction[String, T],
+                          endColor: T): Seq[(Int, T)] =
+    Highlighter.highlightIndices(Parsers.Splitter(_), buffer, ruleColors, endColor)
 }

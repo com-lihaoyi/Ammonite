@@ -2,8 +2,8 @@
 // HttpApi.sc
 
 import $ivy.{
-  `com.lihaoyi::requests:0.2.0`,
-  `com.lihaoyi::ujson:0.7.5`
+  `com.lihaoyi::requests:0.2.0 compat`,
+  `com.lihaoyi::ujson:0.7.5 compat`
 }
 
 lazy val jsonPlaceHolderBase =

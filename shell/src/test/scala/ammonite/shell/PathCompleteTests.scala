@@ -1,9 +1,10 @@
 package ammonite.shell
 
+import ammonite.TestUtils.scala2
 import utest._
 
 object PathCompleteTests extends TestSuite{
-  val tests = Tests{
+  val mainTests = Tests{
     test("path"){
       test("parse"){
         def check(s: String,
@@ -58,4 +59,8 @@ object PathCompleteTests extends TestSuite{
     }
 
   }
+
+  val tests =
+    if (scala2) mainTests
+    else Tests { test("Disabled in Scala 3") - "Disabled in Scala 3" }
 }

@@ -22,9 +22,15 @@ object LineNumberTests extends TestSuite{
     test("compilationErrorInSecondBlock") - checkErrorMessage(
       file = 'lineNumbers/"compilationErrorInSecondBlock.sc",
       expected = Util.normalizeNewlines(
-        """compilationErrorInSecondBlock.sc:14: not found: value printnl
-          |val res_0 = printnl("OK")
-          |            ^""".stripMargin
+        if (isScala2)
+          """compilationErrorInSecondBlock.sc:14: not found: value printnl
+            |val res_0 = printnl("OK")
+            |            ^""".stripMargin
+        else
+          """|   |val res_0 = printnl("OK")
+             |   |            ^^^^^^^
+             |   |            Not found: printnl
+             |Compilation Failed""".stripMargin
       )
     )
 

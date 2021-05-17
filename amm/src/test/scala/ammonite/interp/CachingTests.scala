@@ -148,6 +148,7 @@ object CachingTests extends TestSuite{
       runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       runScript(os.pwd, scriptPath/"TagPrevCommand.sc", interp)
 
+      implicit val sv = ammonite.interp.api.ScalaVersion(interp.scalaVersion)
       interp.loadIvy("com.lihaoyi" %% "scalatags" % "0.7.0")
       runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       val n = storage.compileCache.size
@@ -184,7 +185,7 @@ object CachingTests extends TestSuite{
         val x = 1337
         @
         val y = x
-        import $ivy.`com.lihaoyi::scalatags:0.7.0`, scalatags.Text.all._
+        import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`, scalatags.Text.all._
         """)
       val scriptFile = os.temp("""div("<('.'<)", y).render""")
 
@@ -206,7 +207,7 @@ object CachingTests extends TestSuite{
       os.write(
         predefFile,
         """
-        import $ivy.`com.lihaoyi::scalatags:0.7.0`; import scalatags.Text.all._
+        import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`; import scalatags.Text.all._
         val y = 31337
         """
       )

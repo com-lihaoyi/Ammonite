@@ -11,6 +11,7 @@ object HighlightTests extends TestSuite{
     fansi.Color.Green,
     fansi.Color.Green,
     fansi.Color.Yellow,
+    fansi.Color.Red,
     fansi.Attr.Reset
   )
 
@@ -24,6 +25,7 @@ object HighlightTests extends TestSuite{
         .replace(fansi.Color.Reset.escape, ">")
     assert(highlighted == expected)
   }
+  val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
   val tests = Tests {
     println("HighlightTests")
     test("highlighting"){
@@ -35,6 +37,7 @@ object HighlightTests extends TestSuite{
           val code = os.read(path)
           val out = Parsers.defaultHighlight(
             code.toVector,
+            fansi.Underlined.On,
             fansi.Underlined.On,
             fansi.Underlined.On,
             fansi.Underlined.On,
@@ -52,23 +55,42 @@ object HighlightTests extends TestSuite{
         paths.length
       }
       test("comment")- check("//a", "<B|//a>")
-      test("type")- check("x: y.type", "x: <G|y>.<Y|type>")
+      test("type")- {
+        val expected =
+          if (isScala2) "x: <G|y>.<Y|type>"
+          else "x: <G|y.type>"
+        check("x: y.type", expected)
+      }
       test("literal")- check("1", "<G|1>")
       test("expressions")- check("val (x, y) = 1 + 2 + 3", "<Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
       test("interpolation")- check(
         """(s"hello ${world + 1}")""",
         """(<G|s"hello >${world + <G|1>}<G|">)"""
       )
-      test("runOff")- check(
-        """(1 + "Hello...""",
-        """(<G|1> + <G|"Hello...>"""
-      )
-      test("underscore")- check(
-        """val _ = 1""",
-        """<Y|val> <Y|_> = <G|1>"""
-      )
-      test("nonTrivial")- check(
-        """def processLine(stmts: Seq[String],
+      test("runOff")- {
+        val expected =
+          if (isScala2) """(<G|1> + <G|"Hello...>"""
+          else """(<G|1> + "Hello...""" // Dotty highlighter doesn't color open strings
+        check("""(1 + "Hello...""", expected)
+      }
+      test("underscore")- {
+        val expected =
+          if (isScala2) """<Y|val> <Y|_> = <G|1>"""
+          else """<Y|val> _ = <G|1>"""
+        check("""val _ = 1""", expected)
+      }
+      test("nonTrivial")- {
+        val underscore =
+          if (isScala2) "<Y|_>"
+          else "_"
+        val underscore0 =
+          if (isScala2) "<Y|_>"
+          else "_"
+        def stringColl(collType: String) =
+          if (isScala2) s"<G|$collType>[<G|String>]"
+          else s"<G|$collType[String]>"
+        check(
+          """def processLine(stmts: Seq[String],
                             saveHistory: (String => Unit, String) => Unit,
                             printer: Iterator[String] => Unit) = for{
               _ <- Catching { case Ex(x@_*) =>
@@ -88,27 +110,28 @@ object HighlightTests extends TestSuite{
               } finally Thread.currentThread().setContextClassLoader(oldClassloader)
             } yield out
         """,
-        """<Y|def> processLine(stmts: <G|Seq>[<G|String>],
+        s"""<Y|def> processLine(stmts: ${stringColl("Seq")},
                             saveHistory: (<G|String> => <G|Unit>, <G|String>) => <G|Unit>,
-                            printer: <G|Iterator>[<G|String>] => <G|Unit>) = <Y|for>{
-              <Y|_> <- Catching { <Y|case> Ex(x@<Y|_>*) =>
+                            printer: ${stringColl("Iterator")} => <G|Unit>) = <Y|for>{
+              $underscore <- Catching { <Y|case> Ex(x@$underscore0*) =>
                 <Y|val> Res.Failure(trace) = Res.Failure(x)
-                Res.Failure(trace + <G|"\nSomething unexpected went wrong =(">)
+                Res.Failure(trace + <G|"\\nSomething unexpected went wrong =(">)
               }
               Preprocessor.Output(code, printSnippet) <- preprocess(stmts, eval.getCurrentLine)
-              <Y|_> = saveHistory(history.append(<Y|_>), stmts.mkString(<G|"; ">))
+              $underscore = saveHistory(history.append($underscore), stmts.mkString(<G|"; ">))
               oldClassloader = Thread.currentThread().getContextClassLoader
               out <- <Y|try>{
                 Thread.currentThread().setContextClassLoader(eval.evalClassloader)
                 eval.processLine(
                   code,
-                  <G|s"ReplBridge.combinePrints(>${printSnippet.mkString(<G|", ">)}<G|)">,
+                  <G|s"ReplBridge.combinePrints(>$${printSnippet.mkString(<G|", ">)}<G|)">,
                   printer
                 )
               } <Y|finally> Thread.currentThread().setContextClassLoader(oldClassloader)
             } <Y|yield> out
         """
-      )
+        )
+      }
     }
   }
 }

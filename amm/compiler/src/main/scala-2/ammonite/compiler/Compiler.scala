@@ -48,7 +48,7 @@ object Compiler{
                      dynamicClasspath: VirtualDirectory): Unit = {
 
     for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('.').toList, ".class")
+      val output = writeDeep(dynamicClasspath, name.split('/').toList)
       output.write(bytes)
       output.close()
     }
@@ -56,13 +56,12 @@ object Compiler{
   }
 
   def writeDeep(d: VirtualDirectory,
-                path: List[String],
-                suffix: String): OutputStream = path match {
-    case head :: Nil => d.fileNamed(path.head + suffix).output
+                path: List[String]): OutputStream = path match {
+    case head :: Nil => d.fileNamed(head).output
     case head :: rest =>
       writeDeep(
         d.subdirectoryNamed(head).asInstanceOf[VirtualDirectory],
-        rest, suffix
+        rest
       )
     // We should never write to an empty path, and one of the above cases
     // should catch this and return before getting here
@@ -299,10 +298,10 @@ object Compiler{
 
         val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
-          val output = writeDeep(dynamicClasspath, segments, "")
+          val output = writeDeep(dynamicClasspath, segments)
           output.write(x.toByteArray)
           output.close()
-          (x.path.stripPrefix("(memory)/").stripSuffix(".class").replace('/', '.'), x.toByteArray)
+          (x.path.stripPrefix("(memory)/"), x.toByteArray)
         }
 
         val imports = lastImports.toList

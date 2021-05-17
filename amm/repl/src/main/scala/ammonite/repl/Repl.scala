@@ -205,7 +205,9 @@ class Repl(input: InputStream,
 
 
   def run(): Any = {
-    welcomeBanner.foreach(printer.outStream.println)
+    welcomeBanner
+      .map(_.replace("%SCALA_VERSION%", compilerBuilder.scalaVersion))
+      .foreach(printer.outStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
       Repl.handleOutput(interp, actionResult)

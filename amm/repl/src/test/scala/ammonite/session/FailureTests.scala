@@ -9,25 +9,46 @@ object FailureTests extends TestSuite{
     println("FailureTests")
     val check = new DualTestRepl()
     test("compileFailure"){
-      check.session("""
-        @ doesnt_exist
-        error: not found: value doesnt_exist
+      if (check.scala2)
+        check.session(s"""
+          @ doesnt_exist
+          error: not found: value doesnt_exist
 
-        @ java
-        error: java is not a value
+          @ java
+          error: java is not a value
 
-        @ 1 + vale
-        error: not found: value vale
-        val res0 = 1 + vale
-                       ^
-        Compilation Failed
+          @ 1 + vale
+          error: not found: value vale
+          val res0 = 1 + vale
+                         ^
+          Compilation Failed
 
-        @ val x = 1 + vale
-        error: not found: value vale
-        val x = 1 + vale
-                    ^
-        Compilation Failed
-      """)
+          @ val x = 1 + vale
+          error: not found: value vale
+          val x = 1 + vale
+                      ^
+          Compilation Failed
+        """)
+      else
+        check.session(s"""
+          @ doesnt_exist
+          error: Not found: doesnt_exist
+
+          @ java
+          error: java is not a value
+
+          @ 1 + vale
+          error: val res0 = 1 + vale
+                         ^^^^
+                         Not found: vale
+          Compilation Failed
+
+          @ val x = 1 + vale
+          error: val x = 1 + vale
+                      ^^^^
+                      Not found: vale
+          Compilation Failed
+        """)
     }
     test("compilerCrash"){
       // Make sure compiler crashes provide the appropriate error

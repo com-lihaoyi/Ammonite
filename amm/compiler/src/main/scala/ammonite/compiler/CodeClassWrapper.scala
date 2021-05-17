@@ -4,6 +4,8 @@ import ammonite.compiler.iface.CodeWrapper
 import ammonite.util._
 import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines}
 
+import scala.language.postfixOps
+
 object CodeClassWrapper extends CodeWrapper{
   /*
    * The goal of this code wrapper is that the user code:
@@ -53,7 +55,7 @@ object ${indexedWrapperName.backticked}{
       )
 
       val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
-  override def toString = "${indexedWrapperName.encoded}"
+  override def toString = "${indexedWrapperName.encoded}";
   $extraCode
 }}
 """)
@@ -93,8 +95,9 @@ object ${indexedWrapperName.backticked}{
              * That way, the unused commands don't prevent serializing this command.
              */
             val encoded = Util.encodeScalaSourcePath(path)
-            s"final val ${key.backticked}: $encoded.type = " +
-              s"if (__amm_usedThings($tq${key.raw}$tq)) $encoded else null$newLine"
+            s"val ${key.backticked}: $encoded.type = " +
+              s"if (__amm_usedThings($tq${key.raw}$tq)) $encoded " +
+              s"else null.asInstanceOf[$encoded.type]$newLine"
           case (key, values) =>
             throw new Exception(
               "Should not happen - several required values with the same name " +
@@ -103,12 +106,12 @@ object ${indexedWrapperName.backticked}{
         }
         .mkString
 
-      val usedThingsSet =
+      val usedThingsSet: String = {
         if (reqVals.isEmpty) ""
         else
-          s"""
-  @_root_.scala.transient private val __amm_usedThings =
-    _root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions.toSet"""
+          "@_root_.scala.transient private val __amm_usedThings = " +
+            "_root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions.iterator.toSet"
+      }
 
         val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}
@@ -124,7 +127,8 @@ final class ${indexedWrapperName.backticked} extends java.io.Serializable {
 
 $usedThingsSet
 
-  override def toString = $q${indexedWrapperName.encoded}$q
+override def toString = $q${indexedWrapperName.encoded}$q
+
 $requiredVals
 $reworkedImports
 
@@ -132,7 +136,8 @@ final class Helper extends java.io.Serializable{\n"""
     )
 
       val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
-  override def toString = "${indexedWrapperName.encoded}"
+
+  override def toString = "${indexedWrapperName.encoded}";
   $extraCode
 }}
 """)

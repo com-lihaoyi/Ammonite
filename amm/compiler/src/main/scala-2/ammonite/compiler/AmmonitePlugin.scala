@@ -84,21 +84,6 @@ object AmmonitePlugin{
       val sym = t.symbol
       (sym.isType, sym.decodedName, sym.decodedName, Seq())
     }
-    val ignoredSyms = Set(
-      "package class-use",
-      "object package-info",
-      "class package-info"
-    )
-    val ignoredNames = Set(
-      // Probably synthetic
-      "<init>",
-      "<clinit>",
-      "$main",
-      // Don't care about this
-      "toString",
-      // Behaves weird in 2.10.x, better to just ignore.
-      "_"
-    )
     def saneSym(sym: g.Symbol): Boolean = {
       !sym.name.decoded.contains('$') &&
       sym.exists &&
@@ -106,8 +91,8 @@ object AmmonitePlugin{
       !sym.isPrivate &&
       !sym.isProtected &&
       sym.isPublic &&
-      !ignoredSyms(sym.toString) &&
-      !ignoredNames(sym.name.decoded)
+      !CompilerUtil.ignoredSyms(sym.toString) &&
+      !CompilerUtil.ignoredNames(sym.name.decoded)
     }
 
     val stats = {
@@ -272,7 +257,7 @@ object AmmonitePlugin{
 
     val open = for {
       ((fromName, toName, importString), items) <- grouped
-      if !ignoredNames(fromName)
+      if !CompilerUtil.ignoredNames(fromName)
     } yield {
       val importType = items match{
         case Seq(true) => ImportData.Type

@@ -18,6 +18,12 @@ object Scripts {
     interp.watch(path)
     val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
 
+
+    val genRoutesCode =
+      // Entrypoints are not supported in Scala 3 for now (its macros are Scala 2-only)
+      if (interp.compilerBuilder.scalaVersion.startsWith("3.")) "null"
+      else "mainargs.ParserForMethods[$routesOuter.type]($routesOuter)"
+
     for{
       scriptTxt <- try Res.Success(Util.normalizeNewlines(os.read(path))) catch{
         case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
@@ -37,7 +43,7 @@ object Scripts {
           |val $$routesOuter = this
           |object $$routes
           |extends scala.Function0[mainargs.ParserForMethods[$$routesOuter.type]]{
-          |  def apply() = mainargs.ParserForMethods[$$routesOuter.type]($$routesOuter)
+          |  def apply() = $genRoutesCode
           |}
           """.stripMargin
         ),
@@ -51,7 +57,7 @@ object Scripts {
 
       scriptMains = interp.scriptCodeWrapper match{
         case ammonite.compiler.DefaultCodeWrapper =>
-          Some(
+          Option(
             interp
               .evalClassloader
               .loadClass(routeClsName + "$$routes$")
@@ -68,7 +74,7 @@ object Scripts {
             .getMethod("instance")
             .invoke(null)
 
-          Some(
+          Option(
             outer.getClass.getMethod("$routes").invoke(outer)
               .asInstanceOf[() => mainargs.ParserForMethods[Any]]
               .apply()
@@ -77,9 +83,9 @@ object Scripts {
       }
 
       res <- Util.withContextClassloader(interp.evalClassloader){
-        scriptMains match {
+        scriptMains.filter(!_.mains.value.isEmpty) match {
           // If there are no @main methods, there's nothing to do
-          case Some(parser) if parser.mains.value.isEmpty =>
+          case None =>
             if (scriptArgs.isEmpty) Res.Success(())
             else Res.Failure(
               "Script " + path.last +

@@ -54,7 +54,8 @@ object AutocompleteTests extends TestSuite{
         "getClass", "asInstanceOf", "isInstanceOf"
       )
       test("import") - checking{ complete =>
-        if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
+        // these fail on Java 9, need investigation
+        if (!Util.java9OrAbove && complete.check.scala2) {
           complete("""import <from><caret>""", Set("java", "javax", "scala") -- _)
           complete("""import <from>j<caret>""", Set("java", "javax") -- _)
           complete(
@@ -93,7 +94,8 @@ object AutocompleteTests extends TestSuite{
       }
 
       test("scope") - checking{ complete =>
-        if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
+        // these fail on Java 9, need investigation
+        if (!Util.java9OrAbove && complete.check.scala2) {
           complete( """<caret>""", Set("scala") -- _)
           complete( """Seq(1, 2, 3).map(argNameLol => <from><caret>)""", Set("argNameLol") -- _)
           complete( """object Zomg{ <from><caret> }""", Set("Zomg") -- _)
@@ -111,7 +113,8 @@ object AutocompleteTests extends TestSuite{
         //      )
       }
       test("scopePrefix") - checking{ complete =>
-        if (!Util.java9OrAbove) { // these fail on Java 9, need investigation
+        // these fail on Java 9, need investigation
+        if (!Util.java9OrAbove && complete.check.scala2) {
           complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
 
           complete(
@@ -148,7 +151,7 @@ object AutocompleteTests extends TestSuite{
 
       }
 
-      test("deep") - checking{ complete =>
+      def deepTests(complete: Completer) = {
         complete( """<from>fromN<caret>""",
           Set("scala.concurrent.duration.fromNow") ^ _
         )
@@ -166,9 +169,10 @@ object AutocompleteTests extends TestSuite{
         complete( """scala.Option.option2<caret>""",
           Set() ^ _
         )
-        complete( """val x = 1; x + x.<from>><caret>""",
-          Set(">>", ">>>") -- _,
-          Set(
+
+        val expected =
+          if (complete.check.scala2)
+            Set(
             "def >(x: Double): Boolean",
             "def >(x: Float): Boolean",
             "def >(x: Int): Boolean",
@@ -176,7 +180,31 @@ object AutocompleteTests extends TestSuite{
             "def >(x: Long): Boolean",
             "def >(x: Char): Boolean",
             "def >(x: Byte): Boolean"
-          ) ^ _
+          )
+        else
+          Set(
+            "def >>>(x: Long): Int",
+            "def >>>(x: Int): Int",
+            "def >>(x: Long): Int",
+            "def >>(x: Int): Int",
+            "def >=(x: Long): Boolean",
+            "def >=(x: Int): Boolean",
+            "def >=(x: Short): Boolean",
+            "def >=(x: Char): Boolean",
+            "def >=(x: Byte): Boolean",
+            "def >=(x: Double): Boolean",
+            "def >=(x: Float): Boolean",
+            "def >(x: Long): Boolean",
+            "def >(x: Int): Boolean",
+            "def >(x: Short): Boolean",
+            "def >(x: Char): Boolean",
+            "def >(x: Byte): Boolean",
+            "def >(x: Double): Boolean",
+            "def >(x: Float): Boolean"
+          )
+        complete( """val x = 1; x + x.<from>><caret>""",
+          Set(">>", ">>>") -- _,
+          expected ^ _
         )
 
 
@@ -192,6 +220,13 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.compa<caret>)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.co<caret>mpa)""", compares ^)
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
+      }
+
+      test("deep") - checking{ complete =>
+        if (complete.check.scala2)
+          deepTests(complete)
+        else
+          "Disabled in Scala 3"
       }
 
       test("defTab") - checking{ complete =>
@@ -231,7 +266,7 @@ object AutocompleteTests extends TestSuite{
     }
 
     test("dependencies"){
-      checking { complete =>
+      def dependenciesTests(complete: Completer) = {
         complete(
           """import $ivy.<from>`io.get-c<caret>`""",
           Set("`io.get-coursier") ^ _
@@ -263,6 +298,10 @@ object AutocompleteTests extends TestSuite{
                 c.filter(!_.startsWith("`io.get-coursier::coursier-cache:1.0."))
           )
         }
+      }
+      checking { complete =>
+        if (complete.check.scala2) dependenciesTests(complete)
+        else "Disabled in Scala 3"
       }
     }
   }

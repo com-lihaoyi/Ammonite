@@ -2,8 +2,8 @@ package ammonite
 
 import java.io.PrintStream
 
-import ammonite.compiler.DefaultCodeWrapper
-import ammonite.compiler.iface.CodeWrapper
+import ammonite.compiler.{CompilerBuilder, DefaultCodeWrapper}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder => ICompilerBuilder}
 import ammonite.interp.Interpreter
 import ammonite.main.Defaults
 import ammonite.repl._
@@ -22,7 +22,10 @@ import ammonite.runtime.ImportHook
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl { self =>
+class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
+  def scala2 = compilerBuilder.scalaVersion.startsWith("2.")
+  def scalaVersion = compilerBuilder.scalaVersion
+
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
@@ -68,7 +71,7 @@ class TestRepl { self =>
   var currentLine = 0
   val interp = try {
     new Interpreter(
-      ammonite.compiler.CompilerBuilder,
+      compilerBuilder,
       parser,
       printer0,
       storage = storage,
@@ -223,7 +226,7 @@ class TestRepl { self =>
       // ...except for the empty 0-line fragment, and the entire fragment,
       // both of which are complete.
       for (incomplete <- commandText.inits.toSeq.drop(1).dropRight(1)){
-        assert(ammonite.compiler.Parsers.split(incomplete.mkString(Util.newLine)).isEmpty)
+        assert(ammonite.compiler.Parsers.split(incomplete.mkString(Util.newLine)).forall(_.isLeft))
       }
 
       // Finally, actually run the complete command text through the
@@ -238,7 +241,10 @@ class TestRepl { self =>
 
       if (expected.startsWith("error: ")) {
         val strippedExpected = expected.stripPrefix("error: ")
-        assert(error.contains(strippedExpected))
+        val error0 =
+          if (scala2) error
+          else error.stripMargin('|')
+        assert(error0.contains(strippedExpected))
 
       }else if (expected.startsWith("warning: ")){
         val strippedExpected = expected.stripPrefix("warning: ")
@@ -328,7 +334,11 @@ class TestRepl { self =>
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
-    val splitted = ammonite.compiler.Parsers.split(input).get.toOption.get
+    val splitted = ammonite.compiler.Parsers.split(input) match {
+      case None => sys.error(s"No result when splitting input '$input'")
+      case Some(Left(error)) => sys.error(s"Error when splitting input '$input': $error")
+      case Some(Right(stmts)) => stmts
+    }
     val processed = interp.processLine(
       input,
       splitted,
@@ -386,4 +396,7 @@ class TestRepl { self =>
       throw e
     }
 
+  def notFound(name: String): String =
+    if (scala2) s"not found: value $name"
+    else s"Not found: $name"
 }
