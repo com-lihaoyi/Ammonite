@@ -99,7 +99,7 @@ trait AmmInternalModule extends mill.scalalib.CrossSbtModule{
   def scalacPluginIvyDeps = Agg(Deps.acyclic)
   trait Tests extends super.Tests{
     def ivyDeps = Agg(Deps.utest)
-    def testFrameworks = Seq("utest.runner.Framework")
+    def testFramework = "utest.runner.Framework"
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
