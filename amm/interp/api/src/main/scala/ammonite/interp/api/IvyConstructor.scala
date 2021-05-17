@@ -6,8 +6,10 @@ case class ScalaVersion(value: String)
 
 object IvyConstructor extends IvyConstructor {
 
-  def scalaBinaryVersion(sv: String) =
-    sv.split('.').take(2).mkString(".")
+  def scalaBinaryVersion(sv: String) = {
+    val retain = if (sv.startsWith("2")) 2 else 1
+    sv.split('.').take(retain).mkString(".")
+  }
 
 }
 trait IvyConstructor{
