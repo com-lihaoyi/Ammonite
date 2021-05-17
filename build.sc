@@ -27,7 +27,7 @@ val commitsSinceTaggedVersion = {
 
 
 val scala2_12Versions = Seq("2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13")
-val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5")
+val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6")
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
