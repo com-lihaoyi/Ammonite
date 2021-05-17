@@ -27,7 +27,7 @@ val commitsSinceTaggedVersion = {
 
 
 val scala2_12Versions = Seq("2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13")
-val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5")
+val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6")
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
@@ -52,7 +52,8 @@ val (buildVersion, unstable) = scala.util.Try(
 }
 
 val bspVersion = "2.0.0-M6"
-val scalametaVersion = "4.4.10"
+val fastparseVersion = "2.3.0"
+val scalametaVersion = "4.4.18"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi::acyclic:0.2.0"
@@ -61,6 +62,7 @@ object Deps {
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val coursierInterface = ivy"io.get-coursier:interface:0.0.21"
   val fansi = ivy"com.lihaoyi::fansi:0.2.9"
+  val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
@@ -75,7 +77,7 @@ object Deps {
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.3.1"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
-  val scalaparse = ivy"com.lihaoyi::scalaparse:2.3.0"
+  val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
   val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.0-M3"
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.27"
@@ -293,6 +295,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.bsp4j,
+      Deps.fastparse,
       Deps.trees,
       Deps.scalaReflect(crossScalaVersion),
       Deps.scalaXml
