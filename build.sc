@@ -52,6 +52,7 @@ val (buildVersion, unstable) = scala.util.Try(
 }
 
 val bspVersion = "2.0.0-M6"
+val fastparseVersion = "2.3.0"
 val scalametaVersion = "4.4.18"
 
 object Deps {
@@ -61,6 +62,7 @@ object Deps {
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val coursierInterface = ivy"io.get-coursier:interface:0.0.21"
   val fansi = ivy"com.lihaoyi::fansi:0.2.9"
+  val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
@@ -75,7 +77,7 @@ object Deps {
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.3.1"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
-  val scalaparse = ivy"com.lihaoyi::scalaparse:2.3.0"
+  val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
   val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.0-M3"
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.27"
@@ -293,6 +295,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.bsp4j,
+      Deps.fastparse,
       Deps.trees,
       Deps.scalaReflect(crossScalaVersion),
       Deps.scalaXml
