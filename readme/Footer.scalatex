@@ -123,6 +123,12 @@
 
 
   @sect{Changelog}
+    @sect{2.4.0}
+      @ul
+        @li
+          Bump version of uPickle to 1.4.0
+        @li
+          Internal preparation for basic Scala 3 support
     @sect{2.3.8}
       @ul
         @li
