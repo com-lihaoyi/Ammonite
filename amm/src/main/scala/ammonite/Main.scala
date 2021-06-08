@@ -316,6 +316,9 @@ object Main{
           Await.result(shutdownFuture, Duration.Inf)
           printErr.println("BSP server done")
           true
+        }else if (cliConfig.core.showVersion.value){
+          printOut.println(customName)
+          true
         }else{
 
           val runner = new MainRunner(
