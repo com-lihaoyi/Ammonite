@@ -4,7 +4,7 @@
 # You can give the required mill version with AMM_VERSION env variable
 # If no version is given, it falls back to the value of DEFAULT_AMM_VERSION
 DEFAULT_AMM_VERSION=
-
+SCALA_VERSION=
 set -e
 
 if [ -z "$AMM_VERSION" ] ; then
@@ -12,12 +12,12 @@ if [ -z "$AMM_VERSION" ] ; then
 fi
 
 AMM_DOWNLOAD_PATH="$HOME/.ammonite/download"
-AMM_EXEC_PATH="${AMM_DOWNLOAD_PATH}/$AMM_VERSION"
+AMM_EXEC_PATH="${AMM_DOWNLOAD_PATH}/$AMM_VERSION_$SCALA_VERSION"
 
 if [ ! -x "$AMM_EXEC_PATH" ] ; then
   mkdir -p $AMM_DOWNLOAD_PATH
   DOWNLOAD_FILE=$AMM_EXEC_PATH-tmp-download
-  AMM_DOWNLOAD_URL="https://github.com/lihaoyi/ammonite/releases/download/${AMM_VERSION%%-*}/2.13-$AMM_VERSION"
+  AMM_DOWNLOAD_URL="https://github.com/lihaoyi/ammonite/releases/download/${AMM_VERSION%%-*}/$SCALA_VERSION-$AMM_VERSION"
   curl --fail -L -o "$DOWNLOAD_FILE" "$AMM_DOWNLOAD_URL"
   chmod +x "$DOWNLOAD_FILE"
   mv "$DOWNLOAD_FILE" "$AMM_EXEC_PATH"
