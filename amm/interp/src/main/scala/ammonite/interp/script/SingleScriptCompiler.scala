@@ -231,7 +231,11 @@ class SingleScriptCompiler(
                 idxInScala
               )
             val idxInSc = idxInScala - offsetInScala - extraOffsetInScala
-            offsetToPosSc(block.startIdx + idxInSc)
+            val offset = block.startIdx + idxInSc
+            if (offset < 0 || offset > module.code.length)
+              Position(0, 0)
+            else
+              offsetToPosSc(offset)
           }
         }
       }
