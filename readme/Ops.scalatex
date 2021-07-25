@@ -152,7 +152,7 @@
 
   @sect{Operations}
     @p
-      @sect.ref{Paths} not aren't interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:
+      @sect.ref{Paths} are not interesting on their own, but serve as a base to use to perform filesystem operations in a concise and easy to use way. Here is a quick tour of the core capabilities that Ammonite-Ops provides:
 
     @hl.ref(opsExamples, Seq("""test("reference")""", "import"))
 
