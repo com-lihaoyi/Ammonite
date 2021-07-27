@@ -1,18 +1,17 @@
 package ammonite.unit
 
 
-import ammonite.repl.SourceAPIImpl
-import ammonite.repl.api.{Location, SourceBridge}
 import utest._
-import ammonite.repl.tools.source.load
+import ammonite.compiler.tools.source.load
 import ammonite.util.Util
+import ammonite.util.Util.Location
 
 import java.io.InputStream
 object SourceTests extends TestSuite{
-  val tests = Tests{
-
-    if (SourceBridge.value0 == null)
-      SourceBridge.value0 = new SourceAPIImpl {}
+  val tests =
+    if (ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")) scala2Tests
+    else scala3Tests
+  def scala2Tests = Tests{
 
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
 
@@ -45,22 +44,24 @@ object SourceTests extends TestSuite{
 //          "hlists.scala",
 //          "final case class ::"
 //        )
-        check(
-          load(scopt.Read),
-          "options.scala",
-          "object Read"
-        )
+//        check(
+//          load(mainargs.TokensReader),
+//          "TokensReader.scala",
+//          "class TokensReader"
+//        )
       }
       test("stdLibScala"){
         test("direct"){
-          // The Scala standard library classes for some reason don't get
-          // properly included in the classpath in 2.10; it's unfortunate but
-          // we'll just ignore it since the community has already moved on to
-          // 2.11 and 2.12
+          val is2_13_3_orLower = {
+            val ver = scala.util.Properties.versionNumberString
+            !ver.startsWith("2.13.") ||
+              scala.util.Try(ver.stripPrefix("2.13.").toInt).toOption.exists(_ <= 3)
+          }
           check(
             load(Nil),
-            "List.scala",
-            "case object Nil extends List[Nothing]"
+            if (is2_13_3_orLower) "List.scala" else "package.scala",
+            if (is2_13_3_orLower) "case object Nil extends List[Nothing]"
+            else "val Nil = scala.collection.immutable.Nil"
           )
         }
         test("runtimeTyped"){
@@ -130,5 +131,9 @@ object SourceTests extends TestSuite{
         )
       }
     }
+  }
+  def scala3Tests = Tests {
+    // 'source' not supported for now
+    test("disabled") { "disabled for Scala 3" }
   }
 }

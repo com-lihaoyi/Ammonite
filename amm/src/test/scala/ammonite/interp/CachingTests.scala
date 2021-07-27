@@ -16,7 +16,7 @@ object CachingTests extends TestSuite{
     def runScript(wd: os.Path,
                   path: os.Path,
                   interp: ammonite.interp.Interpreter,
-                  scriptArgs: Seq[(String, Option[String])] = Nil) =
+                  scriptArgs: Seq[String] = Nil) =
       Scripts.runScript(wd, path, interp, scriptArgs) match {
         case Res.Success(_) =>
         case Res.Skip =>
@@ -148,6 +148,7 @@ object CachingTests extends TestSuite{
       runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       runScript(os.pwd, scriptPath/"TagPrevCommand.sc", interp)
 
+      implicit val sv = ammonite.interp.api.ScalaVersion(interp.scalaVersion)
       interp.loadIvy("com.lihaoyi" %% "scalatags" % "0.7.0")
       runScript(os.pwd, scriptPath/"TagBase.sc", interp)
       val n = storage.compileCache.size
@@ -159,8 +160,14 @@ object CachingTests extends TestSuite{
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
       )
 
-      val interp1 = createTestInterp(new Storage.Folder(tempDir))
-      val interp2 = createTestInterp(new Storage.Folder(tempDir))
+      val interp1 = createTestInterp(
+        new Storage.Folder(tempDir),
+        predefImports = Interpreter.predefImports
+      )
+      val interp2 = createTestInterp(
+        new Storage.Folder(tempDir),
+        predefImports = Interpreter.predefImports
+      )
 
       runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp1)
       runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp2)
@@ -178,11 +185,11 @@ object CachingTests extends TestSuite{
         val x = 1337
         @
         val y = x
-        import $ivy.`com.lihaoyi::scalatags:0.7.0`, scalatags.Text.all._
+        import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`, scalatags.Text.all._
         """)
       val scriptFile = os.temp("""div("<('.'<)", y).render""")
 
-      def processAndCheckCompiler(f: ammonite.interp.Compiler => Boolean) ={
+      def processAndCheckCompiler(f: ammonite.compiler.iface.Compiler => Boolean) ={
         val interp = createTestInterp(
           new Storage.Folder(tempDir){
             override val predef = predefFile
@@ -200,7 +207,7 @@ object CachingTests extends TestSuite{
       os.write(
         predefFile,
         """
-        import $ivy.`com.lihaoyi::scalatags:0.7.0`; import scalatags.Text.all._
+        import $ivy.`com.lihaoyi::scalatags:0.7.0 compat`; import scalatags.Text.all._
         val y = 31337
         """
       )

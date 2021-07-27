@@ -64,26 +64,37 @@ object BasicTests extends TestSuite{
         os.rel/'basic/"Print.sc",
         tmpDir
       )
-      val count1 = substrCount(evaled1.out.trim, "scala.tools.nsc")
-      val count2 = substrCount(evaled2.out.trim, "scala.tools.nsc")
+      val compilerPackage =
+        if (isScala2) "scala.tools.nsc"
+        else "dotty.tools.dotc"
+      val count1 = substrCount(evaled1.out.trim, compilerPackage)
+      val count2 = substrCount(evaled2.out.trim, compilerPackage)
       //These numbers might fail in future but basic point is to keep count2
       //very low whereas count1 will be inevitably bit higher
-      assert(count1 > 10)
-      assert(count2 < 5)
+      if (isScala2) {
+        assert(count1 > 10)
+        assert(count2 < 5)
+      } else {
+        assert(count1 > 100)
+        assert(count2 < 15)
+      }
     }
     test("fastparseNotLoadedByCachedScritps"){
+      val parserPackage =
+        if (isScala2) "fastparse"
+        else "dotty.tools.dotc.parsing"
       val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
         os.rel/'basic/"Print.sc",
         tmpDir
       )
-      assert(evaled1.out.trim.contains("fastparse"))
+      assert(evaled1.out.trim.contains(parserPackage))
 
       val evaled2 = execWithJavaOptsSet(
         os.rel/'basic/"Print.sc",
         tmpDir
         )
-      assert(!evaled2.out.trim.contains("fastparse"))
+      assert(!evaled2.out.trim.contains(parserPackage))
     }
 
 
@@ -108,7 +119,7 @@ object BasicTests extends TestSuite{
     }
 
 
-    test("shell"){
+    def shellTest() = {
       // make sure you can load the example-predef.sc, have it pull stuff in
       // from ivy, and make use of `cd!` and `wd` inside the executed script.
       val res = os.proc(
@@ -120,7 +131,7 @@ object BasicTests extends TestSuite{
         "-c",
         """val x = wd
         |@
-        |cd! 'amm/'src
+        |cd! "amm"/"src"
         |@
         |println(wd relativeTo x)""".stripMargin,
         "-s"
@@ -131,6 +142,15 @@ object BasicTests extends TestSuite{
       if (!Util.windowsPlatform)
         // seems the script is run only until the first '@' on Windows
         assert(output == "amm/src")
+    }
+    test("shell"){
+      // FIXME In Scala 3.0.0-M1, etting errors like
+      //   java.lang.AssertionError: assertion failed:
+      //     duplicate type CC#31508; previous was type CC#31500
+      if (isScala2)
+        shellTest()
+      else
+        "Disabled in Scala 3"
     }
 
     // Ensure we can load the source code of the built-in Java standard library
@@ -144,7 +164,7 @@ object BasicTests extends TestSuite{
       // so it's probably fine if this doesn't work.
       //
       // Also disabled on Java 9 due to unavailability of Java lib sources
-      if (!Util.windowsPlatform && !Util.java9OrAbove) {
+      if (!Util.windowsPlatform && !Util.java9OrAbove && isScala2) {
         os.proc(
           executable,
           "--thin",
@@ -164,7 +184,11 @@ object BasicTests extends TestSuite{
     // Ensure we can load the source code of external libraries, which needs to
     // get pulled down together with the library code when you `import $ivy`
     test("sourceExternal"){
-      exec(os.rel/'basic / "SourceDownload.sc")
+      // Re-enable when source support is added in Scala 3
+      if (isScala2)
+        exec(os.rel/'basic / "SourceDownload.sc")
+      else
+        "Disabled in Scala 3"
     }
 
     test("classloaders"){
@@ -185,7 +209,10 @@ object BasicTests extends TestSuite{
         exec(os.rel / 'basic/"Failure.sc")
       }.result.err.string
 
-      assert(errorMsg.contains("not found: value x"))
+      val expected =
+        if (isScala2) "not found: value x"
+        else "Not found: x"
+      assert(errorMsg.contains(expected))
     }
     test("testSilentIvyExceptions"){
       val errorMsg = intercept[os.SubprocessException]{
@@ -225,9 +252,15 @@ object BasicTests extends TestSuite{
           )
 
           // 2. build & publish code locally
+          val compatScalaVersion =
+           if (scalaVersion.startsWith("3."))
+             // should be the right 2.13 version
+             scala.util.Properties.versionNumberString
+           else
+             scalaVersion
           os.proc("sbt", "-J-Xmx1g", "-batch", "-no-colors", "publishLocal").call(
             env = Map(
-              "SCALA_VERSION" -> scala.util.Properties.versionNumberString,
+              "SCALA_VERSION" -> compatScalaVersion,
               "FIRST_RUN" -> s"$firstRun",
               "VERSION" -> version
             ),
@@ -254,30 +287,42 @@ object BasicTests extends TestSuite{
     // in our unit test suite, but test a few cases as integration tests
     // to make sure things work end-to-end
     test("multiMain"){
-      test("positiveArgs"){
+      def positiveArgsTest() = {
         val evaled = exec(os.rel / 'basic/"MultiMain.sc", "functionB", "2", "foo")
 
         val out = evaled.out.string
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
-      test("specifyMain"){
+      def specifyMainTest() = {
         val evaled = intercept[os.SubprocessException](exec(os.rel / 'basic/"MultiMain.sc"))
 
         val out = evaled.result.err.string
         val expected = Util.normalizeNewlines(
-          s"""Need to specify a subcommand to call when running MultiMain.sc
-             |
-             |Available subcommands:
-             |
-             |  mainA
-             |
-             |  functionB
-             |    --i     Int
-             |    --s     String
-             |    --path  os.Path (default""".stripMargin
+          s"""Need to specify a sub command: mainA, functionB""".stripMargin
         )
         assert(out.contains(expected))
       }
+      test("positiveArgs"){
+        if (isScala2) positiveArgsTest()
+        else "Disabled in Scala 3"
+      }
+      test("specifyMain"){
+        if (isScala2) specifyMainTest()
+        else "Disabled in Scala 3"
+      }
+    }
+
+    test("BSP"){
+      val jsonrpc = """{"jsonrpc": "2.0", "id": 1, "method": "build/shutdown", "params": null}"""
+        .getBytes("UTF-8")
+      val input = Array(
+        s"Content-Length: ${jsonrpc.length}",
+        "\r\n" * 2
+      ).flatMap(_.getBytes("UTF-8")) ++ jsonrpc
+      val res = os.proc(TestUtils.executable, "--bsp").call(
+        stdin = input
+      )
+      assert(res.exitCode == 0)
     }
   }
 }

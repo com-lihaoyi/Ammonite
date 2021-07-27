@@ -31,6 +31,8 @@ trait Storage{
                          tag: Tag): Unit
   def classFilesListLoad(filePathPrefix: os.SubPath, tag: Tag): Option[ScriptOutput]
   def getSessionId: Long
+
+  def dirOpt: Option[os.Path] = None
 }
 
 object Storage{
@@ -287,7 +289,7 @@ object Storage{
           createFolders = true
       )
       data.classFiles.foreach{ case (name, bytes) =>
-        os.write.over(tagCacheDir/s"$name.class", bytes, createFolders = true)
+        os.write.over(tagCacheDir/name.split('/'), bytes, createFolders = true)
       }
 
     }
@@ -308,10 +310,10 @@ object Storage{
     }
 
     def loadClassFiles(cacheDir: os.Path): Option[ClassFiles] = {
-      val classFiles = os.list(cacheDir).filter(_.ext == "class").toVector
+      val classFiles = os.walk(cacheDir).filter(os.isFile(_)).toVector
       Try{
         val data = classFiles.map{ case file =>
-          val className = (file relativeTo cacheDir).toString.stripSuffix(".class")
+          val className = (file relativeTo cacheDir).toString
           (className, os.read.bytes(file))
         }
         data
@@ -339,5 +341,7 @@ object Storage{
       try Some((os.read(predef), predef))
       catch { case e: java.nio.file.NoSuchFileException => Some(("", predef))}
     }
+
+    override def dirOpt: Option[os.Path] = Some(dir)
   }
 }

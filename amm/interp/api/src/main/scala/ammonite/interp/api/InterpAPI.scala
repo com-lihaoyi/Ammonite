@@ -43,9 +43,7 @@ trait InterpAPI {
     * Functions that will be chained and called on the coursier
     * Fetch object right before they are run
     */
-  val resolutionHooks: mutable.Buffer[
-    Fetch => Fetch
-  ]
+  val resolutionHooks: mutable.Buffer[Fetch => Fetch]
 
   /**
     * Exit the Ammonite REPL. You can also use Ctrl-D to exit
@@ -60,18 +58,10 @@ trait InterpAPI {
     * exitValue before the repl exits
     */
   val beforeExitHooks: mutable.Buffer[Any => Any]
-  /**
-    * Configures the current compiler, or if the compiler hasn't been initialized
-    * yet, registers the configuration callback and applies it to the compiler
-    * when it ends up being initialized later
-    */
-  def configureCompiler(c: scala.tools.nsc.Global => Unit): Unit
 
-  /**
-    * Pre-configures the next compiler. Useful for tuning options that are
-    * used during parsing such as -Yrangepos
-    */
-  def preConfigureCompiler(c: scala.tools.nsc.Settings => Unit): Unit
+  implicit def scalaVersion: ScalaVersion
+
+  def _compilerManager: ammonite.compiler.iface.CompilerLifecycleManager
 }
 
 

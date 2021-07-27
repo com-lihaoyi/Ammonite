@@ -333,9 +333,10 @@ object EulerTests extends TestSuite{
     test("p14"){
       // Find the longest sequence using a starting number under one million.*
       check.session("""
-        @ def from(n: Long, c: Int = 0): Int =
+        @ def from(n: Long, c: Int = 0): Int = {
         @   if(n == 1) c + 1 else
         @   from(if(n % 2 == 0) n / 2 else 3 * n + 1, c + 1)
+        @ }
         defined function from
 
         @ (
@@ -350,8 +351,9 @@ object EulerTests extends TestSuite{
       // Starting in the top left corner in a 20 by 20 grid,
       // how many routes are there to the bottom right corner?*
       check.session("""
-        @ def f(row: Seq[Long], c: Int): Long =
+        @ def f(row: Seq[Long], c: Int): Long = {
         @      if (c == 0) row.last else f(row.scan(0L)(_ + _), c - 1)
+        @ }
         defined function f
 
         @ def r(n: Int) = f(Seq.fill(n + 1)(1L), n)
@@ -561,8 +563,9 @@ object EulerTests extends TestSuite{
     test("p25"){
       // What is the first term in the Fibonacci sequence to contain 1000 digits?*
       check.session("""
-        @ lazy val fs: Stream[BigInt] =
+        @ lazy val fs: Stream[BigInt] = {
         @  (0: BigInt) #:: (1: BigInt) #:: fs.zip(fs.tail).map(p => p._1 + p._2)
+        @ }
 
         @ val r = fs.view.takeWhile(_.toString.length < 1000).size
         r: Int = 4782

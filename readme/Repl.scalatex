@@ -19,7 +19,7 @@
 @sect("Ammonite-REPL", "A Modernized Scala REPL")
 
   @p
-    The @b{Ammonite-REPL} is an improved Scala REPL, re-implemented from first
+    The @b{Ammonite-REPL} is an improved Scala REPL, reimplemented from first
     principles. It is much more featureful than the default REPL and comes
     with a lot of @sect.ref("Features", "ergonomic improvements") and
     @sect.ref("Configuration", "configurability") that may be familiar to
@@ -28,48 +28,57 @@
 
   @p
     It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your
-    systems shell, but also can be used alone as a @sect.ref("Features",
-    "superior") version of the default Scala REPL, or as a
-    @sect.ref("Debugging", "debugging tool"), or for many other
+    systems shell, but can also be used alone as a @sect.ref("Features",
+    "superior") version of the default Scala REPL, as a
+    @sect.ref("Debugging", "debugging tool"), and for many other
     @sect.ref("Ammonite Cookbook", "fun and interesting things")!
 
 
-  @p
-    If you want to use Ammonite as a plain Scala shell, download the standalone
-    Ammonite @ammonite.Constants.version executable for Scala 2.12 (also
-    available for @sect.ref{Older Scala Versions}):
+  @sect{Installation on Linux}
+    @p
+      If you want to use Ammonite as a plain Scala shell, download the standalone
+      Ammonite @ammonite.Constants.version executable for Scala 2.12 (also
+      available for @sect.ref{Older Scala Versions}):
 
-  @hl.sh
-    @replCurl
+    @hl.sh
+      @replCurl
 
-  @p
-    Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
-    @sect.ref("Unstable Versions", "Unstable Release")
-    @ammonite.Constants.unstableVersion:
+    @p
+      Or to try out the @sect.ref("Unstable Changelog", "latest features") in our
+      @sect.ref("Unstable Versions", "Unstable Release")
+      @ammonite.Constants.unstableVersion:
 
-  @hl.sh
-    @readme.Sample.unstableCurl
+    @hl.sh
+      @readme.Sample.unstableCurl
 
-  @p
-    Alternatively, on macOS you can install Ammonite via brew:
+    @p
+      You can also download a bootstrap script, that can be downloaded and committed
+      to version control as a file `amm`:
 
-  @hl.sh
-    $ brew install ammonite-repl
+    @hl.sh
+      curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-bootstrap > amm && chmod +x amm
 
-  @p
-    You can also download a bootstrap script, that can be downloaded and committed
-    to version control as a file `amm`:
+  @sect{Installation on macOS}
+    @p
+      Same as @sect.ref("Installation on Linux", "Installation on Linux").
+      Or you can install it via brew:
 
-  @hl.sh
-    curl -L https://github.com/lihaoyi/ammonite/releases/download/@ammonite.Constants.version/2.13-@ammonite.Constants.version-bootstrap > amm && chmod +x amm
+    @hl.sh
+      $ brew install ammonite-repl
 
-  @p
-    You can then run Ammonite via the `./amm` command.
+  @sect{Installation on Windows}
+    @p
+      Download the @lnk("Latest version", s"https://github.com/com-lihaoyi/Ammonite/releases/download/${ammonite.Constants.version}/2.13-${ammonite.Constants.version}")
+      and rename it to @code{amm.bat}
+
+  @sect{Running Ammonite REPL}
+    @p
+      You can then run Ammonite via the `./amm` command.
 
   @p
     This will give you access to the Ammonite-REPL:
 
-  @img(src:="GettingStarted.png", width:="100%")
+  @img(src:="GettingStarted.png", width:="100%", loadingLazy)
 
   @p
     With @sect.ref("Pretty-printed output", "Pretty Printing"),
@@ -134,21 +143,14 @@
     sbt projectName/test:runMain amm
 
   @p
-    To activate the Ammonite REPL
+    to activate the Ammonite REPL.
 
   @p
     You can also pass a string to the @code{Main} call containing any
     commands or imports you want executed at the start of every run, along
-    with @lnk("other configuration",
-    "http://www.lihaoyi.com/Ammonite/api/repl/index.html#ammonite.Main").
+    with @lnk("other configuration", "#ammonite.Main").
     If you want Ammonite to be available in all projects, simply add the
     above snippet to a new file @code{~/.sbt/0.13/global.sbt}.
-
-  @p
-    Note: Ammonite-REPL does @i{not} support Windows, even though
-    @sect.ref{Ammonite-Ops} does. See @lnk("#119",
-    "https://github.com/lihaoyi/Ammonite/issues/119") if you are interested
-    in details or want to try your hand at making it work.
 
   @sect{Features}
     @p
@@ -165,7 +167,7 @@
         By default, Ammonite @sect.ref("Configurable Truncation", "truncates")
         the pretty-printed output to avoid flooding your terminal. If you want
         to disable truncation, call @hl.scala{show(...)} on your expression to
-        pretty-print it's full output. You can also pass in an optional
+        pretty-print its full output. You can also pass in an optional
         @hl.scala{height = ...} parameter to control how much you want to show
         before truncation.
 
@@ -184,7 +186,7 @@
         provides...
 
       @sect{Syntax Highlighting}
-        @img(src:="Highlighting.png", width:="100%")
+        @img(src:="Highlighting.png", width:="100%", loadingLazy)
         @p
           Ammonite syntax highlights both the code you're entering as well as any
           output being echoed in response. This should make it much easier to
@@ -195,13 +197,13 @@
         @p
           Stack traces are similarly highlighted, for easier reading:
 
-        @img(src:="ColoredTraces.png", width:="100%")
+        @img(src:="ColoredTraces.png", width:="100%", loadingLazy)
       @sect{Multi-line editing}
 
         @p
           You can use the @b{Up} and @b{Down} arrows to navigate between lines
-          within your snippet. @code{Enter} only executes the code when you're
-          on the last line of a multi-line snippet, meaning you can take your
+          within your snippet. @code{Enter} executes the code @i{only when you're
+          on the last line} of a multi-line snippet, meaning you can take your
           time, space out your code nicely, and fix any mistakes anywhere in your
           snippet. History is multi-line too, meaning re-running a multi-line
           snippet is trivial, even with tweaks.
@@ -214,7 +216,7 @@
           line by individual line out of the history so you can run it again!
 
       @sect{Desktop key-bindings}
-        @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172)
+        @img(src:="Editing.gif", display.block, marginLeft.auto, marginRight.auto, height := 172, loadingLazy)
         @p
           You can use @b{Alt-Left}/@b{Right} to move forward/backwards by one
           word at a time or hold down @b{Shift} to select text to delete. These
@@ -238,7 +240,7 @@
 
       @sect{History Search}
 
-        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block)
+        @img(src:="HistorySearch.gif", width:="445px", marginRight.auto, marginLeft.auto, display.block, loadingLazy)
 
         @p
           Apart from browsing your command-line history with @code{UP}, you can
@@ -280,7 +282,7 @@
         @hl.ref(advancedTests, Seq("""test("forceWrapping")""", "@"))
 
       @sect{Undo & Redo}
-        @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154)
+        @img(src:="UndoRedo.gif", display.block, marginLeft.auto, marginRight.auto, height := 154, loadingLazy)
         @p
           The Ammonite command-line editor allows you to undo and re-do portions
           of your edits:
@@ -421,14 +423,14 @@
 
       @sect{import $exec}
         @p
-          This is similar to @hl.scala{import $file}, except that it dumps the
-          definitions and imports from the script into your REPL session. This is
+          This is similar to @hl.scala{import $file}, except that it @i{dumps the
+          definitions and imports from the script} into your REPL session. This is
           useful if you are using a script to hold a set of common imports:
           using @sect.ref{import $file} to import a script doesn't propagate
           imports from that script into your REPL.
 
         @p
-          Alternatively, this is also useful if you want to split up your
+          It is also useful if you want to split up your
           @code{~/.ammonite/predef.sc} file into multiple scripts: e.g. if you
           want to break up your @code{predef.sc} into two scripts
           @code{~/.ammonite/predef.sc} and @code{~/.ammonite/helper.sc}. While
@@ -450,7 +452,11 @@
           For example, here is loading @lnk("Scalaz",
           "https://github.com/scalaz/scalaz") and using it in the Ammonite-REPL:
 
-        @hl.ref(ammoniteTests/"ProjectTests.scala", Seq("""test("scalaz")""", "@"))
+        @hl.scala
+          @@ import $ivy.`org.scalaz::scalaz-core:7.2.27`, scalaz._, Scalaz._
+
+          @@ (Option(1) |@{"@"}| Option(2))(_ + _)
+          res1: Option[Int] = Some(value = 3)
 
         @p
           Note that the different portions of the @hl.scala{$ivy} import are
@@ -598,7 +604,7 @@
           These tools are useful but not strictly necessary;
 
         @sect{source}
-          @img(src:="Source.gif", display.block, marginLeft.auto, marginRight.auto, height := 364)
+          @img(src:="Source.gif", display.block, marginLeft.auto, marginRight.auto, height := 364, loadingLazy)
 
           @p
             Ammonite provides the @code{src} built-in, which lets you easily
@@ -720,7 +726,7 @@
 
         @sect{browse}
 
-          @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278)
+          @img(src:="Browse.gif", display.block, marginLeft.auto, marginRight.auto, height := 278, loadingLazy)
 
           @p
             @hl.scala{browse} is a utility that lets you open up far-too-large
@@ -758,7 +764,7 @@
             as @hl.scala{"emacs"} or @hl.scala{"nano"} or @hl.scala{"subl"}
 
         @sect{desugar}
-          @img(src:="Desugar.png", display.block, marginLeft.auto, marginRight.auto, height := 495)
+          @img(src:="Desugar.png", display.block, marginLeft.auto, marginRight.auto, height := 495, loadingLazy)
 
           @p
             @hl.scala{desugar} allows you to easily see what the compiler is
@@ -784,13 +790,11 @@
             of implicit parameters, implicit conversions, macros, and other odd
             Scala features, @hl.scala{desugar} could you see what is left after
             all the magic happens.
-          @p
-            @hl.scala{desugar} only works in Scala 2.11.x and above, not in 2.10.x
 
     @sect{Save/Load Session}
       @p
         Ammonite allows you to save your work half way through, letting you
-        discard and future changes and returning to the state of the world you
+        discard any future changes and returning to the state of the world you
         saved.
 
       @p
@@ -867,7 +871,7 @@
         public package repositories and find the name and version of a dependency
         that you want:
 
-      @img(src:="IvyComplete.gif", display.block, marginLeft.auto, marginRight.auto, height := 400)
+      @img(src:="IvyComplete.gif", display.block, marginLeft.auto, marginRight.auto, height := 400, loadingLazy)
 
 
       @p
@@ -947,7 +951,8 @@
         @hl.scala{prompt} to always include your current working directory
 
       @hl.scala
-        repl.prompt.bind(wd.toString + "@@ ")
+        import ammonite.ops._
+        repl.prompt.bind(pwd.toString + " @@ ")
 
       @p
         As is common practice in other shells. Further modifications to make it
@@ -1039,7 +1044,7 @@
         Here's an example of it being used to debug changes to the
         @lnk("WootJS webserver", "https://github.com/d6y/wootjs"):
 
-      @img(src:="Debugging.png", width:="100%")
+      @img(src:="Debugging.png", width:="100%", loadingLazy)
       @p
       In this case, we added the @hl.scala{debug} statement within the
       websocket frame handler, so we can inspect the values that are taking
@@ -1102,7 +1107,7 @@
         embedded in the @lnk("Akka HTTP microservice example",
         "https://github.com/theiterators/akka-http-microservice"):
 
-      @img(src:="DebuggingViaSshd.png", width:="100%")
+      @img(src:="DebuggingViaSshd.png", width:="100%", loadingLazy)
 
       @p
         Here we can interact with code live, inspecting values or calling
@@ -1131,4 +1136,4 @@
         other necessary infrastructure to allow trusted parties SSH access to
         the relevant machines. Running on @code{localhost} lets you leverage
         that and gain all the same security properties without having to
-        re-implement them in Scala.
+        reimplement them in Scala.

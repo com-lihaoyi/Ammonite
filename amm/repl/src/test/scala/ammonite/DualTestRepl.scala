@@ -1,8 +1,6 @@
 package ammonite
 
-import ammonite.interp.CodeClassWrapper
-import ammonite.repl.api.SourceBridge
-import ammonite.repl.SourceAPIImpl
+import ammonite.compiler.CodeClassWrapper
 import ammonite.util.{Evaluated, Res}
 
 /**
@@ -10,28 +8,38 @@ import ammonite.util.{Evaluated, Res}
   */
 class DualTestRepl { dual =>
 
-  if (SourceBridge.value0 == null)
-    SourceBridge.value0 = new SourceAPIImpl {}
-
   def predef: (String, Option[os.Path]) = ("", None)
 
+  val compilerBuilder = ammonite.compiler.CompilerBuilder
   val repls = Seq(
-    new TestRepl {
+    new TestRepl(compilerBuilder) {
       override def predef = dual.predef
     },
-    new TestRepl {
+    new TestRepl(compilerBuilder) {
       override def predef = dual.predef
       override def codeWrapper = CodeClassWrapper
     }
   )
 
+  def scalaVersion = compilerBuilder.scalaVersion
+  def scala2 = scalaVersion.startsWith("2.")
+  def scala2_12 = scalaVersion.startsWith("2.12.")
+
   def interps = repls.map(_.interp)
 
   def session(sess: String): Unit =
     repls.foreach(_.session(sess))
+  def session(objWrapperSess: String, classWrapperSess: String): Unit =
+    repls.foreach { repl =>
+      val sess = if (repl.codeWrapper == CodeClassWrapper) classWrapperSess else objWrapperSess
+      repl.session(sess)
+    }
   def result(input: String, expected: Res[Evaluated]): Unit =
     repls.foreach(_.result(input, expected))
   def fail(input: String,
            failureCheck: String => Boolean = _ => true): Unit =
     repls.foreach(_.fail(input, failureCheck))
+
+  def notFound(name: String): String =
+    repls.headOption.fold("")(_.notFound(name))
 }

@@ -7,24 +7,27 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.{CompletableFuture, Executors, ThreadFactory}
 import java.util.UUID
 
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.api.InterpAPI
-import ammonite.interp.{CodeWrapper, DependencyLoader}
-import ammonite.runtime.{Classpath, ImportHook, Storage}
-import ammonite.util.{Imports, Printer}
+import ammonite.interp.DependencyLoader
+import ammonite.runtime.{ImportHook, Storage}
+import ammonite.util.{Classpath, Imports, Printer}
 import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
+  compilerBuilder: CompilerBuilder,
+  parser: Parser,
+  codeWrapper: CodeWrapper,
   initialScripts: Seq[os.Path] = Nil,
   initialImports: Imports = AmmoniteBuildServer.defaultImports,
   defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
-  codeWrapper: CodeWrapper = CodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) extends BuildServer with ScalaBuildServer with DummyBuildServerImplems {
 
@@ -52,29 +55,32 @@ class AmmoniteBuildServer(
       classOf[InterpAPI].getClassLoader
     else
       Thread.currentThread().getContextClassLoader
-  private def initialClassPath = Classpath.classpath(initialClassLoader, storage)
-    .map(_.toURI)
+  private def initialClassPath =
+    Classpath.classpath(initialClassLoader, storage.dirOpt.map(_.toNIO)).map(_.toURI)
 
   private lazy val proc =
     withRoot { root =>
       ScriptProcessor(
+        compilerBuilder.scalaVersion,
+        parser,
+        codeWrapper,
         dependencyLoader,
         defaultRepositories,
         Seq(
           Dependency.of(
             "org.scalameta",
             "semanticdb-scalac_" + scala.util.Properties.versionNumberString,
-            "4.3.20"
+            ammonite.interp.script.Constants.semanticDbVersion
           )
         ),
         root,
-        codeWrapper,
         importHooks
       )
   }
   private lazy val compiler =
     withRoot { root =>
       new ScriptCompiler(
+        compilerBuilder,
         storage,
         printer,
         codeWrapper,
@@ -453,6 +459,15 @@ class AmmoniteBuildServer(
       new CleanCacheResult("", true)
     }
 
+  private val shutdownPromise = Promise[Unit]()
+  def buildShutdown(): CompletableFuture[Object] =
+    nonBlocking {
+      if (!shutdownPromise.isCompleted)
+        shutdownPromise.success(())
+      null
+    }
+
+  def initiateShutdown: Future[Unit] = shutdownPromise.future
 }
 
 object AmmoniteBuildServer {
@@ -532,12 +547,29 @@ object AmmoniteBuildServer {
         .map(_.split('/').toSeq)
         .toSet
 
+  private def naiveJavaFutureToScalaFuture[T](
+    f: java.util.concurrent.Future[T]
+  ): Future[T] = {
+    val p = Promise[T]()
+    val t = new Thread {
+      setDaemon(true)
+      setName("ammonite-bsp-wait-for-exit")
+      override def run(): Unit =
+        p.complete {
+          try Success(f.get())
+          catch { case t: Throwable => Failure(t) }
+        }
+    }
+    t.start()
+    p.future
+  }
+
   def start(
     server: AmmoniteBuildServer,
     input: InputStream = System.in,
     output: OutputStream = System.out
-  ): Launcher[BuildClient] = {
-    val ec = Executors.newFixedThreadPool(4) // FIXME Daemon threads
+  ): (Launcher[BuildClient], Future[Unit]) = {
+    val ec = Executors.newFixedThreadPool(4, threadFactory("ammonite-bsp-jsonrpc"))
     val launcher = new Launcher.Builder[BuildClient]()
       .setExecutorService(ec)
       .setInput(input)
@@ -547,7 +579,14 @@ object AmmoniteBuildServer {
       .create()
     val client = launcher.getRemoteProxy
     server.onConnectWithClient(client)
-    launcher
-  }
+    val f = launcher.startListening()
 
+    val scalaEc = ExecutionContext.fromExecutorService(ec)
+    val futures = Seq(
+      naiveJavaFutureToScalaFuture(f).map(_ => ())(scalaEc),
+      server.initiateShutdown
+    )
+    val shutdownFuture = Future.firstCompletedOf(futures)(scalaEc)
+    (launcher, shutdownFuture)
+  }
 }

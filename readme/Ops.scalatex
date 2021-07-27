@@ -21,7 +21,7 @@
   @hl.ref(opsExamples, Seq("longExample", "import"), "assert(")
 
   @p
-    These examples make heavy use of Ammonite-Ops' @sect.ref{Paths}, @sect.ref{Operations} and @sect.ref{Extensions} to achieve their minimal, concise syntax
+    These examples make heavy use of Ammonite-Ops' @sect.ref{Paths}, @sect.ref{Operations} and @sect.ref{Extensions} to achieve their minimal, concise syntax.
   @p
     As you can see, Ammonite-Ops replaces the common mess of boilerplate:
 
@@ -34,9 +34,6 @@
 
   @p
     That handles the common case for you: recursively deleting folders, not-failing if the file doesn't exist, etc.
-
-  @p
-    Note: Ammonite-Ops supports Windows experimentally, even if @sect.ref{Ammonite-REPL} does not. That means you can use these convenient filesystem operations and commands in your Scala programs that run on Windows. Try it out and let me know if there are problems.
 
   @sect{Paths}
     @p
@@ -114,7 +111,7 @@
         @li
           @hl.scala{String}s
         @li
-          @hl.scala{Symbols}s
+          @hl.scala{Symbol}s
         @li
           @hl.scala{Array[T]}s where @hl.scala{T} is convertible into a @hl.scala{RelPath}
         @li
@@ -174,7 +171,7 @@
         All of these operations are pre-defined and strongly typed, so feel free to jump to their implementation to look at what they do or what else is available. Here's a shortlist of the one that may interest you:
 
       @ul
-        @val docBase = "https://lihaoyi.github.io/Ammonite/api/ops/index.html#ammonite.ops."
+        @val docBase = "https://ammonite.io/api/ops/index.html#ammonite.ops."
         @li
           @hl.scala{ls! path} @a("[doc]", href := (docBase+ "ls$")) returning @hl.scala{Vector[Path]}, and @hl.scala{ls.iter! path} returning a @hl.scala{Iterator[Path]}
         @li
@@ -269,7 +266,8 @@
 
     @sect{Reading Resources}
       @p
-        In addition to manipulating paths on the filesystem, you can also manipulate @code{resource} paths in order to read resources off of the Java classpath. By default, the path used to load resources is absolute, using the @hl.scala{Thread.currentThread().getContextClassLoader}. You can also pass in a classloader explicitly to the @hl.scala{resource} call:
+        You can also manipulate @code{resource} paths in order to read resources from the Java classpath. 
+        By default, the path used to load resources is absolute, using the @hl.scala{Thread.currentThread().getContextClassLoader}. You can also pass in a classloader explicitly to the @hl.scala{resource} call:
   
       @hl.ref(opsTests/"OpTests.scala", Seq("readResource", "absolute", ""))
   
@@ -363,7 +361,7 @@
         * master
           speedip
   
-        @@ %%('git, checkout, "master")
+        @@ %%('git, 'checkout, "master")
         Already on 'master'
         res6: CommandResult =
         M	readme/Index.scalatex

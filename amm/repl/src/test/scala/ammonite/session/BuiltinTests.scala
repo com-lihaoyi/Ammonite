@@ -73,13 +73,13 @@ object BuiltinTests extends TestSuite{
       check.session("""
         @ import ammonite.ops._, ImplicitWd._
 
-        @ val javaSrc = pwd/'amm/'src/'test/'resources/'loadable/'hello/"Hello.java"
+        @ val javaSrc = pwd/"amm"/"src"/"test"/"resources"/"loadable"/"hello"/"Hello.java"
 
-        @ mkdir! pwd/'target/'loadCP/'hello
+        @ mkdir! pwd/"target"/"loadCP"/"hello"
 
-        @ cp.over(javaSrc, pwd/'target/'loadCP/'hello/"Hello.java")
+        @ cp.over(javaSrc, pwd/"target"/"loadCP"/"hello"/"Hello.java")
 
-        @ %javac 'target/'loadCP/'hello/"Hello.java"  //This line causes problems in windows
+        @ %javac "target"/"loadCP"/"hello"/"Hello.java"  //This line causes problems in windows
 
         @ import $cp.target.loadCP  //This line causes problems in windows
 
@@ -94,7 +94,11 @@ object BuiltinTests extends TestSuite{
       // not sure why that one doesn't pass in 2.13
       // even disabling the noimports and imports settings instead of setting noimports to false
       // doesn't seem to reinstate imports
-      if (TestUtils.scala2_12) check.session(s"""
+      def sv = scala.util.Properties.versionNumberString
+      // In 2.12.13, I would have expected things like
+      //   interp.configureCompiler(_.settings.Wconf.tryToSet(List("any:wv", "cat=unchecked:ws")))
+      // to re-instate the expected warning below, to no avail :|
+      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 12) check.session(s"""
         @ // Disabling default Scala imports
 
         @ List(1, 2, 3) + "lol"
@@ -143,21 +147,25 @@ object BuiltinTests extends TestSuite{
       """)
     }
     test("infoLogging"){
-      check.session("""
-        @ 1 + 1
-        res0: Int = 2
+      if (check.scala2)
+        check.session("""
+          @ 1 + 1
+          res0: Int = 2
 
-        @ repl.compiler.settings.debug.value = true
+          @ repl.compiler.settings.debug.value = true
 
-        @ 1 + 1
-        info: running phase parser on
-      """)
+          @ 1 + 1
+          info: running phase parser on
+        """)
+      else
+        // couldn't get XshowPhases or Ydebug to do that…
+        "Disabled in Scala 3"
     }
 
 
     test("saveLoad"){
       check.session(
-        """
+        s"""
         @ val veryImportant = 1
         veryImportant: Int = 1
 
@@ -168,7 +176,7 @@ object BuiltinTests extends TestSuite{
 
         @ // Let's try this new cool new library
 
-        @ import $ivy.`com.lihaoyi::scalatags:0.7.0`
+        @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
 
         @ veryImportant
         res4: Int = 1
@@ -189,10 +197,10 @@ object BuiltinTests extends TestSuite{
         res9: Int = 1
 
         @ oopsDontWantThis
-        error: not found: value oopsDontWantThis
+        error: ${check.notFound("oopsDontWantThis")}
 
         @ import scalatags.Text.all._
-        error: not found: value scalatags
+        error: ${check.notFound("scalatags")}
         """)
     }
     test("saveLoad2"){
@@ -230,13 +238,13 @@ object BuiltinTests extends TestSuite{
                     """)
     }
     test("discardLoadCommandResult"){
-      test - check.session("""
+      test - check.session(s"""
         @ repl.sess.save("foo")
 
         @ val a = repl.sess.load("foo")
 
         @ a
-        error: not found: value a
+        error: ${check.notFound("a")}
       """)
 
       test - check.session("""

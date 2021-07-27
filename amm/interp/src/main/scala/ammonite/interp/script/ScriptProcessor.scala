@@ -2,7 +2,8 @@ package ammonite.interp.script
 
 import java.io.File
 
-import ammonite.interp.{CodeWrapper, DependencyLoader, Interpreter, Parsers, Preprocessor}
+import ammonite.compiler.iface.{CodeWrapper, Parser}
+import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
 import ammonite.util.{ImportTree, Name, Util}
 import ammonite.util.Util.CodeSource
@@ -11,13 +12,15 @@ import coursierapi.{Dependency, Repository}
 import scala.collection.mutable
 
 final case class ScriptProcessor(
+  scalaVersion: String,
+  parser: Parser,
+  codeWrapper: CodeWrapper,
   dependencyLoader: DependencyLoader,
   defaultRepositories: Seq[Repository],
   extraPluginDependencies: Seq[Dependency] = Nil,
   wd: os.Path = os.pwd,
-  codeWrapper: CodeWrapper = CodeWrapper,
   importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
-) {
+) { self =>
 
   import ScriptProcessor._
 
@@ -28,7 +31,7 @@ final case class ScriptProcessor(
 
     val rawCode = Interpreter.skipSheBangLine(code)
     lazy val offsetToPos = PositionOffsetConversion.offsetToPos(rawCode)
-    val splittedScript = Preprocessor.splitScriptWithStart(
+    val splittedScript = parser.scriptBlocksWithStartIndices(
       rawCode,
       codeSource.fileName
     ).left.map { f =>
@@ -38,8 +41,7 @@ final case class ScriptProcessor(
         val actualEndIdx = if (endIdx < 0) rawCode.length else endIdx
         offsetToPos(actualEndIdx)
       }
-      val expected = f.trace().failure.label
-      Seq(Diagnostic("ERROR", startPos, endPos, s"Expected $expected"))
+      Seq(Diagnostic("ERROR", startPos, endPos, s"Expected ${f.expected}"))
     }
 
     def hookFor(tree: ImportTree): Either[Diagnostic, (Seq[String], ImportHook)] = {
@@ -62,7 +64,7 @@ final case class ScriptProcessor(
       val r = hook.handle(
         codeSource,
         tree.copy(prefix = tree.prefix.drop(hookPrefix.length)),
-        ScriptProcessor.dummyInterpreterInterface,
+        dummyInterpreterInterface,
         codeWrapper.wrapperPath
       )
       r.left.map { error =>
@@ -82,9 +84,9 @@ final case class ScriptProcessor(
 
     val blocks = for {
       elems <- splittedScript.right.toSeq
-      (startIdx, leadingSpaces, statements) <- elems
+      Parser.ScriptBlock(startIdx, leadingSpaces, statements) <- elems
     } yield {
-      val (statements0, importTrees) = Parsers.parseImportHooksWithIndices(codeSource, statements)
+      val (statements0, importTrees) = parser.parseImportHooksWithIndices(codeSource, statements)
       val importResults =
         for {
           tree <- importTrees
@@ -171,6 +173,13 @@ final case class ScriptProcessor(
         }
     }
 
+  private val dummyInterpreterInterface =
+    new ImportHook.InterpreterInterface {
+      def loadIvy(coordinates: Dependency*): Either[String, Seq[File]] = Right(Nil)
+      def watch(p: os.Path): Unit = ()
+      def scalaVersion = self.scalaVersion
+    }
+
 }
 
 object ScriptProcessor {
@@ -201,10 +210,4 @@ object ScriptProcessor {
         Left(lefts.toList)
     }
   }
-
-  private val dummyInterpreterInterface =
-    new ImportHook.InterpreterInterface {
-      def loadIvy(coordinates: Dependency*): Either[String, Seq[File]] = Right(Nil)
-      def watch(p: os.Path): Unit = ()
-    }
 }

@@ -10,7 +10,7 @@ object ProjectTests213 extends TestSuite{
     println("Running ProjectTest213")
 
     test("httpApi"){
-      test("addPost") - jsonplaceholder.withServer { url =>
+      def addPostTest() = jsonplaceholder.withServer { url =>
         val res = execWithEnv(
           Seq("JSONPLACEHOLDER" -> url),
           'basic / "HttpApi.sc",
@@ -18,7 +18,7 @@ object ProjectTests213 extends TestSuite{
         )
         assert(res.out.trim.contains("101"))
       }
-      test("comments") - jsonplaceholder.withServer { url =>
+      def commentsTest() = jsonplaceholder.withServer { url =>
         val res = execWithEnv(
           Seq("JSONPLACEHOLDER" -> url),
           'basic / "HttpApi.sc",
@@ -26,6 +26,14 @@ object ProjectTests213 extends TestSuite{
         )
         assert(res.out.trim.contains("totam vel saepe aut"))
         assert(res.out.trim.contains("aperiam et omnis totam"))
+      }
+      test("addPost") {
+        if (isScala2) addPostTest()
+        else "Disabled in Scala 3"
+      }
+      test("comments") {
+        if (isScala2) commentsTest()
+        else "Disabled in Scala 3"
       }
     }
   }

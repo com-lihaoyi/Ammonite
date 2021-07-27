@@ -289,6 +289,8 @@ object HistoryFilter{
                           history: IndexedSeq[String],
                           indexIncrement: Int,
                           skipped: Vector[Char]) = {
+    val searchTermStr = new String(searchTerm.toArray)
+    val skippedStr = new String(skipped.toArray)
     /**
       * `Some(i)` means we found a reasonable result at history element `i`
       * `None` means we couldn't find anything, and should show a not-found
@@ -299,7 +301,7 @@ object HistoryFilter{
       // means it doesn't show anything but we shouldn't show an error
       case None if i < 0 => Some(-1)
       case None => None
-      case Some(s) if s.contains(searchTerm) && !s.contentEquals(skipped) =>
+      case Some(s) if s.contains(searchTermStr) && !s.contentEquals(skippedStr) =>
         Some(i)
       case _ => rec(i + indexIncrement)
     }

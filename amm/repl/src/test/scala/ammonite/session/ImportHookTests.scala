@@ -37,15 +37,21 @@ object ImportHookTests extends TestSuite{
           res1: Int = 31337
         """)
 
-        test("multiImport") - check.session("""
-          @ import $file.amm.src.test.resources.importHooks.{Basic, BasicTwo}
+        test("multiImport") - {
+          def run(extra: String = "") = check.session(s"""
+            @ import $$file.amm.src.test.resources.importHooks.{Basic, BasicTwo$extra}
 
-          @ Basic.basicValue
-          res1: Int = 31337
+            @ Basic.basicValue
+            res1: Int = 31337
 
-          @ BasicTwo.basicValueTwo
-          res2: Int = 1337
-        """)
+            @ BasicTwo.basicValueTwo
+            res2: Int = 1337
+          """)
+
+          test - run()
+          test - run("  ")
+          test - run("\n            @ ")
+        }
 
         test("rename") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.{Basic, BasicTwo => BasicToo}
@@ -71,11 +77,11 @@ object ImportHookTests extends TestSuite{
       }
       test("ivy"){
         test("basic"){
-          check.session("""
+          check.session(s"""
             @ import scalatags.Text.all._
-            error: not found: value scalatags
+            error: ${check.notFound("scalatags")}
 
-            @ import $ivy.`com.lihaoyi::scalatags:0.7.0`
+            @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
 
             @ import scalatags.Text.all._
 
@@ -85,11 +91,14 @@ object ImportHookTests extends TestSuite{
         }
 
         test("explicitBinaryVersion"){
+          val sbv =
+            if (check.scalaVersion.startsWith("3.")) "2.13"
+            else IvyConstructor.scalaBinaryVersion(check.scalaVersion)
           check.session(s"""
             @ import scalatags.Text.all._
-            error: not found: value scalatags
+            error: ${check.notFound("scalatags")}
 
-            @ import $$ivy.`com.lihaoyi:scalatags_${IvyConstructor.scalaBinaryVersion}:0.7.0`
+            @ import $$ivy.`com.lihaoyi:scalatags_$sbv:0.7.0`
 
             @ import scalatags.Text.all._
 
@@ -99,11 +108,11 @@ object ImportHookTests extends TestSuite{
         }
 
         test("inline"){
-          check.session("""
+          check.session(s"""
             @ import scalatags.Text.all._
-            error: not found: value scalatags
+            error: ${check.notFound("scalatags")}
 
-            @ import $ivy.`com.lihaoyi::scalatags:0.7.0`, scalatags.Text.all._
+            @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`, scalatags.Text.all._
 
             @ div("Hello").render
             res1: String = "<div>Hello</div>"

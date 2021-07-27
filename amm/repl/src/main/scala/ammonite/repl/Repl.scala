@@ -2,12 +2,13 @@ package ammonite.repl
 
 import java.io.{InputStream, InputStreamReader, OutputStream}
 
-import ammonite.repl.api.{FrontEnd, FrontEndAPI, History, ReplLoad, SourceAPI}
+import ammonite.repl.api.{FrontEnd, History, ReplLoad}
 import ammonite.runtime._
 import ammonite.terminal.Filter
 import ammonite.util.Util.{newLine, normalizeNewlines}
 import ammonite.util._
-import ammonite.interp.{CodeWrapper, Interpreter, Parsers, Preprocessor}
+import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
+import ammonite.interp.Interpreter
 import coursierapi.Dependency
 
 import scala.annotation.tailrec
@@ -27,6 +28,8 @@ class Repl(input: InputStream,
            scriptCodeWrapper: CodeWrapper,
            alreadyLoadedDependencies: Seq[Dependency],
            importHooks: Map[Seq[String], ImportHook],
+           compilerBuilder: CompilerBuilder,
+           parser: Parser,
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
            classPathWhitelist: Set[Seq[String]]) { repl =>
@@ -35,9 +38,9 @@ class Repl(input: InputStream,
 
   val frontEnd = Ref[FrontEnd](
     if (scala.util.Properties.isWin)
-      ammonite.repl.FrontEnds.JLineWindows
+      new ammonite.repl.FrontEnds.JLineWindows(parser)
     else
-      AmmoniteFrontEnd(Filter.empty)
+      AmmoniteFrontEnd(parser, Filter.empty)
   )
 
   var lastException: Throwable = null
@@ -71,6 +74,8 @@ class Repl(input: InputStream,
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
   val interp = new Interpreter(
+    compilerBuilder,
+    parser,
     printer,
     storage,
     wd,
@@ -102,8 +107,6 @@ class Repl(input: InputStream,
         def fullHistory = storage.fullHistory()
         def history = repl.history
         def newCompiler() = interp.compilerManager.init(force = true)
-        def compiler = interp.compilerManager.compiler.compiler
-        def interactiveCompiler = interp.compilerManager.pressy.compiler
         def fullImports = repl.fullImports
         def imports = repl.imports
         def usedEarlierDefinitions = repl.usedEarlierDefinitions
@@ -125,17 +128,16 @@ class Repl(input: InputStream,
             apply(normalizeNewlines(os.read(file)))
           }
         }
+
+        def _compilerManager = interp.compilerManager
       }
-    ),
-    (
-      "ammonite.repl.api.SourceBridge",
-      "source",
-      new SourceAPIImpl {}
     ),
     (
       "ammonite.repl.api.FrontEndBridge",
       "frontEnd",
-      new FrontEndAPIImpl {}
+      new FrontEndAPIImpl {
+        def parser = repl.parser
+      }
     )
   )
 
@@ -154,7 +156,7 @@ class Repl(input: InputStream,
     // running the user code directly. Could be made longer to better warm more
     // code paths, but then the fixed overhead gets larger so not really worth it
     val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
-    val stmts = Parsers.split(code).get.get.value
+    val stmts = parser.split(code).get.toOption.get
     interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/)
   }
 
@@ -203,7 +205,9 @@ class Repl(input: InputStream,
 
 
   def run(): Any = {
-    welcomeBanner.foreach(printer.outStream.println)
+    welcomeBanner
+      .map(_.replace("%SCALA_VERSION%", compilerBuilder.scalaVersion))
+      .foreach(printer.outStream.println)
     @tailrec def loop(): Any = {
       val actionResult = action()
       Repl.handleOutput(interp, actionResult)

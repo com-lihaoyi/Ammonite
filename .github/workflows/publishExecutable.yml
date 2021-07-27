@@ -1,0 +1,21 @@
+name: Publish Executable
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  publishExecutable:
+    runs-on: ubuntu-latest
+    env:
+      AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8'
+      - run: ./mill -i publishExecutable

@@ -96,9 +96,9 @@
         @lnk("an sbt plug-in", "https://github.com/ThoughtWorksInc/sbt-ammonite-classpath")
         to export the classpath of an sbt project to Ammonite Script.
       @li
-        @link("Elastic", "https://www.elastic.co/")
+        @lnk("Elastic", "https://www.elastic.co/")
         uses Ammonite as a management repl inside their
-        @link("Elastic Cloud Enterprise", "https://www.elastic.co/products/ece")
+        @lnk("Elastic Cloud Enterprise", "https://www.elastic.co/products/ece")
         product.
 
   @sect{Scaladoc}
@@ -107,15 +107,15 @@
 
     @ul
       @li
-        @a("Ammonite-Ops", href:="https://lihaoyi.github.io/Ammonite/api/ops/index.html")
+        @a("Ammonite-Ops", href:="https://ammonite.io/api/ops/index.html")
       @li
-        @a("Ammonite-Terminal", href:="https://lihaoyi.github.io/Ammonite/api/terminal/index.html")
+        @a("Ammonite-Terminal", href:="https://ammonite.io/api/terminal/index.html")
       @li
-        @a("Ammonite-Repl", href:="https://lihaoyi.github.io/Ammonite/api/repl/index.html")
+        @a("Ammonite-Repl", href:="https://ammonite.io/api/repl/index.html")
       @li
-        @a("Ammonite-Shell", href:="https://lihaoyi.github.io/Ammonite/api/shell/index.html")
+        @a("Ammonite-Shell", href:="https://ammonite.io/api/shell/index.html")
       @li
-        @a("Ammonite-Sshd", href:="https://lihaoyi.github.io/Ammonite/api/sshd/index.html")
+        @a("Ammonite-Sshd", href:="https://ammonite.io/api/sshd/index.html")
 
     @p
       Although it's best to read the documentation on this page to learn how
@@ -123,6 +123,22 @@
 
 
   @sect{Changelog}
+    @sect{2.4.0}
+      @ul
+        @li
+          Bump version of uPickle to 1.4.0
+        @li
+          Internal preparation for basic Scala 3 support
+    @sect{2.3.8}
+      @ul
+        @li
+          Replace the built in @code{@@main} method functionality with the
+          @lnk("MainArgs", "https://github.com/lihaoyi/mainargs") library
+        @li
+          Note that the MainArgs replacement has some backwards incompatibilities:
+          Short flags like @code{-i} can no longer be passed via @code{--i},
+          the @code{@@doc("")} is now @code{@@arg(doc = "")}, @code{Seq[T]} parameters
+          are now passed via repeated @code{--foo} flags rather than comma-separated.
     @sect{2.2.0}
       @ul
         @li
@@ -454,7 +470,7 @@
           during @code{mtime}ing, and make it properly re-run scripts when a
           file in a watched folder is renamed.
         @li
-          Display @hl.scala("@doc") annotations on a script's @hl.scala("@main")
+          Display @hl.scala("@arg") annotations on a script's @hl.scala("@main")
           methods as part of the script's help text, thanks to
           @lnk("mgedigian", "https://github.com/mgedigian")
         @li

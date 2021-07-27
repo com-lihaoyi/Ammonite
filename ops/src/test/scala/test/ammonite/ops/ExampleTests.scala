@@ -128,8 +128,8 @@ object ExampleTests extends TestSuite{
       // List the current directory
       val listed = ls! wd
 
-      // Write to a file without pain! Necessary
-      // enclosing directories are created automatically
+      // Write to a file without pain!
+      // Necessary enclosing directories are created automatically
       write(wd/'dir2/"file1.scala", "package example\nclass Foo{}\n", createFolders = true)
       write(wd/'dir2/"file2.scala", "package example\nclass Bar{}\n", createFolders = true)
 
@@ -294,13 +294,16 @@ object ExampleTests extends TestSuite{
         (p, read.lines(p).zipWithIndex |? (_._1.length > 100) | (_._2))
 
       val filesWithTooLongLines = (
-        %%("git", "ls-files")(ammonite.ops.pwd).out.lines
-            | (Path(_, ammonite.ops.pwd))
+        %%("git", "ls-files")(pwd).out.lines
+            | (Path(_, pwd))
             |? (_.ext == "scala")
             | longLines
             |? (_._2.length > 0)
             |? (!_._1.segments.contains("src_managed"))
-      )
+      ).map {
+        case (path, lines) =>
+          (path relativeTo ammonite.ops.pwd, lines.map(_ + 1))
+      }
 
       assert(filesWithTooLongLines.length == 0)
     }

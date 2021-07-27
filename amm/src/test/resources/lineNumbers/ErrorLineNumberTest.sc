@@ -1,5 +1,5 @@
 object Qs{
-  def main(a: Int){
+  def main(a: Int) = {
     println("OK")
     var unsorted: List[Int] = List(5,4,2,3,1)
     printlnqs(unsorted))

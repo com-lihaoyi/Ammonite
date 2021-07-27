@@ -1,0 +1,25 @@
+name: Publish Docs
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  publishDocs:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '8'
+      - name: publish docs
+        shell: 'script -q -e -c "bash {0}"'
+        run: echo "Hello World" && ./mill -i publishDocs
+        env:
+          TERM: xterm-256color

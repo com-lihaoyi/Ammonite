@@ -28,7 +28,13 @@ object AmmoniteBuildServerTests extends TestSuite {
   for (elem <- os.list(scriptBase))
     os.copy(elem, wd / elem.last, createFolders = true)
 
-  val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+  val sbv = ammonite.compiler.CompilerBuilder.scalaVersion.split('.').take(2).mkString(".")
+  val compatSbv = if (sbv.startsWith("3.")) "2.13" else sbv
+  val isScala2 = sbv.startsWith("2.")
+
+  def notFound(name: String): String =
+    if (isScala2) s"not found: value $name"
+    else s"Not found: $name"
 
   override def utestAfterAll(): Unit =
     os.remove.all(wd)
@@ -36,11 +42,11 @@ object AmmoniteBuildServerTests extends TestSuite {
   val tests = Tests {
 
     "simple" - {
-      val runner = new BspScriptRunner(wd / "simple" / "main.sc")
+      val runner = new BspScriptRunner(wd / "simple" / "script.sc")
 
       val expectedClassPath = List(
-        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
-        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+        s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$compatSbv/1.0.2/core_$compatSbv-1.0.2.jar"
       ).map("https/repo1.maven.org/maven2/" + _)
 
       for {
@@ -61,11 +67,11 @@ object AmmoniteBuildServerTests extends TestSuite {
     }
 
     "don't delete directories in target" - {
-      val runner = new BspScriptRunner(wd / "simple" / "main.sc")
+      val runner = new BspScriptRunner(wd / "simple" / "script.sc")
 
       val expectedClassPath = List(
-        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
-        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+        s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$compatSbv/1.0.2/core_$compatSbv-1.0.2.jar"
       ).map("https/repo1.maven.org/maven2/" + _)
 
       for {
@@ -95,7 +101,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
     "caching" - {
       val runner = new BspScriptRunner(
-        Seq("main", "lib").map(name => wd / "import-file" / s"$name.sc"): _*
+        Seq("script", "lib").map(name => wd / "import-file" / s"$name.sc"): _*
       )
 
       for {
@@ -114,7 +120,7 @@ object AmmoniteBuildServerTests extends TestSuite {
         classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
 
         _ = {
-          val clsFile = classDirectory / "ammonite" / "$file" / "import$minusfile" / "main.class"
+          val clsFile = classDirectory / "ammonite" / "$file" / "import$minusfile" / "script.class"
           assert(os.isDir(classDirectory))
           assert(os.isFile(clsFile))
           os.remove.all(classDirectory)
@@ -220,21 +226,18 @@ object AmmoniteBuildServerTests extends TestSuite {
       val script = tmpDir / "script.sc"
       os.write(
         script,
-        """@doc("Main stuff")
-          |@main
+        """@main(doc = "Main stuff")
           |def doMainStuff() = {
           |  thingOne()
           |  otherTing()
           |}
           |
-          |@doc("Do the first thingy")
-          |@main
+          |@main(doc = "Do the first thingy")
           |def thingOne() = {
           |  println("1.")
           |}
           |
-          |@doc("Do the other thing")
-          |@main
+          |@main(doc = "Do the other thing")
           |def otherTing() = {
           |  println("hello")
           |}
@@ -261,7 +264,7 @@ object AmmoniteBuildServerTests extends TestSuite {
           val expectedDiagnostics = List(
             new BDiagnostic(
               new Range(new BPosition(0, 12), new BPosition(0, 14)),
-              "not found: value zz"
+              notFound("zz")
             )
           )
           expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
@@ -313,7 +316,10 @@ object AmmoniteBuildServerTests extends TestSuite {
         notifications1 = runner.client.didChangeNotifications()
         _ = assert(notifications1.isEmpty)
 
-        _ = os.write.over(script, "import $ivy.`com.chuusai::shapeless:2.3.3`; val value = 3")
+        _ = os.write.over(
+          script,
+          "import $ivy.`com.chuusai::shapeless:2.3.3 compat`; val value = 3"
+        )
         _ <- runner.compile(StatusCode.OK)
 
         notifications = runner.client.didChangeNotifications()
@@ -321,7 +327,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
         _ = os.write.over(
           script,
-          "import $ivy.`com.chuusai::shapeless:2.3.3`; import sys.process._"
+          "import $ivy.`com.chuusai::shapeless:2.3.3 compat`; import sys.process._"
         )
         _ <- runner.compile(StatusCode.OK)
 
@@ -380,11 +386,11 @@ object AmmoniteBuildServerTests extends TestSuite {
         val expectedDiagnostics = List(
           new BDiagnostic(
             new Range(new BPosition(0, 0), new BPosition(0, 2)),
-            "not found: value aa"
+            notFound("aa")
           ),
           new BDiagnostic(
             new Range(new BPosition(3, 0), new BPosition(3, 2)),
-            "not found: value zz"
+            notFound("zz")
           )
         )
         expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
@@ -433,7 +439,7 @@ object AmmoniteBuildServerTests extends TestSuite {
           ),
           new BDiagnostic(
             new Range(new BPosition(2, 0), new BPosition(2, 2)),
-            "not found: value zz"
+            notFound("zz")
           )
         )
         expectedDiagnostics.foreach(_.setSeverity(DiagnosticSeverity.ERROR))
@@ -451,17 +457,17 @@ object AmmoniteBuildServerTests extends TestSuite {
       }
     }
 
-    "multi" - {
+    def multiTest(): Unit = {
       val dir = wd / "multi"
-      val scriptNames = Seq("main", "lib1", "lib2", "lib3")
+      val scriptNames = Seq("script", "lib1", "lib2", "lib3")
       val runner = new BspScriptRunner(scriptNames.map(n => dir / s"$n.sc"): _*)
 
       val expectedClassPath = List(
-        s"io/circe/circe-core_$sbv/0.12.3/circe-core_$sbv-0.12.3.jar",
-        s"io/circe/circe-generic_$sbv/0.12.3/circe-generic_$sbv-0.12.3.jar",
-        s"io/circe/circe-parser_$sbv/0.12.3/circe-parser_$sbv-0.12.3.jar",
-        s"io/circe/circe-numbers_$sbv/0.12.3/circe-numbers_$sbv-0.12.3.jar",
-        s"io/circe/circe-jawn_$sbv/0.12.3/circe-jawn_$sbv-0.12.3.jar"
+        s"io/circe/circe-core_$compatSbv/0.12.3/circe-core_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-generic_$compatSbv/0.12.3/circe-generic_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-parser_$compatSbv/0.12.3/circe-parser_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-numbers_$compatSbv/0.12.3/circe-numbers_$compatSbv-0.12.3.jar",
+        s"io/circe/circe-jawn_$compatSbv/0.12.3/circe-jawn_$compatSbv-0.12.3.jar"
       ).map("https/repo1.maven.org/maven2/" + _) ++ List(
         "https/jitpack.io/com/github/jupyter/jvm-repr/0.4.0/jvm-repr-0.4.0.jar"
       )
@@ -527,8 +533,8 @@ object AmmoniteBuildServerTests extends TestSuite {
             "Compiled multi/lib2.sc",
             "Compiling multi/lib3.sc",
             "Compiled multi/lib3.sc",
-            "Compiling multi/main.sc",
-            "Compiled multi/main.sc"
+            "Compiling multi/script.sc",
+            "Compiled multi/script.sc"
           )
           assert(messages == expectedMessages)
         }
@@ -538,15 +544,21 @@ object AmmoniteBuildServerTests extends TestSuite {
 
       } yield ()
     }
+    "multi" - {
+      // Disabled in Scala 3  as the test involves Scala 2 macros.
+      // TODO Re-enable once we switch to a Scala 3 version that has circe artifacts
+      if (isScala2) multiTest()
+      else "Temporarily disabled in Scala 3"
+    }
 
     "semanticdb" - {
-      val scriptPath = os.RelPath("semdb/main.sc")
+      val scriptPath = os.RelPath("semdb/script.sc")
       val otherScriptPath = os.RelPath("semdb/other.sc")
       val runner = new BspScriptRunner(wd / scriptPath, wd / otherScriptPath)
 
       val expectedClassPath = List(
-        s"com/softwaremill/sttp/client/core_$sbv/2.0.6/core_$sbv-2.0.6.jar",
-        s"com/softwaremill/sttp/model/core_$sbv/1.0.2/core_$sbv-1.0.2.jar"
+        s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
+        s"com/softwaremill/sttp/model/core_$compatSbv/1.0.2/core_$compatSbv-1.0.2.jar"
       ).map("https/repo1.maven.org/maven2/" + _)
 
       val otherScriptUri = (wd / otherScriptPath).toNIO.toUri.toASCIIString
@@ -606,7 +618,17 @@ object AmmoniteBuildServerTests extends TestSuite {
           SymbolOccurrence.Role.REFERENCE
         )
 
-        assert(doc.occurrences.contains(listOccurrence))
+        // Seems necessary for 2.13.4
+        val alternativeListOccurrence = new SymbolOccurrence(
+          Some(new Range(0, 11, 0, 15)),
+          "scala/package.List.",
+          SymbolOccurrence.Role.REFERENCE
+        )
+
+        assert(
+          doc.occurrences.contains(listOccurrence) ||
+            doc.occurrences.contains(alternativeListOccurrence)
+        )
       }
 
       for {
@@ -642,7 +664,7 @@ object AmmoniteBuildServerTests extends TestSuite {
     }
 
     "single comment with no line feed" - {
-      val runner = new BspScriptRunner(wd / "comment" / "main.sc")
+      val runner = new BspScriptRunner(wd / "comment" / "script.sc")
 
       for {
         _ <- runner.init()
@@ -663,7 +685,12 @@ object AmmoniteBuildServerTests extends TestSuite {
     def this(script: os.Path*) =
       this(wd, script)
 
-    val server = new AmmoniteBuildServer(initialScripts = script)
+    val server = new AmmoniteBuildServer(
+      ammonite.compiler.CompilerBuilder,
+      ammonite.compiler.Parsers,
+      ammonite.compiler.DefaultCodeWrapper,
+      initialScripts = script
+    )
 
     val client = new TestBuildClient
     server.onConnectWithClient(client)
@@ -730,9 +757,15 @@ object AmmoniteBuildServerTests extends TestSuite {
           val classPath = item.getClasspath.asScala.toList
           val classDir = os.Path(Paths.get(new URI(item.getClassDirectory)))
 
-          assert(options.contains("-Yrangepos"))
-          assert(options.exists(_.startsWith("-P:semanticdb:sourceroot:")))
-          assert(options.exists(_.startsWith("-P:semanticdb:targetroot:")))
+          if (isScala2) {
+            assert(options.contains("-Yrangepos"))
+            assert(options.exists(_.startsWith("-P:semanticdb:sourceroot:")))
+            assert(options.exists(_.startsWith("-P:semanticdb:targetroot:")))
+          } else {
+            assert(options.contains("-Xsemanticdb") || options.contains("-Xsemanticdb"))
+            assert(options.contains("-sourceroot"))
+            assert(options.contains("-semanticdb-target"))
+          }
           assert(classDir.startsWith(wd / ".ammonite"))
         }
 

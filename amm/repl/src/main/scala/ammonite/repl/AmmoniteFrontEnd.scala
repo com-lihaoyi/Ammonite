@@ -8,8 +8,11 @@ import GUILikeFilters.SelectionFilter
 import ammonite.terminal._
 import fastparse.Parsed
 import ammonite.util.{Colors, Res}
-import ammonite.interp.{Parsers, Preprocessor}
-case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEnd{
+import ammonite.compiler.iface.Parser
+case class AmmoniteFrontEnd(
+  parser: Parser,
+  extraFilters: Filter = Filter.empty
+) extends FrontEnd{
 
   def width = FrontEndUtils.width
   def height = FrontEndUtils.height
@@ -26,13 +29,9 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
-        fastparse.parse(code, Parsers.Splitter(_)) match{
-          case Parsed.Success(value, idx) =>
-            Res.Success((code, value.map(_._2)))
-          case f @ Parsed.Failure(_, index, extra) =>
-            Res.Failure(
-              Preprocessor.formatFastparseError("(console)", code, f)
-            )
+        parser.split(code, ignoreIncomplete = false).get match{
+          case Right(value) => Res.Success((code, value))
+          case Left(error) => Res.Failure(error)
         }
     }
   }
@@ -55,12 +54,13 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
         }
         val details2 = for (d <- details) yield {
 
-          Highlighter.defaultHighlight(
+          parser.defaultHighlight(
             d.toVector,
             colors.comment(),
             colors.`type`(),
             colors.literal(),
             colors.keyword(),
+            colors.error(),
             fansi.Attr.Reset
           ).mkString
         }
@@ -100,7 +100,7 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
     // Enter
     val multilineFilter = Filter.action(
       SpecialKeys.NewLine,
-      ti => Parsers.split(ti.ts.buffer.mkString).isEmpty
+      ti => parser.split(ti.ts.buffer.mkString).isEmpty
     ){
       case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }
@@ -133,15 +133,15 @@ case class AmmoniteFrontEnd(extraFilters: Filter = Filter.empty) extends FrontEn
       displayTransform = { (buffer, cursor) =>
 
 
-        val indices = Highlighter.defaultHighlightIndices(
-          buffer,
+        val highlighted = fansi.Str(parser.defaultHighlight(
+          buffer.toVector,
           colors.comment(),
           colors.`type`(),
           colors.literal(),
           colors.keyword(),
+          colors.error(),
           fansi.Attr.Reset
-        )
-        val highlighted = fansi.Str(Highlighter.flattenIndices(indices, buffer).mkString)
+        ).mkString)
         val (newBuffer, offset) = SelectionFilter.mangleBuffer(
           selectionFilter, highlighted, cursor, colors.selected()
         )

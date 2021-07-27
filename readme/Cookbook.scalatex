@@ -127,12 +127,12 @@
     @p
       This can be run inside the Ammonite REPL without installing anything, and will show the following window with a single button:
 
-    @img(src:="Swing1.png", marginLeft.auto, marginRight.auto)
+    @img(src:="Swing1.png", marginLeft.auto, marginRight.auto, loadingLazy)
 
     @p
       When clicked, it changes text:
 
-    @img(src:="Swing2.png", marginLeft.auto, marginRight.auto)
+    @img(src:="Swing2.png", marginLeft.auto, marginRight.auto, loadingLazy)
 
     @p
       Although this is just a small demo, you can use Ammonite yourself to experiment with GUI programming without needing to go through the hassle of setting up an environment and project and all that rigmarole. Just run the code right in the console! You can even interact with the GUI live in the console, e.g. running this snippet of code to add another action listener to keep count of how many times you clicked the button
@@ -151,7 +151,7 @@
     @p
       Which immediately becomes visible in the title of the window:
 
-    @img(src:="Swing3.png", marginLeft.auto, marginRight.auto)
+    @img(src:="Swing3.png", marginLeft.auto, marginRight.auto, loadingLazy)
 
     @p
       Even while you're clicking on the button, you can still access @code{count} in the console:

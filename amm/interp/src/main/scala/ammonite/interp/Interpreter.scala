@@ -3,18 +3,22 @@ package ammonite.interp
 import java.io.{File, OutputStream, PrintStream}
 import java.util.regex.Pattern
 
-import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar}
-import ammonite.interp.CodeWrapper
+import ammonite.compiler.iface.{
+  CodeWrapper,
+  CompilerBuilder,
+  CompilerLifecycleManager,
+  Parser,
+  Preprocessor
+}
+import ammonite.interp.api.{InterpAPI, InterpLoad, LoadJar, ScalaVersion}
 
 import scala.collection.mutable
 import ammonite.runtime._
-import fastparse._
 
 import annotation.tailrec
 import ammonite.runtime.tools.IvyThing
-import ammonite.util.ImportTree
 import ammonite.util.Util._
-import ammonite.util._
+import ammonite.util.{Frame => _, _}
 import coursierapi.{Dependency, Fetch, Repository}
 
 /**
@@ -22,7 +26,10 @@ import coursierapi.{Dependency, Fetch, Repository}
  * to interpret Scala code. Doesn't attempt to provide any
  * real encapsulation for now.
  */
-class Interpreter(val printer: Printer,
+class Interpreter(val compilerBuilder: CompilerBuilder,
+                  // by-name, so that fastparse isn't loaded when we don't need it
+                  parser: => Parser,
+                  val printer: Printer,
                   val storage: Storage,
                   val wd: os.Path,
                   colors: Ref[Colors],
@@ -50,11 +57,13 @@ class Interpreter(val printer: Printer,
   def frameImports = headFrame.imports
   def frameUsedEarlierDefinitions = headFrame.usedEarlierDefinitions
 
+  def scalaVersion = compilerBuilder.scalaVersion
+
   def dependencyComplete: String => (Int, Seq[String]) =
     IvyThing.completer(repositories(), verbose = verboseOutput)
 
-  val compilerManager = new CompilerLifecycleManager(
-    storage,
+  val compilerManager = compilerBuilder.newManager(
+    storage.dirOpt.map(_.toNIO),
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
@@ -237,7 +246,7 @@ class Interpreter(val printer: Printer,
       Seq(Name("ammonite"), Name("$sess")),
       Some(wd/"(console)")
     )
-    val (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -278,10 +287,13 @@ class Interpreter(val printer: Printer,
                    incrementLine: () => Unit): Res[(Evaluated, Tag)] = synchronized{
     for{
       _ <- Catching{ case e: ThreadDeath => Evaluator.interrupted(e) }
-      output <- compilerManager.compileClass(
-        processed,
-        printer,
-        fileName
+      output <- Res(
+        compilerManager.compileClass(
+          processed,
+          printer,
+          fileName
+        ),
+        "Compilation Failed"
       )
       _ = incrementLine()
       res <- eval.processLine(
@@ -314,8 +326,11 @@ class Interpreter(val printer: Printer,
 
     for {
       _ <- Catching{case e: Throwable => e.printStackTrace(); throw e}
-      output <- compilerManager.compileClass(
-        processed, printer, codeSource.fileName
+      output <- Res(
+        compilerManager.compileClass(
+          processed, printer, codeSource.fileName
+        ),
+        "Compilation Failed"
       )
       cls <- eval.loadClass(fullyQualifiedName, output.classFiles)
 
@@ -371,7 +386,7 @@ class Interpreter(val printer: Printer,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = Preprocessor.splitScript(
+        lazy val splittedScript = parser.splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.fileName
         )
@@ -416,7 +431,7 @@ class Interpreter(val printer: Printer,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(Preprocessor.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(parser.splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -565,7 +580,7 @@ class Interpreter(val printer: Printer,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = Parsers.parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )
@@ -654,14 +669,6 @@ class Interpreter(val printer: Printer,
     def watch(p: os.Path) = interp.watch(p)
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}
 
-    def configureCompiler(callback: scala.tools.nsc.Global => Unit) = {
-      compilerManager.configureCompiler(callback)
-    }
-
-    def preConfigureCompiler(callback: scala.tools.nsc.Settings => Unit) = {
-      compilerManager.preConfigureCompiler(callback)
-    }
-
     val beforeExitHooks = interp.beforeExitHooks
 
     val repositories = interp.repositories
@@ -701,6 +708,10 @@ class Interpreter(val printer: Printer,
       }
 
     }
+
+    def scalaVersion = ScalaVersion(interp.scalaVersion)
+
+    def _compilerManager = interp.compilerManager
   }
 
 }
@@ -709,15 +720,20 @@ object Interpreter{
 
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpBridge.value.exit"),
+    ImportData("ammonite.interp.api.InterpBridge.value.scalaVersion"),
     ImportData(
       "ammonite.interp.api.IvyConstructor.{ArtifactIdExt, GroupIdExt}",
       importType = ImportData.Type
     ),
+    ImportData("""ammonite.compiler.CompilerExtensions.{
+      CompilerInterpAPIExtensions,
+      CompilerReplAPIExtensions
+    }"""),
     ImportData("ammonite.runtime.tools.{browse, grep, time}"),
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
-    ImportData("ammonite.repl.tools.{desugar, source}"),
-    ImportData("ammonite.main.Router.{doc, main}"),
-    ImportData("ammonite.repl.tools.Util.pathScoptRead")
+    ImportData("ammonite.compiler.tools.{desugar, source}"),
+    ImportData("mainargs.{arg, main}"),
+    ImportData("ammonite.repl.tools.Util.PathRead")
   )
 
 

@@ -126,4 +126,6 @@ object Util{
 
     transpose(xs, Nil).reverse
   }
+
+  case class Location(fileName: String, lineNum: Int, fileContent: String)
 }
