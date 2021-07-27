@@ -8,6 +8,7 @@ import ammonite.util.Util.CodeSource
 import pprint.Util
 
 import dotty.tools.dotc
+import dotc.ast.desugar
 import dotc.ast.untpd
 import dotc.core.Contexts._
 import dotc.core.{Flags, Names}
@@ -172,7 +173,13 @@ class Preprocessor(
     case m: untpd.TypeDef if m.isClassDef && m.mods.flags.is(Flags.Trait) =>
       m.name
   }
-  private val DefDef = DefProc("function"){ case m: untpd.DefDef => m.name }
+  private val DefDef = DefProc("function"){
+    case m: untpd.DefDef if m.mods.flags.is(Flags.Given) && m.name.isEmpty =>
+      given Context = ctx
+      desugar.inventGivenOrExtensionName(m.tpt)
+    case m: untpd.DefDef =>
+      m.name
+  }
   private val TypeDef = DefProc("type"){ case m: untpd.TypeDef => m.name }
 
   private val VarDef = Processor { case (name, code, t: untpd.ValDef) =>
@@ -184,8 +191,14 @@ class Preprocessor(
       // synthetic flags right now, because we're dumb-parsing it and not putting
       // it through a full compilation
       if (isPrivate(t) || t.name.decode.toString.contains("$")) Nil
-      else if (!t.mods.flags.is(Flags.Lazy)) Seq(pprint(Name.backtickWrap(t.name.decode.toString)))
-      else Seq(pprintSignature(Name.backtickWrap(t.name.decode.toString), Some("<lazy>")))
+      else if (t.mods.flags.is(Flags.Given)) {
+        given Context = ctx
+        val name0 = if (t.name.isEmpty) desugar.inventGivenOrExtensionName(t.tpt) else t.name
+        Seq(pprintSignature(Name.backtickWrap(name0.decode.toString), Some("<given>")))
+      }
+      else if (t.mods.flags.is(Flags.Lazy))
+        Seq(pprintSignature(Name.backtickWrap(t.name.decode.toString), Some("<lazy>")))
+      else Seq(pprint(Name.backtickWrap(t.name.decode.toString)))
     )
   }
 
