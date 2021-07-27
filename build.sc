@@ -26,14 +26,13 @@ val commitsSinceTaggedVersion = {
     .toInt
 }
 
-// When this version is used as cross scala version,
+// When a Scala 3 version is used as cross scala version,
 // cross2_3Version sometimes ends up being picked as actual Scala version.
-// Modules retaining scala3 or cross2_3Version can depend on each other, thanks to
+// Modules retaining the Scala 3 version or cross2_3Version can depend on each other, thanks to
 // the dotty compatibility.
 // Beware that this requires both versions to have the same tasty format
 // version. For example, 2.13.4 and 3.0.0-M1 do, while 2.13.4 and 3.0.0-M{2,3}
 // don't.
-val scala3 = "3.0.0"
 val cross2_3Version = "2.13.6"
 
 
@@ -50,12 +49,13 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
 
 val scala2_12Versions = Seq("2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6")
+val scala3Versions = Seq("3.0.0")
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala3)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala3Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
-val fullCrossScalaVersions = scala2_12Versions ++ scala2_13Versions ++ Seq(scala3)
+val fullCrossScalaVersions = scala2_12Versions ++ scala2_13Versions ++ scala3Versions
 
 val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 
@@ -143,7 +143,7 @@ trait CrossSbtModule extends mill.scalalib.SbtModule with mill.scalalib.CrossMod
 
 trait AmmInternalModule extends CrossSbtModule{
   def useCrossPrefix = T{
-    crossScalaVersion == scala3 && scalaVersion() != scala3
+    scala3Versions.contains(crossScalaVersion) && !scala3Versions.contains(scalaVersion())
   }
   def artifactName = T{
     // When crossScalaVersion == scala3, but we are building the current module
@@ -222,7 +222,7 @@ trait AmmInternalModule extends CrossSbtModule{
   }
   def supports3: Boolean = false
   def scalaVersion = T{
-    if (crossScalaVersion == scala3 && !supports3) cross2_3Version
+    if (scala3Versions.contains(crossScalaVersion) && !supports3) cross2_3Version
     else crossScalaVersion
   }
   def repositories = super.repositories ++ Seq(
@@ -292,7 +292,7 @@ object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = T{
     val fansi =
-      if (crossScalaVersion == scala3)
+      if (scala3Versions.contains(crossScalaVersion))
         Agg(
           ivy"com.lihaoyi:fansi_3:${Deps.fansi.dep.version}",
           ivy"org.scala-lang:scala3-library_3:$crossScalaVersion"
@@ -315,7 +315,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops())
     def ivyDeps = T{
-      if (crossScalaVersion == scala3)
+      if (scala3Versions.contains(crossScalaVersion))
         Agg(
           ivy"com.lihaoyi:pprint_3:${Deps.pprint.dep.version}",
           ivy"com.lihaoyi:fansi_3:${Deps.fansi.dep.version}",
@@ -511,7 +511,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   // com.lihaoyi:ammonite-cross-23_2.13.x, in order not to conflict with the main
   // Scala 2.13.x amm module. In order to still publish a com.lihaoyi:ammonite_3.x module,
   // we build an empty module, and have it depend on com.lihaoyi:ammonite-cross-23_2.13.x.
-  object helper extends Cross[HelperModule](scala3)
+  object helper extends Cross[HelperModule](scala3Versions: _*)
   class HelperModule(val crossScalaVersion: String) extends AmmModule {
     def supports3 = true
     def artifactName = "ammonite"
