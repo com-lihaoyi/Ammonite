@@ -89,7 +89,7 @@ class Compiler(
     ictx.setProperty(MacroClassLoaderKey, macroClassLoader)
     Positioned.init
 
-    if !ictx.settings.YdropComments.value || ictx.mode.is(Mode.ReadComments) then
+    if !ictx.settings.YdropComments.value then
       ictx.setProperty(ContextDoc, new ContextDocstrings)
     val fileNamesOpt = ScalacCommand.checkUsage(
       summary,
@@ -122,7 +122,7 @@ class Compiler(
   //   compiler/src/dotty/tools/repl/ReplDriver.scala/#L67-L73
   /** Create a fresh and initialized context with IDE mode enabled */
   lazy val initialCtx =
-    val rootCtx = initCtx.fresh.addMode(Mode.ReadPositions | Mode.Interactive | Mode.ReadComments)
+    val rootCtx = initCtx.fresh.addMode(Mode.ReadPositions | Mode.Interactive)
     rootCtx.setSetting(rootCtx.settings.YcookComments, true)
     // FIXME Disabled for the tests to pass
     rootCtx.setSetting(rootCtx.settings.color, "never")
