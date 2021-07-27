@@ -613,5 +613,30 @@ object AdvancedTests extends TestSuite{
         found: Boolean = true
       """)
     }
+
+    test("given"){
+      if (check.scala2) "N/A"
+      else
+        check.session("""
+          @ class Foo
+          defined class Foo
+
+          @ given Ordering[Foo] = new Ordering[Foo] { def compare(a: Foo, b: Foo): Int = 0 }
+          given_Ordering_Foo: Ordering[Foo] = <given>
+
+          @ class Bar
+          defined class Bar
+
+          @ given (using Ordering[Foo]): Ordering[Bar] = {
+          @   new Ordering[Bar] { def compare(a: Bar, b: Bar): Int = 0 }
+          @ }
+          defined function given_Ordering_Bar
+
+          @ given fooOrd: Ordering[Foo] = {
+          @   new Ordering[Foo] { def compare(a: Foo, b: Foo): Int = 0 }
+          @ }
+          fooOrd: Ordering[Foo] = <given>
+        """)
+    }
   }
 }
