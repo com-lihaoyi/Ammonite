@@ -89,7 +89,18 @@ object Config{
       doc =
         "Wrap user code in classes rather than singletons, typically for Java serialization "+
         "friendliness.")
-    classBased: Flag
+    classBased: Flag,
+    @arg(
+      name = "scalapy",
+      doc =
+        "Enable Scalapy")
+    scalapy: Flag,
+    @arg(
+      name = "python-executable",
+      doc =
+        """Path to the Python interpreter executable to be used with ScalaPy"""
+    )
+    pythonExecutable: Option[String]
   )
   implicit val replParser = ParserForClass[Repl]
 

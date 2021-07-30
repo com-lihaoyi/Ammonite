@@ -29,6 +29,17 @@ object Defaults{
       typeOf
     }""")
   )
+
+  val scalapyImports = Imports(
+    ImportData("""me.shadaj.scalapy.{
+      py
+    }"""),
+    ImportData("""me.shadaj.scalapy.py.{
+      PyQuote,
+      SeqConverters
+    }""")
+  )
+
   def ammoniteHome = os.Path(System.getProperty("user.home"))/".ammonite"
 
   def alreadyLoadedDependencies(

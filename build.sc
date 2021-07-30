@@ -76,6 +76,7 @@ val (buildVersion, unstable) = scala.util.Try(
 val bspVersion = "2.0.0-M6"
 val fastparseVersion = "2.3.0"
 val scalametaVersion = "4.4.24"
+val scalapyVersion = "0.5.0"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi::acyclic:0.2.0"
@@ -94,12 +95,14 @@ object Deps {
   val mainargs = ivy"com.lihaoyi::mainargs:0.2.0"
   val osLib = ivy"com.lihaoyi::os-lib:0.7.2"
   val pprint = ivy"com.lihaoyi::pprint:0.6.6"
+  val pythonNativeLibs = ivy"ai.kien::python-native-libs:0.2.1"
   val requests = ivy"com.lihaoyi::requests:0.6.5"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.14.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.4.1"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
+  val scalapy = ivy"me.shadaj::scalapy-core:${scalapyVersion}"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
   val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.0-M3"
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.27"
@@ -397,7 +400,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
         Deps.scalaReflect(scalaVersion()),
-        Deps.coursierInterface
+        Deps.coursierInterface,
+        Deps.pythonNativeLibs
       )
       def constantsFile = T {
         val dest = T.dest / "Constants.scala"
@@ -449,7 +453,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       )
 
       def generatedSources = T{
-        Seq(PathRef(generateConstantsFile(buildVersion, bspVersion = bspVersion)))
+        Seq(PathRef(generateConstantsFile(buildVersion, bspVersion = bspVersion, scalapyVersion = scalapyVersion)))
       }
 
       def exposedClassPath = T{
@@ -750,6 +754,7 @@ def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.
 def generateConstantsFile(version: String = buildVersion,
                           unstableVersion: String = "<fill-me-in-in-Constants.scala>",
                           bspVersion: String = "<fill-me-in-in-Constants.scala>",
+                          scalapyVersion: String = "<fill-me-in-in-Constants.scala>",
                           curlUrl: String = "<fill-me-in-in-Constants.scala>",
                           unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
                           oldCurlUrls: Seq[(String, String)] = Nil,
@@ -761,6 +766,7 @@ def generateConstantsFile(version: String = buildVersion,
       val version = "$version"
       val unstableVersion = "$unstableVersion"
       val bspVersion = "$bspVersion"
+      val scalapyVersion = "$scalapyVersion"
       val curlUrl = "$curlUrl"
       val unstableCurlUrl = "$unstableCurlUrl"
       val oldCurlUrls = Seq[(String, String)](
@@ -898,6 +904,7 @@ def publishDocs() = {
       latestTaggedVersion,
       buildVersion,
       bspVersion,
+      scalapyVersion,
       s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$stableKey",
       s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$unstableKey",
       for(k <- oldStableKeys)
@@ -968,4 +975,3 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
         x:_*
       )
   }
-

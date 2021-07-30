@@ -7,6 +7,7 @@ import java.nio.file.NoSuchFileException
 import ammonite.compiler.{CodeClassWrapper, DefaultCodeWrapper}
 import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
+import ammonite.interp.api.IvyConstructor
 import ammonite.interp.script.AmmoniteBuildServer
 import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
@@ -19,6 +20,9 @@ import ammonite.runtime.ImportHook
 import coursierapi.Dependency
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.util.{Success, Failure}
+
+import ai.kien.python.Python
 
 
 
@@ -81,7 +85,8 @@ case class Main(predefCode: String = "",
                 compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder,
                 // by-name, so that fastparse isn't loaded when we don't need it
                 parser: () => Parser = () => ammonite.compiler.Parsers,
-                classPathWhitelist: Set[Seq[String]] = Set.empty){
+                classPathWhitelist: Set[Seq[String]] = Set.empty,
+                scalapy: Boolean = false){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -108,7 +113,8 @@ case class Main(predefCode: String = "",
 
     loadedPredefFile.right.map{ predefFileInfoOpt =>
       val augmentedImports =
-        if (defaultPredef) Defaults.replImports ++ Interpreter.predefImports
+        if (defaultPredef) Defaults.replImports ++ Interpreter.predefImports ++
+          (if (scalapy) Defaults.scalapyImports else Imports())
         else Imports()
 
       val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
@@ -217,6 +223,19 @@ case class Main(predefCode: String = "",
     instantiateRepl(replArgs.toIndexedSeq) match{
       case Left(missingPredefInfo) => missingPredefInfo
       case Right(repl) =>
+        if (scalapy) {
+          val sv = scala.util.Properties.versionNumberString
+          val sbv = IvyConstructor.scalaBinaryVersion(sv)
+          repl.interp.loadIvy(
+            Dependency.of("me.shadaj", s"scalapy-core_$sbv", Constants.scalapyVersion)
+          ).fold(
+            failureMsg => throw new Exception(failureMsg),
+            loaded => loaded
+              .map(_.toURI.toURL)
+              .foreach(jar => repl.interp.headFrame.addClasspath(Seq(jar)))
+          )
+        }
+
         repl.initializePredef().getOrElse{
           // Warm up the compilation logic in the background, hopefully while the
           // user is typing their first command, so by the time the command is
@@ -325,6 +344,22 @@ object Main{
           (cliConfig.core.code, cliConfig.rest.toList) match{
             case (Some(code), Nil) =>
               runner.runCode(code)
+
+            case (None, Nil) if cliConfig.repl.scalapy.value =>
+              val sv = scala.util.Properties.versionNumberString
+              if (sv.startsWith("3")) {
+                runner.printError("ScalaPy has not been supported for Scala 3")
+                false
+              } else Python(cliConfig.repl.pythonExecutable).scalapyProperties match {
+                case Failure(ex) =>
+                  runner.printError(s"Error while setting up ScalaPy: $ex")
+                  false
+                case Success(props) =>
+                  props.foreach { case (k, v) => System.setProperty(k, v) }
+                  runner.printInfo("Loading...")
+                  runner.runRepl()
+                  true
+              }
 
             case (None, Nil) =>
               runner.printInfo("Loading...")
@@ -485,8 +520,8 @@ class MainRunner(cliConfig: Config,
       parser = () => parser,
       alreadyLoadedDependencies =
         Defaults.alreadyLoadedDependencies(),
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.core.thin.value)
-
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.core.thin.value),
+      scalapy = cliConfig.repl.scalapy.value
     )
   }
 
