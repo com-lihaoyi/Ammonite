@@ -20,12 +20,12 @@ object Sample{
   val cygwinSed = """$ sed -i '0,/"\$0"/{s/"\$0"/`cygpath -w "\$0"`/}' /usr/local/bin/amm"""
   val filesystemCurl =
     "$ mkdir -p ~/.ammonite && curl -L -o ~/.ammonite/predef.sc https://git.io/vHaKQ"
-  
+
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
     val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
     try read! path
-    catch{ case e =>
+    catch { case e : Throwable =>
       val newValue = calc
       write.over(path, newValue)
       newValue
@@ -48,7 +48,9 @@ object Sample{
       args = Map("JAVA_OPTS" -> "-Xmx600m")
     )
 
-    val lines = Predef.augmentString(out).lines.toSeq.drop(4).dropRight(2).mkString("\n")
+    // drop(1) to remove "Welcome to the Ammonite Repl..."
+    // dropRight(3) to remove "\nexit\n"
+    val lines = Predef.augmentString(out).lines.toSeq.drop(1).dropRight(3).mkString("\n")
     val rawHtmlString = ANSI.ansiToHtml(lines).render.replaceAll("\r\n|\n\r", "\n")
     raw(rawHtmlString)
   }
@@ -69,9 +71,9 @@ object Sample{
           .call(cwd = os.pwd, env = args, stdin = input)
       val resultString = p.out.string
 
-      println(s"====================RESULT====================")
+      println("====================RESULT====================")
       println(resultString)
-      println("========================================")
+      println("==============================================")
       resultString
     } catch {
       case e: os.SubprocessException =>
@@ -80,19 +82,18 @@ object Sample{
   }
 
   def compare(bashCode: String, ammoniteCode: String) = {
-    val out = {
-      val customPrompt = "__bash__"
-      val output = exec(
-        Seq("bash", "-i"),
-        s"PS1=$customPrompt\n${bashCode.trim}\nexit\n"
-      )
-      for(chunk <- output.split("\n" + customPrompt, -1).drop(1).dropRight(1)) yield{
-        Seq[Frag](span(color := ANSI.magenta, "\nbash$ "), chunk)
-      }
-    }
+    val customPrompt = "__bash__"
+    val out = exec(
+      Seq("bash", "-i"),
+      s"PS1=$customPrompt\n${bashCode.trim}\nexit\n"
+    )
+
+    val bashCodeFormatted = Seq[Frag](span(color := ANSI.magenta, "bash$ "), bashCode.trim)
+    val bashOutput = Predef.augmentString(out).lines.toSeq.mkString("\n")
 
     div(
-      pre(out),
+      pre(bashCodeFormatted),
+      pre(bashOutput),
       pre(ammSample(ammoniteCode))
     )
   }
