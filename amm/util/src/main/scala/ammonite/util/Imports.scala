@@ -55,10 +55,18 @@ case class ImportData(fromName: Name,
 
 
 object ImportData{
-  sealed case class ImportType(name: String)
-  val Type = ImportType("Type")
-  val Term = ImportType("Term")
-  val TermType = ImportType("TermType")
+  sealed trait ImportType {
+    def name: String
+  }
+  case object Type extends ImportType {
+    def name = "Type"
+  }
+  case object Term extends ImportType {
+    def name = "Term"
+  }
+  case object TermType extends ImportType {
+    def name = "TermType"
+  }
 
   def apply(name: String, importType: ImportType = Term): Seq[ImportData] = {
     val elements = name.split('.')
