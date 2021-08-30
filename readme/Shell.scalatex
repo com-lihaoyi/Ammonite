@@ -139,7 +139,7 @@
         Here is how to find the largest 3 files in a given directory tree:
 
       @compare(
-        "find ./repl/src -ls | sort -nrk 7 | head -3",
+        "find ./amm/src -ls | sort -nrk 7 | head -3",
         "ls.rec! wd/'amm/'src | (x => x.size -> x.last) sortBy (-_._1) take 3"
       )
 
