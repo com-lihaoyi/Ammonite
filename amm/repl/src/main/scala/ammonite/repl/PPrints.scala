@@ -7,8 +7,8 @@ import ammonite.util.Util
 import pprint.Renderer
 
 object PPrints{
-  val replPPrintHandlers: PartialFunction[Any, pprint.Tree] = {
-    case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x)
+  def replPPrintHandlers(width: => Int): PartialFunction[Any, pprint.Tree] = {
+    case x: ammonite.ops.LsSeq => PPrints.lsSeqRepr(x, width)
 //    case x: os.Path => PPrints.pathRepr(x)
 //    case x: os.RelPath => PPrints.relPathRepr(x)
 //    case x: ammonite.ops.Path => PPrints.pathRepr(os.Path(x.toString))
@@ -18,7 +18,7 @@ object PPrints{
     case t: GrepResult => pprint.Tree.Lazy(ctx => Iterator(GrepResult.grepResultRepr(t, ctx)))
     case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
   }
-  def lsSeqRepr(t: LsSeq) = pprint.Tree.Lazy { ctx =>
+  def lsSeqRepr(t: LsSeq, width: Int) = pprint.Tree.Lazy { ctx =>
     val renderer = new Renderer(
       ctx.width, ctx.applyPrefixColor, ctx.literalColor, ctx.indentStep
     )
@@ -29,7 +29,7 @@ object PPrints{
                 .toStream:_*
       )
     }
-    Iterator(Util.newLine) ++ FrontEndUtils.tabulate(snippets, FrontEndUtils.width)
+    Iterator(Util.newLine) ++ FrontEndUtils.tabulate(snippets, width)
   }
 
 

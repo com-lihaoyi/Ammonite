@@ -87,7 +87,7 @@ trait ReplApiImpl extends FullReplAPI{
       defaultWidth = width,
       colorLiteral = colors().literal(),
       colorApplyPrefix = colors().prefix(),
-      additionalHandlers = PPrints.replPPrintHandlers
+      additionalHandlers = PPrints.replPPrintHandlers(width)
     )
   )
 
