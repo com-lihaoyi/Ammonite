@@ -49,7 +49,7 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
 
 val scala2_12Versions = Seq("2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6")
-val scala3Versions = Seq("3.0.0", "3.0.1")
+val scala3Versions = Seq("3.0.0", "3.0.1", "3.0.2")
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala3Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
@@ -214,8 +214,12 @@ trait AmmInternalModule extends CrossSbtModule{
       if (sv.startsWith("2.13.") || sv.startsWith("3."))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.13-or-3"))
       else Nil
+    val extraDir5 =
+      if (sv.startsWith("3.") && !sv.startsWith("3.0.0"))
+        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.1+"))
+      else Nil
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
