@@ -57,6 +57,10 @@
         Maxim Novak gave a talk @lnk("Rock solid shell-scripting with Ammonite",
         "http://www.slideshare.net/maximnovak/rocksolid-shell-scripting-with-ammonite")
         at Scalapeno 2016 in Tel Aviv.
+      @li
+        Wojtek Pituła gave a talk @lnk("That's enough bash. That's enough",
+        "https://youtu.be/xHdgeOco-OU")
+        at ScalaWave 2018 in Gdańsk.
 
   @sect{In the Wild}
     @ul
