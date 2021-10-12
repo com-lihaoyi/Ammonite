@@ -393,6 +393,10 @@ class MainRunner(cliConfig: Config,
                  stdErr: OutputStream,
                  wd: os.Path){
 
+  // for trapping exit when the --watch option is on
+  if (cliConfig.core.watch.value)
+    System.setSecurityManager(TrapExitSecurityManager)
+
   val colors =
     if(cliConfig.core.color.getOrElse(Main.isInteractive())) Colors.Default
     else Colors.BlackWhite
