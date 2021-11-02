@@ -1,0 +1,17 @@
+{
+    "value": [
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/ops/src/main/resources",
+        "ref:e9995c91:/home/runner/work/Ammonite/Ammonite/out/ops/2.13.7/compile/dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/resources",
+        "qref:1124a98a:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.7/scala-reflect-2.13.7.jar",
+        "qref:fc754d7f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.7/scala-library-2.13.7.jar",
+        "qref:b96b5a73:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.6.6/pprint_2.13-0.6.6.jar",
+        "qref:593391d4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.2.14/fansi_2.13-0.2.14.jar",
+        "qref:132d3e7d:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.7.2/os-lib_2.13-0.7.2.jar",
+        "qref:32805ecb:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.4.1/scala-collection-compat_2.13-2.4.1.jar",
+        "qref:7eb5f9d8:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.2.7/sourcecode_2.13-0.2.7.jar",
+        "qref:f36b4d6a:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.6.5/geny_2.13-0.6.5.jar"
+    ],
+    "valueHash": 1420492219,
+    "inputsHash": -921216906
+}

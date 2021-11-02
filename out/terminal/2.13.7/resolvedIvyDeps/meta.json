@@ -1,0 +1,10 @@
+{
+    "value": [
+        "qref:1124a98a:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.7/scala-reflect-2.13.7.jar",
+        "qref:fc754d7f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.7/scala-library-2.13.7.jar",
+        "qref:593391d4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.2.14/fansi_2.13-0.2.14.jar",
+        "qref:7eb5f9d8:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.2.7/sourcecode_2.13-0.2.7.jar"
+    ],
+    "valueHash": -444366155,
+    "inputsHash": -1642084701
+}
