@@ -262,9 +262,9 @@ span.hljs-tag, span.hljs-symbol{
     <p>
       Or to try out the <a href="#UnstableChangelog">latest features</a> in our
       <a href="#UnstableVersions">Unstable Release</a>
-      2.4.0-24-b4a313e0:
+      2.4.0-27-65476446:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-24-b4a313e0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-27-65476446) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
     <p>
       You can also download a bootstrap script, that can be downloaded and committed
@@ -346,9 +346,9 @@ sourceGenerators in Test += Def.task {
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    2.4.0-24-b4a313e0:
+    2.4.0-27-65476446:
 </p>
-  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;2.4.0-24-b4a313e0&quot; % &quot;test&quot; cross CrossVersion.full
+  <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;2.4.0-27-65476446&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
   <p>
     After that, simply hit
@@ -1408,7 +1408,7 @@ typescript</pre><pre><span style="color: #8e44ad;">@ </span><span>time{ls!}
 </span><span style="color: #27ae60;">'amm</span><span>                </span><span style="color: #27ae60;">'integration</span><span>        </span><span style="color: #27ae60;">&quot;readme.md&quot;</span><span>
 </span><span style="color: #27ae60;">&quot;amm-template.sh&quot;</span><span>   </span><span style="color: #27ae60;">&quot;internals-docs&quot;</span><span>    </span><span style="color: #27ae60;">'shell</span><span>
 ,
-  14642084 nanoseconds
+  20196669 nanoseconds
 )</span></pre></div>
 
           <p>
@@ -2165,9 +2165,9 @@ replServer.start()
   <p>
     Or to try out the <a href="#UnstableChangelog">latest features</a> in our
     <a href="#UnstableVersions">Unstable Release</a>
-    2.4.0-24-b4a313e0:
+    2.4.0-27-65476446:
 </p>
-  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-24-b4a313e0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+  <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-27-65476446) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
   <p>
     And read on to learn about how Scala scripts work.
@@ -3985,9 +3985,9 @@ hello3.txt</pre><pre><span style="color: #8e44ad;">@ </span><span>mkdir! </span>
       <p>
         Here is how to find the largest 3 files in a given directory tree:
 </p>
-      <div><pre><span style="color: #8e44ad;">bash$ </span>find ./amm/src -ls | sort -nrk 7 | head -3</pre><pre>  1058878    336 -rw-r--r--   1 runner   docker     340324 Nov  2 21:17 ./amm/src/test/resources/testdata/Resume.docx
-  1058882    224 -rw-r--r--   1 runner   docker     227570 Nov  2 21:17 ./amm/src/test/resources/testdata/images/SystemShell.png
-  1058881    204 -rw-r--r--   1 runner   docker     208328 Nov  2 21:17 ./amm/src/test/resources/testdata/images/Highlighting.png</pre><pre><span style="color: #8e44ad;">@ </span><span>ls.rec! wd/</span><span style="color: #27ae60;">'amm</span><span>/</span><span style="color: #27ae60;">'src</span><span> | (x =&gt; x.size -&gt; x.last) sortBy (-</span><span style="color: #f39c12;">_</span><span>._1) take </span><span style="color: #27ae60;">3</span><span> 
+      <div><pre><span style="color: #8e44ad;">bash$ </span>find ./amm/src -ls | sort -nrk 7 | head -3</pre><pre>   795687    336 -rw-r--r--   1 runner   docker     340324 Nov  2 21:40 ./amm/src/test/resources/testdata/Resume.docx
+   795691    224 -rw-r--r--   1 runner   docker     227570 Nov  2 21:40 ./amm/src/test/resources/testdata/images/SystemShell.png
+   795690    204 -rw-r--r--   1 runner   docker     208328 Nov  2 21:40 ./amm/src/test/resources/testdata/images/Highlighting.png</pre><pre><span style="color: #8e44ad;">@ </span><span>ls.rec! wd/</span><span style="color: #27ae60;">'amm</span><span>/</span><span style="color: #27ae60;">'src</span><span> | (x =&gt; x.size -&gt; x.last) sortBy (-</span><span style="color: #f39c12;">_</span><span>._1) take </span><span style="color: #27ae60;">3</span><span> 
 </span><span style="color: #16a085;">res0</span><span>: </span><span style="color: #27ae60;">Seq</span><span>[(</span><span style="color: #27ae60;">Long</span><span>, </span><span style="color: #27ae60;">String</span><span>)] = </span><span style="color: #f39c12;">List</span><span>(
   (</span><span style="color: #27ae60;">340324L</span><span>, </span><span style="color: #27ae60;">&quot;Resume.docx&quot;</span><span>),
   (</span><span style="color: #27ae60;">227570L</span><span>, </span><span style="color: #27ae60;">&quot;SystemShell.png&quot;</span><span>),
@@ -4035,8 +4035,8 @@ HELLO
       <div><pre><span style="color: #8e44ad;">bash$ </span>git branch</pre><pre>* master</pre><pre><span style="color: #8e44ad;">@ </span><span>%git </span><span style="color: #27ae60;">'branch</span><span> 
 * master
 </span></pre></div>
-      <div><pre><span style="color: #8e44ad;">bash$ </span>date</pre><pre>Tue Nov  2 21:22:55 UTC 2021</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
-Tue Nov  2 21:22:59 UTC 2021
+      <div><pre><span style="color: #8e44ad;">bash$ </span>date</pre><pre>Tue Nov  2 21:44:59 UTC 2021</pre><pre><span style="color: #8e44ad;">@ </span><span>%date 
+Tue Nov  2 21:45:03 UTC 2021
 </span></pre></div>
 
       <p>
@@ -4241,7 +4241,7 @@ Hello from Java!
 </span><span style="color: #27ae60;">import </span><span style="color: #16a085;">java.util._</span><span>
 
 </span><span style="color: #8e44ad;">@ </span><span style="color: #f39c12;">val</span><span> date = </span><span style="color: #f39c12;">new</span><span> </span><span style="color: #27ae60;">Date</span><span>() 
-</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Tue Nov 02 21:23:58 UTC 2021
+</span><span style="color: #16a085;">date</span><span>: </span><span style="color: #27ae60;">Date</span><span> = Tue Nov 02 21:46:02 UTC 2021
 
 </span><span style="color: #8e44ad;">@ </span><span>date.getDay() 
 </span><span style="color: #16a085;">res3</span><span>: </span><span style="color: #27ae60;">Int</span><span> = </span><span style="color: #27ae60;">2</span></pre>
@@ -6385,10 +6385,10 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The page above contains the documentation for the latest stable version
       of Ammonite, <code>2.4.0</code>. Ammonite also publishes
       unstable versions, the latest of which is
-      <code>2.4.0-24-b4a313e0</code> and is available for direct
+      <code>2.4.0-27-65476446</code> and is available for direct
       download:
 </p>
-    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-24-b4a313e0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
+    <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-27-65476446) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm
 </code></pre>
     <p>
       On Cygwin, run the following after the above:
@@ -6399,12 +6399,12 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
       The latest build can also be run as Windows batch; just save the following as amm.bat:
 </p>
     <p>
-      <a href="https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-24-b4a313e0">https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-24-b4a313e0</a>
+      <a href="https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-27-65476446">https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.13-2.4.0-27-65476446</a>
 </p>
     <p>
       For usage in a SBT project:
 </p>
-    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;2.4.0-24-b4a313e0&quot; % &quot;test&quot; cross CrossVersion.full
+    <pre><code class="scala scalatex-site-Styles-highlightMe">libraryDependencies += &quot;com.lihaoyi&quot; % &quot;ammonite&quot; % &quot;2.4.0-27-65476446&quot; % &quot;test&quot; cross CrossVersion.full
 </code></pre>
     <p>
       Ammonite also provides standalone unstable executables for older versions
@@ -6412,9 +6412,9 @@ usersWithInvalidEmail: List[(Long, String)] = List((1L, &quot;foo@bar&quot;), (2
 </p>
     
       <b>
-        Scala 2.4.0/2.12-2.4.0-24-b4a313e0
+        Scala 2.4.0/2.12-2.4.0-27-65476446
 </b>
-      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.12-2.4.0-24-b4a313e0) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
+      <pre><code class="bash scalatex-site-Styles-highlightMe">$ sudo sh -c '(echo &quot;#!/usr/bin/env sh&quot; &amp;&amp; curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.4.0/2.12-2.4.0-27-65476446) &gt; /usr/local/bin/amm &amp;&amp; chmod +x /usr/local/bin/amm' &amp;&amp; amm</code></pre>
     <p>
       These unstable versions will contain any brand-new features that are
       currently being worked on, with the caveat that they are unstable and
