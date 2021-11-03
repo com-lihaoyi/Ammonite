@@ -71,6 +71,8 @@ case class Main(predefCode: String = "",
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
+                @deprecated("remoteLogging has been removed, do not use this field",
+                            "Ammonite 2.3.0")
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default,
                 replCodeWrapper: CodeWrapper = DefaultCodeWrapper,
@@ -325,6 +327,12 @@ object Main{
             cliConfig, printOut, printErr, stdIn, stdOut, stdErr,
             os.pwd
           )
+
+          if (cliConfig.repl.noRemoteLogging.value) {
+            val msg = "Option --no-remote-logging is deprecated (remote logging has been removed)"
+            runner.printInfo(msg)
+          }
+
           (cliConfig.core.code, cliConfig.rest.toList) match{
             case (Some(code), Nil) =>
               runner.runCode(code)
