@@ -53,7 +53,9 @@ object Config{
         Ammonite session. This option mitigates that via class loader isolation.""")
     thin: Flag,
     @arg(doc = "Print this message")
-    help: Flag
+    help: Flag,
+    @arg(name = "version", short = 'v', doc = "Show Ammonite's version")
+    showVersion: Flag
   )
   implicit val coreParser = ParserForClass[Core]
 

@@ -71,6 +71,8 @@ case class Main(predefCode: String = "",
                 outputStream: OutputStream = System.out,
                 errorStream: OutputStream = System.err,
                 verboseOutput: Boolean = true,
+                @deprecated("remoteLogging has been removed, do not use this field",
+                            "Ammonite 2.3.0")
                 remoteLogging: Boolean = true,
                 colors: Colors = Colors.Default,
                 replCodeWrapper: CodeWrapper = DefaultCodeWrapper,
@@ -316,12 +318,21 @@ object Main{
           Await.result(shutdownFuture, Duration.Inf)
           printErr.println("BSP server done")
           true
+        }else if (cliConfig.core.showVersion.value){
+          printOut.println(customName)
+          true
         }else{
 
           val runner = new MainRunner(
             cliConfig, printOut, printErr, stdIn, stdOut, stdErr,
             os.pwd
           )
+
+          if (cliConfig.repl.noRemoteLogging.value) {
+            val msg = "Option --no-remote-logging is deprecated (remote logging has been removed)"
+            runner.printInfo(msg)
+          }
+
           (cliConfig.core.code, cliConfig.rest.toList) match{
             case (Some(code), Nil) =>
               runner.runCode(code)
@@ -358,6 +369,18 @@ object Main{
     */
   def isInteractive() = System.console() != null
 
+  def javaMajorVersion: Int = {
+    val prop = System.getProperty("java.version")
+    val prop0 =
+      if (prop.startsWith("1.")) prop.stripPrefix("1.")
+      else prop
+    val idx = prop0.indexOf('.')
+    val version =
+      if (idx < 0) prop0
+      else prop0.take(idx)
+    version.toInt
+  }
+
 
   class WhiteListClassLoader(whitelist: Set[Seq[String]], parent: ClassLoader)
     extends URLClassLoader(Array(), parent){
@@ -392,6 +415,10 @@ class MainRunner(cliConfig: Config,
                  stdOut: OutputStream,
                  stdErr: OutputStream,
                  wd: os.Path){
+
+  // for trapping exit when the --watch option is on
+  if (cliConfig.core.watch.value && Main.javaMajorVersion < 17)
+    System.setSecurityManager(TrapExitSecurityManager)
 
   val colors =
     if(cliConfig.core.color.getOrElse(Main.isInteractive())) Colors.Default

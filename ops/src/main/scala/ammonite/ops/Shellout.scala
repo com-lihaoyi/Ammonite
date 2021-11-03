@@ -74,8 +74,7 @@ object Shellout{
     val chunks = collection.mutable.Buffer.empty[Either[Bytes, Bytes]]
     val sources = Seq(stdout -> (Left(_: Bytes)), stderr -> (Right(_: Bytes)))
     while(
-      // Process.isAlive doesn't exist on JDK 7 =/
-      util.Try(process.exitValue).isFailure ||
+      process.isAlive ||
       stdout.available() > 0 ||
       stderr.available() > 0
     ){

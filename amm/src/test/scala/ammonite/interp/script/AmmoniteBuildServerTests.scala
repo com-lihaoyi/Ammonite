@@ -42,7 +42,7 @@ object AmmoniteBuildServerTests extends TestSuite {
   val tests = Tests {
 
     "simple" - {
-      val runner = new BspScriptRunner(wd / "simple" / "main.sc")
+      val runner = new BspScriptRunner(wd / "simple" / "script.sc")
 
       val expectedClassPath = List(
         s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
@@ -67,7 +67,7 @@ object AmmoniteBuildServerTests extends TestSuite {
     }
 
     "don't delete directories in target" - {
-      val runner = new BspScriptRunner(wd / "simple" / "main.sc")
+      val runner = new BspScriptRunner(wd / "simple" / "script.sc")
 
       val expectedClassPath = List(
         s"com/softwaremill/sttp/client/core_$compatSbv/2.0.6/core_$compatSbv-2.0.6.jar",
@@ -101,7 +101,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
     "caching" - {
       val runner = new BspScriptRunner(
-        Seq("main", "lib").map(name => wd / "import-file" / s"$name.sc"): _*
+        Seq("script", "lib").map(name => wd / "import-file" / s"$name.sc"): _*
       )
 
       for {
@@ -120,7 +120,7 @@ object AmmoniteBuildServerTests extends TestSuite {
         classDirectory = os.Path(Paths.get(new URI(scalacOptionsItem.getClassDirectory)))
 
         _ = {
-          val clsFile = classDirectory / "ammonite" / "$file" / "import$minusfile" / "main.class"
+          val clsFile = classDirectory / "ammonite" / "$file" / "import$minusfile" / "script.class"
           assert(os.isDir(classDirectory))
           assert(os.isFile(clsFile))
           os.remove.all(classDirectory)
@@ -459,7 +459,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
     def multiTest(): Unit = {
       val dir = wd / "multi"
-      val scriptNames = Seq("main", "lib1", "lib2", "lib3")
+      val scriptNames = Seq("script", "lib1", "lib2", "lib3")
       val runner = new BspScriptRunner(scriptNames.map(n => dir / s"$n.sc"): _*)
 
       val expectedClassPath = List(
@@ -533,8 +533,8 @@ object AmmoniteBuildServerTests extends TestSuite {
             "Compiled multi/lib2.sc",
             "Compiling multi/lib3.sc",
             "Compiled multi/lib3.sc",
-            "Compiling multi/main.sc",
-            "Compiled multi/main.sc"
+            "Compiling multi/script.sc",
+            "Compiled multi/script.sc"
           )
           assert(messages == expectedMessages)
         }
@@ -552,7 +552,7 @@ object AmmoniteBuildServerTests extends TestSuite {
     }
 
     "semanticdb" - {
-      val scriptPath = os.RelPath("semdb/main.sc")
+      val scriptPath = os.RelPath("semdb/script.sc")
       val otherScriptPath = os.RelPath("semdb/other.sc")
       val runner = new BspScriptRunner(wd / scriptPath, wd / otherScriptPath)
 
@@ -664,7 +664,7 @@ object AmmoniteBuildServerTests extends TestSuite {
     }
 
     "single comment with no line feed" - {
-      val runner = new BspScriptRunner(wd / "comment" / "main.sc")
+      val runner = new BspScriptRunner(wd / "comment" / "script.sc")
 
       for {
         _ <- runner.init()
