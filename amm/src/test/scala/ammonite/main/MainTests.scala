@@ -105,6 +105,41 @@ class MainTests extends TestSuite{
     }
 
     test("args"){
+      test("version"){
+        // Unlike other flags, activating the version flag (if it ever appears
+        // as one of the flags passed in) should show Ammonite's version and
+        // then quickly exit afterwards.
+        def execRawArgs(args: String*) =
+          new InProcessMainMethodRunnerRawArgs(args.toList)
+
+        val expectedVersionOutput =
+          s"Ammonite REPL & Script-Runner, ${ammonite.Constants.version}"
+
+        test("longVersionFlag"){
+          val evaled = execRawArgs("--version")
+          assert(evaled.success)
+          assert(evaled.out.trim == expectedVersionOutput)
+        }
+
+        test("shortVersionFlag"){
+          val evaled = execRawArgs("-v")
+          assert(evaled.success)
+          assert(evaled.out.trim == expectedVersionOutput)
+        }
+
+        test("longVersionFlagWithOtherArgs"){
+          val evaled = execRawArgs("--version", "-i", "-w")
+          assert(evaled.success)
+          assert(evaled.out.trim == expectedVersionOutput)
+        }
+
+        test("shortVersionFlagWithOtherArgs"){
+          val evaled = execRawArgs("-v", "-i", "-w")
+          assert(evaled.success)
+          assert(evaled.out.trim == expectedVersionOutput)
+        }
+      }
+
       test("full"){
         val evaled = exec("Args.sc", "-i", "3", "-s", "Moo", (os.pwd/'omg/'moo).toString)
         assert(evaled.success)
