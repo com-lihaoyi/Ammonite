@@ -127,6 +127,14 @@
 
 
   @sect{Changelog}
+    @sect{2.4.1}
+      @ul
+        @li
+          Support for more Scala versions:  2.12.14, 2.12.15, 2.13.7, 3.0.1, and 3.0.2
+        @li
+          Improved Scala 3 support and pretty-print @code{given}-s as such
+        @li
+          Traps @code{System.exit} in scripts when running in @code{--watch}-mode (for Java versions below 17)
     @sect{2.4.0}
       @ul
         @li
