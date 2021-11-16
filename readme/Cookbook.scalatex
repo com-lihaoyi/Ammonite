@@ -163,7 +163,7 @@
     @p 
       You can also import JavaFX applications, using ScalaFX.  This is easiest if you create a file `jfx.sc` to contain the relevant imports:
 
-    @h1.scala
+    @hl.scala
       @@ {
         import $ivy.{
           `org.scalafx::scalafx:16.0.0-R24`
@@ -184,7 +184,7 @@
    @p 
       And then you can use `import $file.jfx` with the ScalaFX DSL.
 
-    @h1.scala
+    @hl.scala
       @@ {
         import $file.jfx
 
