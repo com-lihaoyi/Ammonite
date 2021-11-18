@@ -94,7 +94,7 @@ object Deps {
   val mainargs = ivy"com.lihaoyi::mainargs:0.2.0"
   val osLib = ivy"com.lihaoyi::os-lib:0.7.2"
   val pprint = ivy"com.lihaoyi::pprint:0.6.6"
-  val requests = ivy"com.lihaoyi::requests:0.6.5"
+  val requests = ivy"com.lihaoyi::requests:0.6.9"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.14.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.4.1"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
@@ -341,8 +341,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
-      withDottyCompat(Deps.upickle, scalaVersion()),
-      withDottyCompat(Deps.requests, scalaVersion()),
+      Deps.upickle,
+      Deps.requests,
       withDottyCompat(Deps.mainargs, scalaVersion())
     )
   }
