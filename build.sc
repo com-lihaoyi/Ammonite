@@ -285,7 +285,7 @@ object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
     Deps.osLib,
-    Deps.scalaCollectionCompat
+    withDottyCompat(Deps.scalaCollectionCompat, scalaVersion())
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
   object test extends Tests
