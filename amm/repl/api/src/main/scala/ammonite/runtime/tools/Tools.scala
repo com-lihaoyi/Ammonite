@@ -43,7 +43,7 @@ case class GrepResult(spans: Seq[(Int, Int)], text: fansi.Str)
 object GrepResult{
   case class Color(highlight: fansi.Attrs, dotDotDotColor: fansi.Attrs)
   object Color{
-    implicit val defaultColor = Color(
+    implicit val defaultColor: Color = Color(
       fansi.Back.Yellow ++ fansi.Color.Blue,
       fansi.Attrs.Empty
     )
@@ -211,8 +211,8 @@ object time {
 object browse{
   case class Strings(values: Seq[String])
   object Strings{
-    implicit def stringPrefix(s: String) = Strings(Seq(s))
-    implicit def stringSeqPrefix(s: Seq[String]) = Strings(s)
+    implicit def stringPrefix(s: String): Strings = Strings(Seq(s))
+    implicit def stringSeqPrefix(s: Seq[String]): Strings = Strings(s)
   }
   // R -> show ansi-colors as colors, M -> show current-browse-% bar
   val lessViewer = Seq("less", "-RM")

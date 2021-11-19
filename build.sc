@@ -446,6 +446,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     object api extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
     class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
       def crossFullScalaVersion = true
+      def supports3 = true
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(
         ops(), amm.util(),
