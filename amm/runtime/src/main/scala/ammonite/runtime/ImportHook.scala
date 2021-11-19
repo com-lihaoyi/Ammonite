@@ -123,7 +123,7 @@ object ImportHook{
           files.foreach(interp.watch)
           missing.foreach(x => interp.watch(x/os.up/(x.last + ".sc")))
           if (missing.nonEmpty) {
-            Left("Cannot resolve $file import: " + missing.map(_ + ".sc").mkString(", "))
+            Left("Cannot resolve $file import: " + missing.map(f => s"$f.sc").mkString(", "))
           } else {
             Right(
               for(((relativeModule, rename), filePath) <- relativeModules.zip(files)) yield {
