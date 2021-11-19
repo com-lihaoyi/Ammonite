@@ -13,7 +13,7 @@ import java.util.Locale
 import scala.collection.mutable
 
 class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
-  def frames = frames0()
+  def frames: List[Frame] = frames0()
   val namedFrames = mutable.Map.empty[String, List[Frame]]
 
   def childFrame(parent: Frame) = new Frame(

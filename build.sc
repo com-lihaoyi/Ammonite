@@ -470,6 +470,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
   class ReplModule(val crossScalaVersion: String) extends AmmModule{
     def crossFullScalaVersion = true
+    def supports3 = true
     def moduleDeps = Seq(
       ops(), amm.util(),
       amm.runtime(), amm.interp(),

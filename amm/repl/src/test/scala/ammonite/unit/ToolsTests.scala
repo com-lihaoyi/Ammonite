@@ -19,7 +19,7 @@ object ToolsTests extends TestSuite{
 
     test("grep"){
 
-      implicit val pprinter = pprint.PPrinter.Color.copy(
+      implicit val pprinter: pprint.PPrinter = pprint.PPrinter.Color.copy(
         colorLiteral = fansi.Attr.Reset,
         defaultWidth = 25,
         additionalHandlers = {
