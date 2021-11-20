@@ -142,6 +142,29 @@ trait CrossSbtModule extends mill.scalalib.SbtModule with mill.scalalib.CrossMod
 }
 
 trait AmmInternalModule extends CrossSbtModule{
+  /**
+   * As stated here: https://github.com/com-lihaoyi/mill/issues/860#issuecomment-974654679
+   * Mill doesn't handle correctly the Scala 2.13 modules depending on Scala
+   * 3 modules. This happens because dependencies are resolved at using
+   * the suffix from the leaf module instead of every module resolving its dependencies
+   * on its own. So if a module compiled with Scala 3 depends on libraries
+   * with the `_3` suffix, once another module using Scala 2.13 depends on it
+   * all the dependencies get transformed to use the `_2.13` suffix.
+   * We manually convert dependencies to have the `_3` suffix and add the `scala3-library`
+   * dependency.
+  */ 
+  def AggScala3Compat(scalaVersion: String)(ivyDeps: Dep*): Agg[Dep] = {
+    if(scala3Versions.contains(scalaVersion)) {
+      (ivyDeps ++ Agg(ivy"org.scala-lang::scala3-library:$crossScalaVersion")).map { dep =>
+        dep.cross match {
+          case cross: CrossVersion.Binary =>
+            val compatSuffix = "_3"
+            dep.copy(cross = CrossVersion.Constant(value = compatSuffix, platformed = dep.cross.platformed))
+          case _ => dep
+        }
+      }
+    } else ivyDeps
+  }
   def useCrossPrefix = T{
     scala3Versions.contains(crossScalaVersion) && !scala3Versions.contains(scalaVersion())
   }
@@ -175,7 +198,7 @@ trait AmmInternalModule extends CrossSbtModule{
     else Agg[Dep]()
   }
   trait Tests extends super.Tests with TestModule.Utest{
-    def ivyDeps = Agg(Deps.utest)
+    def ivyDeps = AggScala3Compat(scalaVersion())(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
@@ -283,7 +306,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(
+  def ivyDeps = AggScala3Compat(scalaVersion())(
     Deps.osLib,
     withDottyCompat(Deps.scalaCollectionCompat, scalaVersion())
   )
@@ -294,17 +317,7 @@ class OpsModule(val crossScalaVersion: String) extends AmmModule{
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = T{
-    val fansi =
-      if (scala3Versions.contains(crossScalaVersion))
-        Agg(
-          ivy"com.lihaoyi:fansi_3:${Deps.fansi.dep.version}",
-          ivy"org.scala-lang:scala3-library_3:$crossScalaVersion"
-        )
-      else
-        Agg(Deps.fansi)
-    fansi ++ Agg(
-      Deps.sourcecode
-    )
+    AggScala3Compat(scalaVersion())(Deps.fansi, Deps.sourcecode)
   }
   def compileIvyDeps = Agg(
     Deps.scalaReflect(scalaVersion())
@@ -340,7 +353,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def supports3 = true
-    def ivyDeps = Agg(
+    def ivyDeps = AggScala3Compat(scalaVersion())(
       Deps.upickle,
       Deps.requests,
       withDottyCompat(Deps.mainargs, scalaVersion())
@@ -377,8 +390,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
             Deps.scalaXml,
           )
         else
-          Agg[Dep](
-            ivy"org.scala-lang:scala3-compiler_3:${scalaVersion()}"
+          AggScala3Compat(scalaVersion())(
+            ivy"org.scala-lang::scala3-compiler:${scalaVersion()}"
           )
         scalaSpecificDeps ++ Agg(
           Deps.javassist,
@@ -425,7 +438,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(ops(), amm.util(), amm.runtime(), amm.compiler.interface())
     def crossFullScalaVersion = true
-    def ivyDeps = Agg(
+    def ivyDeps = AggScala3Compat(scalaVersion())(
       Deps.bsp4j,
       withDottyCompat(Deps.fastparse, scalaVersion()),
       withDottyCompat(Deps.trees, scalaVersion()),
@@ -452,7 +465,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ops(), amm.util(),
         interp.api()
       )
-      def ivyDeps = Agg(
+      def ivyDeps = AggScala3Compat(scalaVersion())(
         withDottyCompat(Deps.mainargs, scalaVersion())
       )
 
@@ -478,7 +491,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       terminal(),
       amm.compiler.interface()
     )
-    def ivyDeps = Agg(
+    def ivyDeps = AggScala3Compat(scalaVersion())(
       Deps.jlineTerminal,
       Deps.jlineJna,
       Deps.jlineReader
@@ -509,7 +522,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         ReplModule.this.externalSources() ++
         resolveDeps(ivyDeps, sources = true)()).distinct
       }
-      def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
+      def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ AggScala3Compat(scalaVersion())(
         withDottyCompat(Deps.scalazCore, scalaVersion())
       )
     }
@@ -621,7 +634,7 @@ class MainModule(val crossScalaVersion: String)
 
   object test extends Tests{
     def moduleDeps = super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
-    def ivyDeps = super.ivyDeps() ++ Agg(
+    def ivyDeps = super.ivyDeps() ++ AggScala3Compat(scalaVersion())(
       Deps.shapeless,
       Deps.scalaJava8Compat
     )
@@ -728,13 +741,13 @@ object sshd extends Cross[SshdModule](fullCrossScalaVersions:_*)
 class SshdModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(ops(), amm())
   def crossFullScalaVersion = true
-  def ivyDeps = Agg(
+  def ivyDeps = AggScala3Compat(scalaVersion())(
     // sshd-core 1.3.0 requires java8
     Deps.sshdCore,
     Deps.bcprovJdk15on
   )
   object test extends Tests {
-    def ivyDeps = super.ivyDeps() ++ Agg(
+    def ivyDeps = super.ivyDeps() ++ AggScala3Compat(scalaVersion())(
       // slf4j-nop makes sshd server use logger that writes into the void
       Deps.slf4jNop,
       Deps.jsch,
