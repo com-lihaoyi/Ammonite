@@ -1,6 +1,5 @@
 package ammonite.repl.api
 
-import ammonite.ops.Internals
 import ammonite.util._
 
 import scala.reflect.runtime.universe._
@@ -220,5 +219,5 @@ trait Clipboard{
     *
     * @param data New contents for the clipboard.
     */
-  def write(data: Internals.Writable): Unit
+  def write(data: geny.Writable): Unit
 }

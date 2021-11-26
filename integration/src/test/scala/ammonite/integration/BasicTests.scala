@@ -118,41 +118,6 @@ object BasicTests extends TestSuite{
       }
     }
 
-
-    def shellTest() = {
-      // make sure you can load the example-predef.sc, have it pull stuff in
-      // from ivy, and make use of `cd!` and `wd` inside the executed script.
-      val res = os.proc(
-        executable,
-        "--thin",
-        "--no-home-predef",
-        "--predef",
-        exampleBarePredef,
-        "-c",
-        """val x = wd
-        |@
-        |cd! "amm"/"src"
-        |@
-        |println(wd relativeTo x)""".stripMargin,
-        "-s"
-      ).call()
-
-      val output = res.out.trim
-
-      if (!Util.windowsPlatform)
-        // seems the script is run only until the first '@' on Windows
-        assert(output == "amm/src")
-    }
-    test("shell"){
-      // FIXME In Scala 3.0.0-M1, etting errors like
-      //   java.lang.AssertionError: assertion failed:
-      //     duplicate type CC#31508; previous was type CC#31500
-      if (isScala2)
-        shellTest()
-      else
-        "Disabled in Scala 3"
-    }
-
     // Ensure we can load the source code of the built-in Java standard library
     test("source"){
       // This fails on windows because for some reason the windows subprocess

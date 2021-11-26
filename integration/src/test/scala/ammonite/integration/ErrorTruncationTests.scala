@@ -1,8 +1,6 @@
 package ammonite.integration
 
 import ammonite.integration.TestUtils._
-import ammonite.ops.ImplicitWd._
-import ammonite.ops._
 import ammonite.util.Util
 import utest._
 
@@ -13,7 +11,7 @@ import utest._
  */
 object ErrorTruncationTests extends TestSuite{
 
-  def checkErrorMessage(file: RelPath, expected: String): Unit = {
+  def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
     val e = fansi.Str(
       Util.normalizeNewlines(
         intercept[os.SubprocessException]{ exec(file) }
@@ -29,7 +27,7 @@ object ErrorTruncationTests extends TestSuite{
   val tests = Tests {
     println("ErrorTruncationTests")
     test("compileError") - checkErrorMessage(
-      file = 'errorTruncation/"compileError.sc",
+      file = os.rel/'errorTruncation/"compileError.sc",
       expected = Util.normalizeNewlines(
         if (isScala2)
           s"""compileError.sc:1: not found: value doesntexist
@@ -45,7 +43,7 @@ object ErrorTruncationTests extends TestSuite{
       )
     )
     test("multiExpressionError") - checkErrorMessage(
-      file = 'errorTruncation/"compileErrorMultiExpr.sc",
+      file = os.rel / 'errorTruncation/"compileErrorMultiExpr.sc",
       expected = Util.normalizeNewlines(
         if (isScala2)
           s"""compileErrorMultiExpr.sc:11: not found: value doesntexist
@@ -64,7 +62,7 @@ object ErrorTruncationTests extends TestSuite{
     test("parseError"){
       if(!Util.windowsPlatform){
         checkErrorMessage(
-          file = 'errorTruncation/"parseError.sc",
+          file = os.rel/'errorTruncation/"parseError.sc",
           expected = Util.normalizeNewlines(
             if (isScala2)
               """parseError.sc:1:1 expected end-of-input
@@ -84,7 +82,7 @@ object ErrorTruncationTests extends TestSuite{
       "ammonite.$file.integration.src.test.resources.ammonite.integration.errorTruncation"
 
     test("runtimeError") - checkErrorMessage(
-      file = 'errorTruncation/"runtimeError.sc",
+      file = os.rel/'errorTruncation/"runtimeError.sc",
       expected = Util.normalizeNewlines(
         if (scalaVersion.startsWith("2.12"))
           s"""java.lang.ArithmeticException: / by zero

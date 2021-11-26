@@ -154,18 +154,16 @@ object ProjectTests extends TestSuite{
       //     duplicate type CC#44165; previous was type CC#44157
       // (2.13 / 3 compatibility issue?)
       if (check.scala2 && !check.scala2_12) check.session("""
-        @ import ammonite.ops._
-
         @ val path = {
-        @   resource/"org"/"apache"/"jackrabbit"/"oak"/"plugins"/"blob"/"blobstore.properties"
+        @   os.resource/"org"/"apache"/"jackrabbit"/"oak"/"plugins"/"blob"/"blobstore.properties"
         @ }
 
-        @ read! path
+        @ os.read(path)
         error: ResourceNotFoundException
 
         @ import $ivy.`org.apache.jackrabbit:oak-core:1.3.16`
 
-        @ read! path // Should work now
+        @ os.read(path) // Should work now
       """)
     }
     test("scalaparse"){

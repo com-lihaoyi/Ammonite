@@ -71,15 +71,13 @@ object BuiltinTests extends TestSuite{
 
     test("loadCP"){
       check.session("""
-        @ import ammonite.ops._, ImplicitWd._
+        @ val javaSrc = os.pwd/"amm"/"src"/"test"/"resources"/"loadable"/"hello"/"Hello.java"
 
-        @ val javaSrc = pwd/"amm"/"src"/"test"/"resources"/"loadable"/"hello"/"Hello.java"
+        @ os.makeDir(os.pwd/"target"/"loadCP"/"hello")
 
-        @ mkdir! pwd/"target"/"loadCP"/"hello"
+        @ os.copy.over(javaSrc, os.pwd/"target"/"loadCP"/"hello"/"Hello.java")
 
-        @ cp.over(javaSrc, pwd/"target"/"loadCP"/"hello"/"Hello.java")
-
-        @ %javac "target"/"loadCP"/"hello"/"Hello.java"  //This line causes problems in windows
+        @ os.proc("javac", os.rel / "target"/"loadCP"/"hello"/"Hello.java").call()  //This line causes problems in windows
 
         @ import $cp.target.loadCP  //This line causes problems in windows
 

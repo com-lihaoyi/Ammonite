@@ -1,6 +1,5 @@
 @import Main._
 @import readme.Sample._
-@import ammonite.ops._
 @val ammoniteTests = 'amm/'repl/'src/'test/'scala/'ammonite/'session
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
 @val scriptTests = 'amm/'src/'test/'scala/'ammonite/'session/"ScriptTests.scala"
@@ -952,8 +951,7 @@
         @hl.scala{prompt} to always include your current working directory
 
       @hl.scala
-        import ammonite.ops._
-        repl.prompt.bind(pwd.toString + " @@ ")
+        repl.prompt.bind(os.pwd.toString + " @@ ")
 
       @p
         As is common practice in other shells. Further modifications to make it

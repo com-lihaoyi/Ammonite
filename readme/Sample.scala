@@ -2,7 +2,6 @@ package readme
 
 import java.io.{BufferedReader, ByteArrayOutputStream, InputStreamReader}
 
-import ammonite.ops._
 import scalatags.Text.all._
 
 object Sample{

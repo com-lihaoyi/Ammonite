@@ -1,8 +1,6 @@
 package ammonite.integration
 
 import ammonite.integration.TestUtils._
-import ammonite.ops.ImplicitWd._
-import ammonite.ops._
 import ammonite.util.Util
 import utest._
 
@@ -24,7 +22,7 @@ object ProjectTests extends TestSuite{
     test("playframework"){
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec('basic/"PlayFramework.sc")
+          val evaled = exec(os.rel/'basic/"PlayFramework.sc")
           assert(evaled.out.string.contains("Hello bar"))
         }
       }
@@ -46,7 +44,7 @@ object ProjectTests extends TestSuite{
       // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec('basic/"Spark2.sc")
+          val evaled = exec(os.rel / 'basic/"Spark2.sc")
           assert(evaled.out.string.contains("fake db write"))
         }
       }

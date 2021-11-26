@@ -1,8 +1,6 @@
 package ammonite.integration
 
-import ammonite.ops._
 import ammonite.util.Util
-import ImplicitWd._
 
 /**
   * Created by haoyi on 6/4/16.
@@ -19,14 +17,14 @@ object TestUtils {
     else
       Seq("bash", p)
   }
-  val intTestResources = pwd/'integration/'src/'test/'resources
+  val intTestResources = os.pwd/'integration/'src/'test/'resources
   val replStandaloneResources = intTestResources/'ammonite/'integration
-  val shellAmmoniteResources = pwd/'shell/'src/'main/'resources/'ammonite/'shell
+  val shellAmmoniteResources = os.pwd/'shell/'src/'main/'resources/'ammonite/'shell
   val emptyPrefdef = shellAmmoniteResources/"empty-predef.sc"
   val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.sc"
 
   //we use an empty predef file here to isolate the tests from external forces.
-  def execBase(name: RelPath,
+  def execBase(name: os.RelPath,
                extraAmmArgs: Seq[String],
                home: os.Path,
                args: Seq[String],
@@ -46,16 +44,16 @@ object TestUtils {
       stderr = os.Pipe
     )
   }
-  def exec(name: RelPath, args: String*) =
-    execBase(name, Nil, tmp.dir(), args, thin = true, Nil)
-  def execWithEnv(env: Iterable[(String, String)], name: RelPath, args: String*) =
-    execBase(name, Nil, tmp.dir(), args, thin = true, env)
-  def execNonThin(name: RelPath, args: String*) =
-    execBase(name, Nil, tmp.dir(), args, thin = false, Nil)
-  def execWithHome(home: os.Path, name: RelPath, args: String*) =
+  def exec(name: os.RelPath, args: String*) =
+    execBase(name, Nil, os.temp.dir(), args, thin = true, Nil)
+  def execWithEnv(env: Iterable[(String, String)], name: os.RelPath, args: String*) =
+    execBase(name, Nil, os.temp.dir(), args, thin = true, env)
+  def execNonThin(name: os.RelPath, args: String*) =
+    execBase(name, Nil, os.temp.dir(), args, thin = false, Nil)
+  def execWithHome(home: os.Path, name: os.RelPath, args: String*) =
     execBase(name, Nil, home, args, thin = true, Nil)
-  def execSilent(name: RelPath, args: String*) =
-    execBase(name, Seq("-s"), tmp.dir(), args, thin = true, Nil)
+  def execSilent(name: os.RelPath, args: String*) =
+    execBase(name, Seq("-s"), os.temp.dir(), args, thin = true, Nil)
 
   /**
     *Counts number of non-overlapping occurrences of `subs` in `s`
