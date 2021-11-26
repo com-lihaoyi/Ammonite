@@ -196,7 +196,5 @@
 
   @Repl()
   @Scripts()
-  @Ops()
-  @Shell()
   @Cookbook()
   @Footer()

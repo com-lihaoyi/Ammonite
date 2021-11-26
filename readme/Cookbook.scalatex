@@ -1,6 +1,5 @@
 @import Main._
 @import readme.Sample._
-@import ammonite.ops._
 @val ammoniteTests = 'amm/'repl/'src/'test/'scala/'ammonite/'session
 @val replSource = 'amm/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
@@ -37,9 +36,6 @@
     @hl.scala
       Welcome to the Ammonite Repl
 
-      @@ import ammonite.ops._
-      import ammonite.ops._
-
       @@ val resp = requests.get("https://api.github.com/repos/scala/scala")
 
       @@ val parsed = upickle.json.read(resp.text()).asInstanceOf[upickle.Js.Obj]
@@ -55,9 +51,9 @@
                 ("login", Str("scala")),
       ...
 
-      @@ for((k, v) <- parsed.value) write(pwd/'target/'temp/k, upickle.json.write(v))
+      @@ for((k, v) <- parsed.value) os.write(os.pwd/'target/'temp/k, upickle.json.write(v))
 
-      @@ ls! pwd/'target/'temp
+      @@ os.list(os.pwd/'target/'temp)
       res6: LsSeq = LsSeq(
         /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/archive_url,
         /Users/haoyi/Dropbox (Personal)/Workspace/Ammonite/target/temp/assignees_url,
@@ -168,13 +164,12 @@
     @hl.scala
       @@ import $ivy.`org.apache.poi:poi-ooxml:3.13`
 
-      @@ import ammonite.ops._                  // Prepare to deal with some files
       @@ import org.apache.poi.xwpf.usermodel._ // Bring Ms-Word APIs into scope
       @@ import collection.JavaConversions._    // Make use of Java collections easier
 
       @@ val path = pwd/'amm/'src/'test/'resources/'testdata/"Resume.docx"
 
-      @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(read.bytes(path)))
+      @@ val docx = new XWPFDocument(new java.io.ByteArrayInputStream(os.read.bytes(path)))
 
       @@ docx.get<tab>
       getAllEmbedds                            getParagraphArray
