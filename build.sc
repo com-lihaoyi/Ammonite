@@ -92,25 +92,25 @@ object Deps {
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.54"
   val mainargs = ivy"com.lihaoyi::mainargs:0.2.0"
-  val osLib = ivy"com.lihaoyi::os-lib:0.7.2"
+  val osLib = ivy"com.lihaoyi::os-lib:0.7.8"
   val pprint = ivy"com.lihaoyi::pprint:0.6.6"
   val requests = ivy"com.lihaoyi::requests:0.6.9"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.14.0"
-  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.4.1"
+  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.4.4"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
-  val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.0-M3"
+  val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.1"
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.27"
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
-  val sourcecode = ivy"com.lihaoyi::sourcecode:0.2.1"
+  val sourcecode = ivy"com.lihaoyi::sourcecode:0.2.7"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
   val upickle = ivy"com.lihaoyi::upickle:1.4.0"
-  val utest = ivy"com.lihaoyi::utest:0.7.3"
+  val utest = ivy"com.lihaoyi::utest:0.7.10"
 }
 
 // Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
@@ -174,9 +174,8 @@ trait AmmInternalModule extends CrossSbtModule{
     if (isScala2()) Agg(Deps.acyclic)
     else Agg[Dep]()
   }
-  trait Tests extends super.Tests{
-    def ivyDeps = Agg(withDottyCompat(Deps.utest, scalaVersion()))
-    def testFramework = "utest.runner.Framework"
+  trait Tests extends super.Tests with TestModule.Utest{
+    def ivyDeps = Agg(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
@@ -285,7 +284,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
 class OpsModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = Agg(
-    withDottyCompat(Deps.osLib, scalaVersion()),
+    Deps.osLib,
     withDottyCompat(Deps.scalaCollectionCompat, scalaVersion())
   )
   def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
@@ -304,7 +303,7 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
       else
         Agg(Deps.fansi)
     fansi ++ Agg(
-      withDottyCompat(Deps.sourcecode, scalaVersion())
+      Deps.sourcecode
     )
   }
   def compileIvyDeps = Agg(
@@ -430,7 +429,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       withDottyCompat(Deps.fastparse, scalaVersion()),
       withDottyCompat(Deps.trees, scalaVersion()),
       Deps.scalaReflect(scalaVersion()),
-      withDottyCompat(Deps.scalaXml, scalaVersion())
+      Deps.scalaXml
     )
   }
 
