@@ -73,7 +73,7 @@ object BuiltinTests extends TestSuite{
       check.session("""
         @ val javaSrc = os.pwd/"amm"/"src"/"test"/"resources"/"loadable"/"hello"/"Hello.java"
 
-        @ os.makeDir(os.pwd/"target"/"loadCP"/"hello")
+        @ os.makeDir.all(os.pwd/"target"/"loadCP"/"hello")
 
         @ os.copy.over(javaSrc, os.pwd/"target"/"loadCP"/"hello"/"Hello.java")
 
@@ -82,7 +82,7 @@ object BuiltinTests extends TestSuite{
         @ import $cp.target.loadCP  //This line causes problems in windows
 
         @ hello.Hello.hello()
-        res6: String = "Hello!"
+        res5: String = "Hello!"
       """)
     }
     test("settings"){
