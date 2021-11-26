@@ -619,7 +619,7 @@
           Importing @code{$file}s from within your predef now properly makes them
           available within your REPL, the same way other imports are @issue(616)
         @li
-          The predef required for @sect.ref{Ammonite-Shell} was tweaked slightly;
+          The predef required for Ammonite-Shell was tweaked slightly;
           if you are using it please update your @code{~/.ammonite/predef.sc}
           with the new @lnk("predef", "https://git.io/vH4ju") code.
 
@@ -886,7 +886,7 @@
             Added @code{show} and @code{typeOf} back into the default REPL
             imports, since they are pretty useful
           @li
-            @code{write.over} in @sect.ref{Ammonite-Ops} should now properly
+            @code{write.over} in Ammonite-Ops should now properly
             truncate files if the thing being written is shorter than the
             original @issue(441)
           @li
@@ -1085,12 +1085,12 @@
             much more consistent.
           @li
             Moved tools such as @sect.ref{grep}, @sect.ref{time},
-            @sect.ref{browse} from @sect.ref{Ammonite-Shell} into the base
+            @sect.ref{browse} from Ammonite-Shell into the base
             @sect.ref{Ammonite-REPL}, and made them imported by default, so
             everyone can enjoy them by default.
           @li
-            Imported the various @sect.ref("Extensions", "pipe operations") from
-            @sect.ref{Ammonite-Ops}: aliasing @code{.map} as @code{|},
+            Imported the various pipe operations from
+            Ammonite-Ops: aliasing @code{.map} as @code{|},
             @code{.filter} as @code{|?}, etc. to make it more convenient to use
             tools like @sect.ref{grep} from the base REPL
           @li
@@ -1122,7 +1122,7 @@
           @li
             @hl.scala{write} no longer inserts newlines between items by default.
           @li
-            Introduced the @sect.ref{browse} helper to @sect.ref{Ammonite-Shell},
+            Introduced the @sect.ref{browse} helper to Ammonite-Shell,
             letting you easily open up large data structures in external editors
             like Vim or Emacs to browse them without spamming the console
           @li
@@ -1164,7 +1164,7 @@
             @hl.scala{Thread.currentThread.getContextClassLoader} by default,
             fixing @issue(348)
           @li
-            Re-organize @sect.ref{Reading Resources} in Ammonite-Ops to allow
+            Re-organize Reading Resources in Ammonite-Ops to allow
             proper handling of absolute and relative resources by passing in
             @hl.scala{Class}s or @hl.scala{ClassLoader}s
           @li
@@ -1224,7 +1224,6 @@
             Construction of @hl.scala{Path}s from various types
             (@hl.scala{String}s, @hl.scala{java.nio.file.Path},
             @hl.scala{java.io.File}) is much more well behaved & consistent now.
-            See @sect.ref{Constructing Paths} for details.
           @li
             @hl.scala{read.resource! root/'foo} is now
             @hl.scala{read! resource/'foo}
@@ -1336,8 +1335,7 @@
           @li
             Refactor of the @hl.scala{CommandResult} type being returned from the
             @hl.scala{%%} operator, to now properly capture the raw byte output,
-            stdout, stderr, exit code. See @sect.ref{Spawning Subprocesses} for
-            details. @issue(207)
+            stdout, stderr, exit code. @issue(207)
           @li
             Added a new @sect.ref{grep} command.
           @li
@@ -1410,7 +1408,7 @@
             Ammonite's filesystem functionality (@hl.scala{cd!},
             @hl.scala{wd}, path-completion) has been pulled out of
             Ammonite-REPL, and is now available separately as
-            @sect.ref{Ammonite-Shell}.
+            Ammonite-Shell.
           @li
             Improve the pretty-printing of the @hl.scala{ls} and
             @hl.scala{ls.rec} commands
@@ -1427,12 +1425,12 @@
             folders, before fetching from maven central
           @li
             Wrote up a good amount of documentation for
-            @sect.ref{Ammonite-Shell}: using Ammonite as a Bash replacement
+            Ammonite-Shell: using Ammonite as a Bash replacement
       @sect{0.4.6}
         @ul
           @li
-            Provide a way of @sect.ref{Invoking Files} and passing
-            @sect.ref{Environment Variables}
+            Provide a way of Invoking Files and passing
+            Environment Variables
           @li
             Documented existing approach for setting @sect.ref{Compiler Flags}
           @li
@@ -1550,9 +1548,9 @@
             Removed the ability to reload classes; using @hl.scala{load.ivy} no
             longer causes all existing values to be lazily recomputed.
           @li
-            Added the @sect.ref("Filesystem Operations", "cd! and wd")
+            Added the cd! and wd
             built-ins to make working with filesystem operations via
-            @sect.ref{Ammonite-Ops} more pleasant
+            Ammonite-Ops more pleasant
           @li
             Evaluated values of type @hl.scala{Unit} are no longer echo-ed to
             the user
@@ -1568,8 +1566,8 @@
             Standardized the use of @sect.ref{Refs} for configuration, including
             the ability to bind them "live" to the value of an expression.
           @li
-            Allows you to trivially @sect.ref("Spawning Subprocesses",
-            "spawn subprocesses"), letting you run @code{git} commands, edit
+            Allows you to trivially
+            spawn subprocesses, letting you run @code{git} commands, edit
             files via @code{vim}, open @code{ssh} sessions or even start
             @code{SBT} or @code{Python} shells right from your Scala REPL
     @sect{0.3.x}

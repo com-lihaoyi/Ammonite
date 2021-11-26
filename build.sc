@@ -827,15 +827,21 @@ def publishDocs() = {
   // need to make significant changes to the readme and that'll time.
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: Building readme for verification")
-    os.proc(
-      "sbt",
-      "readme/run",
-    ).call(
-      env = Map(
-        "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
-        "CONSTANTS_FILE" -> generateConstantsFile().toString
+    try {
+      os.proc(
+        "sbt",
+        "readme/run",
+      ).call(
+        env = Map(
+          "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
+          "CONSTANTS_FILE" -> generateConstantsFile().toString
+        )
       )
-    )
+    }catch{case e =>
+      println(e)
+      e.printStackTrace()
+      throw e
+    }
   }else T.command{
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 

@@ -1,5 +1,6 @@
 @import Main._
 @import readme.Sample._
+@import ammonite.ops._
 @val ammoniteTests = 'amm/'repl/'src/'test/'scala/'ammonite/'session
 @val replSource = 'amm/'src/'main/'scala/'ammonite
 @val advancedTests = ammoniteTests/"AdvancedTests.scala"
@@ -8,8 +9,7 @@
     The Ammonite Scala REPL and Scripts are meant to be extended: you can load
     in arbitrary Java/Scala modules from the internet via
     @sect.ref{import $ivy}. Using this third-party code, you
-    extend the REPL to do anything you wish to do, and tools like
-    @sect.ref{Ammonite-Shell} are simply modules like any other. Simple
+    extend the REPL to do anything you wish to do. Simple
     install Java, @sect.ref("Ammonite-REPL", "download Ammonite") onto any
     Linux/OSX machine, and try out one of these fun snippets! They work
     directly in the @sect.ref{Ammonite-REPL}, or you can save them to
@@ -62,7 +62,7 @@
       ...
 
     @p
-      In this example, we use the @lnk("Requests-Scala", "https://github.com/lihaoyi/requests-scala") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and @sect.ref{Ammonite-Ops} to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally.
+      In this example, we use the @lnk("Requests-Scala", "https://github.com/lihaoyi/requests-scala") library to download a URL, and we use @lnk("uPickle", "http://lihaoyi.github.io/upickle-pprint/upickle/") and OS-Lib to parse the JSON and write it into files. uPickle and Ammonite-Ops are bundled with the Ammonite REPL and are used internally.
     @p
       This is a small example, but it illustrates the potential: if you find yourself needing to scrape some website or bulk-download large quantities of data from some website's HTTP/JSON API, you can start doing so within a matter of seconds using Ammonite. The results are given to you in nicely structured data, and you can deal with them using any Java or Scala libraries or tools you are used to rather than being forced to munge around in Bash. Sometimes, you may find that you need to get data from somewhere without a nice JSON API, which means you'd need to fall back to @sect.ref{Scraping HTML}...
 

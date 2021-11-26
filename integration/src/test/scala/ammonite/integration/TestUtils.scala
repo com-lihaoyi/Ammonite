@@ -20,8 +20,6 @@ object TestUtils {
   val intTestResources = os.pwd/'integration/'src/'test/'resources
   val replStandaloneResources = intTestResources/'ammonite/'integration
   val shellAmmoniteResources = os.pwd/'shell/'src/'main/'resources/'ammonite/'shell
-  val emptyPrefdef = shellAmmoniteResources/"empty-predef.sc"
-  val exampleBarePredef = shellAmmoniteResources/"example-predef-bare.sc"
 
   //we use an empty predef file here to isolate the tests from external forces.
   def execBase(name: os.RelPath,
