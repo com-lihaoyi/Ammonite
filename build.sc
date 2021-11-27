@@ -310,17 +310,20 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq()
     def ivyDeps = T{
       Agg(
-        Deps.pprint,
+
         Deps.osLib,
         Deps.scalaCollectionCompat,
         Deps.fansi
       ) ++ (
         if (scala3Versions.contains(crossScalaVersion))
           Agg(
+            ivy"com.lihaoyi:pprint_3:${Deps.pprint.dep.version}",
             ivy"org.scala-lang.modules::scala-collection-compat:${Deps.scalaCollectionCompat.dep.version}",
             ivy"org.scala-lang:scala3-library_3:$crossScalaVersion"
           )
-        else Agg()
+        else Agg(
+          Deps.pprint
+        )
       )
     }
     def compileIvyDeps = Agg(
