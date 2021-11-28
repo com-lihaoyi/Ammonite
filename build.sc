@@ -883,6 +883,7 @@ def publishDocs() = {
     )
 
     os.proc(
+      "sbt",
       "readme/run",
 
     ).call(
