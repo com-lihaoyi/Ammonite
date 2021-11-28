@@ -2,7 +2,6 @@ package readme
 
 import java.io.{BufferedReader, ByteArrayOutputStream, InputStreamReader}
 
-import ammonite.ops._
 import scalatags.Text.all._
 
 object Sample{
@@ -23,11 +22,11 @@ object Sample{
 
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
-    val path = cwd/'target/'cache/(key.hashCode + cacheVersion).toString
-    try read! path
+    val path = os.pwd/'target/'cache/(key.hashCode + cacheVersion).toString
+    try os.read(path)
     catch { case e : Throwable =>
       val newValue = calc
-      write.over(path, newValue)
+      os.write.over(path, newValue, createFolders=true)
       newValue
     }
   }
@@ -35,14 +34,12 @@ object Sample{
   def ammSample(ammoniteCode: String) = {
     val scalaVersion = scala.util.Properties.versionNumberString
     val ammVersion = ammonite.Constants.version
-    val predef = "shell/src/main/resources/ammonite/shell/example-predef-bare.sc"
     val out = exec(
       Seq(
         sys.env.getOrElse("AMMONITE_ASSEMBLY", "amm"),
         "--color", "true",
         "--no-remote-logging",
         "--no-home-predef",
-        "--predef", predef
       ),
       s"${ammoniteCode.trim}\nexit\n",
       args = Map("JAVA_OPTS" -> "-Xmx600m")

@@ -1,13 +1,12 @@
 package ammonite.repl
 
-import ammonite.ops.Internals
 import ammonite.repl.api.{Clipboard, FrontEnd, FrontEndAPI, Session}
 import ammonite.runtime._
 import ammonite.util.Util._
 import ammonite.util.{Frame => _, _}
-
 import java.awt.Toolkit
 import java.awt.datatransfer.{DataFlavor, StringSelection}
+import java.io.ByteArrayOutputStream
 import java.util.Locale
 
 import scala.collection.mutable
@@ -130,9 +129,11 @@ object ClipboardImpl extends Clipboard {
       case _ => ""
     }
 
-  override def write(data: Internals.Writable): Unit = {
+  override def write(data: geny.Writable): Unit = {
+    val out = new ByteArrayOutputStream()
+    data.writeBytesTo(out)
     val newContents = new StringSelection(
-      data.writeableData.map(new String(_)).mkString
+      new String(out.toByteArray)
     )
     systemClipboard.setContents(newContents, newContents)
   }

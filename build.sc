@@ -1,5 +1,4 @@
 import mill._, scalalib._, publish._
-import ammonite.ops._, ImplicitWd._
 import coursier.mavenRepositoryString
 import $file.ci.upload
 
@@ -96,7 +95,7 @@ object Deps {
   val pprint = ivy"com.lihaoyi::pprint:0.6.6"
   val requests = ivy"com.lihaoyi::requests:0.6.9"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.14.0"
-  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.4.4"
+  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.6.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
@@ -281,16 +280,6 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
   }
 }
 
-object ops extends Cross[OpsModule](binCrossScalaVersions:_*)
-class OpsModule(val crossScalaVersion: String) extends AmmModule{
-  def ivyDeps = Agg(
-    Deps.osLib,
-    withDottyCompat(Deps.scalaCollectionCompat, scalaVersion())
-  )
-  def scalacOptions = super.scalacOptions().filter(!_.contains("acyclic"))
-  object test extends Tests
-}
-
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = T{
@@ -316,19 +305,23 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
 object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object util extends Cross[UtilModule](binCrossScalaVersions:_*)
   class UtilModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops())
+    def moduleDeps = Seq()
     def ivyDeps = T{
-      if (scala3Versions.contains(crossScalaVersion))
-        Agg(
-          ivy"com.lihaoyi:pprint_3:${Deps.pprint.dep.version}",
-          ivy"com.lihaoyi:fansi_3:${Deps.fansi.dep.version}",
-          ivy"org.scala-lang:scala3-library_3:$crossScalaVersion"
+      Agg(
+
+        Deps.osLib,
+        Deps.scalaCollectionCompat,
+        Deps.fansi
+      ) ++ (
+        if (scala3Versions.contains(crossScalaVersion))
+          Agg(
+            ivy"com.lihaoyi:pprint_3:${Deps.pprint.dep.version}",
+            ivy"org.scala-lang:scala3-library_3:$crossScalaVersion"
+          )
+        else Agg(
+          Deps.pprint
         )
-      else
-        Agg(
-          Deps.pprint,
-          Deps.fansi
-        )
+      )
     }
     def compileIvyDeps = Agg(
       Deps.scalaReflect(scalaVersion())
@@ -337,7 +330,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
   object runtime extends Cross[RuntimeModule](fullCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), interp.api(), amm.repl.api())
+    def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.upickle,
@@ -398,7 +391,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
     class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-      def moduleDeps = Seq(amm.compiler.interface(), ops(), amm.util())
+      def moduleDeps = Seq(amm.compiler.interface(), amm.util())
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = Agg(
@@ -422,7 +415,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
-    def moduleDeps = Seq(ops(), amm.util(), amm.runtime(), amm.compiler.interface())
+    def moduleDeps = Seq(amm.util(), amm.runtime(), amm.compiler.interface())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.bsp4j,
@@ -446,10 +439,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-dependencies.txt"
-      def moduleDeps = Seq(
-        ops(), amm.util(),
-        interp.api()
-      )
+      def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = Agg(
         withDottyCompat(Deps.mainargs, scalaVersion())
       )
@@ -470,7 +460,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class ReplModule(val crossScalaVersion: String) extends AmmModule{
     def crossFullScalaVersion = true
     def moduleDeps = Seq(
-      ops(), amm.util(),
+      amm.util(),
       amm.runtime(), amm.interp(),
       terminal(),
       amm.compiler.interface()
@@ -541,7 +531,7 @@ class MainModule(val crossScalaVersion: String)
   def mainClass = Some("ammonite.Main")
 
   def moduleDeps = Seq(
-    terminal(), ops(),
+    terminal(),
     amm.util(), amm.runtime(),
     amm.interp.api(),
     amm.repl.api(),
@@ -551,7 +541,6 @@ class MainModule(val crossScalaVersion: String)
 
   def runClasspath =
     super.runClasspath() ++
-    ops().sources() ++
     terminal().sources() ++
     amm.util().sources() ++
     amm.runtime().sources() ++
@@ -640,7 +629,6 @@ class MainModule(val crossScalaVersion: String)
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
       super.runClasspath() ++
-      ops().sources() ++
       terminal().sources() ++
       amm.util().sources() ++
       amm.runtime().sources() ++
@@ -680,33 +668,9 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
   PathRef(ctx.dest)
 }
 
-object shell extends Cross[ShellModule](fullCrossScalaVersions:_*)
-class ShellModule(val crossScalaVersion: String) extends AmmModule{
-  def moduleDeps = Seq(ops(), amm())
-  def crossFullScalaVersion = true
-  object test extends Tests{
-    def moduleDeps = super.moduleDeps ++ Seq(amm.repl().test)
-    def thinWhitelist = T{
-      generateApiWhitelist(
-        amm.repl.api().exposedClassPath() ++
-        amm.compiler().exposedClassPath() ++
-        Seq(amm.repl().test.compile().classes, compile().classes) ++
-        resolveDeps(T.task{compileIvyDeps() ++ transitiveIvyDeps()})()
-      )
-    }
-
-    def localClasspath = T{
-      super.localClasspath() ++ Agg(thinWhitelist())
-    }
-    def forkEnv = super.forkEnv() ++ Seq(
-      "AMMONITE_SHELL" -> shell().jar().path.toString,
-      "AMMONITE_ASSEMBLY" -> amm().assembly().path.toString
-    )
-  }
-}
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
 class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
-  def moduleDeps = Seq(ops(), amm())
+  def moduleDeps = Seq(amm())
   def ivyDeps = T{
     if (scalaVersion().startsWith("2.13."))
       Agg(Deps.cask)
@@ -715,7 +679,6 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
   }
   object test extends Tests {
     def forkEnv = super.forkEnv() ++ Seq(
-      "AMMONITE_SHELL" -> shell().jar().path.toString,
       "AMMONITE_ASSEMBLY" -> amm().launcher().path.toString
     )
   }
@@ -723,7 +686,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
 
 object sshd extends Cross[SshdModule](fullCrossScalaVersions:_*)
 class SshdModule(val crossScalaVersion: String) extends AmmModule{
-  def moduleDeps = Seq(ops(), amm())
+  def moduleDeps = Seq(amm())
   def crossFullScalaVersion = true
   def ivyDeps = Agg(
     // sshd-core 1.3.0 requires java8
@@ -741,11 +704,9 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
 }
 
 def unitTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
-  ops(scalaVersion).test.test()()
   terminal(scalaVersion).test.test()()
   amm.repl(scalaVersion).test.test()()
   amm(scalaVersion).test.test()()
-  shell(scalaVersion).test.test()()
   sshd(scalaVersion).test.test()()
 }
 
@@ -779,7 +740,7 @@ def generateConstantsFile(version: String = buildVersion,
   """
   println("Writing Constants.scala")
 
-  write(ctx.dest/"Constants.scala", versionTxt)
+  os.write(ctx.dest/"Constants.scala", versionTxt)
   ctx.dest/"Constants.scala"
 }
 
@@ -801,10 +762,10 @@ def generateDependenciesFile(fileName: String,
     }
     .mkString("\n")
 
-  mkdir(dir)
+  os.makeDir(dir)
   println(s"Writing $dest")
   dir.toIO.mkdirs()
-  write(dest, content.getBytes("UTF-8"))
+  os.write(dest, content.getBytes("UTF-8"))
 
   dir
 }
@@ -866,17 +827,26 @@ def publishDocs() = {
   // need to make significant changes to the readme and that'll time.
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: Building readme for verification")
-    %sbt(
-      "readme/run",
-      AMMONITE_SHELL=shell("2.13.1").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.1").assembly().path,
-      CONSTANTS_FILE=generateConstantsFile()
-    )
+    try {
+      os.proc(
+        "sbt",
+        "readme/run",
+      ).call(
+        env = Map(
+          "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
+          "CONSTANTS_FILE" -> generateConstantsFile().toString
+        )
+      )
+    }catch{case e =>
+      println(e)
+      e.printStackTrace()
+      throw e
+    }
   }else T.command{
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
-    val publishDocs = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-    write(pwd / 'deploy_key, publishDocs)
+    val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+    os.write(os.pwd / 'deploy_key, deployKey)
 
     val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
       if (!unstable){
@@ -912,13 +882,16 @@ def publishDocs() = {
         yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k")
     )
 
-    %sbt(
+    os.proc(
       "readme/run",
-      AMMONITE_SHELL=shell("2.13.1").jar().path,
-      AMMONITE_ASSEMBLY=amm("2.13.1").assembly().path,
-      CONSTANTS_FILE=constantsFile
+
+    ).call(
+      env = Map(
+        "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
+        "CONSTANTS_FILE" -> constantsFile.toString
+      )
     )
-    %("ci/deploy_master_docs.sh")
+    os.proc("ci/deploy_master_docs.sh").call()
   }
 }
 
@@ -953,7 +926,7 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
                     divisionCount: Int) =
   T.command{
 
-    val x: Seq[(Seq[(Path, String)], Artifact)] = {
+    val x: Seq[(Seq[(os.Path, String)], Artifact)] = {
       mill.define.Target.sequence(partition(publishArtifacts, shard, divisionCount))().map{
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
       }

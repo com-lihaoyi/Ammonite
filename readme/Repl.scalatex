@@ -27,8 +27,7 @@
     "https://ipython.org/") or @lnk("Zsh", "http://www.zsh.org/").
 
   @p
-    It can be combined with @sect.ref{Ammonite-Ops} to replace Bash as your
-    systems shell, but can also be used alone as a @sect.ref("Features",
+    Ammonite-REPL is a @sect.ref("Features",
     "superior") version of the default Scala REPL, as a
     @sect.ref("Debugging", "debugging tool"), and for many other
     @sect.ref("Ammonite Cookbook", "fun and interesting things")!
@@ -88,7 +87,7 @@
 
   @p
     If you want to use Ammonite as a filesystem
-    shell, take a look at @sect.ref{Ammonite-Shell}. If you're not sure what
+    shell, take a look at Ammonite-Shell. If you're not sure what
     to do with Ammonite, check out the @sect.ref{Ammonite Cookbook} for some
     fun ideas!
 
@@ -596,7 +595,7 @@
             @sect.ref{desugar}
 
         @p
-          The REPL also imports the @sect.ref("Extensions", "pipe-operators")
+          The REPL also imports the pipe-operators
           from Ammonite-Ops by default to make it easy for you to use tools like
           @sect.ref{grep} interactively, and imports all the @sect.ref{Builtins}
           from the @hl.scala{repl}.
@@ -952,13 +951,12 @@
         @hl.scala{prompt} to always include your current working directory
 
       @hl.scala
-        import ammonite.ops._
-        repl.prompt.bind(pwd.toString + " @@ ")
+        repl.prompt.bind(os.pwd.toString + " @@ ")
 
       @p
         As is common practice in other shells. Further modifications to make it
         include e.g. your current branch in Git (which you can call through
-        Ammonite's @sect.ref("Spawning Subprocesses", "subprocess API") or the
+        Ammonite's subprocess API or the
         current timestamp/user are similarly possible.
 
     @sect{Compiler Flags}

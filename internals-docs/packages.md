@@ -6,18 +6,12 @@ most of them, it also contains some synthetic packages that house user code
 compiled and run within the Ammonite REPL.
 
 The main static packages containing Ammonite code are:
- 
-- `ammonite.ops`: a standalone usable filesystem library that feel great to
-  use from the REPL, but can be used as part of any other program
-  
+
 - `ammonite.terminal`: a standalone replacement for JLine, with more features
   such as syntax-highlighting, GUI-style keybindings and good multiline editing
   
 - `ammonite`: the main Ammonite REPL
 
-- `ammonite.shell`: an extension package for the Ammonite REPL to configure it 
-  for use as a system shell: a pwd-based-prompt, file-path-autocomplete, etc.
-  
 - `ammonite.sshd`: spin up an Ammonite server in any existing process you can
   connect to via SSH
   

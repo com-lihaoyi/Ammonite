@@ -1,6 +1,5 @@
 @import Main._
 @import readme.Sample._
-@import ammonite.ops._
 
 @script
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -49,10 +48,8 @@
   @p
     Ammonite lets you use the
     @lnk("Scala language", "https://www.scala-lang.org/") for
-    scripting purposes: in the @sect.ref("Ammonite-REPL", "REPL"), as
-    @sect.ref("Scala Scripts", "scripts"), as a @sect.ref("Ammonite-Ops",
-    "library to use in existing projects"), or as a standalone
-    @sect.ref("Ammonite-Shell", "systems shell").
+    scripting purposes: in the @sect.ref("Ammonite-REPL", "REPL") or as
+    @sect.ref("Scala Scripts", "scripts").
 
   @val logos = Seq(
     (
@@ -76,26 +73,6 @@
         setting up a "project" or waiting for SBT's slow startup times.
         """
 
-    ),
-    (
-        "fa-gears",
-        "Ammonite-Ops",
-        "A Rock-solid Filesystem Library for Scala",
-        """
-        Deal with the filesystem
-        easily from your existing Scala projects or applications, as easily
-        as you would from a Bash or Python script.
-        """
-    ),
-    (
-        "fa-terminal",
-        "Ammonite-Shell",
-        "A modern replacement for the Bash system shell",
-        """
-        Provides a systems shell in the high-level Scala language, letting you
-        seamlessly mix system operations with real code without the hassle or
-        the frustration of trying to write complex code in Bash.
-        """
     )
   )
 
@@ -196,7 +173,5 @@
 
   @Repl()
   @Scripts()
-  @Ops()
-  @Shell()
   @Cookbook()
   @Footer()

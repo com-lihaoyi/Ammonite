@@ -30,7 +30,7 @@ class InProcessMainMethodRunner(p: os.RelPath, preArgs: List[String], args: Seq[
     Console.withErr(err0){
       Console.withOut(out0){
         ammonite.Main.main0(
-          List("--home", ammonite.ops.tmp.dir().toString) ++
+          List("--home", os.temp.dir().toString) ++
           preArgs ++
           Seq(path.toString) ++
           args.toList,
