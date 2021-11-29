@@ -20,7 +20,7 @@ class InProcessMainMethodRunnerRawArgs(args: Seq[String]){
   val success = Console.withIn(in){
     Console.withErr(err0){
       Console.withOut(out0){
-        ammonite.Main.main0(args.toList, in, out0, err0)
+        ammonite.AmmoniteMain.main0(args.toList, in, out0, err0)
       }
     }
   }
