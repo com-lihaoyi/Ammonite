@@ -750,4 +750,4 @@
         
       @p
         Running a script from your SBT project can be achieved with
-        @code{ammonite.Main.main(Array("--predef-code", """println("welcome!")""", "file.sc"))}
+        @code{ammonite.AmmoniteMain.main(Array("--predef-code", """println("welcome!")""", "file.sc"))}
