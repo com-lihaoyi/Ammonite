@@ -29,7 +29,7 @@ class InProcessMainMethodRunner(p: os.RelPath, preArgs: List[String], args: Seq[
   val success = Console.withIn(in){
     Console.withErr(err0){
       Console.withOut(out0){
-        ammonite.Main.main0(
+        ammonite.AmmoniteMain.main0(
           List("--home", os.temp.dir().toString) ++
           preArgs ++
           Seq(path.toString) ++
