@@ -330,5 +330,25 @@ object ImportTests extends TestSuite{
         res3: Int = 1
       """)
     }
+    test("shapelessBugMinimized"){
+      check.session("""
+        @ object f{ case class Foo()}
+
+        @ import f.Foo
+
+        @ val Foo = 1
+
+        @ Foo
+      """)
+    }
+    test("shapelessBugFull"){
+      check.session("""
+        @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless.::
+
+        @ implicit def :: = 1
+
+        @ ::
+      """)
+    }
   }
 }
