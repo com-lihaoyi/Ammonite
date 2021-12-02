@@ -342,8 +342,8 @@ object ImportTests extends TestSuite{
       """)
     }
     test("shapelessBugFull"){
-      check.session("""
-        @ import $ivy.`com.chuusai::shapeless:2.3.2`, shapeless.::
+      if (check.scala2) check.session("""
+        @ import $ivy.`com.chuusai::shapeless:2.3.7`, shapeless.::
 
         @ implicit def :: = 1
 
