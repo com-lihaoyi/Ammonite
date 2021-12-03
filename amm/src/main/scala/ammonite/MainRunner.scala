@@ -70,12 +70,19 @@ class MainRunner(cliConfig: Config,
   def runRepl(): Unit = watchLoop(isRepl = true, printing = false, _.run())
 
   def watchAndWait(watched: Seq[(Watchable, Long)]) = {
-    printInfo(s"Watching for changes to ${watched.length} files... (Ctrl-C to exit)")
-    def statAll() = watched.forall{ case (check, lastMTime) =>
-      check.poll() == lastMTime
+    val watchedPaths = watched.count {
+      case (ammonite.interp.Watchable.Path(p), _) => true
+      case (_, _) => false
     }
+    val watchedValues = watched.size - watchedPaths
 
-    while(statAll()) Thread.sleep(100)
+    val watchedValueStr = if (watchedValues == 0) "" else s" and $watchedValues other values"
+
+    printInfo(
+      s"Watching for changes to $watchedPaths paths$watchedValueStr... (Enter to re-run, Ctrl-C to exit)"
+    )
+
+    MainRunner.statWatchWait(watched, stdIn)
   }
 
   def handleWatchRes[T](res: Res[T], printing: Boolean) = {
@@ -134,5 +141,45 @@ class MainRunner(cliConfig: Config,
 
     )
   }
+
+}
+object MainRunner{
+
+  /**
+   * Polls for updates until either one of the input files changes,
+   * or the enter key is pressed
+   * */
+  def statWatchWait(watched: Seq[(Watchable, Long)],
+                    stdIn: InputStream): Unit = {
+    val buffer = new Array[Byte](4 * 1024)
+
+    def allWatchedUnchanged() =
+      watched.forall { case (file, lastMTime) => file.poll() == lastMTime }
+
+    @tailrec def statWatchWait0(): Unit = {
+      if (allWatchedUnchanged()) {
+        if (lookForEnterKey()) ()
+        else {
+          Thread.sleep(100)
+          statWatchWait0()
+        }
+      }
+    }
+    @tailrec def lookForEnterKey(): Boolean = {
+      if (stdIn.available() == 0) false
+      else stdIn.read(buffer)  match{
+        case 0 | -1 => false
+        case n =>
+          buffer.indexOf('\n') match{
+            case -1 => lookForEnterKey()
+            case i =>
+              if (i >= n) lookForEnterKey()
+              else true
+          }
+      }
+    }
+    statWatchWait0()
+  }
+
 
 }
