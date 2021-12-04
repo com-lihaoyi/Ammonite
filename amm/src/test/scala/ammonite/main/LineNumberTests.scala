@@ -27,7 +27,7 @@ object LineNumberTests extends TestSuite{
       checkErrorMessage(
         file = path,
         s"""sourceCodeMetadata.sc
-           |/Users/lihaoyi/Github/Ammonite/amm/src/test/resources/lineNumbers/sourceCodeMetadata.sc
+           |$path
            |3
            |""".stripMargin
       )
