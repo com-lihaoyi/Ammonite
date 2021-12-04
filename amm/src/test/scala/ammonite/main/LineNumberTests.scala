@@ -13,7 +13,7 @@ import utest._
 object LineNumberTests extends TestSuite{
   val tests = this{
 
-    def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
+    def checkErrorMessage(file: os.Path, expected: String): Unit = {
       val e = new InProcessMainMethodRunner(file, Nil, Nil)
 
       assert(e.err.contains(expected))
@@ -22,20 +22,31 @@ object LineNumberTests extends TestSuite{
     val sv = ammonite.compiler.CompilerBuilder.scalaVersion
     val isScala2 = sv.startsWith("2.")
 
+    test("sourcecode"){
+      val path = InProcessMainMethodRunner.base / 'lineNumbers / "sourceCodeMetadata.sc"
+      checkErrorMessage(
+        file = path,
+        s"""sourceCodeMetadata.sc
+           |/Users/lihaoyi/Github/Ammonite/amm/src/test/resources/lineNumbers/sourceCodeMetadata.sc
+           |3
+           |""".stripMargin
+      )
+    }
     //All Syntax Error tests currently don't pass on windows as fastparse gives out some 10
     //surrounding chars which are different on windows and linux due to `\n` and `\r\n`
     //as `\r\n` counts as 2 so less number of surrounding chars are shown on windows
     test("errorTest"){
       if(!Util.windowsPlatform) {
+        val path = InProcessMainMethodRunner.base / 'lineNumbers / "ErrorLineNumberTest.sc"
         checkErrorMessage(
-          file = os.rel / 'lineNumbers / "ErrorLineNumberTest.sc",
+          file = path,
           expected = Util.normalizeNewlines(
             if (isScala2)
-              """ErrorLineNumberTest.sc:5:24 expected "}"
+              s"""$path:5:24 expected "}"
                 |    printlnqs(unsorted))
                 |                       ^""".stripMargin
             else
-              """ErrorLineNumberTest.sc
+              s"""$path
                 |  |    printlnqs(unsorted))
                 |  |                       ^
                 |  |                       '}' expected, but ')' found
@@ -47,15 +58,16 @@ object LineNumberTests extends TestSuite{
 
     test("multipleCompilationUnitErrorTest1"){
       if(!Util.windowsPlatform) {
-        checkErrorMessage(
-          file = os.rel / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc",
+        val path = InProcessMainMethodRunner.base / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc"
+          checkErrorMessage(
+          file = path,
           expected = Util.normalizeNewlines(
             if (isScala2)
-              """MultipleCompilationUnitErrorMsgTest1.sc:5:1 expected end-of-input
+              s"""$path:5:1 expected end-of-input
                 |}
                 |^""".stripMargin
             else
-              """MultipleCompilationUnitErrorMsgTest1.sc
+              s"""$path
                 |  |}
                 |  |^
                 |  |eof expected, but '}' found
@@ -68,15 +80,16 @@ object LineNumberTests extends TestSuite{
 
     test("multipleCompilationUnitErrorTest2"){
       if(!Util.windowsPlatform) {
+        val path = InProcessMainMethodRunner.base / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc"
         checkErrorMessage(
-          file = os.rel / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc",
+          file = path,
           expected = Util.normalizeNewlines(
             if (isScala2)
-              """MultipleCompilationUnitErrorMsgTest2.sc:3:1 expected end-of-input
+              s"""$path:3:1 expected end-of-input
                 |}
                 |^""".stripMargin
             else
-              """MultipleCompilationUnitErrorMsgTest2.sc
+              s"""$path
                 |  |}
                 |  |^
                 |  |eof expected, but '}' found
@@ -86,78 +99,93 @@ object LineNumberTests extends TestSuite{
       }
     }
 
-    test("compilationErrorWithCommentsAtTop") - checkErrorMessage(
-      file = os.rel / 'lineNumbers/"compilationErrorWithCommentsAtTop.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          """compilationErrorWithCommentsAtTop.sc:11: not found: value quicort
-            |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
-          """quicksort(unsorted.filter(_ > pivot))"""
-        else {
-          val firstLine = "quicort(unsorted.filter(_ < pivot)):::List(pivot):::" +
-            "quicksort(unsorted.filter(_ > pivot))"
-          s"""|   |    $firstLine
-              |   |    ^^^^^^^
-              |   |    Not found: quicort""".stripMargin
-        }
+    test("compilationErrorWithCommentsAtTop") {
+      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorWithCommentsAtTop.sc"
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            s"""$path:11: not found: value quicort
+              |    quicort(unsorted.filter(_ < pivot)):::List(pivot):::""".stripMargin +
+              """quicksort(unsorted.filter(_ > pivot))"""
+          else {
+            val firstLine = "quicort(unsorted.filter(_ < pivot)):::List(pivot):::" +
+              "quicksort(unsorted.filter(_ > pivot))"
+            s"""|   |    $firstLine
+                |   |    ^^^^^^^
+                |   |    Not found: quicort""".stripMargin
+          }
+        )
       )
-    )
+    }
 
-    test("compilationErrorInSecondBlock") - checkErrorMessage(
-      file = os.rel / 'lineNumbers/"compilationErrorInSecondBlock.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          """compilationErrorInSecondBlock.sc:14: not found: value printnl
-            |val res_0 = printnl("OK")
-            |            ^""".stripMargin
-        else
-          """   |val res_0 = printnl("OK")
-            |   |            ^^^^^^^
-            |   |            Not found: printnl""".stripMargin
+    test("compilationErrorInSecondBlock") {
+      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorInSecondBlock.sc"
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            s"""$path:14: not found: value printnl
+              |val res_0 = printnl("OK")
+              |            ^""".stripMargin
+          else
+            """   |val res_0 = printnl("OK")
+              |   |            ^^^^^^^
+              |   |            Not found: printnl""".stripMargin
+        )
       )
-    )
+    }
 
-    test("compilationErrorInFourthBlock") - checkErrorMessage(
-      file = os.rel / 'lineNumbers/"compilationErrorInFourthBlock.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          """compilationErrorInFourthBlock.sc:30: not found: value prinntl
-            |val res = prinntl("Ammonite")
-            |          ^""".stripMargin
-        else
-          """   |val res = prinntl("Ammonite")
-            |   |          ^^^^^^^
-            |   |          Not found: prinntl""".stripMargin
+    test("compilationErrorInFourthBlock") {
+      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorInFourthBlock.sc"
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            s"""$path:30: not found: value prinntl
+              |val res = prinntl("Ammonite")
+              |          ^""".stripMargin
+          else
+            """   |val res = prinntl("Ammonite")
+              |   |          ^^^^^^^
+              |   |          Not found: prinntl""".stripMargin
+        )
       )
-    )
+    }
 
-    test("compilationErrorInClass") - checkErrorMessage(
-      file = os.rel / 'lineNumbers/"compilationErrorInClass.sc",
-      expected =
-        if (isScala2)
-          "compilationErrorInClass.sc:17: value a is not a member of"
-        else
-          "value a cannot be accessed as a member of"
-    )
-
-    test("CompilationErrorLineNumberTest") - checkErrorMessage(
-      file = os.rel / 'lineNumbers/"CompilationErrorLineNumberTest.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          """CompilationErrorLineNumberTest.sc:7: not found: value noSuchObject
-            |  val x = noSuchObject.badFunction
-            |          ^""".stripMargin
-        else
-          """   |  val x = noSuchObject.badFunction
-            |   |          ^^^^^^^^^^^^
-            |   |          Not found: noSuchObject""".stripMargin
+    test("compilationErrorInClass") {
+      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorInClass.sc"
+      checkErrorMessage(
+        file = path,
+        expected =
+          if (isScala2)
+            s"$path:17: value a is not a member of"
+          else
+            "value a cannot be accessed as a member of"
       )
-    )
+    }
+
+    test("CompilationErrorLineNumberTest") {
+      val path = InProcessMainMethodRunner.base / 'lineNumbers / "CompilationErrorLineNumberTest.sc"
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            s"""$path:7: not found: value noSuchObject
+              |  val x = noSuchObject.badFunction
+              |          ^""".stripMargin
+          else
+            """   |  val x = noSuchObject.badFunction
+              |   |          ^^^^^^^^^^^^
+              |   |          Not found: noSuchObject""".stripMargin
+        )
+      )
+    }
 
     test("RuntimeCompilationErrorLineNumberTest") - {
       if (isScala2)
         checkErrorMessage(
-          file = os.rel / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
+          file = InProcessMainMethodRunner.base / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
           expected = s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
         )
       else
