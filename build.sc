@@ -401,8 +401,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         Deps.scalaReflect(scalaVersion()),
         Deps.coursierInterface
       )
-      def constantsFile = T {
-        val dest = T.dest / "Constants.scala"
+      def constantsSourceDir = T {
+        val dir = T.dest / "src"
+        val dest = dir / "Constants.scala"
         val code =
           s"""package ammonite.interp.script
              |
@@ -411,10 +412,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
              |  def semanticDbVersion = "${Deps.semanticDbScalac.dep.version}"
              |}
              |""".stripMargin
-             os.write(dest, code)
-        PathRef(dest)
+             os.write(dest, code, createFolders = true)
+        PathRef(dir)
       }
-      override def generatedSources: T[Seq[PathRef]] = super.generatedSources() ++ Seq(constantsFile())
+      override def generatedSources: T[Seq[PathRef]] = super.generatedSources() ++ Seq(constantsSourceDir())
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
@@ -723,7 +724,8 @@ def generateConstantsFile(version: String = buildVersion,
                           curlUrl: String = "<fill-me-in-in-Constants.scala>",
                           unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
                           oldCurlUrls: Seq[(String, String)] = Nil,
-                          oldUnstableCurlUrls: Seq[(String, String)] = Nil)
+                          oldUnstableCurlUrls: Seq[(String, String)] = Nil,
+                          returnDirectory: Boolean = true)
                          (implicit ctx: mill.util.Ctx.Dest)= {
   val versionTxt = s"""
     package ammonite
@@ -743,8 +745,10 @@ def generateConstantsFile(version: String = buildVersion,
   """
   println("Writing Constants.scala")
 
-  os.write(ctx.dest/"Constants.scala", versionTxt)
-  ctx.dest/"Constants.scala"
+  val dir = ctx.dest / "src"
+  os.write(dir/"Constants.scala", versionTxt, createFolders = true)
+  if (returnDirectory) dir
+  else dir/"Constants.scala"
 }
 
 def generateDependenciesFile(fileName: String,
@@ -777,9 +781,9 @@ def generateDependenciesFile(fileName: String,
 def publishExecutable() = {
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: generating executable but not publishing")
-    mill.define.Task.sequence(latestAssemblies)()
+    T.sequence(latestAssemblies)()
   }else T.command{
-    val latestAssemblyJars = mill.define.Task.sequence(latestAssemblies)()
+    val latestAssemblyJars = T.sequence(latestAssemblies)()
 
     println("MASTER COMMIT: Creating a release")
     if (!unstable){
@@ -837,7 +841,7 @@ def publishDocs() = {
       ).call(
         env = Map(
           "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
-          "CONSTANTS_FILE" -> generateConstantsFile().toString
+          "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
         )
       )
     }catch{case e =>
@@ -882,7 +886,8 @@ def publishDocs() = {
       for(k <- oldStableKeys)
         yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k"),
       for(k <- oldUnstableKeys)
-        yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k")
+        yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k"),
+      returnDirectory = false
     )
 
     os.proc(
