@@ -32,7 +32,7 @@ val commitsSinceTaggedVersion = {
 // Beware that this requires both versions to have the same tasty format
 // version. For example, 2.13.4 and 3.0.0-M1 do, while 2.13.4 and 3.0.0-M{2,3}
 // don't.
-val cross2_3Version = "2.13.6"
+val cross2_3Version = "2.13.7"
 
 
 // Same as https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/Dep.scala/#L55,
@@ -48,9 +48,11 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
 
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8")
-val scala3Versions = Seq("3.0.0", "3.0.1", "3.0.2")
+val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
+val scala31Versions = Seq("3.1.0")
+val scala3Versions = scala30Versions ++ scala31Versions
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala3Versions.last)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala30Versions.last, scala31Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
@@ -216,8 +218,17 @@ trait AmmInternalModule extends CrossSbtModule{
       if (sv.startsWith("3.") && !sv.startsWith("3.0.0"))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.1+"))
       else Nil
+    val extraDir6 = {
+      val dirNames =
+        if (sv.startsWith("3.")) {
+          if (sv.startsWith("3.0.")) Seq("scala-3.0-only")
+          else Seq("scala-3.1+")
+        }
+        else Nil
+      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
+    }
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
@@ -475,7 +486,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       Deps.jlineReader
     )
 
-    object test extends Tests with AmmDependenciesResourceFileModule {
+    object test extends Tests with AmmDependenciesResourceFileModule with PatchScala3Library {
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.scalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
@@ -521,8 +532,27 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 }
 
+trait PatchScala3Library extends JavaModule {
+
+  def transitiveIvyDeps = T{
+    val l = super.transitiveIvyDeps()
+    l.map { dep =>
+      if (dep.dep.module.name.value == "scala3-library")
+        dep.copy(
+          dep = dep.dep.withModule(
+            dep.dep.module
+              .withName(coursier.ModuleName(dep.dep.module.name.value + "_3"))
+          ),
+          cross = CrossVersion.Constant("", true)
+        )
+      else dep
+    }
+  }
+
+}
+
 class MainModule(val crossScalaVersion: String)
-  extends AmmModule {
+  extends AmmModule with PatchScala3Library {
 
   def artifactName = T{
     // See AmmInternalModule.artifactName for more details about ammonite-cross-23.
@@ -609,7 +639,7 @@ class MainModule(val crossScalaVersion: String)
       }
   }
 
-  object test extends Tests{
+  object test extends Tests with PatchScala3Library{
     def moduleDeps = super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.shapeless,

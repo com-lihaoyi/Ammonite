@@ -12,6 +12,7 @@ import ammonite.compiler.iface.{
   Preprocessor => IPreprocessor,
   _
 }
+import ammonite.compiler.internal.CompilerHelper
 import ammonite.util.{ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
@@ -32,7 +33,6 @@ import dotc.report
 import dotc.reporting
 import dotc.semanticdb
 import dotc.transform.{PostTyper, Staging}
-import dotc.typer.FrontEnd
 import dotc.util.{Property, SourceFile, SourcePosition}
 import dotc.util.Spans.Span
 import dotty.tools.io.{
@@ -153,12 +153,13 @@ class Compiler(
   //   compiler/src/dotty/tools/repl/ReplCompiler.scala/#L34-L39
   val compiler =
     new DottyCompiler:
-      override protected def frontendPhases: List[List[Phase]] = List(
-        List(new FrontEnd), // List(new REPLFrontEnd),
-        List(new semanticdb.ExtractSemanticDB),
-        List(new AmmonitePhase(userCodeNestingLevel, userCodeNestingLevel == 2)),
-        List(new PostTyper)
-      )
+      override protected def frontendPhases: List[List[Phase]] =
+        CompilerHelper.frontEndPhases ++
+        List(
+          List(new semanticdb.ExtractSemanticDB),
+          List(new AmmonitePhase(userCodeNestingLevel, userCodeNestingLevel == 2)),
+          List(new PostTyper)
+        )
 
   // Originally adapted from
   // https://github.com/lampepfl/dotty/blob/3.0.0-M3/
@@ -166,11 +167,7 @@ class Compiler(
   /** Formats errors using the `messageRenderer` */
   private def formatError(dia: reporting.Diagnostic)(implicit ctx: Context): reporting.Diagnostic =
     new reporting.Diagnostic(
-      Compiler.messageRenderer.messageAndPos(
-        dia.msg,
-        dia.pos,
-        Compiler.messageRenderer.diagnosticLevel(dia)
-      ),
+      CompilerHelper.messageAndPos(Compiler.messageRenderer, dia),
       dia.pos,
       dia.level
     )
