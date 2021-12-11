@@ -431,34 +431,28 @@ object AdvancedTests extends TestSuite{
 
       val dir = os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
       test("loadExec"){
-        if (scala2) {
-          val c1 = new DualTestRepl() {
-            override def predef = (
-              os.read(dir / "PredefLoadExec.sc"),
-              Some(dir / "PredefLoadExec.sc")
-            )
-          }
-          c1.session(
-            """
+        val c1 = new DualTestRepl() {
+          override def predef = (
+            os.read(dir/"PredefLoadExec.sc"),
+            Some(dir/"PredefLoadExec.sc")
+          )
+        }
+        c1.session("""
           @ val previouslyLoaded = predefDefinedValue
           previouslyLoaded: Int = 1337
         """)
-        }
       }
       test("loadModule"){
-        if (scala2) {
-          val c2 = new DualTestRepl() {
-            override def predef = (
-              os.read(dir / "PredefLoadModule.sc"),
-              Some(dir / "PredefLoadModule.sc")
-            )
-          }
-          c2.session(
-            """
+        val c2 = new DualTestRepl(){
+          override def predef = (
+            os.read(dir/"PredefLoadModule.sc"),
+            Some(dir/"PredefLoadModule.sc")
+          )
+        }
+        c2.session("""
           @ val previouslyLoaded = predefDefinedValue
           previouslyLoaded: Int = 1337
         """)
-        }
       }
       test("importIvy"){
         val c2 = new DualTestRepl(){
