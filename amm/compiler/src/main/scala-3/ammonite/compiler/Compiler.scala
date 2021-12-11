@@ -216,7 +216,11 @@ class Compiler(
         val root = run.runContext.settings.sourceroot.value(using run.runContext)
         SourceFile(AbstractFile.getFile(Paths.get(root).resolve(fileName)), "UTF-8")
       }else{
-        SourceFile.virtual(fileName, new String(src, StandardCharsets.UTF_8))
+        val vf = new VirtualFile(fileName.split("/", -1).last, fileName)
+        val out = vf.output
+        out.write(src)
+        out.close()
+        new SourceFile(vf, scala.io.Codec.UTF8)
       }
 
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
