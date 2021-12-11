@@ -206,9 +206,15 @@ class Compiler(
         // semanticdb needs the sources to be written on disk, so we assume they're there already
         val root = run.runContext.settings.sourceroot.value(using run.runContext)
         SourceFile(AbstractFile.getFile(Paths.get(root).resolve(fileName)), "UTF-8")
-      } else
-        SourceFile.virtual(fileName, new String(src, StandardCharsets.UTF_8))
-
+      } else {
+        val chars =  new String (src, StandardCharsets.UTF_8).toCharArray
+        new SourceFile (AbstractFile.getFile (Paths.get(fileName)), chars)
+      }
+    System.err.println("sourceFile " + sourceFile)
+    System.err.println("sourceFile.path " + sourceFile.path)
+    System.err.println("sourceFile.name " + sourceFile.name)
+    System.err.println("sourceFile.file " + sourceFile.file)
+    System.err.println("sourceFile.getClass.getMethods " + sourceFile.getClass.getMethods.map(_.getName).toList)
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =

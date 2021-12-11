@@ -513,6 +513,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def artifactName = "ammonite"
     def crossFullScalaVersion = true
     def mainClass = Some("ammonite.AmmoniteMain")
+    def ivyDeps = Agg(Deps.sourcecode)
     def moduleDeps = Seq(amm())
   }
 }
