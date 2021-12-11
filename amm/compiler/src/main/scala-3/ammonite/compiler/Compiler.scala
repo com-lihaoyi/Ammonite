@@ -216,11 +216,7 @@ class Compiler(
         val root = run.runContext.settings.sourceroot.value(using run.runContext)
         SourceFile(AbstractFile.getFile(Paths.get(root).resolve(fileName)), "UTF-8")
       }else{
-        val vf = new VirtualFile(fileName.split("/", -1).last, fileName){
-          override def jpath = java.nio.file.Paths.get(fileName)
-        }
-        val chars = new String(src, StandardCharsets.UTF_8).toCharArray
-        new SourceFile(vf, chars)
+        SourceFile.virtual(fileName, new String(src, StandardCharsets.UTF_8))
       }
 
     implicit val ctx: Context = run.runContext.withSource(sourceFile)

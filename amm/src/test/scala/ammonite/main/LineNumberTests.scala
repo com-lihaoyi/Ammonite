@@ -23,13 +23,15 @@ object LineNumberTests extends TestSuite{
     val isScala2 = sv.startsWith("2.")
 
     test("sourcecode"){
-      val path = InProcessMainMethodRunner.base / 'lineNumbers / "sourceCodeMetadata.sc"
-      checkErrorMessage(
-        file = path,
-        s"""sourceCodeMetadata.sc
-           |$path
-           |""".stripMargin
-      )
+      if (isScala2) {
+        val path = InProcessMainMethodRunner.base / 'lineNumbers / "sourceCodeMetadata.sc"
+        checkErrorMessage(
+          file = path,
+          s"""sourceCodeMetadata.sc
+             |$path
+             |""".stripMargin
+        )
+      }
     }
     //All Syntax Error tests currently don't pass on windows as fastparse gives out some 10
     //surrounding chars which are different on windows and linux due to `\n` and `\r\n`
