@@ -301,7 +301,7 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
     Agg(Deps.sourcecode)
 
   object test extends Tests{
-    def ivyDeps = super.ivyDeps ++ Agg(Deps.sourcecode)
+    def ivyDeps = super.ivyDeps() ++ Agg(Deps.sourcecode)
   }
 }
 
