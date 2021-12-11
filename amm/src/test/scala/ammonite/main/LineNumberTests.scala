@@ -28,7 +28,6 @@ object LineNumberTests extends TestSuite{
         file = path,
         s"""sourceCodeMetadata.sc
            |$path
-           |3
            |""".stripMargin
       )
     }

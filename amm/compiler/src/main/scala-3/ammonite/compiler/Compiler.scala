@@ -35,7 +35,15 @@ import dotc.transform.{PostTyper, Staging}
 import dotc.typer.FrontEnd
 import dotc.util.{Property, SourceFile, SourcePosition}
 import dotc.util.Spans.Span
-import dotty.tools.io.{AbstractFile, ClassPath, ClassRepresentation, File, VirtualDirectory}
+import dotty.tools.io.{
+  AbstractFile,
+  ClassPath,
+  ClassRepresentation,
+  File,
+  VirtualDirectory,
+  PlainFile,
+  Path
+}
 import dotty.tools.repl.CollectTopLevelImports
 
 class Compiler(
@@ -206,15 +214,11 @@ class Compiler(
         // semanticdb needs the sources to be written on disk, so we assume they're there already
         val root = run.runContext.settings.sourceroot.value(using run.runContext)
         SourceFile(AbstractFile.getFile(Paths.get(root).resolve(fileName)), "UTF-8")
-      } else {
-        val chars =  new String (src, StandardCharsets.UTF_8).toCharArray
-        new SourceFile (AbstractFile.getFile (Paths.get(fileName)), chars)
+      }else{
+        val chars = new String(src, StandardCharsets.UTF_8).toCharArray
+        new SourceFile(new PlainFile(Path(fileName)), chars)
       }
-    System.err.println("sourceFile " + sourceFile)
-    System.err.println("sourceFile.path " + sourceFile.path)
-    System.err.println("sourceFile.name " + sourceFile.name)
-    System.err.println("sourceFile.file " + sourceFile.file)
-    System.err.println("sourceFile.getClass.getMethods " + sourceFile.getClass.getMethods.map(_.getName).toList)
+
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =
