@@ -130,6 +130,21 @@
     @sect{2.4.1}
       @ul
         @li
+          Updated to latest versions of OS-Lib (0.8.0) Requests-Scala (0.7.0) PPrint (0.7.0) Fansi (0.3.0) uPickle (1.4.3)
+       
+        @li
+          Fix `sourcecode.File()` to return full file path @lnk("#1233", "https://github.com/com-lihaoyi/Ammonite/pull/1233")
+        @li
+          Allow users to re-run watched scripts by pressing enter @lnk("#1232", "https://github.com/com-lihaoyi/Ammonite/pull/1232")
+        @li
+          Fix handling of imports using synthetic case objects @lnk("#1231", "https://github.com/com-lihaoyi/Ammonite/pull/1231")
+        @li
+          Rename main entrypoint to @code{ammonite.AmmoniteMain} @lnk("#1229", "https://github.com/com-lihaoyi/Ammonite/pull/1229")
+        @li
+          EOL Ammonite-Ops and Ammonite-Shell @lnk("1227", "https://github.com/com-lihaoyi/Ammonite/pull/1227")
+    @sect{2.4.1}
+      @ul
+        @li
           Support for more Scala versions:  2.12.14, 2.12.15, 2.13.7, 3.0.1, and 3.0.2
         @li
           Improved Scala 3 support and pretty-print @code{given}-s as such
