@@ -283,23 +283,26 @@ trait AmmDependenciesResourceFileModule extends JavaModule{
 object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = T{
-    val fansi =
-      if (scala3Versions.contains(crossScalaVersion))
-        Agg(
-          ivy"com.lihaoyi:fansi_3:${Deps.fansi.dep.version}",
-          ivy"org.scala-lang:scala3-library_3:$crossScalaVersion"
-        )
-      else
-        Agg(Deps.fansi)
-    fansi ++ Agg(
-      Deps.sourcecode
-    )
+    if (scala3Versions.contains(crossScalaVersion))
+      Agg(
+        ivy"com.lihaoyi:fansi_3:${Deps.fansi.dep.version}",
+        ivy"org.scala-lang:scala3-library_3:$crossScalaVersion",
+      )
+    else
+      Agg(Deps.fansi)
   }
   def compileIvyDeps = Agg(
+    Deps.sourcecode,
     Deps.scalaReflect(scalaVersion())
   )
+  def runIvyDeps = if (scala3Versions.contains(crossScalaVersion))
+    Agg(ivy"com.lihaoyi:sourcecode_3:${Deps.sourcecode.dep.version}")
+  else
+    Agg(Deps.sourcecode)
 
-  object test extends Tests
+  object test extends Tests{
+    def ivyDeps = super.ivyDeps() ++ Agg(Deps.sourcecode)
+  }
 }
 
 object amm extends Cross[MainModule](fullCrossScalaVersions:_*){

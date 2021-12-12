@@ -10,7 +10,7 @@ object YRangeposTests extends TestSuite {
   val tests = Tests {
     println("YRangeposTests")
 
-    def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
+    def checkErrorMessage(file: os.Path, expected: String): Unit = {
       val e = new InProcessMainMethodRunner(file, Nil, Nil)
 
       assert(e.err.contains(expected))
@@ -40,7 +40,7 @@ object YRangeposTests extends TestSuite {
       // behaviour, by checking that the line at which the error is found matches
       // the expected one in the file
       val expectedErrorMessage = "yRangeposError.sc:9: type mismatch;"
-      checkErrorMessage(os.rel / 'scriptCompilerSettings / "yRangeposError.sc",
+      checkErrorMessage(InProcessMainMethodRunner.base / 'scriptCompilerSettings / "yRangeposError.sc",
         expectedErrorMessage)
     }
     test("YrangeposError"){

@@ -11,7 +11,7 @@ import utest._
  */
 class MainTests extends TestSuite{
   def exec(p: String, args: String*) =
-    new InProcessMainMethodRunner(os.rel / 'mains / p, Nil, args)
+    new InProcessMainMethodRunner(InProcessMainMethodRunner.base / 'mains / p, Nil, args)
 
   def stripInvisibleMargin(s: String): String = {
     val lines = Predef.augmentString(s).lines.toArray
@@ -40,7 +40,7 @@ class MainTests extends TestSuite{
     // logic revolves around handling arguments. Make sure this fails properly
     test("badAmmoniteFlag"){
       val evaled = new InProcessMainMethodRunner(
-        os.rel / 'mains/"Hello.sc",
+        InProcessMainMethodRunner.base / 'mains/"Hello.sc",
         List("--doesnt-exist"),
         Nil
       )
