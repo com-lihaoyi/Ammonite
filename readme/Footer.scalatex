@@ -127,7 +127,7 @@
 
 
   @sect{Changelog}
-    @sect{2.4.1}
+    @sect{2.5.0}
       @ul
         @li
           Updated to latest versions of OS-Lib (0.8.0) Requests-Scala (0.7.0) PPrint (0.7.0) Fansi (0.3.0) uPickle (1.4.3)
