@@ -46,7 +46,7 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
     case _ => dep
   }
 
-val scala2_12Versions = Seq("2.12.1", "2.12.2", "2.12.3", "2.12.4", "2.12.6", "2.12.7", "2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15")
+val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7")
 val scala3Versions = Seq("3.0.0", "3.0.1", "3.0.2")
 
@@ -77,12 +77,12 @@ val fastparseVersion = "2.3.0"
 val scalametaVersion = "4.4.30"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi::acyclic:0.2.0"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.0"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val coursierInterface = ivy"io.get-coursier:interface:0.0.21"
-  val fansi = ivy"com.lihaoyi::fansi:0.2.14"
+  val fansi = ivy"com.lihaoyi::fansi:0.3.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
@@ -90,10 +90,10 @@ object Deps {
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.54"
-  val mainargs = ivy"com.lihaoyi::mainargs:0.2.0"
-  val osLib = ivy"com.lihaoyi::os-lib:0.7.8"
-  val pprint = ivy"com.lihaoyi::pprint:0.6.6"
-  val requests = ivy"com.lihaoyi::requests:0.6.9"
+  val mainargs = ivy"com.lihaoyi::mainargs:0.2.2"
+  val osLib = ivy"com.lihaoyi::os-lib:0.8.0"
+  val pprint = ivy"com.lihaoyi::pprint:0.7.1"
+  val requests = ivy"com.lihaoyi::requests:0.7.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.14.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.6.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
@@ -108,7 +108,7 @@ object Deps {
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.2.7"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
-  val upickle = ivy"com.lihaoyi::upickle:1.4.0"
+  val upickle = ivy"com.lihaoyi::upickle:1.4.3"
   val utest = ivy"com.lihaoyi::utest:0.7.10"
 }
 
