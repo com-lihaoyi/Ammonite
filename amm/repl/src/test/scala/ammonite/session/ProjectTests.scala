@@ -114,7 +114,7 @@ object ProjectTests extends TestSuite{
           @ import shapeless.syntax.singleton._
 
           @ 2.narrow
-          res4: 2 = 2
+          res4: Constant(2) = 2
         """)
       else
         "Disabled in Scala 3"

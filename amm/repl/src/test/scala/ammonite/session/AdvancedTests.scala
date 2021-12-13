@@ -176,23 +176,6 @@ object AdvancedTests extends TestSuite{
         res5: Buffer[Int] = ArrayBuffer(1)
       """)
     }
-    test("customTypePrinter"){
-      check.session("""
-        @ Array(1)
-        res0: Array[Int] = Array(1)
-
-        @ import pprint.TPrint
-
-        @ implicit def ArrayTPrint[T: TPrint]: TPrint[Array[T]] = TPrint.lambda( c =>
-        @   implicitly[TPrint[T]].render(c) +
-        @   " " +
-        @   c.typeColor("Array").render
-        @ )
-
-        @ Array(1)
-        res3: Int Array = Array(1)
-      """)
-    }
     test("trappedType"){
       check.session("""
         @ val nope = ammonite.Nope(2); val n = 2
