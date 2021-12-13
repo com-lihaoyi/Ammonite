@@ -92,7 +92,7 @@ object Deps {
   val jsch = ivy"com.jcraft:jsch:0.1.54"
   val mainargs = ivy"com.lihaoyi::mainargs:0.2.2"
   val osLib = ivy"com.lihaoyi::os-lib:0.8.0"
-  val pprint = ivy"com.lihaoyi::pprint:0.7.0"
+  val pprint = ivy"com.lihaoyi::pprint:0.7.1"
   val requests = ivy"com.lihaoyi::requests:0.7.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.14.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.6.0"
