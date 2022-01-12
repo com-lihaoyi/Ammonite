@@ -18,6 +18,8 @@ import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+// needed to support deprecated Main.main
+import acyclic.skipped
 
 /**
   * Bundles together:
