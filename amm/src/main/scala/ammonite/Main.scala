@@ -20,6 +20,8 @@ import coursierapi.Dependency
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+// needed to support deprecated Main.main
+import acyclic.skipped
 
 
 /**
@@ -266,3 +268,7 @@ case class Main(predefCode: String = "",
   }
 }
 
+object Main {
+  @deprecated("Use ammonite.AmmoniteMain.main instead", "2.5.0")
+  def main(args: Array[String]): Unit = AmmoniteMain.main(args)
+}
