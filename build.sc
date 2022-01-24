@@ -153,7 +153,7 @@ trait AmmInternalModule extends CrossSbtModule{
     // ammonite-cross-23-… ones can depend on Scala 3 dependencies, even
     // though their JARs should be basically the same as their ammonite-…
     // counterparts.
-    val prefix = if (useCrossPrefix()) "ammonite-cross-23-" else "ammonite-"
+    val prefix = if (useCrossPrefix()) s"ammonite-cross-$crossScalaVersion-" else "ammonite-"
     prefix + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   }
   def testFramework = "utest.runner.Framework"
@@ -357,7 +357,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions:_*)
     class CompilerInterfaceModule(val crossScalaVersion: String) extends AmmModule{
       def artifactName = T{
-        if (useCrossPrefix()) "ammonite-cross-23-compiler-interface"
+        if (useCrossPrefix()) s"ammonite-cross-$crossScalaVersion-compiler-interface"
         else "ammonite-compiler-interface"
       }
       def crossFullScalaVersion = true
@@ -556,7 +556,7 @@ class MainModule(val crossScalaVersion: String)
 
   def artifactName = T{
     // See AmmInternalModule.artifactName for more details about ammonite-cross-23.
-    if (useCrossPrefix()) "ammonite-cross-23"
+    if (useCrossPrefix()) s"ammonite-cross-$crossScalaVersion"
     else "ammonite"
   }
 
