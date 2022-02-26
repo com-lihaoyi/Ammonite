@@ -18,19 +18,19 @@ object InProcessMainMethodRunner{
   * JVM-level isolation between tests. But it works well enough for
   * our unit tests.
   */
-class InProcessMainMethodRunner(p: os.RelPath, preArgs: List[String], args: Seq[String]){
+class InProcessMainMethodRunner(p: os.Path, preArgs: List[String], args: Seq[String]){
 
   val in = new ByteArrayInputStream(Array.empty[Byte])
   val err0 = new ByteArrayOutputStream()
   val out0 = new ByteArrayOutputStream()
-  val path = InProcessMainMethodRunner.base/p
+  val path = p
 
 
   val success = Console.withIn(in){
     Console.withErr(err0){
       Console.withOut(out0){
-        ammonite.Main.main0(
-          List("--home", ammonite.ops.tmp.dir().toString) ++
+        ammonite.AmmoniteMain.main0(
+          List("--home", os.temp.dir().toString) ++
           preArgs ++
           Seq(path.toString) ++
           args.toList,

@@ -1,8 +1,7 @@
 #!/usr/bin/env amm
-import ammonite.ops._
 
 @main
-def apply(uploadedFile: Path,
+def apply(uploadedFile: os.Path,
           tagName: String,
           uploadName: String,
           authKey: String,
@@ -39,7 +38,7 @@ def apply(uploadedFile: Path,
     ),
     connectTimeout = 5000, 
     readTimeout = 60000,
-    data = read.bytes(uploadedFile)
+    data = os.read.bytes(uploadedFile)
   ).text
    
 

@@ -87,7 +87,6 @@ object AmmonitePlugin{
     def saneSym(sym: g.Symbol): Boolean = {
       !sym.name.decoded.contains('$') &&
       sym.exists &&
-      !sym.isSynthetic &&
       !sym.isPrivate &&
       !sym.isProtected &&
       sym.isPublic &&

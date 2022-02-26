@@ -128,4 +128,26 @@ object Util{
   }
 
   case class Location(fileName: String, lineNum: Int, fileContent: String)
+
+  def javaMajorVersion: Int = {
+    val prop = System.getProperty("java.version")
+    val prop0 =
+      if (prop.startsWith("1.")) prop.stripPrefix("1.")
+      else prop
+    val idx = prop0.indexOf('.')
+    val version =
+      if (idx < 0) prop0
+      else prop0.take(idx)
+    version.toInt
+  }
+
+
+  /**
+   * Detects if the console is interactive; lets us make console-friendly output
+   * (e.g. ansi color codes) if it is, and script-friendly output (no ansi codes)
+   * if it's not
+   *
+   * https://stackoverflow.com/a/1403817/871202
+   */
+  def isInteractive() = System.console() != null
 }

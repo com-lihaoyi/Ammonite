@@ -328,7 +328,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
       _ <- Catching{case e: Throwable => e.printStackTrace(); throw e}
       output <- Res(
         compilerManager.compileClass(
-          processed, printer, codeSource.fileName
+          processed, printer, codeSource.printablePath
         ),
         "Compilation Failed"
       )
@@ -388,7 +388,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
         // another script which gets changed, and we'd only know when we reach that block
         lazy val splittedScript = parser.splitScript(
           Interpreter.skipSheBangLine(code),
-          codeSource.fileName
+          codeSource.printablePath
         )
 
         for{

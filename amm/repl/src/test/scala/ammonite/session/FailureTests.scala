@@ -38,15 +38,11 @@ object FailureTests extends TestSuite{
           error: java is not a value
 
           @ 1 + vale
-          error: val res0 = 1 + vale
-                         ^^^^
-                         Not found: vale
+          error: Not found: vale
           Compilation Failed
 
           @ val x = 1 + vale
-          error: val x = 1 + vale
-                      ^^^^
-                      Not found: vale
+          error: Not found: vale
           Compilation Failed
         """)
     }

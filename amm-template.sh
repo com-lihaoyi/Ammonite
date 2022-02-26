@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # This is a wrapper script, that automatically download ammonite from GitHub release pages
-# You can give the required mill version with AMM_VERSION env variable
+# You can give the required ammonite version with AMM_VERSION env variable
 # If no version is given, it falls back to the value of DEFAULT_AMM_VERSION
 DEFAULT_AMM_VERSION=
 SCALA_VERSION=

@@ -1,5 +1,4 @@
 package ammonite.integration
-import ammonite.ops._
 import ammonite.util.Util
 import utest._
 import TestUtils._
@@ -11,7 +10,7 @@ import TestUtils._
 object LineNumberTests extends TestSuite{
   val tests = this{
 
-    def checkErrorMessage(file: RelPath, expected: String): Unit = {
+    def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
       val e = intercept[os.SubprocessException]{
         exec(file)
       }.result.err.string
@@ -20,7 +19,7 @@ object LineNumberTests extends TestSuite{
 
 
     test("compilationErrorInSecondBlock") - checkErrorMessage(
-      file = 'lineNumbers/"compilationErrorInSecondBlock.sc",
+      file = os.rel/'lineNumbers/"compilationErrorInSecondBlock.sc",
       expected = Util.normalizeNewlines(
         if (isScala2)
           """compilationErrorInSecondBlock.sc:14: not found: value printnl

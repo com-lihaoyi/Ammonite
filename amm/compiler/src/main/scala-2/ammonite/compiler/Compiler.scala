@@ -70,22 +70,11 @@ object Compiler{
 
   /**
     * Converts a bunch of bytes into Scalac's weird VirtualFile class
-    *
-    * Can only take in a relative path for the VirtualFile! Otherwise
-    * fails with a weird assert in the presentation compiler:
-    *
-    * [Current.sc]: exception during background compile:
-    * java.lang.AssertionError:
-    * assertion failed: (
-    *   ammonite/predef//Users/lihaoyi/Dropbox/Github/<-wrapped to next line->
-    *   Ammonite/target/tempAmmoniteHome/predef.sc,false,16,16)
-    *
-    * It appears that passing in the filename *only* results in the correct
-    * stack traces (e.g. Foo.sc:425 rather than Users/lihaoyi/Foo.sc:45), so we
-    * do that and assert to make sure it's only one path segment
     */
   def makeFile(src: Array[Byte], name: String) = {
-    val singleFile = new io.VirtualFile(name)
+    val segments = name.split("/", -1)
+
+    val singleFile = new io.VirtualFile(segments.last, segments.mkString("/"))
     val output = singleFile.output
     output.write(src)
     output.close()

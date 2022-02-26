@@ -278,7 +278,7 @@
         @hl.scala{mainargs.Parser*} parsers, which provides parsers for primitives
         like @code{Int}, @code{Double}, @code{String}, as well as basic
         data-structures like @code{Seq}s (taken as a comma-separated list) and
-        common types like @sect.ref{Paths}.
+        common types like Paths.
 
       @p
         If you pass in the wrong number of arguments, or if an argument fails
@@ -716,7 +716,7 @@
       @p
         Furthermore, Ammonite makes it really easy to include that sort of
         recursive/iterative logic inside a single script: you can use
-        @hl.scala{ls!} or @hl.scala{ls.rec!} from @sect.ref{Ammonite-Ops} to
+        @hl.scala{ls!} or @hl.scala{ls.rec!} from Ammonite-Ops to
         traverse the filesystem and work on multiple files all within the same
         process, which avoids duplicating the startup overhead on all the files
         you are manipulating.
@@ -750,4 +750,4 @@
         
       @p
         Running a script from your SBT project can be achieved with
-        @code{ammonite.Main.main(Array("--predef-code", """println("welcome!")""", "file.sc"))}
+        @code{ammonite.AmmoniteMain.main(Array("--predef-code", """println("welcome!")""", "file.sc"))}

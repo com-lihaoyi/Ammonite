@@ -1,2 +1,1 @@
-import ammonite.ops._
-println(ls(pwd/"out"))
+println(os.list(os.pwd/"out"))

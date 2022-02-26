@@ -85,11 +85,6 @@ Although most features should be unit tested, it's still useful to fire up a REP
   command. You can also pass in the path to a `.sc` file to run it using
   Ammonite's script runner
   
-- `mill -i -w shell[2.12.6].test.run` brings up a fully-loaded shell with all filesystem
-  utilities included: `wd`, `cd!`, autocomplete for filesystem paths, and more. 
-  This uses `readme/resources/example-predef.scala` instead of your default 
-  predef, for easier experimentation and development.
-  
 - `mill -i -w integration[2.12.6].test.run` runs the trivial main method in the
   `integration` subproject, letting you manually test running Ammonite
   programmatically, whether through `run` or `debug`
