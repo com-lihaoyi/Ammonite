@@ -1,7 +1,9 @@
 import mill._, scalalib._, publish._
+import mill.contrib.bloop.Bloop
 import coursier.mavenRepositoryString
 import $file.ci.upload
 
+import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
 val ghOrg = "com-lihaoyi"
@@ -142,7 +144,10 @@ trait CrossSbtModule extends mill.scalalib.SbtModule with mill.scalalib.CrossMod
   }
 }
 
-trait AmmInternalModule extends CrossSbtModule{
+trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
+  def skipBloop =
+    // no need to expose the modules for old Scala versions support in Bloop / Metals
+    !binCrossScalaVersions.contains(crossScalaVersion)
   def useCrossPrefix = T{
     scala3Versions.contains(crossScalaVersion) && !scala3Versions.contains(scalaVersion())
   }
