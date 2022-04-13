@@ -4,7 +4,7 @@ import ammonite.compiler.iface.{CodeWrapper, Compiler, CompilerBuilder}
 import ammonite.compiler.iface.Compiler.{Output => CompilerOutput}
 import ammonite.interp.Interpreter
 import ammonite.runtime.{Frame, Storage}
-import ammonite.util.{Classpath, Imports, Name, Printer, Res}
+import ammonite.util.{Classpath, Imports, Name, Position, PositionOffsetConversion, Printer, Res}
 
 import scala.collection.mutable
 
