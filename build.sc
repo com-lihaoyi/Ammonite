@@ -49,7 +49,7 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8")
 val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
-val scala31Versions = Seq("3.1.0", "3.1.1")
+val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2")
 val scala3Versions = scala30Versions ++ scala31Versions
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala30Versions.last, scala31Versions.last)
