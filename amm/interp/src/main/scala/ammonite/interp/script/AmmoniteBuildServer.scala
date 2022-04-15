@@ -11,7 +11,7 @@ import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
 import ammonite.interp.api.InterpAPI
 import ammonite.interp.DependencyLoader
 import ammonite.runtime.{ImportHook, Storage}
-import ammonite.util.{Classpath, Imports, Printer}
+import ammonite.util.{Classpath, Imports, Position, PositionOffsetConversion, Printer}
 import ch.epfl.scala.bsp4j.{Diagnostic => BDiagnostic, Position => BPosition, _}
 import coursierapi.{Dependency, Repository}
 import org.eclipse.lsp4j.jsonrpc.Launcher

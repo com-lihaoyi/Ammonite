@@ -48,10 +48,10 @@ object LineNumberTests extends TestSuite{
                 |                       ^""".stripMargin
             else
               s"""$path
-                |  |    printlnqs(unsorted))
+                |-- [E040] Syntax Error: <splitter>:5:23 ----------------------------------------
+                |5 |    printlnqs(unsorted))
                 |  |                       ^
-                |  |                       '}' expected, but ')' found
-                |""".stripMargin
+                |  |                       '}' expected, but ')' found""".stripMargin
           )
         )
       }
@@ -69,10 +69,10 @@ object LineNumberTests extends TestSuite{
                 |^""".stripMargin
             else
               s"""$path
-                |  |}
+                |-- [E040] Syntax Error: <splitter>:3:0 -----------------------------------------
+                |3 |}
                 |  |^
-                |  |eof expected, but '}' found
-                |""".stripMargin
+                |  |eof expected, but '}' found""".stripMargin
           )
         )
       }
@@ -91,10 +91,10 @@ object LineNumberTests extends TestSuite{
                 |^""".stripMargin
             else
               s"""$path
-                |  |}
+                |-- [E040] Syntax Error: <splitter>:3:0 -----------------------------------------
+                |3 |}
                 |  |^
-                |  |eof expected, but '}' found
-                |""".stripMargin
+                |  |eof expected, but '}' found""".stripMargin
           )
         )
       }
@@ -112,9 +112,11 @@ object LineNumberTests extends TestSuite{
           else {
             val firstLine = "quicort(unsorted.filter(_ < pivot)):::List(pivot):::" +
               "quicksort(unsorted.filter(_ > pivot))"
-            s"""|   |    $firstLine
-                |   |    ^^^^^^^
-                |   |    Not found: quicort""".stripMargin
+            val sp = " "
+            s"""-- [E006] Not Found Error: $path:7:4$sp
+               |7 |    $firstLine
+               |  |    ^^^^^^^
+               |  |    Not found: quicort""".stripMargin
           }
         )
       )
@@ -129,10 +131,13 @@ object LineNumberTests extends TestSuite{
             s"""$path:14: not found: value printnl
               |val res_0 = printnl("OK")
               |            ^""".stripMargin
-          else
-            """   |val res_0 = printnl("OK")
-              |   |            ^^^^^^^
-              |   |            Not found: printnl""".stripMargin
+          else {
+            val sp = " "
+            s"""-- [E006] Not Found Error: $path:1:12$sp
+               |1 |val res_0 = printnl("OK")
+               |  |            ^^^^^^^
+               |  |            Not found: printnl""".stripMargin
+          }
         )
       )
     }
@@ -146,10 +151,13 @@ object LineNumberTests extends TestSuite{
             s"""$path:30: not found: value prinntl
               |val res = prinntl("Ammonite")
               |          ^""".stripMargin
-          else
-            """   |val res = prinntl("Ammonite")
-              |   |          ^^^^^^^
-              |   |          Not found: prinntl""".stripMargin
+          else {
+            val sp = " "
+            s"""-- [E006] Not Found Error: $path:3:10$sp
+               |3 |val res = prinntl("Ammonite")
+               |  |          ^^^^^^^
+               |  |          Not found: prinntl""".stripMargin
+          }
         )
       )
     }
@@ -175,10 +183,13 @@ object LineNumberTests extends TestSuite{
             s"""$path:7: not found: value noSuchObject
               |  val x = noSuchObject.badFunction
               |          ^""".stripMargin
-          else
-            """   |  val x = noSuchObject.badFunction
-              |   |          ^^^^^^^^^^^^
-              |   |          Not found: noSuchObject""".stripMargin
+          else {
+            val sp = " "
+            s"""-- [E006] Not Found Error: $path:7:10$sp
+               |7 |  val x = noSuchObject.badFunction
+               |  |          ^^^^^^^^^^^^
+               |  |          Not found: noSuchObject""".stripMargin
+          }
         )
       )
     }

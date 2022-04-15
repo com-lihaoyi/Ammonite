@@ -13,7 +13,7 @@ import ammonite.compiler.iface.{
   _
 }
 import ammonite.compiler.internal.CompilerHelper
-import ammonite.util.{ImportData, Imports, Printer}
+import ammonite.util.{ImportData, Imports, PositionOffsetConversion, Printer}
 import ammonite.util.Util.newLine
 
 import dotty.tools.dotc
@@ -238,7 +238,38 @@ class Compiler(
 
     result match {
       case Left(errors) =>
+        val scalaPosToScPos = PositionOffsetConversion.scalaPosToScPos(
+          new String(src).drop(importsLen),
+          0,
+          0,
+          new String(src),
+          importsLen
+        )
+        val scFile = new SourceFile(sourceFile.file, sourceFile.content().drop(importsLen))
+        def scalaOffsetToScOffset(scalaOffset: Int): Option[Int] =
+          scalaPosToScPos(sourceFile.offsetToLine(scalaOffset), sourceFile.column(scalaOffset)).map {
+            case (scLine, scCol) => scFile.lineToOffset(scLine) + scCol
+          }
+        def scalaSpanToScSpan(scalaSpan: Span): Option[Span] =
+          for {
+            scStart <- scalaOffsetToScOffset(scalaSpan.start)
+            scEnd <- scalaOffsetToScOffset(scalaSpan.end)
+            scPoint <- scalaOffsetToScOffset(scalaSpan.point)
+          } yield Span(scStart, scEnd, scPoint)
+        def scalaSourcePosToScSourcePos(sourcePos: SourcePosition): Option[SourcePosition] =
+          if (sourcePos.source == sourceFile)
+            scalaSpanToScSpan(sourcePos.span).map { scSpan =>
+              SourcePosition(scFile, scSpan, sourcePos.outer)
+            }
+          else
+            None
+        def scalaDiagnosticToScDiagnostic(diag: reporting.Diagnostic): Option[reporting.Diagnostic] =
+          scalaSourcePosToScSourcePos(diag.pos).map { scPos =>
+            new reporting.Diagnostic(diag.msg, scPos, diag.level)
+          }
+
         errors
+          .map(d => scalaDiagnosticToScDiagnostic(d).getOrElse(d))
           .map(formatError)
           .map(_.msg.toString)
           .foreach(printer.error)
@@ -463,36 +494,5 @@ object Compiler:
 
   }
 
-  /** A `MessageRenderer` for the REPL without file positions */
   private[compiler] val messageRenderer =
-    new reporting.MessageRendering:
-      override def sourceLines(
-        pos: SourcePosition,
-        diagnosticLevel: String
-      )(using Context): (List[String], List[String], Int) = {
-        val (srcBefore, srcAfter, offset) = super.sourceLines(pos, diagnosticLevel)
-        val updatedSrcBefore = srcBefore.map { line =>
-          val chars = line.toCharArray
-          var i = 0
-          var updated = false
-          while (i < chars.length) {
-            if (chars(i) == '|')
-              i = chars.length
-             else if (chars(i).isDigit) {
-               chars(i) = ' '
-               updated = true
-             }
-            i += 1
-          }
-          if (updated) new String(chars)
-          else line
-        }
-        (updatedSrcBefore, srcAfter, offset)
-      }
-      // TODO Add this back for scripts
-      override def posStr(
-        pos: SourcePosition,
-        diagnosticLevel: String,
-        message: reporting.Message
-      )(using Context): String =
-        ""
+    new reporting.MessageRendering {}
