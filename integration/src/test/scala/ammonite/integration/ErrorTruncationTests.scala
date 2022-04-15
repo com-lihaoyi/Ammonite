@@ -26,38 +26,48 @@ object ErrorTruncationTests extends TestSuite{
   }
   val tests = Tests {
     println("ErrorTruncationTests")
-    test("compileError") - checkErrorMessage(
-      file = os.rel/'errorTruncation/"compileError.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          s"""compileError.sc:1: not found: value doesntexist
-            |val res = doesntexist
-            |          ^
-            |Compilation Failed
-            |""".stripMargin
-        else
-          s"""|   |val res = doesntexist
-              |   |          ^^^^^^^^^^^
-              |   |          Not found: doesntexist
-              |Compilation Failed""".stripMargin
+    test("compileError") {
+      val path = os.rel/'errorTruncation/"compileError.sc"
+      val sp = " "
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            s"""compileError.sc:1: not found: value doesntexist
+               |val res = doesntexist
+               |          ^
+               |Compilation Failed
+               |""".stripMargin
+          else
+            s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:1:10$sp
+               |1 |val res = doesntexist
+               |  |          ^^^^^^^^^^^
+               |  |          Not found: doesntexist
+               |Compilation Failed""".stripMargin
+        )
       )
-    )
-    test("multiExpressionError") - checkErrorMessage(
-      file = os.rel / 'errorTruncation/"compileErrorMultiExpr.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          s"""compileErrorMultiExpr.sc:11: not found: value doesntexist
-            |val res_4 = doesntexist
-            |            ^
-            |Compilation Failed
-            |""".stripMargin
-        else
-          s"""|   |val res_4 = doesntexist
-              |   |            ^^^^^^^^^^^
-              |   |            Not found: doesntexist
-              |Compilation Failed""".stripMargin
+    }
+    test("multiExpressionError") {
+      val path = os.rel / 'errorTruncation/"compileErrorMultiExpr.sc"
+      val sp = " "
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            s"""compileErrorMultiExpr.sc:11: not found: value doesntexist
+               |val res_4 = doesntexist
+               |            ^
+               |Compilation Failed
+               |""".stripMargin
+          else
+            s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:11:12$sp
+               |11 |val res_4 = doesntexist
+               |   |            ^^^^^^^^^^^
+               |   |            Not found: doesntexist
+               |Compilation Failed""".stripMargin
+        )
       )
-    )
+    }
 
     test("parseError"){
       if(!Util.windowsPlatform){
@@ -70,9 +80,10 @@ object ErrorTruncationTests extends TestSuite{
                 |^
                 |""".stripMargin
             else
-              """|  |}
-                 |  |^
-                 |  |eof expected, but '}' found""".stripMargin
+              """-- [E040] Syntax Error: <splitter>:1:0 -----------------------------------------
+                |1 |}
+                |  |^
+                |  |eof expected, but '}' found""".stripMargin
           )
         )
       }

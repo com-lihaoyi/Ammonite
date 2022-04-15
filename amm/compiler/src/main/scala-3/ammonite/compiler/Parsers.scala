@@ -3,6 +3,7 @@ package ammonite.compiler
 import java.util.Map
 
 import ammonite.compiler.iface.{Compiler => _, Parser => IParser, _}
+import ammonite.compiler.internal.CompilerHelper
 import ammonite.util.ImportTree
 import ammonite.util.Util.CodeSource
 
@@ -89,11 +90,7 @@ class Parsers extends IParser {
       .removeBufferedMessages
       .map { e =>
         val maybeMsg = scala.util.Try {
-          Compiler.messageRenderer.messageAndPos(
-            e.msg,
-            e.pos,
-            Compiler.messageRenderer.diagnosticLevel(e)
-          )
+          CompilerHelper.messageAndPos(Compiler.messageRenderer, e)
         }
         Compiler.messageRenderer.stripColor(maybeMsg.getOrElse("???"))
       }

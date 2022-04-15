@@ -1,4 +1,4 @@
-package ammonite.interp.script
+package ammonite.util
 
 import scala.collection.mutable
 

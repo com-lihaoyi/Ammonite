@@ -5,7 +5,7 @@ import java.io.File
 import ammonite.compiler.iface.{CodeWrapper, Parser}
 import ammonite.interp.{DependencyLoader, Interpreter}
 import ammonite.runtime.{Frame, ImportHook, Storage}
-import ammonite.util.{ImportTree, Name, Util}
+import ammonite.util.{ImportTree, Name, PositionOffsetConversion, Util}
 import ammonite.util.Util.CodeSource
 import coursierapi.{Dependency, Repository}
 
