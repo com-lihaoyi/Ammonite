@@ -39,7 +39,7 @@
 
   @p
     To begin with, download the Ammonite @ammonite.Constants.version
-    script-runner for Scala 2.12 (also available for
+    script-runner for Scala 2.13 (also available for
     @sect.ref{Older Scala Versions}):
 
   @hl.sh
