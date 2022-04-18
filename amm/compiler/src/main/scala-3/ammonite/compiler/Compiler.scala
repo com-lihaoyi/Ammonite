@@ -3,7 +3,7 @@ package ammonite.compiler
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
-import java.io.OutputStream
+import java.io.{ByteArrayInputStream, OutputStream}
 
 import ammonite.compiler.iface.{
   Compiler => ICompiler,
@@ -285,8 +285,20 @@ class Compiler(
         val classes = files(outputDir).toArray
         Compiler.addToClasspath(classes, dynamicClassPath)
         outputDir.clear()
+        val lineShift = PositionOffsetConversion.offsetToPos(new String(src)).apply(importsLen).line
+        val mappings = Map(sourceFile.file.name -> (sourceFile.file.name, -lineShift))
+        val postProcessedClasses = classes.toVector.map {
+          case (path, byteCode) if path.endsWith(".class") =>
+            val updatedByteCodeOpt = AsmPositionUpdater.postProcess(
+              mappings,
+              new ByteArrayInputStream(byteCode)
+            )
+            (path, updatedByteCodeOpt.getOrElse(byteCode))
+          case other =>
+            other
+        }
         val output = ICompiler.Output(
-          classes.toVector,
+          postProcessedClasses,
           Imports(newImports),
           Some(usedEarlierDefinitions)
         )
