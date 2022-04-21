@@ -13,6 +13,9 @@ class MainTests extends TestSuite{
   def exec(p: String, args: String*) =
     new InProcessMainMethodRunner(InProcessMainMethodRunner.base / 'mains / p, Nil, args)
 
+  def execPreArgs(preArgs: String*)(p: String, args: String*) =
+    new InProcessMainMethodRunner(InProcessMainMethodRunner.base / 'mains / p, preArgs.toList, args)
+
   def stripInvisibleMargin(s: String): String = {
     val lines = Predef.augmentString(s).lines.toArray
     val leftMargin = lines.filter(_.trim.nonEmpty).map(_.takeWhile(_ == ' ').length).min
@@ -286,6 +289,27 @@ class MainTests extends TestSuite{
         // which means that the error stack that gets printed is short-ish
         assert(Predef.augmentString(evaled.err).lines.length < 20)
 
+      }
+      test("noPositionalArgs") {
+        val evaled = execPreArgs("--no-positional-args")("Args.sc", "1", "moo")
+        assert(!evaled.success)
+
+        assert(evaled.err.contains(
+          Util.normalizeNewlines(
+            s"""Missing arguments: -i <int> -s <str>
+               |Unknown arguments: "1" "moo"
+               |$argsUsageMsg""".stripMargin
+          )
+        ))
+      }
+      test("allowRepeatArgs") {
+        val evaled = execPreArgs("--allow-repeat-args")("Args.sc", "1", "Moo", "-i", "3")
+        assert(evaled.success)
+        assert(
+          evaled.out == ("\"Hello! MooMooMoo Ammonite.\"" + Util.newLine) ||
+          // For some reason, on windows CI machines the repo gets clone as lowercase (???)
+          evaled.out == ("\"Hello! MooMooMoo ammonite.\"" + Util.newLine)
+        )
       }
     }
   }

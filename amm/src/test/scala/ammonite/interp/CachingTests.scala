@@ -17,7 +17,7 @@ object CachingTests extends TestSuite{
                   path: os.Path,
                   interp: ammonite.interp.Interpreter,
                   scriptArgs: Seq[String] = Nil) =
-      Scripts.runScript(wd, path, interp, scriptArgs) match {
+      Scripts.runScript(wd, path, interp, scriptArgs = scriptArgs) match {
         case Res.Success(_) =>
         case Res.Skip =>
         case Res.Exception(t, s) => throw new Exception(s"Error running script: $s", t)
@@ -231,7 +231,7 @@ object CachingTests extends TestSuite{
       val storage = new Storage.Folder(storageFolder)
       def runScript(script: os.Path, expectedCount: Int) = {
         val interp = createTestInterp(storage)
-        val res = Scripts.runScript(script / os.up, script, interp, Nil)
+        val res = Scripts.runScript(script / os.up, script, interp)
 
         val count = interp.compilationCount
         assert(count == expectedCount)
