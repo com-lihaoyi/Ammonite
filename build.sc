@@ -1,7 +1,9 @@
 import mill._, scalalib._, publish._
+import mill.contrib.bloop.Bloop
 import coursier.mavenRepositoryString
 import $file.ci.upload
 
+import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
 
 val ghOrg = "com-lihaoyi"
@@ -32,7 +34,7 @@ val commitsSinceTaggedVersion = {
 // Beware that this requires both versions to have the same tasty format
 // version. For example, 2.13.4 and 3.0.0-M1 do, while 2.13.4 and 3.0.0-M{2,3}
 // don't.
-val cross2_3Version = "2.13.6"
+val cross2_3Version = "2.13.7"
 
 
 // Same as https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/Dep.scala/#L55,
@@ -47,10 +49,12 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
   }
 
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15")
-val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7")
-val scala3Versions = Seq("3.0.0", "3.0.1", "3.0.2")
+val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8")
+val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
+val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2")
+val scala3Versions = scala30Versions ++ scala31Versions
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala3Versions.last)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala30Versions.last, scala31Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
@@ -74,10 +78,10 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.0.0-M6"
 val fastparseVersion = "2.3.0"
-val scalametaVersion = "4.4.30"
+val scalametaVersion = "4.4.32"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.0"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.1"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
@@ -140,7 +144,10 @@ trait CrossSbtModule extends mill.scalalib.SbtModule with mill.scalalib.CrossMod
   }
 }
 
-trait AmmInternalModule extends CrossSbtModule{
+trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
+  def skipBloop =
+    // no need to expose the modules for old Scala versions support in Bloop / Metals
+    !binCrossScalaVersions.contains(crossScalaVersion)
   def useCrossPrefix = T{
     scala3Versions.contains(crossScalaVersion) && !scala3Versions.contains(scalaVersion())
   }
@@ -151,7 +158,7 @@ trait AmmInternalModule extends CrossSbtModule{
     // ammonite-cross-23-… ones can depend on Scala 3 dependencies, even
     // though their JARs should be basically the same as their ammonite-…
     // counterparts.
-    val prefix = if (useCrossPrefix()) "ammonite-cross-23-" else "ammonite-"
+    val prefix = if (useCrossPrefix()) s"ammonite-cross-$crossScalaVersion-" else "ammonite-"
     prefix + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   }
   def testFramework = "utest.runner.Framework"
@@ -216,8 +223,17 @@ trait AmmInternalModule extends CrossSbtModule{
       if (sv.startsWith("3.") && !sv.startsWith("3.0.0"))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.1+"))
       else Nil
+    val extraDir6 = {
+      val dirNames =
+        if (sv.startsWith("3.")) {
+          if (sv.startsWith("3.0.")) Seq("scala-3.0-only")
+          else Seq("scala-3.1+")
+        }
+        else Nil
+      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
+    }
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
@@ -346,7 +362,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions:_*)
     class CompilerInterfaceModule(val crossScalaVersion: String) extends AmmModule{
       def artifactName = T{
-        if (useCrossPrefix()) "ammonite-cross-23-compiler-interface"
+        if (useCrossPrefix()) s"ammonite-cross-$crossScalaVersion-compiler-interface"
         else "ammonite-compiler-interface"
       }
       def crossFullScalaVersion = true
@@ -401,8 +417,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         Deps.scalaReflect(scalaVersion()),
         Deps.coursierInterface
       )
-      def constantsFile = T {
-        val dest = T.dest / "Constants.scala"
+      def constantsSourceDir = T {
+        val dir = T.dest / "src"
+        val dest = dir / "Constants.scala"
         val code =
           s"""package ammonite.interp.script
              |
@@ -411,10 +428,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
              |  def semanticDbVersion = "${Deps.semanticDbScalac.dep.version}"
              |}
              |""".stripMargin
-             os.write(dest, code)
-        PathRef(dest)
+             os.write(dest, code, createFolders = true)
+        PathRef(dir)
       }
-      override def generatedSources: T[Seq[PathRef]] = super.generatedSources() ++ Seq(constantsFile())
+      override def generatedSources: T[Seq[PathRef]] = super.generatedSources() ++ Seq(constantsSourceDir())
     }
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
@@ -474,7 +491,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       Deps.jlineReader
     )
 
-    object test extends Tests with AmmDependenciesResourceFileModule {
+    object test extends Tests with AmmDependenciesResourceFileModule with PatchScala3Library {
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.scalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
@@ -520,12 +537,31 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 }
 
+trait PatchScala3Library extends JavaModule {
+
+  def transitiveIvyDeps = T{
+    val l = super.transitiveIvyDeps()
+    l.map { dep =>
+      if (dep.dep.module.name.value == "scala3-library")
+        dep.copy(
+          dep = dep.dep.withModule(
+            dep.dep.module
+              .withName(coursier.ModuleName(dep.dep.module.name.value + "_3"))
+          ),
+          cross = CrossVersion.Constant("", true)
+        )
+      else dep
+    }
+  }
+
+}
+
 class MainModule(val crossScalaVersion: String)
-  extends AmmModule {
+  extends AmmModule with PatchScala3Library {
 
   def artifactName = T{
     // See AmmInternalModule.artifactName for more details about ammonite-cross-23.
-    if (useCrossPrefix()) "ammonite-cross-23"
+    if (useCrossPrefix()) s"ammonite-cross-$crossScalaVersion"
     else "ammonite"
   }
 
@@ -608,7 +644,7 @@ class MainModule(val crossScalaVersion: String)
       }
   }
 
-  object test extends Tests{
+  object test extends Tests with PatchScala3Library{
     def moduleDeps = super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.shapeless,
@@ -723,7 +759,8 @@ def generateConstantsFile(version: String = buildVersion,
                           curlUrl: String = "<fill-me-in-in-Constants.scala>",
                           unstableCurlUrl: String = "<fill-me-in-in-Constants.scala>",
                           oldCurlUrls: Seq[(String, String)] = Nil,
-                          oldUnstableCurlUrls: Seq[(String, String)] = Nil)
+                          oldUnstableCurlUrls: Seq[(String, String)] = Nil,
+                          returnDirectory: Boolean = true)
                          (implicit ctx: mill.util.Ctx.Dest)= {
   val versionTxt = s"""
     package ammonite
@@ -743,8 +780,10 @@ def generateConstantsFile(version: String = buildVersion,
   """
   println("Writing Constants.scala")
 
-  os.write(ctx.dest/"Constants.scala", versionTxt)
-  ctx.dest/"Constants.scala"
+  val dir = ctx.dest / "src"
+  os.write(dir/"Constants.scala", versionTxt, createFolders = true)
+  if (returnDirectory) dir
+  else dir/"Constants.scala"
 }
 
 def generateDependenciesFile(fileName: String,
@@ -777,9 +816,9 @@ def generateDependenciesFile(fileName: String,
 def publishExecutable() = {
   if (!isMasterCommit) T.command{
     println("MISC COMMIT: generating executable but not publishing")
-    mill.define.Task.sequence(latestAssemblies)()
+    T.sequence(latestAssemblies)()
   }else T.command{
-    val latestAssemblyJars = mill.define.Task.sequence(latestAssemblies)()
+    val latestAssemblyJars = T.sequence(latestAssemblies)()
 
     println("MASTER COMMIT: Creating a release")
     if (!unstable){
@@ -837,7 +876,7 @@ def publishDocs() = {
       ).call(
         env = Map(
           "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
-          "CONSTANTS_FILE" -> generateConstantsFile().toString
+          "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
         )
       )
     }catch{case e =>
@@ -882,7 +921,8 @@ def publishDocs() = {
       for(k <- oldStableKeys)
         yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k"),
       for(k <- oldUnstableKeys)
-        yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k")
+        yield (k, s"https://github.com/${ghOrg}/${ghRepo}/releases/download/$k"),
+      returnDirectory = false
     )
 
     os.proc(

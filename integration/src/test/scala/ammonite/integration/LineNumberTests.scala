@@ -18,20 +18,25 @@ object LineNumberTests extends TestSuite{
     }
 
 
-    test("compilationErrorInSecondBlock") - checkErrorMessage(
-      file = os.rel/'lineNumbers/"compilationErrorInSecondBlock.sc",
-      expected = Util.normalizeNewlines(
-        if (isScala2)
-          """compilationErrorInSecondBlock.sc:14: not found: value printnl
-            |val res_0 = printnl("OK")
-            |            ^""".stripMargin
-        else
-          """|   |val res_0 = printnl("OK")
-             |   |            ^^^^^^^
-             |   |            Not found: printnl
-             |Compilation Failed""".stripMargin
+    test("compilationErrorInSecondBlock") {
+      val path = os.rel/'lineNumbers/"compilationErrorInSecondBlock.sc"
+      val sp = " "
+      checkErrorMessage(
+        file = path,
+        expected = Util.normalizeNewlines(
+          if (isScala2)
+            """compilationErrorInSecondBlock.sc:14: not found: value printnl
+              |val res_0 = printnl("OK")
+              |            ^""".stripMargin
+          else
+            s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:1:12$sp
+               |1 |val res_0 = printnl("OK")
+               |  |            ^^^^^^^
+               |  |            Not found: printnl
+               |Compilation Failed""".stripMargin
+        )
       )
-    )
+    }
 
   }
 }

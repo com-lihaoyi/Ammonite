@@ -127,11 +127,31 @@
 
 
   @sect{Changelog}
+    @sect{2.5.3}
+      @ul
+        @li
+          Print error positions in Scala 3
+        @li
+          Added support for Scala 3.1.2
+        @li
+          Bump uPickle to 1.6.0
+
+    @sect{2.5.2}
+      @ul
+        @li
+          Added support for Scala 3.1.0 and 3.1.1
+
+    @sect{2.5.1}
+      @ul
+        @li
+          Added support for Scala 2.13.8
+        @li
+          Re-added old Main entry point for better compatibility with Ammonite 2.4 and older
+
     @sect{2.5.0}
       @ul
         @li
           Updated to latest versions of OS-Lib (0.8.0) Requests-Scala (0.7.0) PPrint (0.7.0) Fansi (0.3.0) uPickle (1.4.3)
-       
         @li
           Fix `sourcecode.File()` to return full file path @lnk("#1233", "https://github.com/com-lihaoyi/Ammonite/pull/1233")
         @li
