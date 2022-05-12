@@ -156,6 +156,71 @@
       res12: Int = 6
     @p
       This is a level of live interactivity which is traditionally hard to come by in the world of desktop GUI applications, but with the Ammonite REPL, it's totally seamless
+    @p 
+      You can also import JavaFX applications, using ScalaFX.  This is easiest if you create a file `jfx.sc` to contain the relevant imports:
+
+    @hl.scala
+      @@ {
+        import $ivy.{
+          `org.scalafx::scalafx:16.0.0-R24`
+        }
+
+        lazy val osName = System.getProperty("os.name") match {
+          case n if n.startsWith("Linux") => "linux"
+          case n if n.startsWith("Mac") => "mac"
+          case n if n.startsWith("Windows") => "win"
+          case _ => throw new Exception("Unknown platform!")
+        }
+
+        val javaFXModules = Seq("base", "controls", "fxml", "graphics", "media", "swing", "web")
+        javaFXModules.map(m =>
+          interp.load.ivy(coursierapi.Dependency.of("org.openjfx", s"javafx-$m", "15.0.1").withClassifier(osName))
+        )
+      }
+   @p 
+      And then you can use `import $file.jfx` with the ScalaFX DSL.
+
+    @hl.scala
+      @@ {
+        import $file.jfx
+
+        import scalafx.application.JFXApp3
+        import scalafx.application.JFXApp3.PrimaryStage
+        import scalafx.geometry.Insets
+        import scalafx.scene.Scene
+        import scalafx.scene.layout.HBox
+        import scalafx.scene.paint.Color._
+        import scalafx.scene.paint._
+        import scalafx.scene.text.Text
+
+        import scala.language.implicitConversions
+
+        @main
+        def main() {
+          JFXApp3Demo.main(Array())
+        }
+
+        object JFXApp3Demo extends JFXApp3 {
+          override def start(): Unit = {
+            stage = new PrimaryStage {
+              title = "ScalaFX Hello World!"
+              scene = new Scene {
+                fill = Color.rgb(38, 38, 38)
+                content = new HBox {
+                  padding = Insets(50, 80, 50, 80)
+                  children = Seq(
+                    new Text {
+                      text = "Hello World!"
+                      style = "-fx-font: normal bold 100pt sans-serif"
+                      fill = new LinearGradient(endX = 0, stops = Stops(Red, DarkRed))
+                    }
+                  )
+                }
+              }
+            }
+          }
+        }              
+      }
 
   @sect{Office Automation}
     @p
