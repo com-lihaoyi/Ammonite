@@ -127,6 +127,10 @@
 
 
   @sect{Changelog}
+    @sect{2.5.4}
+      @ul
+        @li
+          Bump uPickle to 2.0.0
     @sect{2.5.3}
       @ul
         @li
