@@ -195,7 +195,7 @@
 
         import scala.language.implicitConversions
 
-        @main
+        @@main
         def main() {
           JFXApp3Demo.main(Array())
         }
