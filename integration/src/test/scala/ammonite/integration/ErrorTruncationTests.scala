@@ -100,14 +100,9 @@ object ErrorTruncationTests extends TestSuite{
              |  $runtimeErrorResourcePackage.runtimeError$$.<init>(runtimeError.sc:1)
              |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc)
              |""".stripMargin
-        else if (isScala2)
+        else
           s"""java.lang.ArithmeticException: / by zero
              |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc:1)
-             |""".stripMargin
-        else
-          // FIXME Line number is wrong
-          s"""java.lang.ArithmeticException: / by zero
-             |  $runtimeErrorResourcePackage.runtimeError$$.<clinit>(runtimeError.sc:42)
              |""".stripMargin
       )
     )

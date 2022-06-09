@@ -195,13 +195,10 @@ object LineNumberTests extends TestSuite{
     }
 
     test("RuntimeCompilationErrorLineNumberTest") - {
-      if (isScala2)
-        checkErrorMessage(
-          file = InProcessMainMethodRunner.base / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
-          expected = s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
-        )
-      else
-        "Temporarily disabled in Scala 3"
+      checkErrorMessage(
+        file = InProcessMainMethodRunner.base / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
+        expected = s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
+      )
     }
   }
 }
