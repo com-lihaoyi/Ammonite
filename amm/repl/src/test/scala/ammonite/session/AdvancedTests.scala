@@ -320,22 +320,22 @@ object AdvancedTests extends TestSuite{
         check.session("""
           @ // Compiler plugins imported without `.$plugin` are not loaded
 
-          @ import $ivy.`org.typelevel::kind-projector:0.10.3`
+          @ import $ivy.`org.typelevel:::kind-projector:0.13.2`
 
           @ trait TC0[F[_]]
           defined trait TC0
 
-          @ type TC0EitherStr = TC0[Either[String, ?]]
-          error: not found: type ?
+          @ type TC0EitherStr = TC0[Either[String, *]]
+          error: not found: type *
 
           @ // You need to use `import $plugin.$ivy`
 
-          @ import $plugin.$ivy.`org.typelevel::kind-projector:0.10.3`
+          @ import $plugin.$ivy.`org.typelevel:::kind-projector:0.13.2`
 
           @ trait TC[F[_]]
           defined trait TC
 
-          @ type TCEitherStr = TC[Either[String, ?]]
+          @ type TCEitherStr = TC[Either[String, *]]
           defined type TCEitherStr
 
           @ // Importing plugins doesn't affect the run-time classpath

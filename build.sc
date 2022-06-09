@@ -48,7 +48,7 @@ def withDottyCompat(dep: Dep, scalaVersion: String): Dep =
     case _ => dep
   }
 
-val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15")
+val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8")
 val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
 val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2")
@@ -78,10 +78,10 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.0.0-M6"
 val fastparseVersion = "2.3.0"
-val scalametaVersion = "4.4.32"
+val scalametaVersion = "4.5.9"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.1"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.3"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
