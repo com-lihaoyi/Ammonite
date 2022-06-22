@@ -138,7 +138,8 @@ object AmmoniteBuildServerTests extends TestSuite {
         }
 
         diagnostics = runner.diagnostics()
-        _ = assert(diagnostics.isEmpty)
+        // Since Scala 3.1.3, we get a warning about possible undefined behavior because of the $minus
+        _ = assert(diagnostics.forall(_.getSeverity != DiagnosticSeverity.ERROR))
 
       } yield ()
     }
@@ -374,7 +375,8 @@ object AmmoniteBuildServerTests extends TestSuite {
         }
 
         diagnostics = runner.diagnostics()
-        _ = assert(diagnostics.isEmpty)
+        // Since Scala 3.1.3, we get a warning about possible undefined behavior because of the '-'
+        _ = assert(diagnostics.forall(_.getSeverity != DiagnosticSeverity.ERROR))
 
       } yield ()
     }
