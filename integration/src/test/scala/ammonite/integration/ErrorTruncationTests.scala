@@ -22,7 +22,7 @@ object ErrorTruncationTests extends TestSuite{
     ).plainText
     //This string gets included on windows due to environment variable set additionally
 
-    assert(fansi.Str(e).plainText.contains(expected))
+    assert(TestUtils.containsLines(fansi.Str(e).plainText, expected))
   }
   val tests = Tests {
     println("ErrorTruncationTests")

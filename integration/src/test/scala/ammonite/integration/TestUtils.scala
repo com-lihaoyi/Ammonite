@@ -62,4 +62,20 @@ object TestUtils {
       case x => substrCount(s, subs, count+1, x + subs.length)
     }
   }
+
+  def containsLines(output: String, expected: String): Boolean =
+    containsLines(output.linesIterator.toList, expected.linesIterator.toList)
+
+  @annotation.tailrec
+  def containsLines(output: List[String], expected: List[String]): Boolean =
+    expected match {
+      case Nil => true
+      case h :: t =>
+        output match {
+          case Nil => false
+          case h0 :: t0 =>
+            val remaining = if (h0.contains(h)) t else expected
+            containsLines(t0, remaining)
+        }
+    }
 }

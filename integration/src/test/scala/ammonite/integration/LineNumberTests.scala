@@ -14,7 +14,7 @@ object LineNumberTests extends TestSuite{
       val e = intercept[os.SubprocessException]{
         exec(file)
       }.result.err.string
-      assert(e.contains(expected))
+      assert(TestUtils.containsLines(e, expected))
     }
 
 
