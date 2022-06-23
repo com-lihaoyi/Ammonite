@@ -244,7 +244,21 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
         val error0 =
           if (scala2) error
           else error.stripMargin('|')
-        assert(error0.contains(strippedExpected))
+
+        @annotation.tailrec
+        def contains(output: List[String], expected: List[String]): Boolean =
+          expected match {
+            case Nil => true
+            case h :: t =>
+              output match {
+                case Nil => false
+                case h0 :: t0 =>
+                  val remaining = if (h0.contains(h)) t else expected
+                  contains(t0, remaining)
+              }
+          }
+
+        assert(contains(error0.linesIterator.toList, strippedExpected.linesIterator.toList))
 
       }else if (expected.startsWith("warning: ")){
         val strippedExpected = expected.stripPrefix("warning: ")
