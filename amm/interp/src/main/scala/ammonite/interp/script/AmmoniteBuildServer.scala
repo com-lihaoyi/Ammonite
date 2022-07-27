@@ -175,8 +175,8 @@ class AmmoniteBuildServer(
   private def scriptBuildTarget(script: Script, path: os.Path): BuildTarget = {
     val scalaTarget = new ScalaBuildTarget(
       "org.scala-lang",
-      scala.util.Properties.versionNumberString,
-      scala.util.Properties.versionNumberString.split('.').take(2).mkString("."),
+      compiler.scalaVersion,
+      compiler.scalaVersion.split('.').take(2).mkString("."),
       ScalaPlatform.JVM,
       // TODO This seems not to matter as long as the scala-compiler JARs and all
       // are in the classpath we pass via ScalacOptions.

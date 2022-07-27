@@ -759,11 +759,19 @@ object AmmoniteBuildServerTests extends TestSuite {
           val classPath = item.getClasspath.asScala.toList
           val classDir = os.Path(Paths.get(new URI(item.getClassDirectory)))
 
+          val targets = buildTargetsResp.getTargets()
+          assert(targets.asScala.nonEmpty)
+          val scalaTarget = targets.get(0).getData().asInstanceOf[ScalaBuildTarget]
+          
           if (isScala2) {
+            assert(scalaTarget.getScalaVersion().startsWith("2"))
+            assert(scalaTarget.getScalaBinaryVersion().startsWith("2"))
             assert(options.contains("-Yrangepos"))
             assert(options.exists(_.startsWith("-P:semanticdb:sourceroot:")))
             assert(options.exists(_.startsWith("-P:semanticdb:targetroot:")))
           } else {
+            assert(scalaTarget.getScalaVersion().startsWith("3"))
+            assert(scalaTarget.getScalaBinaryVersion().startsWith("3"))
             assert(options.contains("-Xsemanticdb") || options.contains("-Xsemanticdb"))
             assert(options.contains("-sourceroot"))
             assert(options.contains("-semanticdb-target"))

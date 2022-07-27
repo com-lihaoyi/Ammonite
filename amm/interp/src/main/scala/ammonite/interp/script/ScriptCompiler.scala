@@ -25,6 +25,8 @@ final class ScriptCompiler(
 
   import ScriptProcessor.SeqOps
 
+  def scalaVersion = compilerBuilder.scalaVersion
+
   /** Compiles a script, along with its dependencies */
   def compile(
     module: Script,
