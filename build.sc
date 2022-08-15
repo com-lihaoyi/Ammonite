@@ -104,7 +104,12 @@ object Deps {
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
-  val scalaXml = ivy"org.scala-lang.modules::scala-xml:2.0.1"
+  def scalaXml(sv: String) = {
+    val ver =
+      if (sv.startsWith("2.12.")) "1.3.0"
+      else "2.0.1"
+    ivy"org.scala-lang.modules::scala-xml:$ver"
+  }
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.27"
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
@@ -385,7 +390,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
           Agg(
             Deps.scalaCompiler(scalaVersion()),
             Deps.scalaparse,
-            Deps.scalaXml,
+            Deps.scalaXml(scalaVersion())
           )
         else
           Agg[Dep](
@@ -442,8 +447,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       Deps.bsp4j,
       withDottyCompat(Deps.fastparse, scalaVersion()),
       withDottyCompat(Deps.trees, scalaVersion()),
-      Deps.scalaReflect(scalaVersion()),
-      Deps.scalaXml
+      Deps.scalaReflect(scalaVersion())
     )
   }
 
@@ -489,7 +493,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       Deps.jlineTerminal,
       Deps.jlineJna,
-      Deps.jlineReader
+      Deps.jlineReader,
+      Deps.scalaXml(scalaVersion())
     )
 
     object test extends Tests with AmmDependenciesResourceFileModule with PatchScala3Library {
