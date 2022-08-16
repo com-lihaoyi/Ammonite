@@ -157,7 +157,11 @@ class Preprocessor(
       cond.lift(tree).map{ name =>
         val printer =
           if (isPrivate(tree)) Nil
-          else Seq(definedStr(definitionLabel, Name.backtickWrap(name.decode.toString)))
+          else
+            val definedName =
+              if name.isEmpty then ""
+              else Name.backtickWrap(name.decode.toString)
+            Seq(definedStr(definitionLabel, definedName))
         Expanded(
           code,
           printer
@@ -179,6 +183,10 @@ class Preprocessor(
       desugar.inventGivenOrExtensionName(m.tpt)
     case m: untpd.DefDef =>
       m.name
+  }
+
+  private val ExtDef = DefProc("extension methods") {
+    case ext: untpd.ExtMethods => Names.EmptyTermName
   }
   private val TypeDef = DefProc("type"){ case m: untpd.TypeDef => m.name }
 
@@ -254,7 +262,7 @@ class Preprocessor(
   }
 
   private val decls = Seq[(String, String, untpd.Tree) => Option[Expanded]](
-    ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, VarDef, PatDef, Import, Expr
+    ObjectDef, ClassDef, TraitDef, DefDef, ExtDef, TypeDef, VarDef, PatDef, Import, Expr
   )
 
   private def complete(
