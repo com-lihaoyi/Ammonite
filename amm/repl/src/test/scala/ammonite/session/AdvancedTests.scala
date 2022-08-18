@@ -621,5 +621,29 @@ object AdvancedTests extends TestSuite{
           fooOrd: Ordering[Foo] = <given>
         """)
     }
+    test("extension-methods"){
+      if (scala2) "N/A"
+      else
+        check.session("""
+          @ extension (x: Int) def incr = x + 1
+          defined extension methods
+
+          @ 1.incr
+          res1: Int = 2
+
+          @ {
+          @ extension (x: String)
+          @   def ident = x
+          @   def concat(other: String) = x ++ other
+          @ }
+          defined extension methods
+
+          @ "test".ident
+          res3: String = "test"
+
+          @ "test".concat("test")
+          res4: String = "testtest"
+        """)
+    }
   }
 }
