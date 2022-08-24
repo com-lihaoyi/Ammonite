@@ -221,7 +221,7 @@ object browse{
             width: Integer = null,
             height: Integer = 9999999,
             indent: Integer = null)
-           (implicit pp: pprint.PPrinter,
+           (implicit pp: pprint.PPrinter = pprint.PPrinter.Color.copy(defaultHeight = Int.MaxValue),
             wd: os.Path = os.pwd) = {
 
     os.proc(
