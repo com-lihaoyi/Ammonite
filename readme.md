@@ -100,14 +100,14 @@ Although most features should be unit tested, it's still useful to fire up a REP
 
 ### Automated Testing
 
-While working on an arbitrary `xyz` subproject, `mill -w xyz.test` runs tests after every change.  
-`amm/test` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `amm/test-only -- ammonite.TestObject.path.to.test`.
+While working on an arbitrary `xyz` subproject, `mill -w xyz.test` runs tests after every change.
+`./mill 'amm[2.13.8].test'` can be a bit slow because of the amount of code it compiles, so you may want to specify the test manually via `./mill 'amm[2.13.8].test path.to.test'`.
 
-- `ops/test` tests the filesystem operations, without any REPL present
-- `amm/test` tests the Ammonite-REPL/Script-runner, without filesystem-shell integration.
-- `terminal/test` tests the readline re-implementation: keyboard navigation, shortcuts, editing, without any filesystem/scala-repl logic
-- `shell/test` tests the integration between the standalone `ops/` and `amm/` projects: features like `cd!`/`wd`, path-completion, ops-related pretty-printing and tools
-- `integration/test` kicks off the integration tests, which bundle `amm/` and `shell/` into their respective jars and invoke them as subprocesses. Somewhat slow, but exercises all the command-line-parsing stuff that the other unit tests do not exercise, and makes sure that everything works when run from `.jar`s instead of loose class-files
+- `./mill -i 'amm[2.13.8].test'` tests the Ammonite Script-runner, without filesystem-shell integration.
+- `./mill -i 'amm.repl[2.13.8].test'` tests the Ammonite-REPL.
+- `./mill -i 'terminal[2.13.8].test'` tests the readline re-implementation: keyboard navigation, shortcuts, editing, without any filesystem/scala-repl logic
+- `./mill -i 'integration[2.13.8].test'` kicks off the integration tests, which bundle `amm/` and `shell/` into their respective jars and invoke them as subprocesses. Somewhat slow, but exercises all the command-line-parsing stuff that the other unit tests do not exercise, and makes sure that everything works when run from `.jar`s instead of loose class-files
+- `./mill -i 'sshd[2.13.8].test'` tests the remote Ammonite-REPL over sshd.
 
 ### Publishing
 
