@@ -12,6 +12,10 @@ import scala.language.experimental.macros
 
 object SourceRuntime{
 
+  def defaultPPrinter = pprint.PPrinter.Color.copy(defaultHeight = Int.MaxValue)
+
+  def browseSourceCommand(targetLine: Int) = Seq("less", "+" + targetLine,"-RMN")
+
   /**
     * Pull the height from the pretty-printer as a heuristic to shift the
     * desired line towards the middle of the screen. Typically, the
