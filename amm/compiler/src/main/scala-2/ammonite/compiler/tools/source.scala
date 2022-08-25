@@ -40,29 +40,49 @@ object source{
   }
 
   def apply(f: => Any)
-           (implicit pprinter: pprint.PPrinter,
-            colors: CodeColors): Unit = macro applyMacro
+           (implicit colors: CodeColors): Unit = macro applyDefaultPPrinterMacro
+
+  def apply(f: => Any, pprinter: pprint.PPrinter)
+           (implicit colors: CodeColors): Unit = macro applyMacro
 
   def apply(f: => Any, command: Int => Strings)
-           (implicit pprinter: pprint.PPrinter,
-            colors: CodeColors): Unit = macro applyCustomizeCommandMacro
+            (implicit colors: CodeColors): Unit = macro applyCustomizeCommandDefaultPPrinterMacro
+  def apply(f: => Any, command: Int => Strings, pprinter: pprint.PPrinter)
+            (implicit colors: CodeColors): Unit = macro applyCustomizeCommandMacro
+
+  def applyDefaultPPrinterMacro(c: Context)
+                (f: c.Expr[Any])
+                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+    import c.universe._
+    val defaultPPrinter = c.Expr[pprint.PPrinter](
+      q"${prefix(c)}.defaultPPrinter"
+    )
+    applyMacro(c)(f, defaultPPrinter)(colors)
+  }
 
   def applyMacro(c: Context)
-                (f: c.Expr[Any])
-                (pprinter: c.Expr[pprint.PPrinter],
-                  colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+                (f: c.Expr[Any], pprinter: c.Expr[pprint.PPrinter])
+                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     val defaultBrowseExpr = c.Expr[Int => Strings](
       q"${prefix(c)}.browseSourceCommand"
     )
 
-    applyCustomizeCommandMacro(c)(f, defaultBrowseExpr)(pprinter, colors)
+    applyCustomizeCommandMacro(c)(f, defaultBrowseExpr, pprinter)(colors)
   }
 
-  def applyCustomizeCommandMacro(c: Context)
+  def applyCustomizeCommandDefaultPPrinterMacro(c: Context)
                                 (f: c.Expr[Any], command: c.Expr[Int => Strings])
-                                (pprinter: c.Expr[pprint.PPrinter],
-                  colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+    import c.universe._
+    val defaultPPrinter = c.Expr[pprint.PPrinter](
+      q"${prefix(c)}.defaultPPrinter"
+    )
+    applyCustomizeCommandMacro(c)(f, command, defaultPPrinter)(colors)
+  }
+  def applyCustomizeCommandMacro(c: Context)
+                                (f: c.Expr[Any], command: c.Expr[Int => Strings], pprinter: c.Expr[pprint.PPrinter])
+                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     c.Expr[Unit](
       breakUp(c)(f) match{

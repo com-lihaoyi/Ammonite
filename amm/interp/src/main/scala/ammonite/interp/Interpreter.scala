@@ -733,7 +733,8 @@ object Interpreter{
     ImportData("ammonite.runtime.tools.tail", importType = ImportData.TermType),
     ImportData("ammonite.compiler.tools.{desugar, source}"),
     ImportData("mainargs.{arg, main}"),
-    ImportData("ammonite.repl.tools.Util.PathRead")
+    ImportData("ammonite.repl.tools.Util.PathRead"),
+    ImportData("ammonite.repl.ReplBridge.value.codeColorsImplicit")
   )
 
 
