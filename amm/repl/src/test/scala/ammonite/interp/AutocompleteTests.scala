@@ -279,6 +279,15 @@ object AutocompleteTests extends TestSuite{
           """import $ivy.{<from>`io.get-coursier::coursier-co<caret>`}""",
           Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
         )
+        // Completions when the ivy import has no closing backtick
+        complete(
+          """import $ivy.<from>`io.get-c<caret>""",
+          Set("`io.get-coursier") ^ _
+        )
+        complete(
+          """import $ivy.<from>`io.get-coursier::coursier-co<caret>""",
+          Set("`io.get-coursier::coursier-core") ^ _.filterNot(_.contains("_sjs"))
+        )
         // these rely on versions not around in 2.13
         if (scala.util.Properties.versionNumberString.startsWith("2.12.")) {
           complete(
