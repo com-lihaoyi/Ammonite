@@ -335,7 +335,13 @@ object Pressy {
 
       val signatures = all.collect { case (name, Some(defn)) => defn }.sorted.distinct
 
-      (i - prefix.length, allNames, signatures)
+      val isPartialIvyImport = allNames.isEmpty &&
+        snippet.split("\\s+|`").startsWith(Seq("import", "$ivy.")) &&
+        snippet.count(_ == '`') == 1
+
+      if (isPartialIvyImport) {
+        complete(snippetIndex, previousImports, snippet + "`")
+      } else (i - prefix.length, allNames, signatures)
     }
 
     def shutdownPressy() = {
