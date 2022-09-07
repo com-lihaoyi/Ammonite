@@ -63,7 +63,7 @@ class DottyParser(source: SourceFile)(using Context) extends Parser(source) {
         stats +++= localDef(in.offset)
       else
         empty = true
-      statSepOrEnd(stats, empty, altEnd = Tokens.CASE)
+      statSepOrEnd(stats, noPrevStat = empty, altEnd = Tokens.CASE)
     do ()
     stats.toList
   }

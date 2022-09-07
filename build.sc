@@ -237,8 +237,17 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
         else Nil
       dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
     }
+    val extraDir7 = {
+      val dirNames =
+        if (sv.startsWith("3.")) {
+          if (sv.startsWith("3.0.") || (sv.startsWith("3.1.") && sv != "3.1.3")) Seq("scala-3.0.0-3.1.2")
+          else Seq("scala-3.1.3+")
+        }
+        else Nil
+      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
+    }
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++ extraDir7
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()

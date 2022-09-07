@@ -8,10 +8,10 @@ import dotty.tools.dotc.core.Flags._
 import dotty.tools.dotc.core.Names.{Name, termName}
 import dotty.tools.dotc.core.Symbols.{Symbol, defn}
 import dotty.tools.dotc.core.TypeError
-import dotty.tools.dotc.interactive.Interactive
+import dotty.tools.dotc.interactive.{Completion, Interactive}
 import dotty.tools.dotc.util.SourcePosition
 
-object AmmCompletion {
+object AmmCompletion extends AmmCompletionExtras {
 
   def completions(
     pos: SourcePosition,
@@ -37,6 +37,8 @@ object AmmCompletion {
     val prefix = Completion.completionPrefix(path, pos)
     val completer = new DeepCompleter(mode, prefix, pos)
 
+    val hasBackTick = prefix.headOption.contains('`')
+
     var extra = List.empty[Completion]
 
     val completions = path match {
@@ -46,8 +48,8 @@ object AmmCompletion {
         val complete = dependencyCompleteOpt.get
         val (pos, completions) = complete(prefix)
         val input0 = prefix.take(pos)
-        extra ++= completions.distinct.toList
-          .map(s => Completion(Completion.label(termName(input0 + s)), "", Nil))
+        extra = extra ::: completions.distinct.toList
+          .map(s => maybeBackticked(input0 + s, hasBackTick))
         Map.empty
       case Import(expr, _) :: _                              =>
         completer.directMemberCompletions(expr)
@@ -60,7 +62,7 @@ object AmmCompletion {
         }
     }
 
-    val describedCompletions = extra ++ Completion.describeCompletions(completions)
+    val describedCompletions = extra ++ Completion.describeCompletions(completions).map(backtick)
     val offset = Completion.completionOffset(path)
 
     (pos.span.start - prefix.length, describedCompletions)
