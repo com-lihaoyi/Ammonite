@@ -1,0 +1,10 @@
+[0m[[0m[0minfo[0m] [0m[0mcompiling 8 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/2.13.1/compile.dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/MainRunner.scala:91:19: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: Exit(_)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val success = res match {[0m
+[0m[[0m[33mwarn[0m] [0m[0m                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were three deprecation warnings (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were two deprecation warnings (since Ammonite 2.3.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0mthere were 5 deprecation warnings in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m

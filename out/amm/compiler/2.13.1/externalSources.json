@@ -1,0 +1,24 @@
+{
+    "value": [
+        "qref:4d5284f0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.1/scala-compiler-2.13.1-sources.jar",
+        "qref:908a8b0c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.13/2.3.0/scalaparse_2.13-2.3.0-sources.jar",
+        "qref:b4419fa2:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.0.1/scala-xml_2.13-2.0.1-sources.jar",
+        "qref:44186518:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA-sources.jar",
+        "qref:6b774db5:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/javaparser/javaparser-core/3.2.5/javaparser-core-3.2.5-sources.jar",
+        "qref:3d7fe935:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.1/scala-library-2.13.1-sources.jar",
+        "qref:8cdba3fd:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.8.0/os-lib_2.13-0.8.0-sources.jar",
+        "qref:ffb4ea0c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.6.0/scala-collection-compat_2.13-2.6.0-sources.jar",
+        "qref:48aa1b2c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.3.0/fansi_2.13-0.3.0-sources.jar",
+        "qref:e9ac6db4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.7.1/pprint_2.13-0.7.1-sources.jar",
+        "qref:69ef84ad:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.2.2/mainargs_2.13-0.2.2-sources.jar",
+        "qref:60b1c5f0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.1/scala-reflect-2.13.1-sources.jar",
+        "qref:976392a3:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/0.0.21/interface-0.0.21-sources.jar",
+        "qref:09c388bb:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/jline/jline/2.14.6/jline-2.14.6-sources.jar",
+        "qref:cf2ad0fa:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/fusesource/jansi/jansi/1.12/jansi-1.12-sources.jar",
+        "qref:3b024dca:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/2.3.0/fastparse_2.13-2.3.0-sources.jar",
+        "qref:a5298d6d:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.7.0/geny_2.13-0.7.0-sources.jar",
+        "qref:d169ae30:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.2.7/sourcecode_2.13-0.2.7-sources.jar"
+    ],
+    "valueHash": 715006693,
+    "inputsHash": -1877485121
+}

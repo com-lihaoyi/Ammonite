@@ -1,0 +1,13 @@
+{
+    "value": [
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/resources",
+        "ref:2d02406b:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.8/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/resources",
+        "ref:eab69e71:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/dependencyFileResources.dest/extra-resources",
+        "ref:f74db5bd:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/resources",
+        "ref:9203ec63:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.1/compile.dest/classes"
+    ],
+    "valueHash": -40286476,
+    "inputsHash": 111821708
+}

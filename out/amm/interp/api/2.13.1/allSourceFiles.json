@@ -1,0 +1,12 @@
+{
+    "value": [
+        "ref:0ba0ed04:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/Stubs.scala",
+        "ref:634322d7:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/InterpAPI.scala",
+        "ref:b2302b95:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/APIHolder.scala",
+        "ref:af6db161:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/IvyConstructor.scala",
+        "ref:18d34530:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/AmmoniteExit.scala",
+        "ref:6273d7e1:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/constantsSourceDir.dest/src/Constants.scala"
+    ],
+    "valueHash": 549174714,
+    "inputsHash": -2114252932
+}

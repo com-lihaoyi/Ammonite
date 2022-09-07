@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/resources",
+        "ref:a1cdef94:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/dependencyFileResources.dest/extra-resources",
+        "ref:8d2e564c:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/compile.dest/classes"
+    ],
+    "valueHash": -2085630829,
+    "inputsHash": -1175727803
+}

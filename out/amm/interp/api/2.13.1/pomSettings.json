@@ -1,0 +1,37 @@
+{
+    "value": {
+        "description": "ammonite-interp-api",
+        "organization": "com.lihaoyi",
+        "url": "https://github.com/com-lihaoyi/Ammonite",
+        "licenses": [
+            {
+                "id": "MIT License",
+                "name": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "isOsiApproved": true,
+                "isFsfLibre": true,
+                "distribution": "repo"
+            }
+        ],
+        "versionControl": {
+            "browsableRepository": [
+                "https://github.com/com-lihaoyi/Ammonite"
+            ],
+            "connection": [
+                "scm:git:git://github.com/com-lihaoyi/Ammonite.git"
+            ],
+            "developerConnection": [
+                "scm:git:ssh://git@github.com:com-lihaoyi/Ammonite.git"
+            ]
+        },
+        "developers": [
+            {
+                "id": "lihaoyi",
+                "name": "Li Haoyi",
+                "url": "https://github.com/lihaoyi"
+            }
+        ]
+    },
+    "valueHash": -603603784,
+    "inputsHash": -2021680215
+}

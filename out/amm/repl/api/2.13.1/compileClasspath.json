@@ -1,0 +1,26 @@
+{
+    "value": [
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/resources",
+        "ref:2d02406b:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.8/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/resources",
+        "ref:eab69e71:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/dependencyFileResources.dest/extra-resources",
+        "ref:f74db5bd:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.1/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/resources",
+        "ref:9203ec63:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.1/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/resources",
+        "ref:a1cdef94:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.1/dependencyFileResources.dest/extra-resources",
+        "qref:a4b97f0c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.1/0.3.3/acyclic_2.13.1-0.3.3.jar",
+        "qref:212672a1:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.2.2/mainargs_2.13-0.2.2.jar",
+        "qref:7baead03:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.1/scala-library-2.13.1.jar",
+        "qref:ff439ba8:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.8.0/os-lib_2.13-0.8.0.jar",
+        "qref:1b746150:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.6.0/scala-collection-compat_2.13-2.6.0.jar",
+        "qref:9e7a018d:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.3.0/fansi_2.13-0.3.0.jar",
+        "qref:1efb0f56:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.7.1/pprint_2.13-0.7.1.jar",
+        "qref:07c02703:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.1/scala-reflect-2.13.1.jar",
+        "qref:bda9c00f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/0.0.21/interface-0.0.21.jar",
+        "qref:1ddd2ca7:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/0.7.0/geny_2.13-0.7.0.jar",
+        "qref:7eb5f9d8:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.2.7/sourcecode_2.13-0.2.7.jar"
+    ],
+    "valueHash": -458957492,
+    "inputsHash": 1030312713
+}

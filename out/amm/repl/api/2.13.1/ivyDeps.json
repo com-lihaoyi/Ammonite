@@ -1,0 +1,48 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "com.lihaoyi"
+                    },
+                    "name": {
+                        "value": "mainargs"
+                    },
+                    "attributes": {
+                        
+                    }
+                },
+                "version": "0.2.2",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "exclusions": [
+                    
+                ],
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Constant",
+                "value": "_2.13",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": 1787113752,
+    "inputsHash": 1392092190
+}

@@ -1,0 +1,11 @@
+com.lihaoyi:acyclic_2.13.1:0.3.3
+com.lihaoyi:fansi_2.13:0.3.0
+com.lihaoyi:geny_2.13:0.7.0
+com.lihaoyi:mainargs_2.13:0.2.2
+com.lihaoyi:os-lib_2.13:0.8.0
+com.lihaoyi:pprint_2.13:0.7.1
+com.lihaoyi:sourcecode_2.13:0.2.7
+io.get-coursier:interface:0.0.21
+org.scala-lang:scala-library:2.13.1
+org.scala-lang:scala-reflect:2.13.1
+org.scala-lang.modules:scala-collection-compat_2.13:2.6.0

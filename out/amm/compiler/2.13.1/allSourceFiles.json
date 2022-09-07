@@ -1,0 +1,28 @@
+{
+    "value": [
+        "ref:770c0e0d:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala/ammonite/compiler/CompilerUtil.scala",
+        "ref:f7dc1389:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala/ammonite/compiler/DefaultCodeWrapper.scala",
+        "ref:17fb808a:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala/ammonite/compiler/CodeClassWrapper.scala",
+        "ref:f541459b:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.13/ammonite/compiler/CompilerCompatibility.scala",
+        "ref:d95fd6fa:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Parsers.scala",
+        "ref:205b5d29:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/internal/CustomURLZipArchive.scala",
+        "ref:d975d36b:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/CompilerExtensions.scala",
+        "ref:75d3c294:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Highlighter.scala",
+        "ref:dbdfbd92:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/AmmonitePlugin.scala",
+        "ref:67624183:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Compiler.scala",
+        "ref:d8da8e80:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/desugar.scala",
+        "ref:350b6524:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/HighlightJava.scala",
+        "ref:c15823c6:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/SourceRuntime.scala",
+        "ref:4d94f163:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/source.scala",
+        "ref:e5f9db7e:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/CompilerBuilder.scala",
+        "ref:db997b6e:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Pressy.scala",
+        "ref:ace906a6:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/DefaultPreprocessor.scala",
+        "ref:07c97267:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/CompilerLifecycleManager.scala",
+        "ref:3d5b3126:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/scala/tools/nsc/CustomZipAndJarFileLookupFactory.scala",
+        "ref:a7e88d3c:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.12.10-2.13.1+/scala/tools/nsc/WhiteListClasspath.scala",
+        "ref:e6c1d4cd:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.12.10-2.13.1+/scala/tools/nsc/AmmClassPath.scala",
+        "ref:a830c54e:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.13.1+/ammonite/compiler/MakeReporter.scala"
+    ],
+    "valueHash": 599583306,
+    "inputsHash": 1034408918
+}
