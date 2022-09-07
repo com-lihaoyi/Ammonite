@@ -217,7 +217,7 @@ class Compiler(
         val out = vf.output
         out.write(src)
         out.close()
-        new SourceFile(vf, scala.io.Codec.UTF8)
+        new SourceFile(vf, new String(src, "UTF-8").toCharArray)
       }
 
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
