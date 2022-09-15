@@ -34,8 +34,9 @@ val commitsSinceTaggedVersion = {
 // Beware that this requires both versions to have the same tasty format
 // version. For example, 2.13.4 and 3.0.0-M1 do, while 2.13.4 and 3.0.0-M{2,3}
 // don't.
-val cross2_3Version = "2.13.7"
-
+val cross2_3Version = (scala3Ver: String) =>
+  if (scala3Ver == "3.2.0") "2.13.9"
+  else "2.13.7"
 
 // Same as https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/Dep.scala/#L55,
 // except we also fix the suffix when scalaVersion is like 2.13.x,
@@ -52,9 +53,10 @@ val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12",
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9")
 val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
 val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2", "3.1.3")
-val scala3Versions = scala30Versions ++ scala31Versions
+val scala32Versions = Seq("3.2.0")
+val scala3Versions = scala30Versions ++ scala31Versions ++ scala32Versions
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala30Versions.last, scala31Versions.last)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala30Versions.last, scala31Versions.last, scala32Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
@@ -173,7 +175,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
       if (isScala2()) Seq("-P:acyclic:force")
       else Nil
     val tastyReaderOptions =
-      if (scalaVersion() == cross2_3Version) Seq("-Ytasty-reader")
+      if (scalaVersion() == cross2_3Version(crossScalaVersion)) Seq("-Ytasty-reader")
       else Nil
     acyclicOptions ++ tastyReaderOptions
   }
@@ -246,15 +248,24 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
         else Nil
       dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
     }
+    val extraDir8 = {
+      val dirNames =
+        if (sv.startsWith("3.")) {
+          if (sv.startsWith("3.0.") || sv.startsWith("3.1.")) Seq("scala-3.0-3.1")
+          else Seq("scala-3.2+")
+        }
+        else Nil
+      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
+    }
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++ extraDir7
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++ extraDir7 ++ extraDir8
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
   }
   def supports3: Boolean = false
   def scalaVersion = T{
-    if (scala3Versions.contains(crossScalaVersion) && !supports3) cross2_3Version
+    if (scala3Versions.contains(crossScalaVersion) && !supports3) cross2_3Version(crossScalaVersion)
     else crossScalaVersion
   }
   def repositories = super.repositories ++ Seq(

@@ -12,7 +12,7 @@ import dotc.util.SourceFile
 
 import scala.collection.mutable
 
-class DottyParser(source: SourceFile)(using Context) extends Parser(source) {
+class DottyParser(source: SourceFile)(using Context) extends Parser(source) with CompatibilityParser {
 
   // From
   // https://github.com/lampepfl/dotty/blob/3.0.0-M3/
@@ -40,15 +40,15 @@ class DottyParser(source: SourceFile)(using Context) extends Parser(source) {
   }
 
   // Adapted from
-  // https://github.com/lampepfl/dotty/blob/3.0.1/
-  //   compiler/src/dotty/tools/dotc/parsing/Parsers.scala/#L3882-L3904
+  // https://github.com/lampepfl/dotty/blob/3.2.0/
+  //   compiler/src/dotty/tools/dotc/parsing/Parsers.scala#L4075-L4094
   // Unlike it, we accept private modifiers for top-level definitions.
   override def blockStatSeq(): List[untpd.Tree] = checkNoEscapingPlaceholders {
     val stats = new mutable.ListBuffer[untpd.Tree]
     while
       var empty = false
       if (in.token == Tokens.IMPORT)
-        stats ++= importClause(Tokens.IMPORT, mkImport())
+        stats ++= compatibilityImportClause()
       else if (isExprIntro)
         stats += expr(Location.InBlock)
       else if in.token == Tokens.IMPLICIT && !in.inModifierPosition() then
