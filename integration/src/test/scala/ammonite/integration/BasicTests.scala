@@ -142,7 +142,7 @@ object BasicTests extends TestSuite{
             |
             |assert(snip.contains("public String substring(int beginIndex)"))
           """.stripMargin
-        ).call()
+        ).call(stdin = os.Inherit, stdout = os.Inherit)
       }
     }
 
@@ -229,7 +229,9 @@ object BasicTests extends TestSuite{
               "FIRST_RUN" -> s"$firstRun",
               "VERSION" -> version
             ),
-            cwd = buildRoot
+            cwd = buildRoot,
+            stdin = os.Inherit,
+            stdout = os.Inherit
           )
 
           // 3. use published artifact in a script

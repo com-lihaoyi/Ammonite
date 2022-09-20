@@ -86,8 +86,9 @@ object ParserTests extends TestSuite{
           // I hope that one not passing doesn't have unintended consequences…
           // Once we can use coursier/interface#256 here, use it to compare versions
           // if (coursierapi.Version.compare("3.1.3", sv) <= 0)
-          if (sv == "3.1.3") "Disabled"
-          else assertComplete("va va") // postfix
+          if (sv.startsWith("2.") || sv.startsWith("3.0.") || (sv.startsWith("3.1.") && sv != "3.1.3"))
+            assertComplete("va va") // postfix
+          else "Disabled"
         }
         test - assertComplete("")
         test - assertComplete("""

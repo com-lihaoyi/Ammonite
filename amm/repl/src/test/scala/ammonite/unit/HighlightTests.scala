@@ -1,5 +1,6 @@
 package ammonite.unit
 
+import ammonite.compiler.CompilerBuilder.scalaVersion
 import ammonite.compiler.Parsers
 import utest._
 
@@ -25,7 +26,8 @@ object HighlightTests extends TestSuite{
         .replace(fansi.Color.Reset.escape, ">")
     assert(highlighted == expected)
   }
-  val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
+  val isScala2 = scalaVersion.startsWith("2.")
+  val isScala3_01 = scalaVersion.startsWith("3.0.") || scalaVersion.startsWith("3.1.")
   val tests = Tests {
     println("HighlightTests")
     test("highlighting"){
@@ -84,8 +86,9 @@ object HighlightTests extends TestSuite{
           if (isScala2) "<Y|_>"
           else "_"
         val underscore0 =
-          if (isScala2) "<Y|_>"
-          else "_"
+          if (isScala2) "<Y|_>*"
+          else if (isScala3_01) "_*"
+          else "_<G|*>"
         def stringColl(collType: String) =
           if (isScala2) s"<G|$collType>[<G|String>]"
           else s"<G|$collType[String]>"
@@ -113,7 +116,7 @@ object HighlightTests extends TestSuite{
         s"""<Y|def> processLine(stmts: ${stringColl("Seq")},
                             saveHistory: (<G|String> => <G|Unit>, <G|String>) => <G|Unit>,
                             printer: ${stringColl("Iterator")} => <G|Unit>) = <Y|for>{
-              $underscore <- Catching { <Y|case> Ex(x@$underscore0*) =>
+              $underscore <- Catching { <Y|case> Ex(x@$underscore0) =>
                 <Y|val> Res.Failure(trace) = Res.Failure(x)
                 Res.Failure(trace + <G|"\\nSomething unexpected went wrong =(">)
               }
