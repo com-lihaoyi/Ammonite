@@ -1,0 +1,11 @@
+{
+    "value": {
+        "main": {
+            "Manifest-Version": "1.0",
+            "Created-By": "Mill 0.10.7",
+            "Tool": "Mill-0.10.7"
+        }
+    },
+    "valueHash": -371127703,
+    "inputsHash": 1255603182
+}

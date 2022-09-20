@@ -1,0 +1,12 @@
+[0m[[0m[0minfo[0m] [0m[0mcompiling 10 Scala sources and 2 Java sources to /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.9/compile.dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:32:35: abstract type pattern T is unchecked since it is eliminated by erasure[0m
+[0m[[0m[33mwarn[0m] [0m[0m      case (Res.Success(prev), x: T) => f(prev, x)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                  ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala:30:47: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following input: (Success(_), _)[0m
+[0m[[0m[33mwarn[0m] [0m[0m    inputs.foldLeft[Res[V]](Res.Success(init)){[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                              ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m5 deprecations (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m2 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m

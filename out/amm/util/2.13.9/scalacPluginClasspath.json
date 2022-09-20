@@ -1,0 +1,8 @@
+{
+    "value": [
+        "qref:2d673080:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.9/0.3.5/acyclic_2.13.9-0.3.5.jar",
+        "qref:fad6afbb:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.9/scala-library-2.13.9.jar"
+    ],
+    "valueHash": 675143739,
+    "inputsHash": -906369395
+}
