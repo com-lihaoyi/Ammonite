@@ -13,11 +13,6 @@ This is where the code for the [Ammonite](https://ammonite.io)
 project lives:
 
 - [Ammonite-REPL](https://ammonite.io), the improved Scala REPL
-- [Ammonite-Ops](https://ammonite.io/#Ammonite-Ops), the Scala 
-  file-system library
-- [Ammonite-Shell](https://ammonite.io/#Ammonite-Shell), the 
-  Bash-replacement system shell
-
 
 If you use Ammonite and like it, you will probably enjoy the following book by the Author:
 
@@ -50,9 +45,7 @@ If you use Ammonite and like it, please support us by donating to our Patreon:
 
 The layout of the repository is roughly:
 
-- `ops/` is [Ammonite-Ops](https://ammonite.io/#Ammonite-Ops)
 - `amm/` is [Ammonite](https://ammonite.io)'s core, REPL and script runner
-- `shell/` is [Ammonite-Shell](https://ammonite.io/#Ammonite-Shell)
 - `terminal/` is the JLine re-implementation used by Ammonite-REPL to provide 
   syntax highlighting and multiline editing
 - `readme/` is the source code for the [Documentation](https://ammonite.io/#Ammonite-Ops), 
