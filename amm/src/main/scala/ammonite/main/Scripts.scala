@@ -17,12 +17,7 @@ object Scripts {
                 scriptArgs: Seq[String] = Nil) = {
     interp.watch(path)
     val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
-
-
-    val genRoutesCode =
-      // Entrypoints are not supported in Scala 3 for now (its macros are Scala 2-only)
-      if (interp.compilerBuilder.scalaVersion.startsWith("3.")) "null"
-      else "mainargs.ParserForMethods[$routesOuter.type]($routesOuter)"
+    val genRoutesCode = "mainargs.ParserForMethods[$routesOuter.type]($routesOuter)"
 
     for{
       scriptTxt <- try Res.Success(Util.normalizeNewlines(os.read(path))) catch{

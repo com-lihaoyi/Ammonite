@@ -96,7 +96,7 @@ object Deps {
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.54"
-  val mainargs = ivy"com.lihaoyi::mainargs:0.2.2"
+  val mainargs = ivy"com.lihaoyi::mainargs:0.3.0"
   val osLib = ivy"com.lihaoyi::os-lib:0.8.0"
   val pprint = ivy"com.lihaoyi::pprint:0.7.3"
   val requests = ivy"com.lihaoyi::requests:0.7.0"
@@ -180,9 +180,17 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
     acyclicOptions ++ tastyReaderOptions
   }
   def compileIvyDeps = T {
-    if (isScala2()) Agg(Deps.acyclic)
-    else Agg[Dep]()
+    Agg(Deps.mainargs) ++ (
+      if (isScala2()) Agg(Deps.acyclic)
+      else Agg[Dep]()
+    )
   }
+  def runIvyDeps =
+    if (scala3Versions.contains(crossScalaVersion))
+      Agg(ivy"com.lihaoyi:mainargs_3:${Deps.mainargs.dep.version}")
+    else
+      Agg(Deps.mainargs)
+
   def scalacPluginIvyDeps = T {
     if (isScala2()) Agg(Deps.acyclic)
     else Agg[Dep]()
@@ -378,8 +386,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.upickle,
-      Deps.requests,
-      withDottyCompat(Deps.mainargs, scalaVersion())
+      Deps.requests
     )
   }
 
@@ -485,9 +492,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(amm.util(), interp.api())
-      def ivyDeps = Agg(
-        withDottyCompat(Deps.mainargs, scalaVersion())
-      )
+      def compileIvyDeps = Agg(Deps.mainargs)
 
       def generatedSources = T{
         Seq(PathRef(generateConstantsFile(buildVersion, bspVersion = bspVersion)))
@@ -561,6 +566,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def mainClass = Some("ammonite.AmmoniteMain")
     def moduleDeps = Seq(amm())
   }
+
+  def compileIvyDeps = Agg(
+    Deps.mainargs
+  )
 }
 
 trait PatchScala3Library extends JavaModule {
