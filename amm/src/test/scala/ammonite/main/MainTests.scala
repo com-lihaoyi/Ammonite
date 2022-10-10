@@ -9,7 +9,7 @@ import utest._
   * Tests around Ammonite's CLI handling of main methods, argument parsing,
   * and the associated error behavior if the caller messes up.
  */
-class MainTests extends TestSuite{
+object MainTests extends TestSuite{
   def exec(p: String, args: String*) =
     new InProcessMainMethodRunner(InProcessMainMethodRunner.base / 'mains / p, Nil, args)
 
@@ -289,8 +289,4 @@ class MainTests extends TestSuite{
       }
     }
   }
-}
-
-object MainTests extends MainTests {
-  super.tests
 }
