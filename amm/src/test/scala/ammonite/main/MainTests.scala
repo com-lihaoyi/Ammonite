@@ -292,11 +292,5 @@ class MainTests extends TestSuite{
 }
 
 object MainTests extends MainTests {
-  val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
-  override def tests =
-    if (isScala2) super.tests
-    else
-      Tests {
-        test("Disabled in Scala 3") - "Disabled in Scala 3"
-      }
+  super.tests
 }
