@@ -185,6 +185,9 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
       else Agg[Dep]()
     )
   }
+
+  // We compile with mainargs_2.13, but for the Scala 3 target we actually ship mainargs_3,
+  // because it contains Scala 3 macros which are required at runtime to find the main class entrypoint. 
   def runIvyDeps =
     if (scala3Versions.contains(crossScalaVersion))
       Agg(ivy"com.lihaoyi:mainargs_3:${Deps.mainargs.dep.version}")
