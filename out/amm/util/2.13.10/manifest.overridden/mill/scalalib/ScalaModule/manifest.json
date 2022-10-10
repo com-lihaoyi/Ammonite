@@ -1,0 +1,12 @@
+{
+    "value": {
+        "main": {
+            "Manifest-Version": "1.0",
+            "Created-By": "Mill 0.10.7",
+            "Tool": "Mill-0.10.7",
+            "Scala-Version": "2.13.10"
+        }
+    },
+    "valueHash": 172116266,
+    "inputsHash": 156223745
+}
