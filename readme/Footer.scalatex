@@ -127,6 +127,16 @@
 
 
   @sect{Changelog}
+    @sect{2.5.5}
+      @ul
+        @li
+          Improved Scala 3 support
+        @li
+          Fixed line numbers in stack traces in Scala 3
+        @li
+          Added more supported Scala version: 2.12.16, 2.12.17, 2.13.9, 2.13.10, 3.1.3, 3.2.0
+        @li
+          Various dependency version bumps
     @sect{2.5.4}
       @ul
         @li
