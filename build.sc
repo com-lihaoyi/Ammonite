@@ -689,6 +689,12 @@ class MainModule(val crossScalaVersion: String)
       Deps.scalaJava8Compat
     )
 
+    def runIvyDeps =
+      if (scala3Versions.contains(crossScalaVersion))
+        Agg(ivy"com.lihaoyi:mainargs_3:${Deps.mainargs.dep.version}")
+      else
+        Agg(Deps.mainargs)
+
 
     def thinWhitelist = T{
       generateApiWhitelist(
@@ -715,7 +721,6 @@ class MainModule(val crossScalaVersion: String)
       amm.repl().sources() ++
       sources() ++
       externalSources()
-
   }
 }
 
