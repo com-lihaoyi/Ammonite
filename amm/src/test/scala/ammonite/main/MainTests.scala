@@ -97,9 +97,15 @@ object MainTests extends TestSuite{
           )
           assert(out.contains(expected.trim))
         }
+
         test("emptyArg"){
-          val evaled = exec("ArgList.sc", "")
-          assert(evaled.success)
+          val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
+          if (isScala2) {
+            val evaled = exec("ArgList.sc", "")
+            assert(evaled.success)
+          } else {
+            "Disabled in Scala 3"
+          }
         }
       }
     }
