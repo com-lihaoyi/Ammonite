@@ -553,7 +553,15 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
         withDottyCompat(Deps.scalazCore, scalaVersion())
       )
-    }
+
+      // We compile with mainargs_2.13, but for the Scala 3 target we actually ship mainargs_3,
+      // because it contains Scala 3 macros which are required at runtime to find the main class entrypoint. 
+      def runIvyDeps =
+        if (scala3Versions.contains(crossScalaVersion))
+          Agg(ivy"com.lihaoyi:mainargs_3:${Deps.mainargs.dep.version}")
+        else
+          Agg(Deps.mainargs)
+        }
   }
 
   // When built with crossScalaVersion == 3.x, amm itself is still compiled with
