@@ -186,12 +186,13 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
     acyclicOptions ++ tastyReaderOptions
   }
   // In Scala 3 we want to use the Scala 2.13 deps at compile time
+  // (only in modules where supports3 == false, which are compiled using Scala 2.13)
   // but the Scala 3 libs at runtime. So we override the tasks used
-  // to fetch the dependencies used to compile to force the 2.13 libs
+  // to fetch the dependencies used during compilation to force the 2.13 libs
   def myResolvedIvyDeps: T[Agg[PathRef]] = T {
     resolveDeps(T.task {
       (transitiveCompileIvyDeps() ++ transitiveIvyDeps()).map { dep =>
-        if (isScala3(crossScalaVersion) && use_3Libs.contains(dep.dep.module.name.value)) {
+        if (isScala3(crossScalaVersion) && !supports3 && use_3Libs.contains(dep.dep.module.name.value)) {
           dep.copy(
           dep = dep.dep.withModule(
             dep.dep.module
