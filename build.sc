@@ -115,19 +115,22 @@ object Deps {
     // with the Scala 2.13 artifact, while using the Scala 3 artifact in
     // the pom and at runtime. Please add here any Scala library using macros
     // and add it to `ivyDeps` wrapping it with `Deps.use_3`
-    private val deps = Seq(
-      ivy"com.lihaoyi::mainargs:0.3.0",
-      ivy"com.lihaoyi::fansi:0.4.0",
-      ivy"com.lihaoyi::pprint:0.7.3",
-      ivy"com.lihaoyi::sourcecode:0.2.7"
-    )
+    private def deps(crossScalaVersion: String) = {
+      val fansiVersion = if (crossScalaVersion.startsWith("3.0.")) "0.3.1" else "0.4.0"
+      Seq(
+        ivy"com.lihaoyi::mainargs:0.3.0",
+        ivy"com.lihaoyi::fansi:$fansiVersion",
+        ivy"com.lihaoyi::pprint:0.7.3",
+        ivy"com.lihaoyi::sourcecode:0.2.7"
+      )
+    }
 
-    val depsNames = deps.map(_.dep.module.name.value)
+    val depsNames = deps(scala2_13Versions.last).map(_.dep.module.name.value)
 
     // Since we compile using Scala 2.13, Scala 2.13 libraries are used
     // by default. This forces Scala 3 libraries to use the `_3` suffix
     def apply(name: String, crossScalaVersion: String): Dep = {
-      val dep = deps.find(_.dep.module.name.value == name).get
+      val dep = deps(crossScalaVersion).find(_.dep.module.name.value == name).get
       dep.cross match {
         case cross: CrossVersion.Binary if isScala3(crossScalaVersion) =>
           dep.copy(cross = CrossVersion.Constant(value = "_3", platformed = dep.cross.platformed))
