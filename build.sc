@@ -94,7 +94,7 @@ object Deps {
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val coursierInterface = ivy"io.get-coursier:interface:0.0.21"
-  val fansi = ivy"com.lihaoyi::fansi:0.3.0"
+  val fansi = ivy"com.lihaoyi::fansi:0.4.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
