@@ -200,32 +200,28 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
   // (only in modules where supports3 == false, which are compiled using Scala 2.13)
   // but the Scala 3 libs at runtime. So we override the tasks used
   // to fetch the dependencies used during compilation to force the 2.13 libs
-  def myResolvedIvyDeps: T[Agg[PathRef]] = T {
+  def resolvedCompilationIvyDeps: T[Agg[PathRef]] = T {
     resolveDeps(T.task {
       (transitiveCompileIvyDeps() ++ transitiveIvyDeps()).map { dep =>
         if (isScala3(crossScalaVersion) && !supports3 && Deps.use_3.depsNames.contains(dep.dep.module.name.value)) {
           dep.copy(
-          dep = dep.dep.withModule(
-            dep.dep.module
-              .withName(coursier.ModuleName(dep.dep.module.name.value.stripSuffix("_3") + "_2.13"))
-          ),
-          cross = CrossVersion.Constant("", true))
+            dep = dep.dep.withModule(
+              dep.dep.module
+                .withName(coursier.ModuleName(dep.dep.module.name.value.stripSuffix("_3") + "_2.13"))
+            ),
+            cross = CrossVersion.Constant("", true))
         } else dep
       }
     })()
   }
-  // copy pasted from ScalaModule#compileClasspath but with `myResolvedIvyDeps` instead
+  // copy pasted from ScalaModule#compileClasspath but with `resolvedCompilationIvyDeps` instead
   // of `resolvedIvyDeps`
   override def compileClasspath: T[Agg[PathRef]] = T {
     transitiveLocalClasspath() ++
       resources() ++
       unmanagedClasspath() ++
-      myResolvedIvyDeps()
+      resolvedCompilationIvyDeps()
   }
-  override def ivyDeps = super.ivyDeps() ++ (
-    if(crossScalaVersion.startsWith("3.")) Agg()
-    else Agg.empty[Dep]
-  )
   def compileIvyDeps = T {
     if (isScala2()) Agg(Deps.acyclic)
     else Agg[Dep]()
@@ -492,7 +488,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), amm.runtime(), amm.compiler.interface())
     def crossFullScalaVersion = true
-    import scala.util.chaining._
     def ivyDeps = Agg(
       Deps.bsp4j,
       Deps.scalaReflect(scalaVersion())
