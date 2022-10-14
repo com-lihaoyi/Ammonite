@@ -104,40 +104,44 @@ object Deps {
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
-  val sourcecode = ivy"com.lihaoyi::sourcecode:0.2.7"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
   val upickle = ivy"com.lihaoyi::upickle:2.0.0"
   val utest = ivy"com.lihaoyi::utest:0.7.10"
 
-  object use_3 {
-    // These are the libs that use the trick on Scala 3 of compiling
-    // with the Scala 2.13 artifact, while using the Scala 3 artifact in
-    // the pom and at runtime. Please add here any Scala library using macros
-    // and add it to `ivyDeps` wrapping it with `Deps.use_3`
-    private def deps(crossScalaVersion: String) = {
-      val fansiVersion = if (crossScalaVersion.startsWith("3.0.")) "0.3.1" else "0.4.0"
-      Seq(
-        ivy"com.lihaoyi::mainargs:0.3.0",
-        ivy"com.lihaoyi::fansi:$fansiVersion",
-        ivy"com.lihaoyi::pprint:0.7.3",
-        ivy"com.lihaoyi::sourcecode:0.2.7"
-      )
-    }
-
-    val depsNames = deps(scala2_13Versions.last).map(_.dep.module.name.value)
-
-    // Since we compile using Scala 2.13, Scala 2.13 libraries are used
+  /** A dependency containing Scala 2 macros which we apply at compile-time, even when targetting Scala 3. */
+  trait Use3Dep {
+    /** The dependency. */
+    def dep(scalaVersion: String): Dep
+    /** Use this to enforce the use of the Scala 3 version, even when we compiled with the Scala 2 version. */
+    // Since we compile using Scala 2.13 (because of the macros), Scala 2.13 libraries are used
     // by default. This forces Scala 3 libraries to use the `_3` suffix
-    def apply(name: String, crossScalaVersion: String): Dep = {
-      val dep = deps(crossScalaVersion).find(_.dep.module.name.value == name).get
-      dep.cross match {
-        case cross: CrossVersion.Binary if isScala3(crossScalaVersion) =>
-          dep.copy(cross = CrossVersion.Constant(value = "_3", platformed = dep.cross.platformed))
-        case _ => dep
+    def use_3(scalaVersion: String): Dep = {
+      val d = dep(scalaVersion)
+      d.cross match {
+        case cross: CrossVersion.Binary if isScala3(scalaVersion) =>
+          d.copy(cross = CrossVersion.Constant(value = "_3", platformed = d.cross.platformed))
+        case _ => d
       }
     }
   }
+  object mainargs extends Use3Dep {
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::mainargs:0.3.0"
+  }
+  object fansi extends Use3Dep {
+    override def dep(scalaVersion: String) = {
+      val fansiVersion = if (scalaVersion.startsWith("3.0.")) "0.3.1" else "0.4.0"
+      ivy"com.lihaoyi::fansi:$fansiVersion"
+    }
+  }
+  object pprint extends Use3Dep {
+    override def dep(scalaVersion: String) =  ivy"com.lihaoyi::pprint:0.7.3"
+  }
+  object sourcecode extends Use3Dep {
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
+  }
+
+  val use_3_deps = Seq(mainargs, fansi, pprint, sourcecode)
 }
 
 // Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
@@ -202,8 +206,9 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
   // to fetch the dependencies used during compilation to force the 2.13 libs
   def resolvedCompilationIvyDeps: T[Agg[PathRef]] = T {
     resolveDeps(T.task {
+      val depNames = Deps.use_3_deps.map(_.dep(scala2_13Versions.last)).map(_.dep.module.name.value)
       (transitiveCompileIvyDeps() ++ transitiveIvyDeps()).map { dep =>
-        if (isScala3(crossScalaVersion) && !supports3 && Deps.use_3.depsNames.contains(dep.dep.module.name.value)) {
+        if (isScala3(crossScalaVersion) && !supports3 && depNames.contains(dep.dep.module.name.value)) {
           dep.copy(
             dep = dep.dep.withModule(
               dep.dep.module
@@ -368,15 +373,15 @@ object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = T{
     super.ivyDeps() ++ Agg(
-      Deps.use_3("fansi", crossScalaVersion),
-      Deps.use_3("sourcecode", crossScalaVersion)
+      Deps.fansi.use_3(crossScalaVersion),
+      Deps.sourcecode.use_3(crossScalaVersion)
     )
   }
   def compileIvyDeps = Agg(
     Deps.scalaReflect(scalaVersion())
   )
   object test extends Tests{
-    def ivyDeps = super.ivyDeps() ++ Agg(Deps.sourcecode)
+    def ivyDeps = super.ivyDeps() ++ Agg(Deps.sourcecode.dep(scalaVersion()))
   }
 }
 
@@ -388,8 +393,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       super.ivyDeps() ++ Agg(
         Deps.osLib,
         Deps.scalaCollectionCompat,
-        Deps.use_3("fansi", crossScalaVersion),
-        Deps.use_3("pprint", crossScalaVersion)
+        Deps.fansi.use_3(crossScalaVersion),
+        Deps.pprint.use_3(crossScalaVersion)
       )
     }
     def compileIvyDeps = Agg(
@@ -404,7 +409,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = Agg(
       Deps.upickle,
       Deps.requests,
-      Deps.use_3("mainargs", crossScalaVersion)
+      Deps.mainargs.use_3(crossScalaVersion)
     )
   }
 
@@ -501,7 +506,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
            // then we add it back with _3
            .exclude("com.lihaoyi" -> s"sourcecode_${scalaBinaryVersion(scalaVersion())}")
       else dep
-    ) ++ Agg(Deps.use_3("sourcecode", crossScalaVersion))
+    ) ++ Agg(Deps.sourcecode.use_3(crossScalaVersion))
   }
 
 //  object `test-runner` extends mill.scalalib.SbtModule {
@@ -519,7 +524,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = Agg(
-        Deps.use_3("mainargs", crossScalaVersion)
+        Deps.mainargs.use_3(crossScalaVersion)
       )
 
       def generatedSources = T{
