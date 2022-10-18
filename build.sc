@@ -89,7 +89,6 @@ object Deps {
   val osLib = ivy"com.lihaoyi::os-lib:0.8.0"
   val requests = ivy"com.lihaoyi::requests:0.7.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.15.4"
-  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.6.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
@@ -137,11 +136,14 @@ object Deps {
   object pprint extends Use3Dep {
     override def dep(scalaVersion: String) =  ivy"com.lihaoyi::pprint:0.7.3"
   }
+  object scalaCollectionCompat extends Use3Dep {
+    override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.6.0"
+  }
   object sourcecode extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
   }
 
-  val use_3_deps = Seq(mainargs, fansi, pprint, sourcecode)
+  val use_3_deps = Seq(mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
 }
 
 // Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
@@ -392,7 +394,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = T{
       super.ivyDeps() ++ Agg(
         Deps.osLib,
-        Deps.scalaCollectionCompat,
+        Deps.scalaCollectionCompat.use_3(crossScalaVersion),
         Deps.fansi.use_3(crossScalaVersion),
         Deps.pprint.use_3(crossScalaVersion)
       )
