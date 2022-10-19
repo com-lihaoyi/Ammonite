@@ -137,7 +137,7 @@ object Deps {
     override def dep(scalaVersion: String) =  ivy"com.lihaoyi::pprint:0.7.3"
   }
   object scalaCollectionCompat extends Use3Dep {
-    override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.6.0"
+    override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.8.1"
   }
   object sourcecode extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
@@ -504,11 +504,15 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     ).map(dep =>
       if(isScala3(crossScalaVersion))
         dep.withDottyCompat(crossScalaVersion)
-           // we remove transitive _2.13 sourcecode from Scala 3 and
+           // we remove transitive _2.13 dependencies from Scala 3 and
            // then we add it back with _3
            .exclude("com.lihaoyi" -> s"sourcecode_${scalaBinaryVersion(scalaVersion())}")
+           .exclude("org.scala-lang.modules" -> s"scala-collection-compat_${scalaBinaryVersion(scalaVersion())}")
       else dep
-    ) ++ Agg(Deps.sourcecode.use_3(crossScalaVersion))
+    ) ++ Agg(
+      Deps.sourcecode.use_3(crossScalaVersion),
+      Deps.scalaCollectionCompat.use_3(crossScalaVersion)
+    )
   }
 
 //  object `test-runner` extends mill.scalalib.SbtModule {
