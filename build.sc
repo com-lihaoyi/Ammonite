@@ -5,7 +5,7 @@ import coursier.mavenRepositoryString
 import $file.ci.upload
 
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
-import $ivy.`io.get-coursier::coursier-launcher:2.0.0-RC6-10`
+import $ivy.`io.get-coursier::coursier-launcher:2.1.0-M7-39-gb8f3d7532`
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
