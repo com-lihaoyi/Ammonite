@@ -5,7 +5,7 @@ import coursier.mavenRepositoryString
 import $file.ci.upload
 
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
-import $ivy.`io.get-coursier::coursier-launcher:2.1.0-M7-39-gb8f3d7532`
+import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
@@ -78,7 +78,7 @@ object Deps {
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
-  val coursierInterface = ivy"io.get-coursier:interface:1.0.10"
+  val coursierInterface = ivy"io.get-coursier:interface:1.0.11"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
