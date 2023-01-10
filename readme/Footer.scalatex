@@ -127,6 +127,14 @@
 
 
   @sect{Changelog}
+    @sect{2.5.6}
+      @ul
+        @li
+          Update coursier to 2.1.0-RC1 which also closes some potential security vulnerabilities
+        @li
+          Improved Scala 3 support including @code{@@main} annotation support
+        @li
+          Added support for Scala 3.2.1
     @sect{2.5.5}
       @ul
         @li
