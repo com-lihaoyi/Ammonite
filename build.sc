@@ -52,6 +52,11 @@ val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
 val scala3Versions = scala31Versions ++ scala32Versions
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala31Versions.last, scala32Versions.last)
+def bestBinCrossVersionFor(v: String): String = {
+  val vs = Seq(scala2_12Versions, scala2_13Versions, scala31Versions, scala32Versions)
+  vs.collect { case vs if(vs.contains(v)) => vs.last }.head
+}
+
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
@@ -820,7 +825,7 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
 }
 
 def unitTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
-  terminal(scalaVersion).test.test()()
+  terminal(bestBinCrossVersionFor(scalaVersion)).test.test()()
   amm.repl(scalaVersion).test.test()()
   amm(scalaVersion).test.test()()
   sshd(scalaVersion).test.test()()
