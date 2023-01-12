@@ -13,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [8, 11]
-        scala-version: [2.12.17, 2.13.10, 3.2.2]
+        java-version: [8, 17]
+        scala-version: [2.12.8, 2.12.17, 2.13.10, 3.0.0, 3.2.2]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [8, 11]
+        java-version: [8, 17]
         scala-version: [2.12.17, 2.13.10, 3.2.2]
     runs-on: ubuntu-latest
     steps:
