@@ -166,8 +166,9 @@ class Compiler(
   //   compiler/src/dotty/tools/repl/Rendering.scala/#L97-L103
   /** Formats errors using the `messageRenderer` */
   private def formatError(dia: reporting.Diagnostic)(implicit ctx: Context): reporting.Diagnostic =
+    val renderedMessage = CompilerHelper.messageAndPos(Compiler.messageRenderer, dia)
     new reporting.Diagnostic(
-      CompilerHelper.messageAndPos(Compiler.messageRenderer, dia),
+      reporting.NoExplanation(renderedMessage),
       dia.pos,
       dia.level
     )
