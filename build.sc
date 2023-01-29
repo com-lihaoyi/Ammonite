@@ -347,6 +347,7 @@ trait AmmModule extends AmmInternalModule with PublishModule{
     )()
   }
 
+  override def javacOptions = Seq("-source", "1.8", "-target", "1.8")
 }
 trait AmmDependenciesResourceFileModule extends JavaModule{
   def dependencyResourceFileName: String
