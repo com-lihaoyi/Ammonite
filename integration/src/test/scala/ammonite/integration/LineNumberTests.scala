@@ -13,7 +13,7 @@ object LineNumberTests extends TestSuite{
     def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
       val e = intercept[os.SubprocessException]{
         exec(file)
-      }.result.err.string
+      }.result.err.text()
       assert(TestUtils.containsLines(e, expected))
     }
 

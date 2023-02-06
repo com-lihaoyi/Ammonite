@@ -23,7 +23,7 @@ object ProjectTests extends TestSuite{
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
           val evaled = exec(os.rel/'basic/"PlayFramework.sc")
-          assert(evaled.out.string.contains("Hello bar"))
+          assert(evaled.out.text().contains("Hello bar"))
         }
       }
     }
@@ -45,7 +45,7 @@ object ProjectTests extends TestSuite{
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
           val evaled = exec(os.rel / 'basic/"Spark2.sc")
-          assert(evaled.out.string.contains("fake db write"))
+          assert(evaled.out.text().contains("fake db write"))
         }
       }
     }
