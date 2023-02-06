@@ -106,7 +106,7 @@ object Deps {
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
   val upickle = ivy"com.lihaoyi::upickle:2.0.0"
-  val utest = ivy"com.lihaoyi::utest:0.7.10"
+  val utest = ivy"com.lihaoyi::utest:0.8.1"
 
   /** A dependency containing Scala 2 macros which we apply at compile-time, even when targetting Scala 3. */
   trait Use3Dep {
