@@ -123,6 +123,9 @@ object Deps {
       }
     }
   }
+  object geny extends Use3Dep {
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::geny:1.0.0"
+  }
   object mainargs extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::mainargs:0.3.0"
   }
@@ -142,7 +145,7 @@ object Deps {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
   }
 
-  val use_3_deps = Seq(mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
+  val use_3_deps = Seq(geny, mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
 }
 
 // Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
@@ -530,7 +533,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = Agg(
-        Deps.mainargs.use_3(crossScalaVersion)
+        Deps.mainargs.use_3(crossScalaVersion),
+        Deps.geny.use_3(crossScalaVersion)
       )
 
       def generatedSources = T{
