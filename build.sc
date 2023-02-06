@@ -140,7 +140,7 @@ object Deps {
     override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.8.1"
   }
   object sourcecode extends Use3Dep {
-    override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.3.0"
   }
 
   val use_3_deps = Seq(mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
