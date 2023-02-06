@@ -79,6 +79,7 @@ object Deps {
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.11"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
+  val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
@@ -123,9 +124,6 @@ object Deps {
       }
     }
   }
-  object geny extends Use3Dep {
-    override def dep(scalaVersion: String) = ivy"com.lihaoyi::geny:1.0.0"
-  }
   object mainargs extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::mainargs:0.3.0"
   }
@@ -145,7 +143,7 @@ object Deps {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
   }
 
-  val use_3_deps = Seq(geny, mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
+  val use_3_deps = Seq(mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
 }
 
 // Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
@@ -534,7 +532,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = Agg(
         Deps.mainargs.use_3(crossScalaVersion),
-        Deps.geny.use_3(crossScalaVersion)
+        Deps.geny
       )
 
       def generatedSources = T{
