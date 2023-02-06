@@ -2,10 +2,10 @@ name: Release (2)
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   release2:
     runs-on: ubuntu-latest

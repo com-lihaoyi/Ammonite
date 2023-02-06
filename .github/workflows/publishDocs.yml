@@ -2,10 +2,10 @@ name: Publish Docs
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   publishDocs:
     runs-on: ubuntu-latest
