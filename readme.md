@@ -56,7 +56,7 @@ The layout of the repository is roughly:
 For more detailed information, check out the internals documentation for 
 high-level overviews of some interesting facets of the codebase
 
-- [Internals Documentation](https://github.com/com-lihaoyi/Ammonite/tree/master/internals-docs)
+- [Internals Documentation](https://github.com/com-lihaoyi/Ammonite/tree/main/internals-docs)
 
 ## Common Commands
 
@@ -106,7 +106,7 @@ While working on an arbitrary `xyz` subproject, `mill -w xyz.test` runs tests af
 
 - Publishing is automatic, controlled by scripts in the `ci/` folder.
 
-- Every commit that lands in master will publish a new
+- Every commit that lands in main will publish a new
   [unstable version](https://ammonite.io/#UnstableVersions),
   that you can already use and download. This includes publishing the unstable version
   to maven central to the
@@ -116,12 +116,12 @@ While working on an arbitrary `xyz` subproject, `mill -w xyz.test` runs tests af
   instructions to point to it, though the "main" download/install instructions
   in the doc-site will not be changed.
 
-- Every commit that lands in master *with a tag* will re-publish a stable version
+- Every commit that lands in main *with a tag* will re-publish a stable version
   to maven central and upload a new versioned release (using the tag as the
   version) and the doc-site is updated so the main download/install instructions
   point at the new published stable version.
 
-In general, if you land a change in master, once CI completes (1-2hrs) you
+In general, if you land a change in main, once CI completes (1-2hrs) you
 should be able to download it via the
 [Unstable Version](https://ammonite.io/#UnstableVersions)
 instructions and make use of your changes standalone or in an SBT project.
