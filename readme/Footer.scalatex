@@ -127,6 +127,10 @@
 
 
   @sect{Changelog}
+    @sect{2.5.8}
+      @ul
+        @li
+          Fixed Release Process. This release is otherwise identical to @code{2.5.7}.
     @sect{2.5.7}
       @ul
         @li
