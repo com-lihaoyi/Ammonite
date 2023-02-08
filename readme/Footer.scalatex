@@ -127,6 +127,14 @@
 
 
   @sect{Changelog}
+    @sect{2.5.7}
+      @ul
+        @li
+          Added support for Scala 3.2.2
+        @li
+          Ensured Java 8 compatibility
+        @li
+          Improved internal macros hygiene
     @sect{2.5.6}
       @ul
         @li
