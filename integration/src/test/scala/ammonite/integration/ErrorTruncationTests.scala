@@ -17,7 +17,7 @@ object ErrorTruncationTests extends TestSuite{
         intercept[os.SubprocessException]{ exec(file) }
           .result
           .err
-          .string
+          .text()
       )
     ).plainText
     //This string gets included on windows due to environment variable set additionally

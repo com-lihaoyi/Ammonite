@@ -47,12 +47,11 @@ val cross2_3Version = (scala3Ver: String) =>
 
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16", "2.12.17")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10")
-val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
 val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2", "3.1.3")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
-val scala3Versions = scala30Versions ++ scala31Versions ++ scala32Versions
+val scala3Versions = scala31Versions ++ scala32Versions
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala30Versions.last, scala31Versions.last, scala32Versions.last)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala31Versions.last, scala32Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
@@ -63,7 +62,7 @@ val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
 println("GITHUB REF " + sys.env.get("GITHUB_REF"))
 
 val (buildVersion, unstable) = scala.util.Try(
-  os.proc('git, 'describe, "--exact-match", "--tags", "--always", gitHead)
+  os.proc("git", "describe", "--exact-match", "--tags", "--always", gitHead)
     .call()
     .out
     .trim
@@ -85,13 +84,14 @@ object Deps {
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.11"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
+  val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.54"
-  val osLib = ivy"com.lihaoyi::os-lib:0.8.0"
+  val osLib = ivy"com.lihaoyi::os-lib:0.9.0"
   val requests = ivy"com.lihaoyi::requests:0.7.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.15.4"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
@@ -110,7 +110,7 @@ object Deps {
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
-  val upickle = ivy"com.lihaoyi::upickle:2.0.0"
+  val upickle = ivy"com.lihaoyi::upickle:3.0.0-M2"
   val utest = ivy"com.lihaoyi::utest:0.8.1"
 
   /** A dependency containing Scala 2 macros which we apply at compile-time, even when targetting Scala 3. */
@@ -145,7 +145,7 @@ object Deps {
     override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.8.1"
   }
   object sourcecode extends Use3Dep {
-    override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.2.7"
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.3.0"
   }
 
   val use_3_deps = Seq(mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
@@ -536,7 +536,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = Agg(
-        Deps.mainargs.use_3(crossScalaVersion)
+        Deps.mainargs.use_3(crossScalaVersion),
+        Deps.geny
       )
 
       def generatedSources = T{

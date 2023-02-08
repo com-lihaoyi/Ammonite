@@ -51,7 +51,7 @@ object BasicTests extends TestSuite{
           scriptAddr
           // Somehow this is being set of travis and causing weird errors/warnings
         ).call(env = Map("_JAVA_OPTIONS" -> null))
-        assert(evaled.out.trim == "Script Worked!!" && evaled.err.string.isEmpty)
+        assert(evaled.out.trim == "Script Worked!!" && evaled.err.text().isEmpty)
       }
     }
     test("scalacNotLoadedByCachedScripts"){
@@ -158,21 +158,21 @@ object BasicTests extends TestSuite{
 
     test("classloaders"){
       val evaled = exec(os.rel / 'basic / "Resources.sc")
-      assert(evaled.out.string.contains("1745"))
+      assert(evaled.out.text().contains("1745"))
     }
     test("testSilentScriptRunning"){
       val evaled1 = exec(os.rel / 'basic/"Hello.sc")
       // check Compiling Script is being printed
 
-      assert(evaled1.err.string.contains("Compiling"))
+      assert(evaled1.err.text().contains("Compiling"))
       val evaled2 = execSilent(os.rel / 'basic/"Hello.sc")
       // make sure with `-s` flag script running is silent
-      assert(!evaled2.err.string.contains("Compiling"))
+      assert(!evaled2.err.text().contains("Compiling"))
     }
     test("testSilentRunningWithExceptions"){
       val errorMsg = intercept[os.SubprocessException]{
         exec(os.rel / 'basic/"Failure.sc")
-      }.result.err.string
+      }.result.err.text()
 
       val expected =
         if (isScala2) "not found: value x"
@@ -182,7 +182,7 @@ object BasicTests extends TestSuite{
     test("testSilentIvyExceptions"){
       val errorMsg = intercept[os.SubprocessException]{
         exec(os.rel / 'basic/"wrongIvyCordinates.sc")
-      }.result.err.string
+      }.result.err.text()
 
 
       assert(errorMsg.contains("Failed to resolve ivy dependencies"))
@@ -236,7 +236,7 @@ object BasicTests extends TestSuite{
 
           // 3. use published artifact in a script
           val evaled = execWithHome(home, os.rel / 'basic / script)
-          assert(evaled.out.string.contains(theThing))
+          assert(evaled.out.text().contains(theThing))
         }
 
         publishJarAndRunScript("thing1", "ivyResolveSnapshot1.sc", "0.1-SNAPSHOT", firstRun = true)
@@ -257,13 +257,13 @@ object BasicTests extends TestSuite{
       def positiveArgsTest() = {
         val evaled = exec(os.rel / 'basic/"MultiMain.sc", "functionB", "2", "foo")
 
-        val out = evaled.out.string
+        val out = evaled.out.text()
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
       def specifyMainTest() = {
         val evaled = intercept[os.SubprocessException](exec(os.rel / 'basic/"MultiMain.sc"))
 
-        val out = evaled.result.err.string
+        val out = evaled.result.err.text()
         val expected = Util.normalizeNewlines(
           s"""Need to specify a sub command: mainA, functionB""".stripMargin
         )
