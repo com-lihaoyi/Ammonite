@@ -9,19 +9,24 @@ import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
-val masterBranch = "master"
+val masterBranch = "main"
+val publishBranches = Seq(masterBranch, "2.x")
 val homePage = "https://ammonite.io"
 
 val isMasterCommit =
   sys.env.get("GITHUB_REPOSITORY") == Some(s"${ghOrg}/${ghRepo}") &&
-  sys.env.get("GITHUB_REF").exists(x => x.endsWith(s"/${masterBranch}"))
+    sys.env.get("GITHUB_REF").exists(x => x.endsWith(s"/${masterBranch}"))
 
-val latestTaggedVersion = os.proc('git, 'describe, "--abbrev=0", "--tags").call().out.trim
+val isPublishableCommit =
+  sys.env.get("GITHUB_REPOSITORY") == Some(s"${ghOrg}/${ghRepo}") &&
+    sys.env.get("GITHUB_REF").exists(x => publishBranches.exists(suffix => x.endsWith(s"/${suffix}")))
 
-val gitHead = os.proc('git, "rev-parse", "HEAD").call().out.trim
+val latestTaggedVersion = os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+
+val gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim
 
 val commitsSinceTaggedVersion = {
-  os.proc('git, "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
+  os.proc("git", "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
     .call()
     .out
     .trim
@@ -885,7 +890,7 @@ def generateDependenciesFile(fileName: String,
 
 
 def publishExecutable() = {
-  if (!isMasterCommit) T.command{
+  if (!isPublishableCommit) T.command{
     println("MISC COMMIT: generating executable but not publishing")
     T.sequence(latestAssemblies)()
   }else T.command{
@@ -959,7 +964,7 @@ def publishDocs() = {
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
     val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-    os.write(os.pwd / 'deploy_key, deployKey)
+    os.write(os.pwd / "deploy_key", deployKey)
 
     val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
       if (!unstable){
@@ -1046,7 +1051,7 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
         case PublishModule.PublishData(a, s) => (s.map{case (p, f) => (p.path, f)}, a)
       }
     }
-    if (isMasterCommit)
+    if (isPublishableCommit)
       new SonatypePublisher(
         "https://oss.sonatype.org/service/local",
         "https://oss.sonatype.org/content/repositories/snapshots",
