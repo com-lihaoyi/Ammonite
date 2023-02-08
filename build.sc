@@ -139,7 +139,7 @@ object Deps {
     }
   }
   object pprint extends Use3Dep {
-    override def dep(scalaVersion: String) =  ivy"com.lihaoyi::pprint:0.7.3"
+    override def dep(scalaVersion: String) =  ivy"com.lihaoyi::pprint:0.8.1"
   }
   object scalaCollectionCompat extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.8.1"
