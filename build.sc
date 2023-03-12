@@ -74,7 +74,7 @@ val (buildVersion, unstable) = scala.util.Try(
 }
 
 val bspVersion = "2.0.0-M6"
-val fastparseVersion = "2.3.0"
+val fastparseVersion = "3.0.0"
 val scalametaVersion = "4.5.13"
 
 object Deps {
@@ -110,7 +110,7 @@ object Deps {
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val trees = ivy"org.scalameta::trees:$scalametaVersion"
-  val upickle = ivy"com.lihaoyi::upickle:3.0.0-M2"
+  val upickle = ivy"com.lihaoyi::upickle:3.0.0"
   val utest = ivy"com.lihaoyi::utest:0.8.1"
 
   /** A dependency containing Scala 2 macros which we apply at compile-time, even when targetting Scala 3. */
