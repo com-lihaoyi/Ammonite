@@ -14,7 +14,7 @@ object Parsers extends IParser {
   import scalaparse.Scala._
 
   // For some reason Scala doesn't import this by default
-  private def `_`[_: P] = scalaparse.Scala.`_`
+  private def `_`[_: P] = scalaparse.Scala.Underscore
 
 
   private def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
