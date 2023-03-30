@@ -82,7 +82,7 @@ object Deps {
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
-  val coursierInterface = ivy"io.get-coursier:interface:1.0.11"
+  val coursierInterface = ivy"io.get-coursier:interface:1.0.13"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
