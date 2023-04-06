@@ -86,7 +86,7 @@ class Repl(input: InputStream,
   )
   val interp = new Interpreter(
     compilerBuilder,
-    parser,
+    () => parser,
     getFrame = () => frames().head,
     createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
     replCodeWrapper = replCodeWrapper,

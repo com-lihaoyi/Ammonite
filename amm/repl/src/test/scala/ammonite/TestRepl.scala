@@ -82,7 +82,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
   val interp = try {
     new Interpreter(
       compilerBuilder,
-      parser,
+      () => parser,
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
       replCodeWrapper = codeWrapper,

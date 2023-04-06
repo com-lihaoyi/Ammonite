@@ -39,7 +39,7 @@ object TestUtils {
     )
     val interp = new Interpreter(
       ammonite.compiler.CompilerBuilder,
-      ammonite.compiler.Parsers,
+      () => ammonite.compiler.Parsers,
 
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),

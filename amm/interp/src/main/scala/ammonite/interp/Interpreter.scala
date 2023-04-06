@@ -28,7 +28,7 @@ import coursierapi.{Dependency, Fetch, Repository}
  */
 class Interpreter(val compilerBuilder: CompilerBuilder,
                   // by-name, so that fastparse isn't loaded when we don't need it
-                  parser: => Parser,
+                  parser: () => Parser,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
                   replCodeWrapper: CodeWrapper,
@@ -240,7 +240,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
       Seq(Name("ammonite"), Name("$sess")),
       Some(wd/"(console)")
     )
-    val (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -380,7 +380,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = parser.splitScript(
+        lazy val splittedScript = parser().splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.printablePath
         )
@@ -425,7 +425,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(parser.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(parser().splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -574,7 +574,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )
