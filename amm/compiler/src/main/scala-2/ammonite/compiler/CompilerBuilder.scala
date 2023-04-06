@@ -15,7 +15,7 @@ import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
 
 
-object CompilerBuilder extends ICompilerBuilder {
+case class CompilerBuilder() extends ICompilerBuilder {
   def create(
     initialClassPath: Seq[URL],
     classPath: Seq[URL],
@@ -87,5 +87,9 @@ object CompilerBuilder extends ICompilerBuilder {
       initialClassLoader
     )
 
+  def scalaVersion = CompilerBuilder.scalaVersion
+}
+
+object CompilerBuilder {
   def scalaVersion = scala.util.Properties.versionNumberString
 }

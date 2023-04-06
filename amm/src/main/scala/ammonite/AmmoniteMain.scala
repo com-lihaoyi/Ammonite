@@ -62,7 +62,7 @@ object AmmoniteMain{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
-            ammonite.compiler.CompilerBuilder,
+            ammonite.compiler.CompilerBuilder(),
             ammonite.compiler.Parsers,
             ammonite.compiler.DefaultCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),
