@@ -73,22 +73,25 @@ class Repl(input: InputStream,
 
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
+  val interpParams = Interpreter.Parameters(
+    printer = printer,
+    storage = storage,
+    wd = wd,
+    colors = colors,
+    verboseOutput = true,
+    initialClassLoader = initialClassLoader,
+    importHooks = importHooks,
+    classPathWhitelist = classPathWhitelist,
+    alreadyLoadedDependencies = alreadyLoadedDependencies
+  )
   val interp = new Interpreter(
     compilerBuilder,
     parser,
-    printer,
-    storage,
-    wd,
-    colors,
-    verboseOutput = true,
     getFrame = () => frames().head,
     createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
-    initialClassLoader = initialClassLoader,
     replCodeWrapper = replCodeWrapper,
     scriptCodeWrapper = scriptCodeWrapper,
-    alreadyLoadedDependencies = alreadyLoadedDependencies,
-    importHooks,
-    classPathWhitelist = classPathWhitelist
+    parameters = interpParams
   )
 
   val bridges = Seq(

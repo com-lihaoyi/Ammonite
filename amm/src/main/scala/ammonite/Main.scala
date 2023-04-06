@@ -173,22 +173,25 @@ case class Main(predefCode: String = "",
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
       lazy val parser0 = parser()
+      val interpParams = Interpreter.Parameters(
+        printer = printer,
+        storage = storageBackend,
+        wd = wd,
+        colors = colorsRef,
+        verboseOutput = verboseOutput,
+        initialClassLoader = initialClassLoader,
+        importHooks = importHooks,
+        classPathWhitelist = classPathWhitelist,
+        alreadyLoadedDependencies = alreadyLoadedDependencies
+      )
       val interp = new Interpreter(
         ammonite.compiler.CompilerBuilder,
         parser0,
-        printer,
-        storageBackend,
-        wd,
-        colorsRef,
-        verboseOutput,
         () => frame,
         () => throw new Exception("session loading / saving not possible here"),
-        initialClassLoader = initialClassLoader,
         replCodeWrapper,
         scriptCodeWrapper,
-        alreadyLoadedDependencies = alreadyLoadedDependencies,
-        importHooks = importHooks,
-        classPathWhitelist = classPathWhitelist
+        parameters = interpParams
       )
       val bridges = Seq(
         (

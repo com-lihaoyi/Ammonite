@@ -29,20 +29,14 @@ import coursierapi.{Dependency, Fetch, Repository}
 class Interpreter(val compilerBuilder: CompilerBuilder,
                   // by-name, so that fastparse isn't loaded when we don't need it
                   parser: => Parser,
-                  val printer: Printer,
-                  val storage: Storage,
-                  val wd: os.Path,
-                  colors: Ref[Colors],
-                  verboseOutput: Boolean = true,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
-                  initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
                   val scriptCodeWrapper: CodeWrapper,
-                  alreadyLoadedDependencies: Seq[Dependency],
-                  importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                  classPathWhitelist: Set[Seq[String]] = Set.empty)
+                  parameters: Interpreter.Parameters = Interpreter.Parameters())
   extends ImportHook.InterpreterInterface{ interp =>
+
+  import parameters._
 
 
   def headFrame = getFrame()
@@ -664,7 +658,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 
   private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
-    val colors = interp.colors
+    val colors = parameters.colors
 
     def watch(p: os.Path) = interp.watch(p)
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}
@@ -717,6 +711,25 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 }
 
 object Interpreter{
+
+  case class Parameters(
+    printer: Printer = Printer(
+      System.out,
+      System.err,
+      System.out,
+      System.err.println,
+      System.err.println,
+      System.err.println
+    ),
+    storage: Storage = Storage.InMemory(),
+    wd: os.Path = os.pwd,
+    colors: Ref[Colors] = Ref(Colors.Default),
+    verboseOutput: Boolean = true,
+    initialClassLoader: ClassLoader = null,
+    importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+    alreadyLoadedDependencies: Seq[Dependency] = Nil,
+    classPathWhitelist: Set[Seq[String]] = Set.empty
+  )
 
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpBridge.value.exit"),
