@@ -13,6 +13,8 @@ abstract class CompilerLifecycleManager {
 
   def scalaVersion: String
 
+  def outputDir: Option[Path]
+
   def init(force: Boolean = false): Unit
 
   def complete(

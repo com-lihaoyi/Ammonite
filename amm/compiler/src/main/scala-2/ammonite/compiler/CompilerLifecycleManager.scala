@@ -31,7 +31,8 @@ class CompilerLifecycleManager(
   headFrame: => ammonite.util.Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
-  initialClassLoader: ClassLoader
+  initialClassLoader: ClassLoader,
+  val outputDir: Option[Path]
 ) extends ICompilerLifecycleManager {
 
   def scalaVersion = scala.util.Properties.versionNumberString
@@ -96,6 +97,7 @@ class CompilerLifecycleManager(
       Internal.compiler = Compiler(
         headFrameClassPath,
         dynamicClasspath,
+        outputDir,
         headFrame.classloader,
         headFrame.pluginClassloader,
         () => shutdownPressy(),
@@ -163,7 +165,7 @@ class CompilerLifecycleManager(
     }
 
   def addToClasspath(classFiles: ClassFiles) = synchronized {
-    Compiler.addToClasspath(classFiles, dynamicClasspath)
+    Compiler.addToClasspath(classFiles, dynamicClasspath, outputDir)
   }
   // Not synchronized, since it's part of the exit sequence that needs to run
   // if the repl exits while the warmup code is compiling

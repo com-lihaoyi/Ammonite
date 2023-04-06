@@ -10,7 +10,7 @@ class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
 
-  val compilerBuilder = ammonite.compiler.CompilerBuilder()
+  def compilerBuilder = ammonite.compiler.CompilerBuilder()
   val repls = Seq(
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef

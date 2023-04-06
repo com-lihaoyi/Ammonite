@@ -12,7 +12,9 @@ import ammonite.compiler.iface.{
 import ammonite.util.Frame
 import dotty.tools.io.AbstractFile
 
-case class CompilerBuilder() extends ICompilerBuilder:
+case class CompilerBuilder(
+  outputDir: Option[Path] = None
+) extends ICompilerBuilder:
 
   def create(
     initialClassPath: Seq[URL],
@@ -25,8 +27,8 @@ case class CompilerBuilder() extends ICompilerBuilder:
     classPathWhiteList: Set[Seq[String]],
     lineNumberModifier: Boolean
   ): ICompiler = {
-    val tempDir = AbstractFile.getDirectory(os.temp.dir().toNIO)
-    Compiler.addToClasspath(dynamicClassPath, tempDir)
+    val tempDir = AbstractFile.getDirectory(outputDir.getOrElse(os.temp.dir().toNIO))
+    Compiler.addToClasspath(dynamicClassPath, tempDir, outputDir)
     new Compiler(
       tempDir,
       initialClassPath,
@@ -52,7 +54,8 @@ case class CompilerBuilder() extends ICompilerBuilder:
       headFrame,
       dependencyCompleter,
       whiteList,
-      initialClassLoader
+      initialClassLoader,
+      outputDir
     )
 
 object CompilerBuilder:
