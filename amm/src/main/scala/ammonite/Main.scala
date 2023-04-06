@@ -185,7 +185,7 @@ case class Main(predefCode: String = "",
         alreadyLoadedDependencies = alreadyLoadedDependencies
       )
       val interp = new Interpreter(
-        ammonite.compiler.CompilerBuilder,
+        compilerBuilder,
         () => parser0,
         () => frame,
         () => throw new Exception("session loading / saving not possible here"),
