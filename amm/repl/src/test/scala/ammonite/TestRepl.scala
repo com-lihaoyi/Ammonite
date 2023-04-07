@@ -69,22 +69,25 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
   val parser = ammonite.compiler.Parsers
 
   var currentLine = 0
+  val interpParams = Interpreter.Parameters(
+    printer = printer0,
+    storage = storage,
+    wd = os.pwd,
+    colors = Ref(Colors.BlackWhite),
+    initialClassLoader = initialClassLoader,
+    alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
+    importHooks = ImportHook.defaults,
+    classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
+  )
   val interp = try {
     new Interpreter(
       compilerBuilder,
-      parser,
-      printer0,
-      storage = storage,
-      wd = os.pwd,
-      colors = Ref(Colors.BlackWhite),
+      () => parser,
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
-      initialClassLoader = initialClassLoader,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
-      alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
-      importHooks = ImportHook.defaults,
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
+      parameters = interpParams
     )
 
   }catch{ case e: Throwable =>

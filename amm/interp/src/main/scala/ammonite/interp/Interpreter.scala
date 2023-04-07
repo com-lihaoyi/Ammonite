@@ -28,21 +28,15 @@ import coursierapi.{Dependency, Fetch, Repository}
  */
 class Interpreter(val compilerBuilder: CompilerBuilder,
                   // by-name, so that fastparse isn't loaded when we don't need it
-                  parser: => Parser,
-                  val printer: Printer,
-                  val storage: Storage,
-                  val wd: os.Path,
-                  colors: Ref[Colors],
-                  verboseOutput: Boolean = true,
+                  parser: () => Parser,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
-                  initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
                   val scriptCodeWrapper: CodeWrapper,
-                  alreadyLoadedDependencies: Seq[Dependency],
-                  importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                  classPathWhitelist: Set[Seq[String]] = Set.empty)
+                  parameters: Interpreter.Parameters = Interpreter.Parameters())
   extends ImportHook.InterpreterInterface{ interp =>
+
+  import parameters._
 
 
   def headFrame = getFrame()
@@ -246,7 +240,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
       Seq(Name("ammonite"), Name("$sess")),
       Some(wd/"(console)")
     )
-    val (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -386,7 +380,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = parser.splitScript(
+        lazy val splittedScript = parser().splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.printablePath
         )
@@ -431,7 +425,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
     val wrapperName = Name("cmd" + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(parser.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(parser().splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -580,7 +574,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )
@@ -664,7 +658,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 
   private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
-    val colors = interp.colors
+    val colors = parameters.colors
 
     def watch(p: os.Path) = interp.watch(p)
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}
@@ -717,6 +711,25 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 }
 
 object Interpreter{
+
+  case class Parameters(
+    printer: Printer = Printer(
+      System.out,
+      System.err,
+      System.out,
+      System.err.println,
+      System.err.println,
+      System.err.println
+    ),
+    storage: Storage = Storage.InMemory(),
+    wd: os.Path = os.pwd,
+    colors: Ref[Colors] = Ref(Colors.Default),
+    verboseOutput: Boolean = true,
+    initialClassLoader: ClassLoader = null,
+    importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+    alreadyLoadedDependencies: Seq[Dependency] = Nil,
+    classPathWhitelist: Set[Seq[String]] = Set.empty
+  )
 
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpBridge.value.exit"),
