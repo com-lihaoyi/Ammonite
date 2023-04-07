@@ -64,21 +64,18 @@ object ProjectTests extends TestSuite{
              """)
         }
         test("resolvers"){
-          retry(2){
-            // ivy flakyness...
-            check.session("""
-              @ import $ivy.`com.lightbend::emoji:1.2.1 compat`
-              error: Failed to resolve ivy dependencies
+          check.session("""
+            @ import $ivy.`com.github.jupyter:jvm-repr:0.4.0`
+            error: Failed to resolve ivy dependencies
 
-              @ interp.repositories() ++= Seq(coursierapi.IvyRepository.of(
-              @   "https://repo.typesafe.com/typesafe/ivy-releases/[defaultPattern]"
-              @ ))
+            @ interp.repositories() ++= Seq(coursierapi.MavenRepository.of(
+            @   "https://jitpack.io"
+            @ ))
 
-              @ import $ivy.`com.lightbend::emoji:1.2.1 compat`
+            @ import $ivy.`com.github.jupyter:jvm-repr:0.4.0`
 
-              @ import com.lightbend.emoji._
-            """)
-          }
+            @ import jupyter._
+          """)
         }
         test("resolversStatic"){
           check.session("""
