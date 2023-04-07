@@ -22,7 +22,7 @@ import ammonite.runtime.ImportHook
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
+class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
   def scala2 = compilerBuilder.scalaVersion.startsWith("2.")
   def scalaVersion = compilerBuilder.scalaVersion
 

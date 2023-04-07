@@ -15,7 +15,9 @@ import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
 
 
-object CompilerBuilder extends ICompilerBuilder {
+case class CompilerBuilder(
+  outputDir: Option[Path] = None
+) extends ICompilerBuilder {
   def create(
     initialClassPath: Seq[URL],
     classPath: Seq[URL],
@@ -29,7 +31,7 @@ object CompilerBuilder extends ICompilerBuilder {
   ): ICompiler = {
 
     val vd = new VirtualDirectory("(memory)", None)
-    Compiler.addToClasspath(dynamicClassPath, vd)
+    Compiler.addToClasspath(dynamicClassPath, vd, outputDir)
 
     val scalacSettings = {
       // not 100% sure error collection is correct (duplicates?)
@@ -61,6 +63,7 @@ object CompilerBuilder extends ICompilerBuilder {
     Compiler(
       classPath,
       vd,
+      outputDir,
       evalClassLoader,
       pluginClassLoader,
       () => (),
@@ -84,8 +87,13 @@ object CompilerBuilder extends ICompilerBuilder {
       headFrame,
       dependencyCompleter,
       whiteList,
-      initialClassLoader
+      initialClassLoader,
+      outputDir
     )
 
+  def scalaVersion = CompilerBuilder.scalaVersion
+}
+
+object CompilerBuilder {
   def scalaVersion = scala.util.Properties.versionNumberString
 }

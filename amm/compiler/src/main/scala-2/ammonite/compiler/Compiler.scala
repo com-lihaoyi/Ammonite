@@ -2,6 +2,7 @@ package ammonite.compiler
 
 
 import java.io.OutputStream
+import java.nio.file.Path
 
 import ammonite.compiler.iface.{Compiler => ICompiler, Preprocessor}
 import ammonite.util.{Classpath, ImportData, Imports, Printer}
@@ -45,12 +46,21 @@ object Compiler{
     * Writes files to dynamicClasspath. Needed for loading cached classes.
     */
   def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
+                     dynamicClasspath: VirtualDirectory,
+                     outputDir: Option[Path]): Unit = {
 
+    val outputDir0 = outputDir.map(os.Path(_, os.pwd))
     for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('/').toList)
+      val elems = name.split('/').toList
+      val output = writeDeep(dynamicClasspath, elems)
       output.write(bytes)
       output.close()
+
+      for (dir <- outputDir0) {
+        val dest = dir / elems
+        os.makeDir.all(dest / os.up)
+        os.write(dest, bytes)
+      }
     }
 
   }
@@ -98,6 +108,7 @@ object Compiler{
 
   def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
+            outputDir: Option[Path],
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
@@ -291,6 +302,14 @@ object Compiler{
           output.write(x.toByteArray)
           output.close()
           (x.path.stripPrefix("(memory)/"), x.toByteArray)
+        }
+
+        for {
+          dir <- outputDir.map(os.Path(_, os.pwd))
+          f <- outputFiles
+        } {
+          val segments = f.path.split("/").toList.tail
+          os.write.over(dir / segments, f.toByteArray, createFolders = true)
         }
 
         val imports = lastImports.toList

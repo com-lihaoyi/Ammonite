@@ -38,7 +38,7 @@ object TestUtils {
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
     )
     val interp = new Interpreter(
-      ammonite.compiler.CompilerBuilder,
+      ammonite.compiler.CompilerBuilder(),
       () => ammonite.compiler.Parsers,
 
       getFrame = () => startFrame,

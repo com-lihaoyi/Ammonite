@@ -2,7 +2,7 @@ package ammonite.compiler
 
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.io.{ByteArrayInputStream, OutputStream}
 
 import ammonite.compiler.iface.{
@@ -42,8 +42,7 @@ import dotty.tools.io.{
   File,
   VirtualDirectory,
   VirtualFile,
-  PlainFile,
-  Path
+  PlainFile
 }
 import dotty.tools.repl.CollectTopLevelImports
 
@@ -284,7 +283,8 @@ class Compiler(
         }.getOrElse(Seq.empty[String])
         val fileCount = enumerateVdFiles(outputDir).length
         val classes = files(outputDir).toArray
-        Compiler.addToClasspath(classes, dynamicClassPath)
+        // outputDir is None here, dynamicClassPath should already correspond to an on-disk directory
+        Compiler.addToClasspath(classes, dynamicClassPath, None)
         outputDir.clear()
         val lineShift = PositionOffsetConversion.offsetToPos(new String(src)).apply(importsLen).line
         val mappings = Map(sourceFile.file.name -> (sourceFile.file.name, -lineShift))
@@ -497,12 +497,21 @@ object Compiler:
   }
 
   def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: AbstractFile): Unit = {
+                     dynamicClasspath: AbstractFile,
+                     outputDir: Option[Path]): Unit = {
 
+    val outputDir0 = outputDir.map(os.Path(_, os.pwd))
     for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('/').toList)
+      val elems = name.split('/').toList
+      val output = writeDeep(dynamicClasspath, elems)
       output.write(bytes)
       output.close()
+
+      for (dir <- outputDir0) {
+        val dest = dir / elems
+        os.makeDir.all(dest / os.up)
+        os.write(dest, bytes)
+      }
     }
 
   }

@@ -3,6 +3,8 @@ package ammonite.compiler
 import ammonite.interp.api.InterpAPI
 import ammonite.repl.api.ReplAPI
 
+import java.nio.file.Path
+
 object CompilerExtensions {
 
   implicit class CompilerInterpAPIExtensions(private val api: InterpAPI) extends AnyVal {
@@ -23,6 +25,14 @@ object CompilerExtensions {
       */
     def preConfigureCompiler(c: scala.tools.nsc.Settings => Unit): Unit =
       compilerManager.preConfigureCompiler(c)
+
+    /**
+      * Directory where the byte code resulting from compiling the user code is written.
+      * This is non-empty only if the `--output-directory` or `--tmp-output-directory` options
+      * are passed to Ammonite upon launch.
+      */
+    def outputDir: Option[Path] =
+      compilerManager.outputDir
   }
 
   implicit class CompilerReplAPIExtensions(private val api: ReplAPI) extends AnyVal {

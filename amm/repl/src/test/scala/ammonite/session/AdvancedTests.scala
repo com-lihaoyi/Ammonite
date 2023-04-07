@@ -1,7 +1,7 @@
 package ammonite.session
 
 import ammonite.TestUtils._
-import ammonite.DualTestRepl
+import ammonite.{DualTestRepl, TestRepl}
 import ammonite.util.Res
 import utest._
 
@@ -644,6 +644,56 @@ object AdvancedTests extends TestSuite{
           @ "test".concat("test")
           res4: String = "testtest"
         """)
+    }
+    test("output-directory") {
+      val dir = os.temp.dir(prefix = "amm-output-dir-test")
+      val predef0 =
+        """val n = 2
+          |""".stripMargin
+      val defaultCheck = new TestRepl(
+        ammonite.compiler.CompilerBuilder(outputDir = Some((dir / "default").toNIO))
+      ) {
+        override def predef = (predef0, None)
+      }
+      val classBasedCheck = new TestRepl(
+        ammonite.compiler.CompilerBuilder(outputDir = Some((dir / "class-based").toNIO))
+      ) {
+        override def predef = (predef0, None)
+        override def codeWrapper = ammonite.compiler.CodeClassWrapper
+      }
+      val session = """
+        @ val check = interp.outputDir.nonEmpty
+        check: Boolean = true
+      """
+      defaultCheck.session(session)
+      classBasedCheck.session(session)
+
+      val expectedClassFiles = Seq(
+        os.rel / "default" / "ammonite" / "predef" / "testPredef.class",
+        os.rel / "default" / "ammonite" / "predef" / "testPredef$.class",
+        os.rel / "default" / "ammonite" / "$sess" / "cmd0.class",
+        os.rel / "default" / "ammonite" / "$sess" / "cmd0$.class",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef.class",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef$.class",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef$Helper.class",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0.class",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0$.class",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0$Helper.class"
+      )
+      val expectedTastyFiles = Seq(
+        os.rel / "default" / "ammonite" / "predef" / "testPredef.tasty",
+        os.rel / "default" / "ammonite" / "$sess" / "cmd0.tasty",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef.tasty",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0.tasty"
+      )
+      val expectedFiles =
+        if (ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2."))
+          expectedClassFiles
+        else
+          expectedClassFiles ++ expectedTastyFiles
+
+      val files = os.walk(dir).filter(os.isFile(_)).map(_.relativeTo(dir))
+      assert(files.sorted == expectedFiles.sorted)
     }
   }
 }

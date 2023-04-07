@@ -82,7 +82,7 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder,
+                compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder(),
                 // by-name, so that fastparse isn't loaded when we don't need it
                 parser: () => Parser = () => ammonite.compiler.Parsers,
                 classPathWhitelist: Set[Seq[String]] = Set.empty){
@@ -185,7 +185,7 @@ case class Main(predefCode: String = "",
         alreadyLoadedDependencies = alreadyLoadedDependencies
       )
       val interp = new Interpreter(
-        ammonite.compiler.CompilerBuilder,
+        compilerBuilder,
         () => parser0,
         () => frame,
         () => throw new Exception("session loading / saving not possible here"),

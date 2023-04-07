@@ -12,7 +12,9 @@ import ammonite.compiler.iface.{
 import ammonite.util.Frame
 import dotty.tools.io.AbstractFile
 
-object CompilerBuilder extends ICompilerBuilder:
+case class CompilerBuilder(
+  outputDir: Option[Path] = None
+) extends ICompilerBuilder:
 
   def create(
     initialClassPath: Seq[URL],
@@ -25,8 +27,8 @@ object CompilerBuilder extends ICompilerBuilder:
     classPathWhiteList: Set[Seq[String]],
     lineNumberModifier: Boolean
   ): ICompiler = {
-    val tempDir = AbstractFile.getDirectory(os.temp.dir().toNIO)
-    Compiler.addToClasspath(dynamicClassPath, tempDir)
+    val tempDir = AbstractFile.getDirectory(outputDir.getOrElse(os.temp.dir().toNIO))
+    Compiler.addToClasspath(dynamicClassPath, tempDir, outputDir)
     new Compiler(
       tempDir,
       initialClassPath,
@@ -38,7 +40,7 @@ object CompilerBuilder extends ICompilerBuilder:
     )
   }
 
-  def scalaVersion = dotty.tools.dotc.config.Properties.versionNumberString
+  def scalaVersion = CompilerBuilder.scalaVersion
 
   def newManager(
     rtCacheDir: Option[Path],
@@ -52,5 +54,9 @@ object CompilerBuilder extends ICompilerBuilder:
       headFrame,
       dependencyCompleter,
       whiteList,
-      initialClassLoader
+      initialClassLoader,
+      outputDir
     )
+
+object CompilerBuilder:
+  def scalaVersion = dotty.tools.dotc.config.Properties.versionNumberString
