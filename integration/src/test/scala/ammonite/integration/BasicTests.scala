@@ -3,6 +3,8 @@ package ammonite.integration
 import utest._
 import ammonite.util.Util
 import TestUtils._
+
+import java.io.File
 /**
  * Run a small number of scripts using the Ammonite standalone executable,
  * to make sure that this works. Otherwise it tends to break since the
@@ -298,6 +300,12 @@ object BasicTests extends TestSuite{
       assert(res.exitCode == 1)
       val output = res.out.lines()
       assert(output.contains("""Exception in thread "main" java.lang.Exception: from predef"""))
+    }
+
+    test("missing JAR") {
+      val cp = Seq(TestUtils.ammAssembly, "/foo/b.jar").mkString(File.pathSeparator)
+      os.proc("java", "-cp", cp, "ammonite.AmmoniteMain", "--predef-code", """println("Hello"); sys.exit(0)""")
+        .call()
     }
   }
 }

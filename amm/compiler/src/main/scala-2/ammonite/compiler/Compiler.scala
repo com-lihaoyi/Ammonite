@@ -2,7 +2,7 @@ package ammonite.compiler
 
 
 import java.io.OutputStream
-import java.nio.file.Path
+import java.nio.file.{Files, Path, Paths}
 
 import ammonite.compiler.iface.{Compiler => ICompiler, Preprocessor}
 import ammonite.util.{Classpath, ImportData, Imports, Printer}
@@ -175,7 +175,7 @@ object Compiler{
 
       val (dirDeps, jarDeps) = classpath.partition { u =>
         u.getProtocol == "file" &&
-        java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+        Files.isDirectory(Paths.get(u.toURI))
       }
 
       val jcp = initGlobalClasspath(
@@ -338,21 +338,30 @@ object Compiler{
 
   def prepareJarCp(jarDeps: Seq[java.net.URL], settings: Settings) = {
     jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
-      .map { x =>
+      .flatMap { x =>
         if (x.getProtocol == "file") {
-          val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
-          CompilerCompatibility.createZipJarFactory(arc, settings)
+          val path = Paths.get(x.toURI)
+          if (Files.exists(path)) {
+            val arc = new FileZipArchive(path.toFile)
+            Seq(CompilerCompatibility.createZipJarFactory(arc, settings))
+          }
+          else
+            Nil
         } else {
           val arc = new internal.CustomURLZipArchive(x)
-          CustomZipAndJarFileLookupFactory.create(arc, settings)
+          Seq(CustomZipAndJarFileLookupFactory.create(arc, settings))
         }
       }
       .toVector
   }
   def prepareDirCp(dirDeps: Seq[java.net.URL]) = {
-    dirDeps.map(x =>
-      new DirectoryClassPath(java.nio.file.Paths.get(x.toURI).toFile)
-    )
+    dirDeps.flatMap { x =>
+      val path = Paths.get(x.toURI)
+      if (Files.exists(path))
+        Seq(new DirectoryClassPath(path.toFile))
+      else
+        Nil
+    }
   }
   /**
     * Code to initialize random bits and pieces that are needed
