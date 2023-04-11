@@ -224,20 +224,26 @@ case class Main(predefCode: String = "",
     instantiateRepl(replArgs.toIndexedSeq) match{
       case Left(missingPredefInfo) => missingPredefInfo
       case Right(repl) =>
-        repl.initializePredef().getOrElse{
-          // Warm up the compilation logic in the background, hopefully while the
-          // user is typing their first command, so by the time the command is
-          // submitted it can be processed by a warm compiler
-          val warmupThread = new Thread(new Runnable{
-            def run() = repl.warmup()
-          })
-          // This thread will terminal eventually on its own, but if the
-          // JVM wants to exit earlier this thread shouldn't stop it
-          warmupThread.setDaemon(true)
-          warmupThread.start()
+        repl.initializePredef() match {
+          case Some((e: Res.Exception, _)) =>
+            // just let exceptions during predef propagate up
+            throw e.t
+          case Some(value) =>
+            value
+          case None =>
+            // Warm up the compilation logic in the background, hopefully while the
+            // user is typing their first command, so by the time the command is
+            // submitted it can be processed by a warm compiler
+            val warmupThread = new Thread(new Runnable{
+              def run() = repl.warmup()
+            })
+            // This thread will terminal eventually on its own, but if the
+            // JVM wants to exit earlier this thread shouldn't stop it
+            warmupThread.setDaemon(true)
+            warmupThread.start()
 
-          val exitValue = Res.Success(repl.run())
-          (exitValue.map(repl.beforeExit), repl.interp.watchedValues.toSeq)
+            val exitValue = Res.Success(repl.run())
+            (exitValue.map(repl.beforeExit), repl.interp.watchedValues.toSeq)
         }
     }
   }

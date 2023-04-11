@@ -291,5 +291,13 @@ object BasicTests extends TestSuite{
       )
       assert(res.exitCode == 0)
     }
+
+    test("predef throws") {
+      val res = os.proc(TestUtils.executable, "--predef-code", """throw new Exception("from predef")""")
+        .call(check = false, mergeErrIntoOut = true)
+      assert(res.exitCode == 1)
+      val output = res.out.lines()
+      assert(output.contains("""Exception in thread "main" java.lang.Exception: from predef"""))
+    }
   }
 }
