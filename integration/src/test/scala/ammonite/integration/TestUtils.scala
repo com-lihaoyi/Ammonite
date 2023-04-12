@@ -10,13 +10,12 @@ object TestUtils {
   val isScala2 = scalaVersion.startsWith("2.")
   val javaVersion = scala.util.Properties.javaVersion
   val ammVersion = ammonite.Constants.version
-  val executable = {
-    val p = System.getenv("AMMONITE_ASSEMBLY")
+  val ammAssembly = System.getenv("AMMONITE_ASSEMBLY")
+  val executable =
     if (Util.windowsPlatform)
-      Seq(p)
+      Seq(ammAssembly)
     else
-      Seq("bash", p)
-  }
+      Seq("bash", ammAssembly)
   val intTestResources = os.pwd/'integration/'src/'test/'resources
   val replStandaloneResources = intTestResources/'ammonite/'integration
   val shellAmmoniteResources = os.pwd/'shell/'src/'main/'resources/'ammonite/'shell

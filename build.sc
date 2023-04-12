@@ -794,8 +794,14 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
       Agg.empty
   }
   object test extends Tests {
+    def testLauncher = T {
+      if (scala.util.Properties.isWin)
+        amm().launcher().path.toString
+      else
+        amm().assembly().path.toString
+    }
     def forkEnv = super.forkEnv() ++ Seq(
-      "AMMONITE_ASSEMBLY" -> amm().launcher().path.toString
+      "AMMONITE_ASSEMBLY" -> testLauncher()
     )
   }
 }
