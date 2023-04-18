@@ -50,7 +50,7 @@ object ${indexedWrapperName.backticked}{
   val instance: Helper.type = Helper
   def $$main() = instance.$$main()
 
-  object Helper extends java.io.Serializable {
+  object Helper extends _root_.java.io.Serializable {
 """
       )
 
@@ -123,7 +123,7 @@ object ${indexedWrapperName.backticked}{
   def $$main() = instance.$$main()
 }
 
-final class ${indexedWrapperName.backticked} extends java.io.Serializable {
+final class ${indexedWrapperName.backticked} extends _root_.java.io.Serializable {
 
 $usedThingsSet
 
@@ -132,7 +132,7 @@ override def toString = $q${indexedWrapperName.encoded}$q
 $requiredVals
 $reworkedImports
 
-final class Helper extends java.io.Serializable{\n"""
+final class Helper extends _root_.java.io.Serializable{\n"""
     )
 
       val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
