@@ -6,6 +6,7 @@ import java.net.URI
 import ammonite.interp.api.IvyConstructor
 import ammonite.util.Util.CodeSource
 import ammonite.util._
+import coursier.cputil.ClassPathUtil
 import coursierapi.{Dependency, IvyRepository, MavenRepository, Repository}
 
 import scala.util.{Failure, Success, Try}
@@ -225,19 +226,32 @@ object ImportHook{
                tree: ImportTree,
                interp: InterpreterInterface,
                wrapperPath: Seq[Name]): Either[String, Seq[Result]] = {
-      source.path match{
-        case None => Left("Cannot resolve $cp import in code without source")
-        case Some(currentScriptPath) =>
-          val (relativeModules, files, missing) = resolveFiles(
-            tree, currentScriptPath, Seq(".jar", "")
-          )
-
-          if (missing.nonEmpty)
-            Left("Cannot resolve $cp import: " + missing.mkString(", "))
-          else
-            Right(Seq(Result.ClassPath(None, files, plugin)))
+      val singleElemOpt = (tree.prefix, tree.mappings) match {
+        // for Scala 2
+        case (Seq(elem), None) => Some(elem)
+        // for Scala 3
+        case (Seq(), Some(Seq((elem, None)))) => Some(elem)
+        case _ => None
       }
+      singleElemOpt match {
+        case Some(elem) if elem.contains(JFile.pathSeparator) || elem.contains(JFile.separator) || elem.contains("/") =>
+          val cwd = source.path.fold(os.pwd)(_ / os.up)
+          val cp = ClassPathUtil.classPath(elem).map(os.Path(_, cwd))
+          Right(Seq(Result.ClassPath(None, cp, plugin)))
+        case _ =>
+          source.path match{
+            case None => Left("Cannot resolve $cp import in code without source")
+            case Some(currentScriptPath) =>
+              val (relativeModules, files, missing) = resolveFiles(
+                tree, currentScriptPath, Seq(".jar", "")
+              )
 
+              if (missing.nonEmpty)
+                Left("Cannot resolve $cp import: " + missing.mkString(", "))
+              else
+                Right(Seq(Result.ClassPath(None, files, plugin)))
+          }
+      }
     }
   }
 
