@@ -1,6 +1,6 @@
 package ammonite.runtime
 
-import java.io.{ByteArrayOutputStream, File}
+import java.io.{ByteArrayOutputStream, File => JFile}
 import java.net.URI
 
 import ammonite.interp.api.IvyConstructor
@@ -52,7 +52,7 @@ object ImportHook{
     * default this is what is available.
     */
   trait InterpreterInterface {
-    def loadIvy(coordinates: Dependency*): Either[String, Seq[File]]
+    def loadIvy(coordinates: Dependency*): Either[String, Seq[JFile]]
     def watch(p: os.Path): Unit
     def scalaVersion: String
   }
@@ -175,7 +175,7 @@ object ImportHook{
     def resolve(
       interp: InterpreterInterface,
       signatures: Seq[String]
-    ): Either[String, (Seq[Dependency], Seq[File])] = {
+    ): Either[String, (Seq[Dependency], Seq[JFile])] = {
       val splitted = for (signature <- signatures) yield {
         val (dottyCompat, coords) =
           if (signature.endsWith(" compat")) (true, signature.stripSuffix(" compat"))
