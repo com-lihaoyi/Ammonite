@@ -22,6 +22,9 @@ class DualTestRepl { dual =>
   )
 
   def scalaVersion = compilerBuilder.scalaVersion
+  lazy val scalaBinaryVersion =
+    if (scalaVersion.startsWith("2.")) scalaVersion.split('.').take(2).mkString(".")
+    else scalaVersion.takeWhile(_ != '.')
   def scala2 = scalaVersion.startsWith("2.")
   def scala2_12 = scalaVersion.startsWith("2.12.")
 

@@ -446,6 +446,36 @@
           See the docs for @sect.ref{Scala Scripts} for more on how script
           files work in general.
 
+      @sect{import $cp}
+        @p
+          Lets you add files in the class path. You can use either the same syntax
+          as $sect.ref{import $file}, like
+
+        @hl.scala
+          @@ import $cp.^.scripts.foo // adds ../scripts/foo to the class path
+
+        @p
+          Or you can pass file paths between back-ticks, like
+
+        @hl.scala
+          @@ import $cp.`../scripts/foo.jar` // adds ../scripts/foo.jar to the class path
+
+        @p
+          @code{*} are also accepted after directory paths, Java properties can be substituted
+          in values passed to @hl.scala{import $cp}, and several values can be passed, provided
+          they're separated by the standard path separator (@code{;} on Linux and macOS, and
+          @code{:} on Windows)
+
+        @hl.scala
+          @@ import $cp.`${spark.home}/jars/*` // adds all JARs under the jars subdirectory of Spark home
+
+        @p
+          Ammonite disambiguates the two syntaxes above the following way: if the import consists in a
+          single element after @hl.scala{import $cp.}, and this element contains @code{/} (on all platforms),
+          or the local PATH separator (@code{;} on Windows, @code{:} on Linux and macOS), or
+          a @code{\} if on Windows, then the second syntax above is assumed (class path syntax). Else,
+          the first syntax is assumed.
+
       @sect{import $ivy}
         @p
           Lets you import Ivy dependencies from Maven Central, or anywhere else.

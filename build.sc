@@ -82,6 +82,7 @@ object Deps {
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
+  val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.2"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.13"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = ivy"com.lihaoyi::geny:1.0.0"
@@ -415,6 +416,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
+      Deps.classPathUtil,
       Deps.upickle,
       Deps.requests,
       Deps.mainargs.use_3(crossScalaVersion)
