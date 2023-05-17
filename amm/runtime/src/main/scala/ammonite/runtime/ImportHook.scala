@@ -234,7 +234,7 @@ object ImportHook{
         case _ => None
       }
       singleElemOpt match {
-        case Some(elem) if elem.contains(JFile.pathSeparator) || elem.contains(JFile.separator) || elem.contains("/") =>
+        case Some(elem) if elem.contains(JFile.pathSeparator) || elem.contains(JFile.separator) || elem.contains("/") || elem.contains("${") =>
           val cwd = source.path.fold(os.pwd)(_ / os.up)
           val cp = ClassPathUtil.classPath(elem).map(os.Path(_, cwd))
           Right(Seq(Result.ClassPath(None, cp, plugin)))
