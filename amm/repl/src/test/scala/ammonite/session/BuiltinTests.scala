@@ -87,22 +87,24 @@ object BuiltinTests extends TestSuite{
       """)
     }
     test("importCp") {
-      val catsCp = coursierapi.Fetch.create()
-        .addDependencies(coursierapi.Dependency.of("org.typelevel", "cats-core_" + check.scalaBinaryVersion, "2.9.0"))
-        .fetch()
-        .asScala
-        .map(os.Path(_, os.pwd))
-      val tmpDir = os.temp.dir(prefix = "amm-builtin-tests")
-      for (f <- catsCp)
-        os.copy.into(f, tmpDir)
-      check.session(s"""
-        @ sys.props("the.tmp.dir") = "${tmpDir.toString.replace("\\", "\\\\")}"
+      test {
+        val catsCp = coursierapi.Fetch.create()
+          .addDependencies(coursierapi.Dependency.of("org.typelevel", "cats-core_" + check.scalaBinaryVersion, "2.9.0"))
+          .fetch()
+          .asScala
+          .map(os.Path(_, os.pwd))
+        val tmpDir = os.temp.dir(prefix = "amm-builtin-tests")
+        for (f <- catsCp)
+          os.copy.into(f, tmpDir)
+        check.session(s"""
+          @ sys.props("the.tmp.dir") = "${tmpDir.toString.replace("\\", "\\\\")}"
 
-        @ import $$cp.`$${the.tmp.dir}/*`
+          @ import $$cp.`$${the.tmp.dir}/*`
 
-        @ import cats.Monoid
-        import cats.Monoid
-      """)
+          @ import cats.Monoid
+          import cats.Monoid
+        """)
+      }
     }
     test("settings"){
       val fruitlessTypeTestWarningMessageBlahBlahBlah =
