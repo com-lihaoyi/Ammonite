@@ -75,7 +75,7 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.0.0-M6"
 val fastparseVersion = "3.0.0"
-val scalametaVersion = "4.5.13"
+val scalametaVersion = "4.7.8"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi:::acyclic:0.3.7"
