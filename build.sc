@@ -42,7 +42,8 @@ val commitsSinceTaggedVersion = {
 // don't.
 val cross2_3Version = (scala3Ver: String) =>
   if (scala3Ver.startsWith("3.0.") || scala3Ver.startsWith("3.1.")) "2.13.7"
-  else "2.13.10"
+  else if (scala3Ver.startsWith("3.2.")) "2.13.10"
+  else "2.13.11"
 
 
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16", "2.12.17", "2.12.18")
