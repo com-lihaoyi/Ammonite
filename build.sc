@@ -86,6 +86,7 @@ object Deps {
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.16"
+  val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
@@ -421,7 +422,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       Deps.classPathUtil,
       Deps.upickle,
       Deps.requests,
-      Deps.mainargs.use_3(crossScalaVersion)
+      Deps.mainargs.use_3(crossScalaVersion),
+      Deps.coursierDependencyInterface
     )
   }
 
