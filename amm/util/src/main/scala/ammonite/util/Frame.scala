@@ -8,4 +8,12 @@ trait Frame {
 
   def classpath: Seq[URL]
   def version: Int
+
+  def addHook(hook: Frame.Hook): Unit
+}
+
+object Frame {
+  trait Hook {
+    def addClasspath(additional: Seq[java.net.URL]): Unit
+  }
 }

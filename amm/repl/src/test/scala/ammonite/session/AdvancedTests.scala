@@ -708,5 +708,56 @@ object AdvancedTests extends TestSuite{
         """
       )
     }
+    test("class-path-hook") {
+      val sbv = check.scalaBinaryVersion
+      check.session(
+        s"""
+            @ var deps = Set.empty[String]
+
+            @ repl.sess.frames.head.addHook {
+            @   new ammonite.util.Frame.Hook {
+            @     def addClasspath(additional: Seq[java.net.URL]): Unit = {
+            @       deps = deps ++ additional.map(_.toString).filter(!_.endsWith("-sources.jar")).map(url => url.drop(url.lastIndexOf('/') + 1))
+            @     }
+            @   }
+            @ }
+
+            @ import $$ivy.`org.typelevel::cats-core:2.9.0`
+
+            @ val firstExpectedDeps = Set(
+            @   "cats-core_$sbv-2.9.0.jar",
+            @   "cats-kernel_$sbv-2.9.0.jar"
+            @ )
+
+            @ val firstCheck = deps == firstExpectedDeps
+            firstCheck: Boolean = true
+
+            @ deps = Set.empty[String]
+
+            @ import $$ivy.`org.typelevel::cats-core:2.9.0`
+
+            @ val firstEmptyCheck = deps.isEmpty
+            firstEmptyCheck: Boolean = true
+
+            @ deps = Set.empty[String]
+
+            @ interp.load.ivy("info.picocli" % "picocli" % "4.7.3")
+
+            @ val secondExpectedDeps = Set(
+            @   "picocli-4.7.3.jar"
+            @ )
+
+            @ val secondCheck = deps == secondExpectedDeps
+            secondCheck: Boolean = true
+
+            @ deps = Set.empty[String]
+
+            @ interp.load.ivy("info.picocli" % "picocli" % "4.7.3")
+
+            @ val secondEmptyCheck = deps.isEmpty
+            secondEmptyCheck: Boolean = true
+          """
+      )
+    }
   }
 }

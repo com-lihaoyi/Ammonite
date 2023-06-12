@@ -57,7 +57,7 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frames = Ref(List(Frame.createInitial(initialClassLoader)))
+  val frames = Ref(List(ammonite.runtime.Frame.createInitial(initialClassLoader)))
 
   /**
     * The current line number of the REPL, used to make sure every snippet
