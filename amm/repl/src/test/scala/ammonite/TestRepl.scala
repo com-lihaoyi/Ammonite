@@ -29,6 +29,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
+  def wrapperNamePrefix = Option.empty[String]
 
   val tempDir = os.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
@@ -77,7 +78,8 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
     initialClassLoader = initialClassLoader,
     alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
     importHooks = ImportHook.defaults,
-    classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
+    classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true),
+    wrapperNamePrefix = wrapperNamePrefix.getOrElse(Interpreter.Parameters().wrapperNamePrefix)
   )
   val interp = try {
     new Interpreter(

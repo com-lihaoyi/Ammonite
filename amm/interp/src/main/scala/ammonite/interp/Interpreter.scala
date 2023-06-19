@@ -232,7 +232,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
                   silent: Boolean = false,
                   incrementLine: () => Unit): Res[Evaluated] = synchronized{
 
-    val wrapperName = Name("cmd" + currentLine)
+    val wrapperName = Name(wrapperNamePrefix + currentLine)
 
     val codeSource = CodeSource(
       wrapperName,
@@ -422,7 +422,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   def processExec(code: String,
                   currentLine: Int,
                   incrementLine: () => Unit): Res[Imports] = synchronized{
-    val wrapperName = Name("cmd" + currentLine)
+    val wrapperName = Name(wrapperNamePrefix + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
       blocks <- Res(parser().splitScript(Interpreter.skipSheBangLine(code), fileName))
@@ -712,6 +712,10 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 
 object Interpreter{
 
+  /** @param wrapperNamePrefix
+    *   Name to be used as a prefix for source file and classes wrapping user code, that ends in
+    *   compilation errors or stack traces in particular
+    */
   case class Parameters(
     printer: Printer = Printer(
       System.out,
@@ -728,7 +732,8 @@ object Interpreter{
     initialClassLoader: ClassLoader = null,
     importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
     alreadyLoadedDependencies: Seq[Dependency] = Nil,
-    classPathWhitelist: Set[Seq[String]] = Set.empty
+    classPathWhitelist: Set[Seq[String]] = Set.empty,
+    wrapperNamePrefix: String = "cmd"
   )
 
   val predefImports = Imports(
