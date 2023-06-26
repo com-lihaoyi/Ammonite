@@ -63,8 +63,9 @@ object Parsers extends IParser {
   private def StatementBlock[_: P](blockSep: => P0) =
     P( Semis.? ~ (Index ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!).repX)
 
-  private def Splitter0[_: P] = P( StatementBlock(Fail) )
-  def Splitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
+  private def Splitter0[_: P] = P(StatementBlock(Fail))
+
+  def Splitter[_: P] = P(("{" ~~ WL.! ~~ Splitter0 ~ "}" | WL.! ~~ Splitter0) ~ End)
 
   private def ObjParser[_: P] = P( ObjDef )
 
@@ -94,14 +95,29 @@ object Parsers extends IParser {
         case f @ Parsed.Failure(_, _, _) => Some(Left(
           formatFastparseError(fileName, code, f)
         ))
-        case Parsed.Success(value, index) => Some(Right(value.map(_._2)))
+        case Parsed.Success(value, index) => {
+          val (str, seq) = value
+          if (seq.isEmpty) {
+            Some(Right(Seq(str)))
+          } else {
+            Some(Right(Seq(str + seq.head._2) ++ seq.tail.map(_._2)))
+          }
+        }
       }
     } else
       parse(code, Splitter(_)) match{
         case f @ Parsed.Failure(_, _, _) => Some(Left(
           formatFastparseError(fileName, code, f)
         ))
-        case Parsed.Success(value, index) => Some(Right(value.map(_._2)))
+        case Parsed.Success(value, index) => {
+          val (str, seq) = value
+          if (seq.isEmpty) {
+            Some(Right(Seq(str)))
+          } else {
+            Some(Right(Seq(str + seq.head._2) ++ seq.tail.map(_._2)))
+          }
+
+        }
       }
 
   def isObjDef(code: String): Boolean = {
