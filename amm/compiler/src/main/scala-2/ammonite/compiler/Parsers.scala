@@ -65,6 +65,8 @@ object Parsers extends IParser {
 
   private def Splitter0[_: P] = P(StatementBlock(Fail))
 
+  private def HighlightSplitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
+
   def Splitter[_: P] = P(("{" ~~ WL.! ~~ Splitter0 ~ "}" | WL.! ~~ Splitter0) ~ End)
 
   private def ObjParser[_: P] = P( ObjDef )
@@ -98,7 +100,7 @@ object Parsers extends IParser {
         case Parsed.Success(value, index) => {
           val (str, seq) = value
           if (seq.isEmpty) {
-            Some(Right(Seq(str)))
+            Some(Right(Nil))
           } else {
             Some(Right(Seq(str + seq.head._2) ++ seq.tail.map(_._2)))
           }
@@ -112,7 +114,7 @@ object Parsers extends IParser {
         case Parsed.Success(value, index) => {
           val (str, seq) = value
           if (seq.isEmpty) {
-            Some(Right(Seq(str)))
+            Some(Right(Nil))
           } else {
             Some(Right(Seq(str + seq.head._2) ++ seq.tail.map(_._2)))
           }
@@ -281,7 +283,7 @@ object Parsers extends IParser {
                        keyword: fansi.Attrs,
                        notImplemented: fansi.Attrs,
                        reset: fansi.Attrs) = {
-    Highlighter.defaultHighlight0(Splitter(_), buffer, comment, `type`, literal, keyword, reset)
+    Highlighter.defaultHighlight0(HighlightSplitter(_), buffer, comment, `type`, literal, keyword, reset)
   }
   def defaultHighlightIndices(buffer: Vector[Char],
                               comment: fansi.Attrs,
@@ -289,11 +291,11 @@ object Parsers extends IParser {
                               literal: fansi.Attrs,
                               keyword: fansi.Attrs,
                               reset: fansi.Attrs) = Highlighter.defaultHighlightIndices0(
-    Splitter(_), buffer, comment, `type`, literal, keyword, reset
+    HighlightSplitter(_), buffer, comment, `type`, literal, keyword, reset
   )
 
   def highlightIndices[T](buffer: Vector[Char],
                           ruleColors: PartialFunction[String, T],
                           endColor: T): Seq[(Int, T)] =
-    Highlighter.highlightIndices(Parsers.Splitter(_), buffer, ruleColors, endColor)
+    Highlighter.highlightIndices(Parsers.HighlightSplitter(_), buffer, ruleColors, endColor)
 }
