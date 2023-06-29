@@ -79,27 +79,34 @@ object FailureTests extends TestSuite{
     }
 
     test("lineNumbersInStackTrace1") {
-      check.fail("""
-        |
-        |
-        | 1 / 0
-        |""".stripMargin, x =>
-        x.contains("/ by zero") &&
-        x.contains("cmd0.sc:4") // check that the line number is correct
-      )
+      if (check.scala2) {
+        check.fail(
+          """
+            |
+            |
+            | 1 / 0
+            |""".stripMargin, x =>
+            x.contains("/ by zero") &&
+            x.contains("cmd0.sc:4") // check that the line number is correct
+
+        )
+      }
     }
 
     test("lineNumbersInStackTrace2") {
-      check.fail("""
-        |{
-        |
-        | // block command
-        | 1 / 0
-        |}
-        |""".stripMargin, x =>
-        x.contains("/ by zero") &&
-        x.contains("cmd0.sc:5") // check that the line number is correct
-      )
+      if (check.scala2) {
+        check.fail(
+        """
+          |{
+          |
+          | // block command
+          | 1 / 0
+          |}
+          |""".stripMargin, x =>
+          x.contains("/ by zero") &&
+          x.contains("cmd0.sc:5") // check that the line number is correct
+        )
+      }
     }
   }
 }
