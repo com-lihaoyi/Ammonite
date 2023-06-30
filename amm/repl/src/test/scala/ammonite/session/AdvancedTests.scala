@@ -772,5 +772,80 @@ object AdvancedTests extends TestSuite{
         """
       )
     }
+
+    test("warnings") {
+
+      val checkWithoutWarnings = new DualTestRepl {
+        override def warnings = false
+      }
+
+      checkWithoutWarnings.session(
+        """
+          @ @deprecated("foo", "1.2") def value(): Int = 2
+
+          @ val n = value()
+          warning:
+
+          @ val n0 = n
+          n0: Int = 2
+        """
+      )
+
+      val objCheck = new TestRepl
+      val clsCheck = new TestRepl {
+        override def codeWrapper = ammonite.compiler.CodeClassWrapper
+      }
+
+      if (scala2) {
+        objCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: cmd1.sc:1: method value in object cmd0 is deprecated (since 1.2): foo
+            val n = value()
+                    ^
+          """
+        )
+        clsCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: cmd1.sc:1: method value in class Helper is deprecated (since 1.2): foo
+            val n = value()
+                    ^
+          """
+        )
+      }
+      else {
+        objCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: -- Warning: cmd1.sc:1:8 --------------------------------------------------------
+            1 |val n = value()
+              |        ^^^^^
+              |        method value in object cmd0 is deprecated since 1.2: foo
+          """
+        )
+        clsCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: -- Warning: cmd1.sc:1:8 --------------------------------------------------------
+            1 |val n = value()
+              |        ^^^^^
+              |        method value in class Helper is deprecated since 1.2: foo
+          """
+        )
+      }
+    }
   }
 }

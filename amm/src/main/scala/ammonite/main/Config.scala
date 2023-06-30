@@ -55,7 +55,9 @@ object Config{
     @arg(doc = "Print this message")
     help: Flag,
     @arg(name = "version", short = 'v', doc = "Show Ammonite's version")
-    showVersion: Flag
+    showVersion: Flag,
+    @arg(name = "no-warn", doc = "Disable compiler warnings")
+    noWarnings: Flag
   )
   implicit val coreParser = ParserForClass[Core]
 

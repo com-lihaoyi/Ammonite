@@ -193,7 +193,6 @@ object Compiler{
 
       settings.outputDirs.setSingleOutput(vd)
 
-      settings.nowarnings.value = true
       // Otherwise the presence of `src`'s source files mixed with
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"

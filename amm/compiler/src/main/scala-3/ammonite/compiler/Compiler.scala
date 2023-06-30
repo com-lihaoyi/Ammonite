@@ -234,7 +234,7 @@ class Compiler(
 
     val result =
       if (ctx.reporter.hasErrors) Left(reporter.fold(ctx.reporter.removeBufferedMessages)(_ => Nil))
-      else Right(unit)
+      else Right((reporter.fold(ctx.reporter.removeBufferedMessages)(_ => Nil), unit))
 
     def formatDiagnostics(diagnostics: List[reporting.Diagnostic]): List[String] = {
       val scalaPosToScPos = PositionOffsetConversion.scalaPosToScPos(
@@ -278,7 +278,9 @@ class Compiler(
         for (err <- formatDiagnostics(errors))
           printer.error(err)
         None
-      case Right(unit) =>
+      case Right((warnings, unit)) =>
+        for (warn <- formatDiagnostics(warnings))
+          printer.warning(warn)
         val newImports = unfusedPhases.collectFirst {
           case p: AmmonitePhase => p.importData
         }.getOrElse(Seq.empty[ImportData])

@@ -32,7 +32,8 @@ class Repl(input: InputStream,
            parser: Parser,
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
-           classPathWhitelist: Set[Seq[String]]) { repl =>
+           classPathWhitelist: Set[Seq[String]],
+           warnings: Boolean) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -82,7 +83,8 @@ class Repl(input: InputStream,
     initialClassLoader = initialClassLoader,
     importHooks = importHooks,
     classPathWhitelist = classPathWhitelist,
-    alreadyLoadedDependencies = alreadyLoadedDependencies
+    alreadyLoadedDependencies = alreadyLoadedDependencies,
+    warnings = warnings
   )
   val interp = new Interpreter(
     compilerBuilder,
