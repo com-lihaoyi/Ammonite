@@ -23,9 +23,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java-version }}
-      - shell: 'script -q -e -c "bash {0}"'
-        # support tty for tests, see https://github.com/gfx/example-github-actions-with-tty
-        run: ./mill -i unitTest "${{ matrix.scala-version }}"
+      - run: ./mill -i unitTest "${{ matrix.scala-version }}"
   itest:
     strategy:
       fail-fast: false
