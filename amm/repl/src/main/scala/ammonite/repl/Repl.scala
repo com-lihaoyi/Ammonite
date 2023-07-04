@@ -177,7 +177,9 @@ class Repl(input: InputStream,
 
       case ex => Res.Exception(ex, "")
     }
-
+    // workaround to wildcard imports breaking code completion, see
+    // https://github.com/com-lihaoyi/Ammonite/issues/1009
+    importsForCompletion = Imports(fullImports.value.filter(_.fromName.raw != "package"))
     _ <- Signaller("INT") {
       // Put a fake `ThreadDeath` error in `lastException`, because `Thread#stop`
       // raises an error with the stack trace of *this interrupt thread*, rather
@@ -192,7 +194,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.compilerManager.complete(_, fullImports.toString, _),
+      interp.compilerManager.complete(_, importsForCompletion.toString, _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code
