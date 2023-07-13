@@ -695,5 +695,18 @@ object AdvancedTests extends TestSuite{
       val files = os.walk(dir).filter(os.isFile(_)).map(_.relativeTo(dir))
       assert(files.sorted == expectedFiles.sorted)
     }
+    test("comment and import") {
+      check.session(
+        """
+          @ import $ivy.`org.typelevel::cats-kernel:2.6.1`
+
+          @ {
+          @   // hello
+          @   import cats.kernel._
+          @ }
+          import cats.kernel._
+        """
+      )
+    }
   }
 }

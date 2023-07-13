@@ -17,7 +17,7 @@ object Parsers extends IParser {
   private def `_`[_: P] = scalaparse.Scala.Underscore
 
 
-  private def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
+  private def ImportExpr[_: P]: P[ammonite.util.ImportTree] = {
     def IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
@@ -28,17 +28,21 @@ object Parsers extends IParser {
     )
     def Prefix = P( IdParser.rep(1, sep = ".") )
     def Suffix = P( "." ~/ (BulkImport | Selectors) )
-    def ImportExpr: P[ammonite.util.ImportTree] = {
-      // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
-      // we do not want the whitespace to be consumed even if the WL0 parser parses
-      // to the end of the input (which is the default behavior for WhitespaceApi)
-      P( Index ~~ Prefix ~~ (WL0 ~~ Suffix).? ~~ Index).map{
-        case (start, idSeq, selectors, end) =>
-          ammonite.util.ImportTree(idSeq, selectors, start, end)
-      }
+
+    // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
+    // we do not want the whitespace to be consumed even if the WL0 parser parses
+    // to the end of the input (which is the default behavior for WhitespaceApi)
+    P( Index ~~ Prefix ~~ (WL0 ~~ Suffix).? ~~ Index).map{
+      case (start, idSeq, selectors, end) =>
+        ammonite.util.ImportTree(idSeq, selectors, start, end)
     }
-    P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
   }
+
+  def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] =
+    P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
+
+  def ImportFinder[_: P]: P[String] =
+    P(WL ~ `import` ~/ ImportExpr.! ~ End)
 
   private def PatVarSplitter[_: P] = {
     def Prefixes = P(Prelude ~ (`var` | `val`))
