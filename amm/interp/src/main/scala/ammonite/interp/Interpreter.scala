@@ -61,7 +61,8 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
-    Option(initialClassLoader).getOrElse(headFrame.classloader)
+    Option(initialClassLoader).getOrElse(headFrame.classloader),
+    Nil
   )
 
   val eval = Evaluator(headFrame)

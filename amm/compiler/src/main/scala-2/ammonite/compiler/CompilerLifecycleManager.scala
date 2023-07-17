@@ -32,7 +32,8 @@ class CompilerLifecycleManager(
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader,
-  val outputDir: Option[Path]
+  val outputDir: Option[Path],
+  initialSettings: Seq[String]
 ) extends ICompilerLifecycleManager {
 
   def scalaVersion = scala.util.Properties.versionNumberString
@@ -88,6 +89,9 @@ class CompilerLifecycleManager(
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      val (success, trailingSettings) = settings.processArguments(initialSettings.toList, processAll = true)
+      if (!success)
+        System.err.println(s"Error processing initial settings ${initialSettings.mkString(" ")}")
       onSettingsInit.foreach(_(settings))
 
       val initialClassPath = Classpath.classpath(initialClassLoader, rtCacheDir)

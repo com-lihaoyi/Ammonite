@@ -30,7 +30,8 @@ class CompilerLifecycleManager(
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
   initialClassLoader: ClassLoader,
-  val outputDir: Option[Path]
+  val outputDir: Option[Path],
+  initialSettings: Seq[String]
 ) extends ammonite.compiler.iface.CompilerLifecycleManager {
 
   def scalaVersion = dotc.config.Properties.versionNumberString
@@ -96,7 +97,8 @@ class CompilerLifecycleManager(
         headFrame.classloader,
         classPathWhitelist,
         dependencyCompleteOpt = dependencyCompleteOpt,
-        contextInit = c => onSettingsInit.foreach(_(c))
+        contextInit = c => onSettingsInit.foreach(_(c)),
+        settings = initialSettings
       )
       onCompilerInit.foreach(_(compiler.compiler))
 
