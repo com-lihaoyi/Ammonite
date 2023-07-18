@@ -759,5 +759,18 @@ object AdvancedTests extends TestSuite{
           """
       )
     }
+
+    test("custom wrapper name prefix") {
+      val check = new DualTestRepl {
+        override def wrapperNamePrefix = Some("cell")
+      }
+      // Helper suffix stripped for class-based code wrapping
+      check.session(
+        """
+          @ val clsName = getClass.getName.stripPrefix("ammonite.$sess.").stripSuffix("Helper")
+          clsName: String = "cell0$"
+        """
+      )
+    }
   }
 }
