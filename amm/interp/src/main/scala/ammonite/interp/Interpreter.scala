@@ -656,7 +656,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   }
 
 
-  private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
+  lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
     val colors = parameters.colors
 
