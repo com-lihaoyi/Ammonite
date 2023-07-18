@@ -5,8 +5,13 @@ import ch.epfl.scala.bsp4j._
 import scala.collection.JavaConverters._
 
 private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuildServer {
+  override def buildTargetDependencyModules(dmp: DependencyModulesParams): CompletableFuture[DependencyModulesResult] =
+    CompletableFuture.completedFuture(new DependencyModulesResult(List.empty.asJava))
 
-  def buildTargetResources(params: ResourcesParams): CompletableFuture[ResourcesResult] = {
+  override def buildTargetOutputPaths(opp: OutputPathsParams): CompletableFuture[OutputPathsResult] =
+    CompletableFuture.completedFuture(new OutputPathsResult(List.empty.asJava))
+
+  override def buildTargetResources(params: ResourcesParams): CompletableFuture[ResourcesResult] = {
     val items = params.getTargets.asScala.toList.map { target =>
       new ResourcesItem(target, List.empty[String].asJava)
     }
@@ -14,20 +19,19 @@ private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuil
     CompletableFuture.completedFuture(result)
   }
 
-  def buildTargetRun(params: RunParams): CompletableFuture[RunResult] = {
+  override def buildTargetRun(params: RunParams): CompletableFuture[RunResult] = {
     val result = new RunResult(StatusCode.ERROR)
     result.setOriginId(params.getOriginId)
     CompletableFuture.completedFuture(result)
   }
-  def buildTargetTest(params: TestParams): CompletableFuture[TestResult] = {
+
+  override def buildTargetTest(params: TestParams): CompletableFuture[TestResult] = {
     val result = new TestResult(StatusCode.ERROR)
     result.setOriginId(params.getOriginId)
     CompletableFuture.completedFuture(result)
   }
-  def onBuildExit(): Unit = ()
-  def onBuildInitialized(): Unit = ()
 
-  def buildTargetScalaMainClasses(
+  override def buildTargetScalaMainClasses(
     params: ScalaMainClassesParams
   ): CompletableFuture[ScalaMainClassesResult] = {
     val items = params.getTargets.asScala.map { target =>
@@ -36,7 +40,8 @@ private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuil
     val result = new ScalaMainClassesResult(items.asJava)
     CompletableFuture.completedFuture(result)
   }
-  def buildTargetScalaTestClasses(
+
+  override def buildTargetScalaTestClasses(
     params: ScalaTestClassesParams
   ): CompletableFuture[ScalaTestClassesResult] = {
     val items = params.getTargets.asScala.map { target =>
@@ -46,4 +51,12 @@ private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuil
     CompletableFuture.completedFuture(result)
   }
 
+  override def debugSessionStart(dsp: DebugSessionParams): CompletableFuture[DebugSessionAddress] =
+    CompletableFuture.completedFuture(new DebugSessionAddress(""))
+
+  override def onBuildExit(): Unit = ()
+  override def onBuildInitialized(): Unit = ()
+
+  override def workspaceReload(): CompletableFuture[Object] =
+    CompletableFuture.completedFuture(new {})
 }
