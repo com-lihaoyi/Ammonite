@@ -507,11 +507,8 @@ object Compiler:
       output.write(bytes)
       output.close()
 
-      for (dir <- outputDir0) {
-        val dest = dir / elems
-        os.makeDir.all(dest / os.up)
-        os.write(dest, bytes)
-      }
+      for (dir <- outputDir0)
+        os.write.over(dir / elems, bytes, createFolders = true)
     }
 
   }
