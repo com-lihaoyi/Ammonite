@@ -85,7 +85,8 @@ case class Main(predefCode: String = "",
                 compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder(),
                 // by-name, so that fastparse isn't loaded when we don't need it
                 parser: () => Parser = () => ammonite.compiler.Parsers,
-                classPathWhitelist: Set[Seq[String]] = Set.empty){
+                classPathWhitelist: Set[Seq[String]] = Set.empty,
+                warnings: Boolean = false){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -149,7 +150,8 @@ case class Main(predefCode: String = "",
         compilerBuilder = compilerBuilder,
         parser = parser(),
         initialClassLoader = initialClassLoader,
-        classPathWhitelist = classPathWhitelist
+        classPathWhitelist = classPathWhitelist,
+        warnings = warnings
       )
     }
 
@@ -182,7 +184,8 @@ case class Main(predefCode: String = "",
         initialClassLoader = initialClassLoader,
         importHooks = importHooks,
         classPathWhitelist = classPathWhitelist,
-        alreadyLoadedDependencies = alreadyLoadedDependencies
+        alreadyLoadedDependencies = alreadyLoadedDependencies,
+        warnings = warnings
       )
       val interp = new Interpreter(
         compilerBuilder,

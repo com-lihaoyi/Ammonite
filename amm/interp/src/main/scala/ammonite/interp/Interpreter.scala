@@ -61,7 +61,8 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
-    Option(initialClassLoader).getOrElse(headFrame.classloader)
+    Option(initialClassLoader).getOrElse(headFrame.classloader),
+    if (warnings) Seq("-deprecation", "-feature") else Seq("-nowarn")
   )
 
   val eval = Evaluator(headFrame)
@@ -733,7 +734,8 @@ object Interpreter{
     importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
     alreadyLoadedDependencies: Seq[Dependency] = Nil,
     classPathWhitelist: Set[Seq[String]] = Set.empty,
-    wrapperNamePrefix: String = "cmd"
+    wrapperNamePrefix: String = "cmd",
+    warnings: Boolean = false
   )
 
   val predefImports = Imports(

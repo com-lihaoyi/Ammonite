@@ -12,7 +12,8 @@ abstract class CompilerBuilder {
     headFrame: => Frame,
     dependencyCompleter: => Option[String => (Int, Seq[String])],
     whiteList: Set[Seq[String]],
-    initialClassLoader: ClassLoader
+    initialClassLoader: ClassLoader,
+    settings: Seq[String]
   ): CompilerLifecycleManager
 
   def create(

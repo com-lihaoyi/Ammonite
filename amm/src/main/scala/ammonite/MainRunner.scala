@@ -146,7 +146,8 @@ class MainRunner(cliConfig: Config,
             if (cliConfig.repl.tmpOutputDirectory.value) Some(os.temp.dir(prefix = "ammonite-output").toNIO)
             else None
           }
-      )
+      ),
+      warnings = !cliConfig.core.noWarnings.value
     )
   }
 

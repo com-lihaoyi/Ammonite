@@ -30,6 +30,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
   def wrapperNamePrefix = Option.empty[String]
+  def warnings = true
 
   val tempDir = os.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
@@ -79,7 +80,8 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
     alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
     importHooks = ImportHook.defaults,
     classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true),
-    wrapperNamePrefix = wrapperNamePrefix.getOrElse(Interpreter.Parameters().wrapperNamePrefix)
+    wrapperNamePrefix = wrapperNamePrefix.getOrElse(Interpreter.Parameters().wrapperNamePrefix),
+    warnings = warnings
   )
   val interp = try {
     new Interpreter(
@@ -269,7 +271,9 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
         val strippedExpected = expected.stripPrefix("warning: ")
         assert(warning.contains(strippedExpected))
 
-      }else if (expected.startsWith("info: ")){
+      }else if (expected == "warning:")
+        assert(warning.isEmpty)
+      else if (expected.startsWith("info: ")){
         val strippedExpected = expected.stripPrefix("info: ")
         assert(info.contains(strippedExpected))
 
