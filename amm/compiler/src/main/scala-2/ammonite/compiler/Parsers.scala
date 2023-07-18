@@ -39,7 +39,7 @@ object Parsers extends IParser {
   }
 
   def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] =
-    P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
+    P( WL ~ `import` ~/ ImportExpr.rep(1, sep = ","./) )
 
   def ImportFinder[_: P]: P[String] =
     P(WL ~ `import` ~/ ImportExpr.! ~ End)
