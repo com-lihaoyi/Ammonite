@@ -8,7 +8,11 @@ import ammonite.util.Util.CodeSource
 import ammonite.util._
 import coursier.cputil.ClassPathUtil
 import coursierapi.{Dependency, IvyRepository, MavenRepository, Repository}
+import dependency.ScalaParameters
+import dependency.api.ops._
+import dependency.parser.DependencyParser
 
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -180,25 +184,16 @@ object ImportHook{
         val (dottyCompat, coords) =
           if (signature.endsWith(" compat")) (true, signature.stripSuffix(" compat"))
           else (false, signature)
-        coords.split(':') match{
-          case Array(a, b, c) =>
-            Right(Dependency.of(a, b, c))
-          case Array(a, "", b, c) =>
-            val sbv =
-              if (dottyCompat && interp.scalaVersion.startsWith("3.")) "2.13"
-              else IvyConstructor.scalaBinaryVersion(interp.scalaVersion)
-            Right(Dependency.of(a, b + "_" + sbv, c))
-          case Array(a, "", "", b, c) =>
-            val sv =
-              // FIXME We may need to bump that version from time to time, or
-              // to use a different one, depending on the 3.x version.
-              if (dottyCompat && interp.scalaVersion.startsWith("3."))
-                // Should be the 2.13 version we want
-                scala.util.Properties.versionNumberString
-              else
-                interp.scalaVersion
-            Right(Dependency.of(a, b + "_" + sv, c))
-          case _ => Left(signature)
+        DependencyParser.parse(coords).map { dep =>
+          val scalaVersion =
+            if ((dottyCompat || dep.userParams.get("compat").nonEmpty) && !interp.scalaVersion.startsWith("2."))
+              // When dotty compatibility is enabled, pull Scala 2.13 dependencies rather than Scala 3 ones.
+              // versionNumberString gives us the right 2.13 version for the current Scala 3 version.
+              scala.util.Properties.versionNumberString
+            else
+              interp.scalaVersion
+          val params = ScalaParameters(scalaVersion)
+          dep.applyParams(params).toCs
         }
       }
       val errors = splitted.collect{case Left(error) => error}
