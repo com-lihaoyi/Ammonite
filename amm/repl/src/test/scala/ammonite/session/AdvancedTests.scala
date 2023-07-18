@@ -708,6 +708,19 @@ object AdvancedTests extends TestSuite{
         """
       )
     }
+    test("hook in block") {
+      check.session(
+        """
+          @ {
+          @   import $ivy.`org.typelevel::cats-kernel:2.6.1`
+          @ }
+          import $ivy.$
+
+          @ import cats.kernel._
+          import cats.kernel._
+        """
+      )
+    }
     test("class-path-hook") {
       val sbv = check.scalaBinaryVersion
       check.session(
