@@ -50,7 +50,7 @@ val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12",
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10", "2.13.11", "2.13.12")
 val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2", "3.1.3")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
-val scala33Versions = Seq("3.3.0")
+val scala33Versions = Seq("3.3.0", "3.3.1")
 val scala3Versions = scala31Versions ++ scala32Versions ++ scala33Versions
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala31Versions.last, scala32Versions.last, scala33Versions.last)
