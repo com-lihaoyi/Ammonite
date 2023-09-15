@@ -2,7 +2,7 @@ package ammonite.compiler
 
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path, Paths}
 import java.io.{ByteArrayInputStream, OutputStream}
 
 import ammonite.compiler.iface.{
@@ -42,8 +42,7 @@ import dotty.tools.io.{
   File,
   VirtualDirectory,
   VirtualFile,
-  PlainFile,
-  Path
+  PlainFile
 }
 import dotty.tools.repl.CollectTopLevelImports
 
@@ -235,47 +234,53 @@ class Compiler(
 
     val result =
       if (ctx.reporter.hasErrors) Left(reporter.fold(ctx.reporter.removeBufferedMessages)(_ => Nil))
-      else Right(unit)
+      else Right((reporter.fold(ctx.reporter.removeBufferedMessages)(_ => Nil), unit))
+
+    def formatDiagnostics(diagnostics: List[reporting.Diagnostic]): List[String] = {
+      val scalaPosToScPos = PositionOffsetConversion.scalaPosToScPos(
+        new String(src).drop(importsLen),
+        0,
+        0,
+        new String(src),
+        importsLen
+      )
+      val scFile = new SourceFile(sourceFile.file, sourceFile.content().drop(importsLen))
+      def scalaOffsetToScOffset(scalaOffset: Int): Option[Int] =
+        scalaPosToScPos(sourceFile.offsetToLine(scalaOffset), sourceFile.column(scalaOffset)).map {
+          case (scLine, scCol) => scFile.lineToOffset(scLine) + scCol
+        }
+      def scalaSpanToScSpan(scalaSpan: Span): Option[Span] =
+        for {
+          scStart <- scalaOffsetToScOffset(scalaSpan.start)
+          scEnd <- scalaOffsetToScOffset(scalaSpan.end)
+          scPoint <- scalaOffsetToScOffset(scalaSpan.point)
+        } yield Span(scStart, scEnd, scPoint)
+      def scalaSourcePosToScSourcePos(sourcePos: SourcePosition): Option[SourcePosition] =
+        if (sourcePos.source == sourceFile)
+          scalaSpanToScSpan(sourcePos.span).map { scSpan =>
+            SourcePosition(scFile, scSpan, sourcePos.outer)
+          }
+        else
+          None
+      def scalaDiagnosticToScDiagnostic(diag: reporting.Diagnostic): Option[reporting.Diagnostic] =
+        scalaSourcePosToScSourcePos(diag.pos).map { scPos =>
+          new reporting.Diagnostic(diag.msg, scPos, diag.level)
+        }
+
+      diagnostics
+        .map(d => scalaDiagnosticToScDiagnostic(d).getOrElse(d))
+        .map(formatError)
+        .map(_.msg.toString)
+    }
 
     result match {
       case Left(errors) =>
-        val scalaPosToScPos = PositionOffsetConversion.scalaPosToScPos(
-          new String(src).drop(importsLen),
-          0,
-          0,
-          new String(src),
-          importsLen
-        )
-        val scFile = new SourceFile(sourceFile.file, sourceFile.content().drop(importsLen))
-        def scalaOffsetToScOffset(scalaOffset: Int): Option[Int] =
-          scalaPosToScPos(sourceFile.offsetToLine(scalaOffset), sourceFile.column(scalaOffset)).map {
-            case (scLine, scCol) => scFile.lineToOffset(scLine) + scCol
-          }
-        def scalaSpanToScSpan(scalaSpan: Span): Option[Span] =
-          for {
-            scStart <- scalaOffsetToScOffset(scalaSpan.start)
-            scEnd <- scalaOffsetToScOffset(scalaSpan.end)
-            scPoint <- scalaOffsetToScOffset(scalaSpan.point)
-          } yield Span(scStart, scEnd, scPoint)
-        def scalaSourcePosToScSourcePos(sourcePos: SourcePosition): Option[SourcePosition] =
-          if (sourcePos.source == sourceFile)
-            scalaSpanToScSpan(sourcePos.span).map { scSpan =>
-              SourcePosition(scFile, scSpan, sourcePos.outer)
-            }
-          else
-            None
-        def scalaDiagnosticToScDiagnostic(diag: reporting.Diagnostic): Option[reporting.Diagnostic] =
-          scalaSourcePosToScSourcePos(diag.pos).map { scPos =>
-            new reporting.Diagnostic(diag.msg, scPos, diag.level)
-          }
-
-        errors
-          .map(d => scalaDiagnosticToScDiagnostic(d).getOrElse(d))
-          .map(formatError)
-          .map(_.msg.toString)
-          .foreach(printer.error)
+        for (err <- formatDiagnostics(errors))
+          printer.error(err)
         None
-      case Right(unit) =>
+      case Right((warnings, unit)) =>
+        for (warn <- formatDiagnostics(warnings))
+          printer.warning(warn)
         val newImports = unfusedPhases.collectFirst {
           case p: AmmonitePhase => p.importData
         }.getOrElse(Seq.empty[ImportData])
@@ -284,7 +289,8 @@ class Compiler(
         }.getOrElse(Seq.empty[String])
         val fileCount = enumerateVdFiles(outputDir).length
         val classes = files(outputDir).toArray
-        Compiler.addToClasspath(classes, dynamicClassPath)
+        // outputDir is None here, dynamicClassPath should already correspond to an on-disk directory
+        Compiler.addToClasspath(classes, dynamicClassPath, None)
         outputDir.clear()
         val lineShift = PositionOffsetConversion.offsetToPos(new String(src)).apply(importsLen).line
         val mappings = Map(sourceFile.file.name -> (sourceFile.file.name, -lineShift))
@@ -497,12 +503,18 @@ object Compiler:
   }
 
   def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: AbstractFile): Unit = {
+                     dynamicClasspath: AbstractFile,
+                     outputDir: Option[Path]): Unit = {
 
+    val outputDir0 = outputDir.map(os.Path(_, os.pwd))
     for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('/').toList)
+      val elems = name.split('/').toList
+      val output = writeDeep(dynamicClasspath, elems)
       output.write(bytes)
       output.close()
+
+      for (dir <- outputDir0)
+        os.write.over(dir / elems, bytes, createFolders = true)
     }
 
   }

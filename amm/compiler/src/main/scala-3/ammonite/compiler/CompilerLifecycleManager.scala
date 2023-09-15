@@ -29,7 +29,9 @@ class CompilerLifecycleManager(
   headFrame: => ammonite.util.Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
-  initialClassLoader: ClassLoader
+  initialClassLoader: ClassLoader,
+  val outputDir: Option[Path],
+  initialSettings: Seq[String]
 ) extends ammonite.compiler.iface.CompilerLifecycleManager {
 
   def scalaVersion = dotc.config.Properties.versionNumberString
@@ -39,7 +41,8 @@ class CompilerLifecycleManager(
 
 
   private[this] object Internal{
-    val dynamicClasspath = AbstractFile.getDirectory(os.temp.dir().toNIO)
+    outputDir.map(os.Path(_, os.pwd)).foreach(os.makeDir.all(_))
+    val dynamicClasspath = AbstractFile.getDirectory(outputDir.getOrElse(os.temp.dir().toNIO))
     var compiler: ammonite.compiler.Compiler = null
     val onCompilerInit = mutable.Buffer.empty[DottyCompiler => Unit]
     val onSettingsInit = mutable.Buffer.empty[FreshContext => Unit] // TODO Pass a SettingsState too
@@ -94,7 +97,8 @@ class CompilerLifecycleManager(
         headFrame.classloader,
         classPathWhitelist,
         dependencyCompleteOpt = dependencyCompleteOpt,
-        contextInit = c => onSettingsInit.foreach(_(c))
+        contextInit = c => onSettingsInit.foreach(_(c)),
+        settings = initialSettings
       )
       onCompilerInit.foreach(_(compiler.compiler))
 
@@ -148,7 +152,7 @@ class CompilerLifecycleManager(
     }
 
   def addToClasspath(classFiles: ClassFiles): Unit = synchronized {
-    Compiler.addToClasspath(classFiles, dynamicClasspath)
+    Compiler.addToClasspath(classFiles, dynamicClasspath, outputDir)
   }
   def shutdownPressy() = () // N/A in Scala 3
 }

@@ -73,7 +73,12 @@ public class Export {
         return tempFile;
     }
 
-    public static boolean rtTo(File dest, boolean verbose) {
+    /**
+     * Needs to be `synchronized` because java.nio.file.Files.copy isn't thread safe:
+     * https://stackoverflow.com/questions/69796396/is-files-copy-a-thread-safe-function-in-java
+     * and our own handling of "if !exists, then copy" isn't either...
+     */
+    public static synchronized boolean rtTo(File dest, boolean verbose) {
         try {
             if (!dest.exists()) {
                 if (verbose) {

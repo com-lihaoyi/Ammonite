@@ -9,19 +9,29 @@ import ammonite.util.{Evaluated, Res}
 class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
+  def wrapperNamePrefix = Option.empty[String]
 
-  val compilerBuilder = ammonite.compiler.CompilerBuilder
+  def warnings = true
+
+  def compilerBuilder = ammonite.compiler.CompilerBuilder()
   val repls = Seq(
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef
+      override def wrapperNamePrefix = dual.wrapperNamePrefix
+      override def warnings = dual.warnings
     },
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef
       override def codeWrapper = CodeClassWrapper
+      override def wrapperNamePrefix = dual.wrapperNamePrefix
+      override def warnings = dual.warnings
     }
   )
 
   def scalaVersion = compilerBuilder.scalaVersion
+  lazy val scalaBinaryVersion =
+    if (scalaVersion.startsWith("2.")) scalaVersion.split('.').take(2).mkString(".")
+    else scalaVersion.takeWhile(_ != '.')
   def scala2 = scalaVersion.startsWith("2.")
   def scala2_12 = scalaVersion.startsWith("2.12.")
 

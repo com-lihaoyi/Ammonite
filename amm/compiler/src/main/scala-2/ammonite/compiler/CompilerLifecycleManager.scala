@@ -31,7 +31,9 @@ class CompilerLifecycleManager(
   headFrame: => ammonite.util.Frame,
   dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
   classPathWhitelist: Set[Seq[String]],
-  initialClassLoader: ClassLoader
+  initialClassLoader: ClassLoader,
+  val outputDir: Option[Path],
+  initialSettings: Seq[String]
 ) extends ICompilerLifecycleManager {
 
   def scalaVersion = scala.util.Properties.versionNumberString
@@ -87,6 +89,9 @@ class CompilerLifecycleManager(
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      val (success, trailingSettings) = settings.processArguments(initialSettings.toList, processAll = true)
+      if (!success)
+        System.err.println(s"Error processing initial settings ${initialSettings.mkString(" ")}")
       onSettingsInit.foreach(_(settings))
 
       val initialClassPath = Classpath.classpath(initialClassLoader, rtCacheDir)
@@ -96,6 +101,7 @@ class CompilerLifecycleManager(
       Internal.compiler = Compiler(
         headFrameClassPath,
         dynamicClasspath,
+        outputDir,
         headFrame.classloader,
         headFrame.pluginClassloader,
         () => shutdownPressy(),
@@ -163,7 +169,7 @@ class CompilerLifecycleManager(
     }
 
   def addToClasspath(classFiles: ClassFiles) = synchronized {
-    Compiler.addToClasspath(classFiles, dynamicClasspath)
+    Compiler.addToClasspath(classFiles, dynamicClasspath, outputDir)
   }
   // Not synchronized, since it's part of the exit sequence that needs to run
   // if the repl exits while the warmup code is compiling

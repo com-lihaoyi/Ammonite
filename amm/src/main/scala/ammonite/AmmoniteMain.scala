@@ -1,22 +1,15 @@
 package ammonite
 
 import java.io.{InputStream, OutputStream, PrintStream}
-import java.net.URLClassLoader
-import java.nio.file.NoSuchFileException
 
-import ammonite.compiler.{CodeClassWrapper, DefaultCodeWrapper}
-import ammonite.compiler.iface.{CodeWrapper, CompilerBuilder, Parser}
-import ammonite.interp.{Watchable, Interpreter, PredefInitialization}
+import ammonite.compiler.DefaultCodeWrapper
+import ammonite.compiler.iface.CompilerBuilder
+import ammonite.interp.PredefInitialization
 import ammonite.interp.script.AmmoniteBuildServer
-import ammonite.runtime.{Frame, Storage}
 import ammonite.main._
-import ammonite.repl.{FrontEndAPIImpl, Repl}
 import ammonite.util.Util.newLine
 import ammonite.util._
 
-import scala.annotation.tailrec
-import ammonite.runtime.ImportHook
-import coursierapi.Dependency
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
@@ -62,7 +55,7 @@ object AmmoniteMain{
       case Right(cliConfig) =>
         if (cliConfig.core.bsp.value) {
           val buildServer = new AmmoniteBuildServer(
-            ammonite.compiler.CompilerBuilder,
+            ammonite.compiler.CompilerBuilder(),
             ammonite.compiler.Parsers,
             ammonite.compiler.DefaultCodeWrapper,
             initialScripts = cliConfig.rest.map(os.Path(_)),

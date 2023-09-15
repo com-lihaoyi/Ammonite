@@ -1,7 +1,7 @@
 package ammonite.session
 
 import ammonite.TestUtils._
-import ammonite.DualTestRepl
+import ammonite.{DualTestRepl, TestRepl}
 import ammonite.util.Res
 import utest._
 
@@ -644,6 +644,221 @@ object AdvancedTests extends TestSuite{
           @ "test".concat("test")
           res4: String = "testtest"
         """)
+    }
+    test("output-directory") {
+      val dir = os.temp.dir(prefix = "amm-output-dir-test")
+      val predef0 =
+        """val n = 2
+          |""".stripMargin
+      val defaultCheck = new TestRepl(
+        ammonite.compiler.CompilerBuilder(outputDir = Some((dir / "default").toNIO))
+      ) {
+        override def predef = (predef0, None)
+      }
+      val classBasedCheck = new TestRepl(
+        ammonite.compiler.CompilerBuilder(outputDir = Some((dir / "class-based").toNIO))
+      ) {
+        override def predef = (predef0, None)
+        override def codeWrapper = ammonite.compiler.CodeClassWrapper
+      }
+      val session = """
+        @ val check = interp.outputDir.nonEmpty
+        check: Boolean = true
+      """
+      defaultCheck.session(session)
+      classBasedCheck.session(session)
+
+      val expectedClassFiles = Seq(
+        os.rel / "default" / "ammonite" / "predef" / "testPredef.class",
+        os.rel / "default" / "ammonite" / "predef" / "testPredef$.class",
+        os.rel / "default" / "ammonite" / "$sess" / "cmd0.class",
+        os.rel / "default" / "ammonite" / "$sess" / "cmd0$.class",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef.class",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef$.class",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef$Helper.class",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0.class",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0$.class",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0$Helper.class"
+      )
+      val expectedTastyFiles = Seq(
+        os.rel / "default" / "ammonite" / "predef" / "testPredef.tasty",
+        os.rel / "default" / "ammonite" / "$sess" / "cmd0.tasty",
+        os.rel / "class-based" / "ammonite" / "predef" / "testPredef.tasty",
+        os.rel / "class-based" / "ammonite" / "$sess" / "cmd0.tasty"
+      )
+      val expectedFiles =
+        if (ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2."))
+          expectedClassFiles
+        else
+          expectedClassFiles ++ expectedTastyFiles
+
+      val files = os.walk(dir).filter(os.isFile(_)).map(_.relativeTo(dir))
+      assert(files.sorted == expectedFiles.sorted)
+    }
+    test("comment and import") {
+      check.session(
+        """
+          @ import $ivy.`org.typelevel::cats-kernel:2.6.1`
+
+          @ {
+          @   // hello
+          @   import cats.kernel._
+          @ }
+          import cats.kernel._
+        """
+      )
+    }
+    test("hook in block") {
+      check.session(
+        """
+          @ {
+          @   import $ivy.`org.typelevel::cats-kernel:2.6.1`
+          @ }
+          import $ivy.$
+
+          @ import cats.kernel._
+          import cats.kernel._
+        """
+      )
+    }
+    test("class-path-hook") {
+      val sbv = check.scalaBinaryVersion
+      check.session(
+        s"""
+            @ var deps = Set.empty[String]
+
+            @ repl.sess.frames.head.addHook {
+            @   new ammonite.util.Frame.Hook {
+            @     def addClasspath(additional: Seq[java.net.URL]): Unit = {
+            @       deps = deps ++ additional.map(_.toString).filter(!_.endsWith("-sources.jar")).map(url => url.drop(url.lastIndexOf('/') + 1))
+            @     }
+            @   }
+            @ }
+
+            @ import $$ivy.`org.typelevel::cats-core:2.9.0`
+
+            @ val firstExpectedDeps = Set(
+            @   "cats-core_$sbv-2.9.0.jar",
+            @   "cats-kernel_$sbv-2.9.0.jar"
+            @ )
+
+            @ val firstCheck = deps == firstExpectedDeps
+            firstCheck: Boolean = true
+
+            @ deps = Set.empty[String]
+
+            @ import $$ivy.`org.typelevel::cats-core:2.9.0`
+
+            @ val firstEmptyCheck = deps.isEmpty
+            firstEmptyCheck: Boolean = true
+
+            @ deps = Set.empty[String]
+
+            @ interp.load.ivy("info.picocli" % "picocli" % "4.7.3")
+
+            @ val secondExpectedDeps = Set(
+            @   "picocli-4.7.3.jar"
+            @ )
+
+            @ val secondCheck = deps == secondExpectedDeps
+            secondCheck: Boolean = true
+
+            @ deps = Set.empty[String]
+
+            @ interp.load.ivy("info.picocli" % "picocli" % "4.7.3")
+
+            @ val secondEmptyCheck = deps.isEmpty
+            secondEmptyCheck: Boolean = true
+          """
+      )
+    }
+
+    test("custom wrapper name prefix") {
+      val check = new DualTestRepl {
+        override def wrapperNamePrefix = Some("cell")
+      }
+      // Helper suffix stripped for class-based code wrapping
+      check.session(
+        """
+          @ val clsName = getClass.getName.stripPrefix("ammonite.$sess.").stripSuffix("Helper")
+          clsName: String = "cell0$"
+        """
+      )
+    }
+
+    test("warnings") {
+
+      val checkWithoutWarnings = new DualTestRepl {
+        override def warnings = false
+      }
+
+      checkWithoutWarnings.session(
+        """
+          @ @deprecated("foo", "1.2") def value(): Int = 2
+
+          @ val n = value()
+          warning:
+
+          @ val n0 = n
+          n0: Int = 2
+        """
+      )
+
+      val objCheck = new TestRepl
+      val clsCheck = new TestRepl {
+        override def codeWrapper = ammonite.compiler.CodeClassWrapper
+      }
+
+      if (scala2) {
+        objCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: cmd1.sc:1: method value in object cmd0 is deprecated (since 1.2): foo
+            val n = value()
+                    ^
+          """
+        )
+        clsCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: cmd1.sc:1: method value in class Helper is deprecated (since 1.2): foo
+            val n = value()
+                    ^
+          """
+        )
+      }
+      else {
+        objCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: -- Warning: cmd1.sc:1:8 --------------------------------------------------------
+            1 |val n = value()
+              |        ^^^^^
+              |        method value in object cmd0 is deprecated since 1.2: foo
+          """
+        )
+        clsCheck.session(
+          """
+            @ @deprecated("foo", "1.2") def value(): Int = 2
+            defined function value
+
+            @ val n = value()
+            warning: -- Warning: cmd1.sc:1:8 --------------------------------------------------------
+            1 |val n = value()
+              |        ^^^^^
+              |        method value in class Helper is deprecated since 1.2: foo
+          """
+        )
+      }
     }
   }
 }

@@ -77,5 +77,54 @@ object FailureTests extends TestSuite{
         !x.contains("Something unexpected went wrong =(")
       )
     }
+
+    test("lineNumbersInStackTrace1") {
+      if (check.scala2) {
+        check.fail(
+          """
+            |
+            |
+            | 1 / 0
+            |""".stripMargin, x =>
+            x.contains("/ by zero") &&
+            x.contains("cmd0.sc:4") // check that the line number is correct
+
+        )
+      }
+    }
+
+    test("lineNumbersInStackTrace2") {
+      if (check.scala2) {
+        check.fail(
+        """
+          |{
+          |
+          | // block command
+          | 1 / 0
+          |}
+          |""".stripMargin, x =>
+          x.contains("/ by zero") &&
+          x.contains("cmd0.sc:5") // check that the line number is correct
+        )
+      }
+    }
+
+    test("wrapperNameInStackTrace") {
+      val check = new DualTestRepl {
+        override def wrapperNamePrefix = Some("cell")
+      }
+      check.fail(
+        """{
+          |
+          | // block command
+          | 1 / 0
+          |}
+          |""".stripMargin,
+        x =>
+          x.contains("/ by zero") &&
+          !x.contains("cmd0.sc:") &&
+          x.contains("cell0.sc:")
+      )
+    }
   }
 }

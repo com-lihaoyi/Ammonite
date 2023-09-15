@@ -22,13 +22,15 @@ import ammonite.runtime.ImportHook
  * A test REPL which does not read from stdin or stdout files, but instead lets
  * you feed in lines or sessions programmatically and have it execute them.
  */
-class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
+class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
   def scala2 = compilerBuilder.scalaVersion.startsWith("2.")
   def scalaVersion = compilerBuilder.scalaVersion
 
   var allOutput = ""
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
+  def wrapperNamePrefix = Option.empty[String]
+  def warnings = true
 
   val tempDir = os.Path(
     java.nio.file.Files.createTempDirectory("ammonite-tester")
@@ -69,22 +71,27 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
   val parser = ammonite.compiler.Parsers
 
   var currentLine = 0
+  val interpParams = Interpreter.Parameters(
+    printer = printer0,
+    storage = storage,
+    wd = os.pwd,
+    colors = Ref(Colors.BlackWhite),
+    initialClassLoader = initialClassLoader,
+    alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
+    importHooks = ImportHook.defaults,
+    classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true),
+    wrapperNamePrefix = wrapperNamePrefix.getOrElse(Interpreter.Parameters().wrapperNamePrefix),
+    warnings = warnings
+  )
   val interp = try {
     new Interpreter(
       compilerBuilder,
-      parser,
-      printer0,
-      storage = storage,
-      wd = os.pwd,
-      colors = Ref(Colors.BlackWhite),
+      () => parser,
       getFrame = () => frames().head,
       createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
-      initialClassLoader = initialClassLoader,
       replCodeWrapper = codeWrapper,
       scriptCodeWrapper = codeWrapper,
-      alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
-      importHooks = ImportHook.defaults,
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
+      parameters = interpParams
     )
 
   }catch{ case e: Throwable =>
@@ -264,7 +271,9 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder) { self =>
         val strippedExpected = expected.stripPrefix("warning: ")
         assert(warning.contains(strippedExpected))
 
-      }else if (expected.startsWith("info: ")){
+      }else if (expected == "warning:")
+        assert(warning.isEmpty)
+      else if (expected.startsWith("info: ")){
         val strippedExpected = expected.stripPrefix("info: ")
         assert(info.contains(strippedExpected))
 

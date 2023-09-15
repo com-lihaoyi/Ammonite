@@ -3,6 +3,9 @@ package ammonite.session
 import ammonite.{DualTestRepl, TestUtils}
 import utest._
 
+import java.io.File
+
+import scala.collection.JavaConverters._
 import scala.collection.{immutable => imm}
 object BuiltinTests extends TestSuite{
 
@@ -84,6 +87,42 @@ object BuiltinTests extends TestSuite{
         @ hello.Hello.hello()
         res5: String = "Hello!"
       """)
+    }
+    test("importCp") {
+      test {
+        val catsCp = coursierapi.Fetch.create()
+          .addDependencies(coursierapi.Dependency.of("org.typelevel", "cats-core_" + check.scalaBinaryVersion, "2.9.0"))
+          .fetch()
+          .asScala
+          .map(os.Path(_, os.pwd))
+        val tmpDir = os.temp.dir(prefix = "amm-builtin-tests")
+        for (f <- catsCp)
+          os.copy.into(f, tmpDir)
+        check.session(s"""
+          @ sys.props("the.tmp.dir") = "${tmpDir.toString.replace("\\", "\\\\")}"
+
+          @ import $$cp.`$${the.tmp.dir}/*`
+
+          @ import cats.Monoid
+          import cats.Monoid
+        """)
+      }
+
+      test {
+        val catsCp = coursierapi.Fetch.create()
+          .addDependencies(coursierapi.Dependency.of("org.typelevel", "cats-core_" + check.scalaBinaryVersion, "2.9.0"))
+          .fetch()
+          .asScala
+        val cpStr = catsCp.map(_.toString).mkString(File.pathSeparator)
+        check.session(s"""
+          @ sys.props("the.cats.cp") = "${cpStr.replace("\\", "\\\\")}"
+
+          @ import $$cp.`$${the.cats.cp}`
+
+          @ import cats.Monoid
+          import cats.Monoid
+        """)
+      }
     }
     test("settings"){
       val fruitlessTypeTestWarningMessageBlahBlahBlah =

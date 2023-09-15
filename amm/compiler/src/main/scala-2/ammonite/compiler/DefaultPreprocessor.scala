@@ -111,8 +111,13 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
 
   val Import = Processor{
     case (name, code, tree: G#Import) =>
-      val Array(keyword, body) = code.split(" ", 2)
-      val tq = "\"\"\""
+      val body = fastparse.parse(code, Parsers.ImportFinder(_)) match {
+        case s: fastparse.Parsed.Success[String] =>
+          s.value
+        case _ =>
+          val Array(keyword, body) = code.split(" ", 2)
+          body
+      }
       Expanded(code, Seq(
         s"""
         _root_.ammonite

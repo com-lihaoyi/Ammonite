@@ -24,7 +24,7 @@
   @sect{Older Scala Versions}
     @p
       While most people would be using Ammonite for the latest version of Scala,
-      2.12, Ammonite also provides standalone executables for older versions of
+      3.2, Ammonite also provides standalone executables for older versions of
       Scala:
 
     @for(versionNameLink <- ammonite.Constants.oldCurlUrls)

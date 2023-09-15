@@ -2,6 +2,7 @@ package ammonite.compiler
 
 
 import java.io.OutputStream
+import java.nio.file.{Files, Path, Paths}
 
 import ammonite.compiler.iface.{Compiler => ICompiler, Preprocessor}
 import ammonite.util.{Classpath, ImportData, Imports, Printer}
@@ -45,12 +46,18 @@ object Compiler{
     * Writes files to dynamicClasspath. Needed for loading cached classes.
     */
   def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory): Unit = {
+                     dynamicClasspath: VirtualDirectory,
+                     outputDir: Option[Path]): Unit = {
 
+    val outputDir0 = outputDir.map(os.Path(_, os.pwd))
     for((name, bytes) <- classFiles){
-      val output = writeDeep(dynamicClasspath, name.split('/').toList)
+      val elems = name.split('/').toList
+      val output = writeDeep(dynamicClasspath, elems)
       output.write(bytes)
       output.close()
+
+      for (dir <- outputDir0)
+        os.write.over(dir / elems, bytes, createFolders = true)
     }
 
   }
@@ -98,6 +105,7 @@ object Compiler{
 
   def apply(classpath: Seq[java.net.URL],
             dynamicClasspath: VirtualDirectory,
+            outputDir: Option[Path],
             evalClassloader: => ClassLoader,
             pluginClassloader: => ClassLoader,
             shutdownPressy: () => Unit,
@@ -164,7 +172,7 @@ object Compiler{
 
       val (dirDeps, jarDeps) = classpath.partition { u =>
         u.getProtocol == "file" &&
-        java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+        Files.isDirectory(Paths.get(u.toURI))
       }
 
       val jcp = initGlobalClasspath(
@@ -185,7 +193,6 @@ object Compiler{
 
       settings.outputDirs.setSingleOutput(vd)
 
-      settings.nowarnings.value = true
       // Otherwise the presence of `src`'s source files mixed with
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"
@@ -293,6 +300,14 @@ object Compiler{
           (x.path.stripPrefix("(memory)/"), x.toByteArray)
         }
 
+        for {
+          dir <- outputDir.map(os.Path(_, os.pwd))
+          f <- outputFiles
+        } {
+          val segments = f.path.split("/").toList.tail
+          os.write.over(dir / segments, f.toByteArray, createFolders = true)
+        }
+
         val imports = lastImports.toList
         Some(ICompiler.Output(files, Imports(imports), usedEarlierDefinitions))
 
@@ -319,21 +334,30 @@ object Compiler{
 
   def prepareJarCp(jarDeps: Seq[java.net.URL], settings: Settings) = {
     jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
-      .map { x =>
+      .flatMap { x =>
         if (x.getProtocol == "file") {
-          val arc = new FileZipArchive(java.nio.file.Paths.get(x.toURI).toFile)
-          CompilerCompatibility.createZipJarFactory(arc, settings)
+          val path = Paths.get(x.toURI)
+          if (Files.exists(path)) {
+            val arc = new FileZipArchive(path.toFile)
+            Seq(CompilerCompatibility.createZipJarFactory(arc, settings))
+          }
+          else
+            Nil
         } else {
           val arc = new internal.CustomURLZipArchive(x)
-          CustomZipAndJarFileLookupFactory.create(arc, settings)
+          Seq(CustomZipAndJarFileLookupFactory.create(arc, settings))
         }
       }
       .toVector
   }
   def prepareDirCp(dirDeps: Seq[java.net.URL]) = {
-    dirDeps.map(x =>
-      new DirectoryClassPath(java.nio.file.Paths.get(x.toURI).toFile)
-    )
+    dirDeps.flatMap { x =>
+      val path = Paths.get(x.toURI)
+      if (Files.exists(path))
+        Seq(new DirectoryClassPath(path.toFile))
+      else
+        Nil
+    }
   }
   /**
     * Code to initialize random bits and pieces that are needed

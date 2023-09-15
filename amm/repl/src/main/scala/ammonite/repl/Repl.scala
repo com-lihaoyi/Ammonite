@@ -32,7 +32,8 @@ class Repl(input: InputStream,
            parser: Parser,
            initialClassLoader: ClassLoader =
              classOf[ammonite.repl.api.ReplAPI].getClassLoader,
-           classPathWhitelist: Set[Seq[String]]) { repl =>
+           classPathWhitelist: Set[Seq[String]],
+           warnings: Boolean) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -57,7 +58,7 @@ class Repl(input: InputStream,
     """
   }.mkString(newLine)
 
-  val frames = Ref(List(Frame.createInitial(initialClassLoader)))
+  val frames = Ref(List(ammonite.runtime.Frame.createInitial(initialClassLoader)))
 
   /**
     * The current line number of the REPL, used to make sure every snippet
@@ -73,22 +74,26 @@ class Repl(input: InputStream,
 
   def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
 
+  val interpParams = Interpreter.Parameters(
+    printer = printer,
+    storage = storage,
+    wd = wd,
+    colors = colors,
+    verboseOutput = true,
+    initialClassLoader = initialClassLoader,
+    importHooks = importHooks,
+    classPathWhitelist = classPathWhitelist,
+    alreadyLoadedDependencies = alreadyLoadedDependencies,
+    warnings = warnings
+  )
   val interp = new Interpreter(
     compilerBuilder,
-    parser,
-    printer,
-    storage,
-    wd,
-    colors,
-    verboseOutput = true,
+    () => parser,
     getFrame = () => frames().head,
     createFrame = () => { val f = sess0.childFrame(frames().head); frames() = f :: frames(); f },
-    initialClassLoader = initialClassLoader,
     replCodeWrapper = replCodeWrapper,
     scriptCodeWrapper = scriptCodeWrapper,
-    alreadyLoadedDependencies = alreadyLoadedDependencies,
-    importHooks,
-    classPathWhitelist = classPathWhitelist
+    parameters = interpParams
   )
 
   val bridges = Seq(
@@ -174,7 +179,9 @@ class Repl(input: InputStream,
 
       case ex => Res.Exception(ex, "")
     }
-
+    // workaround to wildcard imports breaking code completion, see
+    // https://github.com/com-lihaoyi/Ammonite/issues/1009
+    importsForCompletion = Imports(fullImports.value.filter(_.fromName.raw != "package"))
     _ <- Signaller("INT") {
       // Put a fake `ThreadDeath` error in `lastException`, because `Thread#stop`
       // raises an error with the stack trace of *this interrupt thread*, rather
@@ -189,7 +196,7 @@ class Repl(input: InputStream,
       output,
       colors().prompt()(prompt()).render,
       colors(),
-      interp.compilerManager.complete(_, fullImports.toString, _),
+      interp.compilerManager.complete(_, importsForCompletion.toString, _),
       storage.fullHistory(),
       addHistory = (code) => if (code != "") {
         storage.fullHistory() = storage.fullHistory() :+ code

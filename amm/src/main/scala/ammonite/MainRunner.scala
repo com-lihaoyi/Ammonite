@@ -139,8 +139,15 @@ class MainRunner(cliConfig: Config,
       parser = () => parser,
       alreadyLoadedDependencies =
         Defaults.alreadyLoadedDependencies(),
-      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.core.thin.value)
-
+      classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(cliConfig.core.thin.value),
+      compilerBuilder = ammonite.compiler.CompilerBuilder(
+        outputDir = cliConfig.repl.outputDirectory.map(_.toNIO)
+          .orElse {
+            if (cliConfig.repl.tmpOutputDirectory.value) Some(os.temp.dir(prefix = "ammonite-output").toNIO)
+            else None
+          }
+      ),
+      warnings = !cliConfig.core.noWarnings.value
     )
   }
 

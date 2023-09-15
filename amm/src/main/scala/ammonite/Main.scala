@@ -82,10 +82,11 @@ case class Main(predefCode: String = "",
                 alreadyLoadedDependencies: Seq[Dependency] =
                   Defaults.alreadyLoadedDependencies(),
                 importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder,
+                compilerBuilder: CompilerBuilder = ammonite.compiler.CompilerBuilder(),
                 // by-name, so that fastparse isn't loaded when we don't need it
                 parser: () => Parser = () => ammonite.compiler.Parsers,
-                classPathWhitelist: Set[Seq[String]] = Set.empty){
+                classPathWhitelist: Set[Seq[String]] = Set.empty,
+                warnings: Boolean = false){
 
   def loadedPredefFile = predefFile match{
     case Some(path) =>
@@ -149,7 +150,8 @@ case class Main(predefCode: String = "",
         compilerBuilder = compilerBuilder,
         parser = parser(),
         initialClassLoader = initialClassLoader,
-        classPathWhitelist = classPathWhitelist
+        classPathWhitelist = classPathWhitelist,
+        warnings = warnings
       )
     }
 
@@ -173,22 +175,26 @@ case class Main(predefCode: String = "",
         PredefInfo(Name("CodePredef"), predefCode, false, None)
       )
       lazy val parser0 = parser()
+      val interpParams = Interpreter.Parameters(
+        printer = printer,
+        storage = storageBackend,
+        wd = wd,
+        colors = colorsRef,
+        verboseOutput = verboseOutput,
+        initialClassLoader = initialClassLoader,
+        importHooks = importHooks,
+        classPathWhitelist = classPathWhitelist,
+        alreadyLoadedDependencies = alreadyLoadedDependencies,
+        warnings = warnings
+      )
       val interp = new Interpreter(
-        ammonite.compiler.CompilerBuilder,
-        parser0,
-        printer,
-        storageBackend,
-        wd,
-        colorsRef,
-        verboseOutput,
+        compilerBuilder,
+        () => parser0,
         () => frame,
         () => throw new Exception("session loading / saving not possible here"),
-        initialClassLoader = initialClassLoader,
         replCodeWrapper,
         scriptCodeWrapper,
-        alreadyLoadedDependencies = alreadyLoadedDependencies,
-        importHooks = importHooks,
-        classPathWhitelist = classPathWhitelist
+        parameters = interpParams
       )
       val bridges = Seq(
         (
@@ -221,20 +227,26 @@ case class Main(predefCode: String = "",
     instantiateRepl(replArgs.toIndexedSeq) match{
       case Left(missingPredefInfo) => missingPredefInfo
       case Right(repl) =>
-        repl.initializePredef().getOrElse{
-          // Warm up the compilation logic in the background, hopefully while the
-          // user is typing their first command, so by the time the command is
-          // submitted it can be processed by a warm compiler
-          val warmupThread = new Thread(new Runnable{
-            def run() = repl.warmup()
-          })
-          // This thread will terminal eventually on its own, but if the
-          // JVM wants to exit earlier this thread shouldn't stop it
-          warmupThread.setDaemon(true)
-          warmupThread.start()
+        repl.initializePredef() match {
+          case Some((e: Res.Exception, _)) =>
+            // just let exceptions during predef propagate up
+            throw e.t
+          case Some(value) =>
+            value
+          case None =>
+            // Warm up the compilation logic in the background, hopefully while the
+            // user is typing their first command, so by the time the command is
+            // submitted it can be processed by a warm compiler
+            val warmupThread = new Thread(new Runnable{
+              def run() = repl.warmup()
+            })
+            // This thread will terminal eventually on its own, but if the
+            // JVM wants to exit earlier this thread shouldn't stop it
+            warmupThread.setDaemon(true)
+            warmupThread.start()
 
-          val exitValue = Res.Success(repl.run())
-          (exitValue.map(repl.beforeExit), repl.interp.watchedValues.toSeq)
+            val exitValue = Res.Success(repl.run())
+            (exitValue.map(repl.beforeExit), repl.interp.watchedValues.toSeq)
         }
     }
   }

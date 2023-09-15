@@ -28,21 +28,15 @@ import coursierapi.{Dependency, Fetch, Repository}
  */
 class Interpreter(val compilerBuilder: CompilerBuilder,
                   // by-name, so that fastparse isn't loaded when we don't need it
-                  parser: => Parser,
-                  val printer: Printer,
-                  val storage: Storage,
-                  val wd: os.Path,
-                  colors: Ref[Colors],
-                  verboseOutput: Boolean = true,
+                  parser: () => Parser,
                   getFrame: () => Frame,
                   val createFrame: () => Frame,
-                  initialClassLoader: ClassLoader = null,
                   replCodeWrapper: CodeWrapper,
                   val scriptCodeWrapper: CodeWrapper,
-                  alreadyLoadedDependencies: Seq[Dependency],
-                  importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
-                  classPathWhitelist: Set[Seq[String]] = Set.empty)
+                  parameters: Interpreter.Parameters = Interpreter.Parameters())
   extends ImportHook.InterpreterInterface{ interp =>
+
+  import parameters._
 
 
   def headFrame = getFrame()
@@ -67,7 +61,8 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
     headFrame,
     Some(dependencyComplete),
     classPathWhitelist,
-    Option(initialClassLoader).getOrElse(headFrame.classloader)
+    Option(initialClassLoader).getOrElse(headFrame.classloader),
+    if (warnings) Seq("-deprecation", "-feature") else Seq("-nowarn")
   )
 
   val eval = Evaluator(headFrame)
@@ -238,7 +233,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
                   silent: Boolean = false,
                   incrementLine: () => Unit): Res[Evaluated] = synchronized{
 
-    val wrapperName = Name("cmd" + currentLine)
+    val wrapperName = Name(wrapperNamePrefix + currentLine)
 
     val codeSource = CodeSource(
       wrapperName,
@@ -246,7 +241,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
       Seq(Name("ammonite"), Name("$sess")),
       Some(wd/"(console)")
     )
-    val (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
+    val (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
 
     for{
       _ <- Catching { case ex => Res.Exception(ex, "") }
@@ -386,7 +381,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
         // and none of it's blocks end up needing to be re-compiled. We don't know up
         // front if any blocks will need re-compilation, because it may import $file
         // another script which gets changed, and we'd only know when we reach that block
-        lazy val splittedScript = parser.splitScript(
+        lazy val splittedScript = parser().splitScript(
           Interpreter.skipSheBangLine(code),
           codeSource.printablePath
         )
@@ -428,10 +423,10 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   def processExec(code: String,
                   currentLine: Int,
                   incrementLine: () => Unit): Res[Imports] = synchronized{
-    val wrapperName = Name("cmd" + currentLine)
+    val wrapperName = Name(wrapperNamePrefix + currentLine)
     val fileName = wrapperName.encoded + ".sc"
     for {
-      blocks <- Res(parser.splitScript(Interpreter.skipSheBangLine(code), fileName))
+      blocks <- Res(parser().splitScript(Interpreter.skipSheBangLine(code), fileName))
 
       metadata <- processAllScriptBlocks(
         blocks.map(_ => None),
@@ -580,7 +575,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
           for{
             allSplittedChunks <- splittedScript
             (leadingSpaces, stmts) = allSplittedChunks(wrapperIndex - 1)
-            (hookStmts, importTrees) = parser.parseImportHooks(codeSource, stmts)
+            (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
             hookInfo <- resolveImportHooks(
              importTrees, hookStmts, codeSource, scriptCodeWrapper.wrapperPath
             )
@@ -662,9 +657,9 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   }
 
 
-  private[this] lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
+  lazy val interpApi: InterpAPI = new InterpAPI{ outer =>
 
-    val colors = interp.colors
+    val colors = parameters.colors
 
     def watch(p: os.Path) = interp.watch(p)
     def watchValue[T](v: => T): T = {interp.watchValue(v); v}
@@ -717,6 +712,31 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
 }
 
 object Interpreter{
+
+  /** @param wrapperNamePrefix
+    *   Name to be used as a prefix for source file and classes wrapping user code, that ends in
+    *   compilation errors or stack traces in particular
+    */
+  case class Parameters(
+    printer: Printer = Printer(
+      System.out,
+      System.err,
+      System.out,
+      System.err.println,
+      System.err.println,
+      System.err.println
+    ),
+    storage: Storage = Storage.InMemory(),
+    wd: os.Path = os.pwd,
+    colors: Ref[Colors] = Ref(Colors.Default),
+    verboseOutput: Boolean = true,
+    initialClassLoader: ClassLoader = null,
+    importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults,
+    alreadyLoadedDependencies: Seq[Dependency] = Nil,
+    classPathWhitelist: Set[Seq[String]] = Set.empty,
+    wrapperNamePrefix: String = "cmd",
+    warnings: Boolean = false
+  )
 
   val predefImports = Imports(
     ImportData("ammonite.interp.api.InterpBridge.value.exit"),

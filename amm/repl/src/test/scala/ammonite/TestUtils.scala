@@ -24,10 +24,7 @@ object TestUtils {
     val initialClassLoader = Thread.currentThread().getContextClassLoader
     val startFrame = Frame.createInitial(initialClassLoader)
     val printStream = new PrintStream(System.out)
-    val interp = new Interpreter(
-      ammonite.compiler.CompilerBuilder,
-      ammonite.compiler.Parsers,
-
+    val interpParams = Interpreter.Parameters(
       printer = Printer(
         printStream, new PrintStream(System.err), printStream,
         println, println, println
@@ -35,14 +32,20 @@ object TestUtils {
       storage = storage,
       wd = os.pwd,
       colors = Ref(Colors.BlackWhite),
-      getFrame = () => startFrame,
-      createFrame = () => throw new Exception("unsupported"),
       initialClassLoader = initialClassLoader,
-      replCodeWrapper = DefaultCodeWrapper,
-      scriptCodeWrapper = DefaultCodeWrapper,
       alreadyLoadedDependencies = Defaults.alreadyLoadedDependencies("amm-test-dependencies.txt"),
       importHooks = ImportHook.defaults,
       classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true)
+    )
+    val interp = new Interpreter(
+      ammonite.compiler.CompilerBuilder(),
+      () => ammonite.compiler.Parsers,
+
+      getFrame = () => startFrame,
+      createFrame = () => throw new Exception("unsupported"),
+      replCodeWrapper = DefaultCodeWrapper,
+      scriptCodeWrapper = DefaultCodeWrapper,
+      parameters = interpParams
     )
     // Provide a custom predef so we can verify in tests that the predef gets cached
     for {
