@@ -46,7 +46,7 @@ val cross2_3Version = (scala3Ver: String) =>
 
 
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16", "2.12.17", "2.12.18")
-val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10", "2.13.11")
+val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10", "2.13.11", "2.13.12")
 val scala30Versions = Seq("3.0.0", "3.0.1", "3.0.2")
 val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2", "3.1.3")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
@@ -79,7 +79,7 @@ val fastparseVersion = "2.3.0"
 val scalametaVersion = "4.8.5"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.8"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.9"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
@@ -269,8 +269,10 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
     val extraDir3 =
       if (isScala2()) {
         val dir =
-          if (sv.startsWith("2.13.") && sv != "2.13.0")
-            millSourcePath / "src" / "main" / "scala-2.13.1+"
+          if (sv.startsWith("2.13.") && sv.stripPrefix("2.13.").toInt >= 1 && sv.stripPrefix("2.13.").toInt <= 11)
+            millSourcePath / "src" / "main" / "scala-2.13.1-2.13.11"
+          else if (sv.startsWith("2.13.") && sv.stripPrefix("2.13.").toInt >= 12)
+            millSourcePath / "src" / "main" / "scala-2.13.12+"
           else if (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").toInt >= 13)
             millSourcePath / "src" / "main" / "scala-2.12.13+"
           else
