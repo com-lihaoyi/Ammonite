@@ -17,7 +17,7 @@ object Parsers extends IParser {
   private def `_`[_: P] = scalaparse.Scala.Underscore
 
 
-  private def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] = {
+  private def ImportExpr[_: P]: P[ammonite.util.ImportTree] = {
     def IdParser = P( (Id | `_` ).! ).map(
       s => if (s(0) == '`') s.drop(1).dropRight(1) else s
     )
@@ -28,17 +28,21 @@ object Parsers extends IParser {
     )
     def Prefix = P( IdParser.rep(1, sep = ".") )
     def Suffix = P( "." ~/ (BulkImport | Selectors) )
-    def ImportExpr: P[ammonite.util.ImportTree] = {
-      // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
-      // we do not want the whitespace to be consumed even if the WL0 parser parses
-      // to the end of the input (which is the default behavior for WhitespaceApi)
-      P( Index ~~ Prefix ~~ (WL0 ~~ Suffix).? ~~ Index).map{
-        case (start, idSeq, selectors, end) =>
-          ammonite.util.ImportTree(idSeq, selectors, start, end)
-      }
+
+    // Manually use `WL0` parser here, instead of relying on WhitespaceApi, as
+    // we do not want the whitespace to be consumed even if the WL0 parser parses
+    // to the end of the input (which is the default behavior for WhitespaceApi)
+    P( Index ~~ Prefix ~~ (WL0 ~~ Suffix).? ~~ Index).map{
+      case (start, idSeq, selectors, end) =>
+        ammonite.util.ImportTree(idSeq, selectors, start, end)
     }
-    P( `import` ~/ ImportExpr.rep(1, sep = ","./) )
   }
+
+  def ImportSplitter[_: P]: P[Seq[ammonite.util.ImportTree]] =
+    P( WL ~ `import` ~/ ImportExpr.rep(1, sep = ","./) )
+
+  def ImportFinder[_: P]: P[String] =
+    P(WL ~ `import` ~/ ImportExpr.! ~ End)
 
   private def PatVarSplitter[_: P] = {
     def Prefixes = P(Prelude ~ (`var` | `val`))
@@ -63,8 +67,11 @@ object Parsers extends IParser {
   private def StatementBlock[_: P](blockSep: => P0) =
     P( Semis.? ~ (Index ~ (!blockSep ~ TmplStat ~~ WS ~~ (Semis | &("}") | End)).!).repX)
 
-  private def Splitter0[_: P] = P( StatementBlock(Fail) )
-  def Splitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
+  private def Splitter0[_: P] = P(StatementBlock(Fail))
+
+  private def HighlightSplitter[_: P] = P( ("{" ~ Splitter0 ~ "}" | Splitter0) ~ End )
+
+  def Splitter[_: P] = P(("{" ~~ WL.! ~~ Splitter0 ~ "}" | WL.! ~~ Splitter0) ~ End)
 
   private def ObjParser[_: P] = P( ObjDef )
 
@@ -94,14 +101,29 @@ object Parsers extends IParser {
         case f @ Parsed.Failure(_, _, _) => Some(Left(
           formatFastparseError(fileName, code, f)
         ))
-        case Parsed.Success(value, index) => Some(Right(value.map(_._2)))
+        case Parsed.Success(value, index) => {
+          val (str, seq) = value
+          if (seq.isEmpty) {
+            Some(Right(Nil))
+          } else {
+            Some(Right(Seq(str + seq.head._2) ++ seq.tail.map(_._2)))
+          }
+        }
       }
     } else
       parse(code, Splitter(_)) match{
         case f @ Parsed.Failure(_, _, _) => Some(Left(
           formatFastparseError(fileName, code, f)
         ))
-        case Parsed.Success(value, index) => Some(Right(value.map(_._2)))
+        case Parsed.Success(value, index) => {
+          val (str, seq) = value
+          if (seq.isEmpty) {
+            Some(Right(Nil))
+          } else {
+            Some(Right(Seq(str + seq.head._2) ++ seq.tail.map(_._2)))
+          }
+
+        }
       }
 
   def isObjDef(code: String): Boolean = {
@@ -265,7 +287,7 @@ object Parsers extends IParser {
                        keyword: fansi.Attrs,
                        notImplemented: fansi.Attrs,
                        reset: fansi.Attrs) = {
-    Highlighter.defaultHighlight0(Splitter(_), buffer, comment, `type`, literal, keyword, reset)
+    Highlighter.defaultHighlight0(HighlightSplitter(_), buffer, comment, `type`, literal, keyword, reset)
   }
   def defaultHighlightIndices(buffer: Vector[Char],
                               comment: fansi.Attrs,
@@ -273,11 +295,11 @@ object Parsers extends IParser {
                               literal: fansi.Attrs,
                               keyword: fansi.Attrs,
                               reset: fansi.Attrs) = Highlighter.defaultHighlightIndices0(
-    Splitter(_), buffer, comment, `type`, literal, keyword, reset
+    HighlightSplitter(_), buffer, comment, `type`, literal, keyword, reset
   )
 
   def highlightIndices[T](buffer: Vector[Char],
                           ruleColors: PartialFunction[String, T],
                           endColor: T): Seq[(Int, T)] =
-    Highlighter.highlightIndices(Parsers.Splitter(_), buffer, ruleColors, endColor)
+    Highlighter.highlightIndices(Parsers.HighlightSplitter(_), buffer, ruleColors, endColor)
 }

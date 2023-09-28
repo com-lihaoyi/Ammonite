@@ -9,6 +9,7 @@ import java.util.Collections
 
 import ammonite.util.{Imports, Util}
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 
@@ -25,7 +26,8 @@ class Frame(val classloader: SpecialClassLoader,
             val pluginClassloader: SpecialClassLoader,
             private[this] var imports0: Imports,
             private[this] var classpath0: Seq[java.net.URL],
-            private[this] var usedEarlierDefinitions0: Seq[String]) extends ammonite.util.Frame{
+            private[this] var usedEarlierDefinitions0: Seq[String],
+            private[this] var hooks0: Seq[ammonite.util.Frame.Hook]) extends ammonite.util.Frame{
   private var frozen0 = false
   def frozen = frozen0
   def freeze(): Unit = {
@@ -48,8 +50,14 @@ class Frame(val classloader: SpecialClassLoader,
   def addClasspath(additional: Seq[java.net.URL]) = {
     if (!frozen0) {
       version0 += 1
-      additional.foreach(classloader.add)
+      val actualAdditional = additional
+        .iterator
+        .map(url => (url, classloader.add(url)))
+        .filter(_._2)
+        .map(_._1)
+        .toVector
       classpath0 = classpath0 ++ additional
+      hooks.foreach(_.addClasspath(actualAdditional))
     }
   }
   def addPluginClasspath(additional: Seq[java.net.URL]) = {
@@ -60,6 +68,10 @@ class Frame(val classloader: SpecialClassLoader,
   }
   def usedEarlierDefinitions_=(usedEarlierDefinitions: Seq[String]): Unit =
     usedEarlierDefinitions0 = usedEarlierDefinitions
+  def hooks: Seq[ammonite.util.Frame.Hook] = hooks0
+  def addHook(hook: ammonite.util.Frame.Hook): Unit = {
+    hooks0 = hooks0 :+ hook
+  }
 }
 object Frame{
   def createInitial(baseClassLoader: ClassLoader = Thread.currentThread().getContextClassLoader) = {
@@ -77,7 +89,7 @@ object Frame{
       likelyJdkSourceLocation.wrapped.toUri.toURL
     )
 
-    new Frame(special, special, Imports(), Seq(), Seq())
+    new Frame(special, special, Imports(), Seq(), Seq(), Seq())
   }
 }
 
@@ -240,10 +252,27 @@ class SpecialClassLoader(parent: ClassLoader,
 
     } else super.findClass(name)
   }
-  def add(url: URL) = {
-    classpathSignature0 = classpathSignature0 ++ Seq(jarSignature(url))
-    this.addURL(url)
+  def hasUrl(url: URL): Boolean = {
+    @tailrec
+    def viaParents(loader: ClassLoader = parent): Boolean = {
+      val hasUrl0 = loader match {
+        case null => false
+        case s: SpecialClassLoader => s.getURLs.contains(url)
+        case _ => false
+      }
+      if (hasUrl0) true
+      else if (loader == null) false
+      else viaParents(loader.getParent)
+    }
+    getURLs.contains(url) || viaParents()
   }
+  def add(url: URL): Boolean =
+    if (hasUrl(url)) false
+    else {
+      classpathSignature0 = classpathSignature0 ++ Seq(jarSignature(url))
+      this.addURL(url)
+      true
+    }
 
   override def close() = {
     // DO NOTHING LOLZ

@@ -126,7 +126,6 @@ class AmmoniteBuildServer(
     clientOpt = Some(client)
   }
 
-
   def buildInitialize(params: InitializeBuildParams): CompletableFuture[InitializeBuildResult] =
     nonBlocking {
 

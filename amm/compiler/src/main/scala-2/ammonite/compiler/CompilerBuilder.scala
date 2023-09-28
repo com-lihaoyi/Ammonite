@@ -80,7 +80,8 @@ case class CompilerBuilder(
     headFrame: => Frame,
     dependencyCompleter: => Option[String => (Int, Seq[String])],
     whiteList: Set[Seq[String]],
-    initialClassLoader: ClassLoader
+    initialClassLoader: ClassLoader,
+    settings: Seq[String]
   ): CompilerLifecycleManager =
     new CompilerLifecycleManager(
       rtCacheDir,
@@ -88,7 +89,8 @@ case class CompilerBuilder(
       dependencyCompleter,
       whiteList,
       initialClassLoader,
-      outputDir
+      outputDir,
+      settings
     )
 
   def scalaVersion = CompilerBuilder.scalaVersion

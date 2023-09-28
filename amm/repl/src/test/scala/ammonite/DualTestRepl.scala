@@ -9,15 +9,22 @@ import ammonite.util.{Evaluated, Res}
 class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
+  def wrapperNamePrefix = Option.empty[String]
+
+  def warnings = true
 
   def compilerBuilder = ammonite.compiler.CompilerBuilder()
   val repls = Seq(
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef
+      override def wrapperNamePrefix = dual.wrapperNamePrefix
+      override def warnings = dual.warnings
     },
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef
       override def codeWrapper = CodeClassWrapper
+      override def wrapperNamePrefix = dual.wrapperNamePrefix
+      override def warnings = dual.warnings
     }
   )
 

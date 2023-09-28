@@ -56,11 +56,8 @@ object Compiler{
       output.write(bytes)
       output.close()
 
-      for (dir <- outputDir0) {
-        val dest = dir / elems
-        os.makeDir.all(dest / os.up)
-        os.write(dest, bytes)
-      }
+      for (dir <- outputDir0)
+        os.write.over(dir / elems, bytes, createFolders = true)
     }
 
   }
@@ -196,7 +193,6 @@ object Compiler{
 
       settings.outputDirs.setSingleOutput(vd)
 
-      settings.nowarnings.value = true
       // Otherwise the presence of `src`'s source files mixed with
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"
