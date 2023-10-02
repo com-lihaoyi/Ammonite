@@ -14,6 +14,8 @@ object Scripts {
   def runScript(wd: os.Path,
                 path: os.Path,
                 interp: ammonite.interp.Interpreter,
+                allowPositional: Boolean = true,
+                allowRepeats: Boolean = false,
                 scriptArgs: Seq[String] = Nil) = {
     interp.watch(path)
     val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
@@ -101,8 +103,8 @@ object Scripts {
             }else mainargs.Invoker.runMains(
               parser.mains,
               scriptArgs,
-              allowPositional = true,
-              allowRepeats = false
+              allowPositional = allowPositional,
+              allowRepeats = allowRepeats
             ) match{
               case Left(earlyError) =>
                 Res.Failure(mainargs.Renderer.renderEarlyError(earlyError))

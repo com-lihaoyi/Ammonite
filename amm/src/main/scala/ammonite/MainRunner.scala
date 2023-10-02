@@ -60,11 +60,11 @@ class MainRunner(cliConfig: Config,
     }
   }
 
-  def runScript(scriptPath: os.Path, scriptArgs: List[String]) =
+  def runScript(scriptPath: os.Path, allowPositional: Boolean, allowRepeats: Boolean, scriptArgs: List[String]) =
     watchLoop(
       isRepl = false,
       printing = true,
-      _.runScript(scriptPath, scriptArgs)
+      _.runScript(scriptPath, scriptArgs, allowPositional = allowPositional, allowRepeats = allowRepeats)
     )
 
   def runCode(code: String) = watchLoop(isRepl = false, printing = false, _.runCode(code))

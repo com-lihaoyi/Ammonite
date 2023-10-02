@@ -256,12 +256,14 @@ case class Main(predefCode: String = "",
     * of `args` and a map of keyword `kwargs` to pass to that file.
     */
   def runScript(path: os.Path,
-                scriptArgs: Seq[String])
+                scriptArgs: Seq[String],
+                allowPositional: Boolean = true,
+                allowRepeats: Boolean = false)
                 : (Res[Any], Seq[(Watchable, Long)]) = {
 
     instantiateInterpreter() match{
       case Right(interp) =>
-        val result = main.Scripts.runScript(wd, path, interp, scriptArgs)
+        val result = main.Scripts.runScript(wd, path, interp, allowPositional, allowRepeats, scriptArgs)
         (result, interp.watchedValues.toSeq)
       case Left(problems) => problems
     }

@@ -6,6 +6,7 @@ import ammonite.repl.tools.Util.PathRead
 case class Config(core: Config.Core,
                   predef: Config.Predef,
                   repl: Config.Repl,
+                  scripts: Config.Scripts,
                   rest: String*)
 
 object Config{
@@ -108,6 +109,21 @@ object Config{
     tmpOutputDirectory: Flag
   )
   implicit val replParser = ParserForClass[Repl]
+
+  @main
+  case class Scripts(
+    @arg(
+      name = "no-positional-args",
+      doc = "Disallow positional arguments for scripts"
+    )
+    noPositionalArgs: Flag,
+    @arg(
+      name = "allow-repeat-args",
+      doc = "Allow repeated arguments for scripts"
+    )
+    allowRepeatArgs: Flag
+  )
+  implicit val scriptsParser = ParserForClass[Scripts]
 
   val parser = mainargs.ParserForClass[Config]
 }

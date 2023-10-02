@@ -102,7 +102,12 @@ object AmmoniteMain{
               false
 
             case (None, head :: rest) =>
-              val success = runner.runScript(os.Path(head, os.pwd), rest)
+              val success = runner.runScript(
+                os.Path(head, os.pwd),
+                allowPositional = !cliConfig.scripts.noPositionalArgs.value,
+                allowRepeats = cliConfig.scripts.allowRepeatArgs.value,
+                rest
+              )
               success
           }
         }
