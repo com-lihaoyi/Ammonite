@@ -225,14 +225,16 @@ object browse{
             wd: os.Path = os.pwd) = {
 
     os.proc(
-      viewer.values,
-      os.temp(
-        pp.tokenize(
-          t,
-          width = if (width == null) pp.defaultWidth else width,
-          height = if (height == null) pp.defaultHeight else height,
-          indent = if (indent == null) pp.defaultIndent else indent
-        ).map(_.render)
+      Seq(
+        viewer.values,
+        os.temp(
+          pp.tokenize(
+            t,
+            width = if (width == null) pp.defaultWidth else width,
+            height = if (height == null) pp.defaultHeight else height,
+            indent = if (indent == null) pp.defaultIndent else indent
+          ).map(_.render)
+        )
       )
     ).call(stdin = os.Inherit, stdout = os.Inherit, stderr = os.Inherit)
   }

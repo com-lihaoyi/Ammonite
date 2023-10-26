@@ -88,26 +88,17 @@ object Deps {
   val coursierInterface = ivy"io.get-coursier:interface:1.0.16"
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
-  val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.54"
-  val osLib = ivy"com.lihaoyi::os-lib:0.9.0"
-  val requests = ivy"com.lihaoyi::requests:0.7.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.15.4"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:0.9.0"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
-  def scalaXml(sv: String) = {
-    val ver =
-      if (sv.startsWith("2.12.")) "1.3.0"
-      else "2.0.1"
-    ivy"org.scala-lang.modules::scala-xml:$ver"
-  }
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.34"
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
@@ -142,17 +133,44 @@ object Deps {
       ivy"com.lihaoyi::fansi:$fansiVersion"
     }
   }
+  object geny extends Use3Dep {
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::geny:1.0.0"
+  }
+  object osLib extends Use3Dep {
+    override def dep(scalaVersion: String) = ivy"com.lihaoyi::os-lib:0.9.0"
+  }
   object pprint extends Use3Dep {
     override def dep(scalaVersion: String) =  ivy"com.lihaoyi::pprint:0.8.1"
   }
+  object requests extends Use3Dep {
+    override def dep(scalaVersion: String) =  ivy"com.lihaoyi::requests:0.8.0"
+  }
   object scalaCollectionCompat extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"org.scala-lang.modules::scala-collection-compat:2.8.1"
+  }
+  object scalaXml extends Use3Dep {
+    override def dep(scalaVersion: String) = {
+      val ver =
+        if (scalaVersion.startsWith("2.12.")) "1.3.0"
+        else "2.0.1"
+      ivy"org.scala-lang.modules::scala-xml:$ver"
+    }
   }
   object sourcecode extends Use3Dep {
     override def dep(scalaVersion: String) = ivy"com.lihaoyi::sourcecode:0.3.0"
   }
 
-  val use_3_deps = Seq(mainargs, fansi, pprint, scalaCollectionCompat, sourcecode)
+  val use_3_deps = Seq(
+    mainargs,
+    fansi,
+    geny,
+    osLib,
+    pprint,
+    requests,
+    scalaCollectionCompat,
+    scalaXml,
+    sourcecode
+  )
 }
 
 // Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
@@ -405,7 +423,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def moduleDeps = Seq()
     def ivyDeps = T{
       super.ivyDeps() ++ Agg(
-        Deps.osLib,
+        Deps.osLib.use_3(crossScalaVersion),
         Deps.scalaCollectionCompat.use_3(crossScalaVersion),
         Deps.fansi.use_3(crossScalaVersion),
         Deps.pprint.use_3(crossScalaVersion)
@@ -422,10 +440,20 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.classPathUtil,
-      Deps.upickle,
-      Deps.requests,
+      Deps.requests.use_3(crossScalaVersion),
       Deps.mainargs.use_3(crossScalaVersion),
       Deps.coursierDependencyInterface
+    ) ++ Agg(Deps.upickle).map(dep =>
+      if(isScala3(crossScalaVersion))
+        dep.withDottyCompat(crossScalaVersion)
+           // we remove transitive _2.13 dependencies from Scala 3 and
+           // then we add it back with _3
+           .exclude("com.lihaoyi" -> s"geny_${scalaBinaryVersion(scalaVersion())}")
+           .exclude("com.lihaoyi" -> s"sourcecode_${scalaBinaryVersion(scalaVersion())}")
+      else dep
+    ) ++ Agg(
+      Deps.geny.use_3(crossScalaVersion),
+      Deps.sourcecode.use_3(crossScalaVersion)
     )
   }
 
@@ -456,7 +484,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
           Agg(
             Deps.scalaCompiler(scalaVersion()),
             Deps.scalaparse,
-            Deps.scalaXml(scalaVersion())
+            Deps.scalaXml.use_3(crossScalaVersion)
           )
         else
           Agg[Dep](
@@ -521,9 +549,11 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
            // we remove transitive _2.13 dependencies from Scala 3 and
            // then we add it back with _3
            .exclude("com.lihaoyi" -> s"sourcecode_${scalaBinaryVersion(scalaVersion())}")
+           .exclude("com.lihaoyi" -> s"geny_${scalaBinaryVersion(scalaVersion())}")
            .exclude("org.scala-lang.modules" -> s"scala-collection-compat_${scalaBinaryVersion(scalaVersion())}")
       else dep
     ) ++ Agg(
+      Deps.geny.use_3(crossScalaVersion),
       Deps.sourcecode.use_3(crossScalaVersion),
       Deps.scalaCollectionCompat.use_3(crossScalaVersion)
     )
@@ -545,7 +575,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = Agg(
         Deps.mainargs.use_3(crossScalaVersion),
-        Deps.geny
+        Deps.geny.use_3(crossScalaVersion)
       )
 
       def generatedSources = T{
@@ -573,7 +603,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       Deps.jlineTerminal,
       Deps.jlineJna,
       Deps.jlineReader,
-      Deps.scalaXml(scalaVersion())
+      Deps.scalaXml.use_3(crossScalaVersion)
     )
 
     object test extends Tests with AmmDependenciesResourceFileModule with PatchScala3Library {
