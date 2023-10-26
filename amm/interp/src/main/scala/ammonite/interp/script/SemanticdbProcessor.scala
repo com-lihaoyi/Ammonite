@@ -27,7 +27,7 @@ object SemanticdbProcessor {
 
     val mapRange = {
       val adjust0 = adjust(module.blocks.length)
-      range: scala.meta.internal.semanticdb.Range =>
+      (range: scala.meta.internal.semanticdb.Range) =>
         for {
           (startLine, startChar) <- adjust0(range.startLine, range.startCharacter)
           (endLine, endChar) <- adjust0(range.endLine, range.endCharacter)

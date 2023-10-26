@@ -25,8 +25,7 @@ object Defaults{
     ImportData("""ammonite.repl.ReplBridge.value.{
       codeColorsImplicit,
       tprintColorsImplicit,
-      show,
-      typeOf
+      show
     }""")
   )
   def ammoniteHome = os.Path(System.getProperty("user.home"))/".ammonite"

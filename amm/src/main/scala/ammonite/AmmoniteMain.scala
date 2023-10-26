@@ -58,7 +58,7 @@ object AmmoniteMain{
             ammonite.compiler.CompilerBuilder(),
             ammonite.compiler.Parsers,
             ammonite.compiler.DefaultCodeWrapper,
-            initialScripts = cliConfig.rest.map(os.Path(_)),
+            initialScripts = cliConfig.rest.value.map(os.Path(_)),
             initialImports = PredefInitialization.initBridges(
               Seq("ammonite.interp.api.InterpBridge" -> "interp")
             ) ++ AmmoniteBuildServer.defaultImports
@@ -83,7 +83,7 @@ object AmmoniteMain{
             runner.printInfo(msg)
           }
 
-          (cliConfig.core.code, cliConfig.rest.toList) match{
+          (cliConfig.core.code, cliConfig.rest.value.toList) match{
             case (Some(code), Nil) =>
               runner.runCode(code)
 

@@ -19,7 +19,7 @@ object LineNumberTests extends TestSuite{
 
 
     test("compilationErrorInSecondBlock") {
-      val path = os.rel/'lineNumbers/"compilationErrorInSecondBlock.sc"
+      val path = os.rel/"lineNumbers"/"compilationErrorInSecondBlock.sc"
       val sp = " "
       checkErrorMessage(
         file = path,

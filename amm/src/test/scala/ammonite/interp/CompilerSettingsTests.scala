@@ -11,7 +11,7 @@ object CompilerSettingsTests extends TestSuite {
   val tests = Tests {
     println("CompilerSettingsTests")
 
-    val scriptPath = os.pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
+    val scriptPath = os.pwd / "amm" / "src" / "test" / "resources" / "scriptCompilerSettings"
 
     test("configureYrangepos"){
     

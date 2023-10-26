@@ -25,9 +25,9 @@ object CachingTests extends TestSuite{
         case Res.Exit(_) => throw new Exception("Unexpected exit call from script")
       }
 
-    val scriptPath = os.pwd/'amm/'src/'test/'resources/'scripts
+    val scriptPath = os.pwd/"amm"/"src"/"test"/"resources"/"scripts"
 
-    val resourcesPath = os.pwd/'amm/'src/'test/'resources
+    val resourcesPath = os.pwd/"amm"/"src"/"test"/"resources"
 
 
     val tempDir = os.temp.dir(prefix="ammonite-tester")
@@ -62,7 +62,7 @@ object CachingTests extends TestSuite{
     }
 
     test("processModuleCaching"){
-      def check(script: os.RelPath){
+      def check(script: os.RelPath) = {
         val storage = new Storage.Folder(tempDir)
 
         val interp1 = createTestInterp(
@@ -83,21 +83,21 @@ object CachingTests extends TestSuite{
         assert(interp2.compilerManager.compiler == null)
       }
 
-      test("testOne") - check(os.rel/'scriptLevelCaching/"scriptTwo.sc")
-      test("testTwo") - check(os.rel/'scriptLevelCaching/"scriptOne.sc")
-      test("testThree") - check(os.rel/'scriptLevelCaching/"QuickSort.sc")
-      test("testLoadModule") - check(os.rel/'scriptLevelCaching/"testLoadModule.sc")
-      test("testFileImport") - check(os.rel/'scriptLevelCaching/"testFileImport.sc")
-      test("testIvyImport") - check(os.rel/'scriptLevelCaching/"ivyCacheTest.sc")
+      test("testOne") - check(os.rel/"scriptLevelCaching"/"scriptTwo.sc")
+      test("testTwo") - check(os.rel/"scriptLevelCaching"/"scriptOne.sc")
+      test("testThree") - check(os.rel/"scriptLevelCaching"/"QuickSort.sc")
+      test("testLoadModule") - check(os.rel/"scriptLevelCaching"/"testLoadModule.sc")
+      test("testFileImport") - check(os.rel/"scriptLevelCaching"/"testFileImport.sc")
+      test("testIvyImport") - check(os.rel/"scriptLevelCaching"/"ivyCacheTest.sc")
       test("testIvyResource"){
-        if (!scala2_12) check(os.rel/'scriptLevelCaching/"ivyCachedResourceTest.sc")
+        if (!scala2_12) check(os.rel/"scriptLevelCaching"/"ivyCachedResourceTest.sc")
       }
 
     }
 
     test("testRunTimeExceptionForCachedScripts"){
       val storage = new Storage.Folder(tempDir)
-      val numFile = os.pwd/'amm/'target/'test/'resources/'scriptLevelCaching/"num.value"
+      val numFile = os.pwd/"amm"/"target"/"test"/"resources"/"scriptLevelCaching"/"num.value"
       os.remove.all(numFile)
       os.write(numFile, "1", createFolders = true)
       val interp1 = createTestInterp(
@@ -107,7 +107,7 @@ object CachingTests extends TestSuite{
 
       runScript(
         os.pwd,
-        resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc",
+        resourcesPath/"scriptLevelCaching"/"runTimeExceptions.sc",
         interp1
       )
 
@@ -117,7 +117,7 @@ object CachingTests extends TestSuite{
       )
       val Res.Exception(ex, _) = Scripts.runScript(
         os.pwd,
-        resourcesPath/'scriptLevelCaching/"runTimeExceptions.sc",
+        resourcesPath/"scriptLevelCaching"/"runTimeExceptions.sc",
         interp2
       )
 

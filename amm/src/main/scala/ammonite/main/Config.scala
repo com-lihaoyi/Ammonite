@@ -6,7 +6,7 @@ import ammonite.repl.tools.Util.PathRead
 case class Config(core: Config.Core,
                   predef: Config.Predef,
                   repl: Config.Repl,
-                  rest: String*)
+                  rest: Leftover[String])
 
 object Config{
 
@@ -59,7 +59,7 @@ object Config{
     @arg(name = "no-warn", doc = "Disable compiler warnings")
     noWarnings: Flag
   )
-  implicit val coreParser = ParserForClass[Core]
+  implicit val coreParser: ParserForClass[Core] = ParserForClass[Core]
 
   @main
   case class Predef(
@@ -75,7 +75,7 @@ object Config{
         choose an additional predef to use using `--predef""")
     noHomePredef: Flag
   )
-  implicit val predefParser = ParserForClass[Predef]
+  implicit val predefParser: ParserForClass[Predef] = ParserForClass[Predef]
 
   @main
   case class Repl(
@@ -107,7 +107,7 @@ object Config{
         the output directory not to be erased.""")
     tmpOutputDirectory: Flag
   )
-  implicit val replParser = ParserForClass[Repl]
+  implicit val replParser: ParserForClass[Repl] = ParserForClass[Repl]
 
-  val parser = mainargs.ParserForClass[Config]
+  val parser: ParserForClass[Config] = mainargs.ParserForClass[Config]
 }

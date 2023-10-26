@@ -157,7 +157,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   def watch(p: os.Path) = watchedValues.append(
     (Watchable.Path(p), Watchable.pathSignature(p))
   )
-  def watchValue[T](v: => T) = watchedValues.append((() => v.hashCode, v.hashCode()))
+  def watchValue[T](v: => T) = watchedValues.append((new Watchable { def poll() = v.hashCode.toLong }, v.hashCode().toLong))
 
   def resolveSingleImportHook(
     source: CodeSource,

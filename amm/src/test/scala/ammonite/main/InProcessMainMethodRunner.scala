@@ -4,7 +4,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 
 object InProcessMainMethodRunner{
-  val base = os.pwd/'amm/'src/'test/'resources
+  val base = os.pwd/"amm"/"src"/"test"/"resources"
 }
 
 /**

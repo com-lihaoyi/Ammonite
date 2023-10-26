@@ -47,7 +47,7 @@ object AdvancedTests extends TestSuite{
     }
 
     test("exit"){
-      check.result("exit", Res.Exit())
+      check.result("exit", Res.Exit(()))
     }
     test("skip"){
       check.result("", Res.Skip)
@@ -412,7 +412,7 @@ object AdvancedTests extends TestSuite{
     }
     test("loadingModulesInPredef"){
 
-      val dir = os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
+      val dir = os.pwd/"amm"/"src"/"test"/"resources"/"scripts"/"predefWithLoad"
       test("loadExec"){
         val c1 = new DualTestRepl() {
           override def predef = (

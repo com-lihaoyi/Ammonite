@@ -125,7 +125,7 @@ case class Main(predefCode: String = "",
           .Internal
           .replArgs($idx)
           .value
-          .asInstanceOf[${b.typeTag.tpe}]
+          .asInstanceOf[${b.typeName}]
         """
       }.mkString(newLine)
 

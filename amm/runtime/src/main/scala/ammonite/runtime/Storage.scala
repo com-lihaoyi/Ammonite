@@ -188,15 +188,15 @@ object Storage{
     // on every version bump; otherwise binary-incompatible changes to
     // ReplAPI/Preprocessor/ammonite-ops will cause scripts to fail after
     // someone upgrades Ammonite.
-    val cacheDir = dir/'cache/ammonite.Constants.version
-    val compileCacheDir = cacheDir/'compile
+    val cacheDir = dir/"cache"/ammonite.Constants.version
+    val compileCacheDir = cacheDir/"compile"
     val classFilesOrder = "classFilesOrder.json"
     val ivyCacheFile = cacheDir/"ivycache.json"
     val coursierFetchCacheDir = cacheDir/"coursier-fetch-cache"
     val metadataFile = "metadata.json"
     val sessionFile  = dir/"session"
 
-    def getSessionId() = {
+    def getSessionId: Long = {
       try os.read(sessionFile).toLong
       catch{case e: Throwable =>
         val randomId = math.abs(util.Random.nextLong)
@@ -204,7 +204,7 @@ object Storage{
         randomId
       }
     }
-    val historyFile = dir/'history
+    val historyFile = dir/"history"
     val fullHistory = new StableRef[History]{
       def apply(): History = {
         try{
@@ -229,7 +229,7 @@ object Storage{
                            tag: Tag): Unit = {
 
       val codeCacheDir =
-        cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env/tag.classPathWhitelistHash
+        cacheDir/"scriptCaches"/filePathPrefix/tag.code/tag.env/tag.classPathWhitelistHash
 
       os.makeDir.all(codeCacheDir)
       try {
@@ -257,7 +257,7 @@ object Storage{
                            tag: Tag): Option[ScriptOutput] = {
 
       val codeCacheDir =
-        cacheDir/'scriptCaches/filePathPrefix/tag.code/tag.env/tag.classPathWhitelistHash
+        cacheDir/"scriptCaches"/filePathPrefix/tag.code/tag.env/tag.classPathWhitelistHash
 
       if(!os.exists(codeCacheDir)) None
       else {

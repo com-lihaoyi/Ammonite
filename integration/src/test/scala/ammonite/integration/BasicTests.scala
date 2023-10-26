@@ -41,7 +41,7 @@ object BasicTests extends TestSuite{
     test("scriptWithSymbols"){
       if (!Util.windowsPlatform){
         val dirAddr =
-          os.pwd/'target/'test/'resources/'ammonite/'integration/'basic
+          os.pwd/"target"/"test"/"resources"/'ammonite/'integration/'basic
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         os.remove.all(scriptAddr)
@@ -193,9 +193,9 @@ object BasicTests extends TestSuite{
 
       // test disabled on windows because sbt not available
       if (!Util.windowsPlatform) {
-        val buildRoot = os.pwd/'target/"some-dummy-library"
+        val buildRoot = os.pwd/"target"/"some-dummy-library"
         os.copy.over(intTestResources/"some-dummy-library", buildRoot)
-        val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
+        val dummyScala = buildRoot/"src"/'main/'scala/'dummy/"Dummy.scala"
         // using the same home to share the ivymap cache across runs
         val home = os.temp.dir()
 

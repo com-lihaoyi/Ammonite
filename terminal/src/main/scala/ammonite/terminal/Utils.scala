@@ -183,6 +183,6 @@ object LazyList{
   */
 case class Strings(values: Seq[String])
 object Strings{
-  implicit def stringPrefix(s: String) = Strings(Seq(s))
-  implicit def stringSeqPrefix(s: Seq[String]) = Strings(s)
+  implicit def stringPrefix(s: String): Strings = Strings(Seq(s))
+  implicit def stringSeqPrefix(s: Seq[String]): Strings = Strings(s)
 }
