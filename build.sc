@@ -95,12 +95,6 @@ object Deps {
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:1.0.2"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
-  def typename(sv: String) = {
-    val ver =
-      if (sv.startsWith("3.1")) "1.0.0"
-      else "1.1.0"
-    ivy"org.tpolecat::typename:$ver"
-  }
   def scalaXml(sv: String) = {
     val ver =
       if (sv.startsWith("2.12.")) "1.3.0"
@@ -114,12 +108,11 @@ object Deps {
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.0"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
-  // version pinned to the minor version scalameta common depends on
-  def scalapbRuntime(sv: String) = {
+  def typename(sv: String) = {
     val ver =
-      if (sv.startsWith("3.2")) "0.11.13"
-      else "0.11.14"
-    ivy"com.thesamet.scalapb::scalapb-runtime:$ver"
+      if (sv.startsWith("3.1")) "1.0.0"
+      else "1.1.0"
+    ivy"org.tpolecat::typename:$ver"
   }
   def upickle(sv: String) = {
     val ver =
@@ -406,9 +399,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
            // we remove transitive _2.13 dependencies from Scala 3 and
            // then we add it back with _3
            .exclude("com.lihaoyi" -> "sourcecode_2.13")
-           .exclude("com.thesamet.scalapb" -> "scalapb-runtime_2.13")
       else dep
-    ) ++ (if(isScala3(crossScalaVersion)) Agg(Deps.sourcecode, Deps.scalapbRuntime(crossScalaVersion)) else Agg.empty[Dep])
+    ) ++ (if(isScala3(crossScalaVersion)) Agg(Deps.sourcecode) else Agg.empty[Dep])
   }
 
 //  object `test-runner` extends mill.scalalib.SbtModule {
