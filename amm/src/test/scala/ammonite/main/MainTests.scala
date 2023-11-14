@@ -98,8 +98,7 @@ object MainTests extends TestSuite{
           assert(out.contains(expected.trim))
         }
         test("emptyArg"){
-          val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
-          if (isScala2) {
+          if (TestUtils.scala2) {
             val evaled = exec("ArgList.sc", "")
             assert(evaled.success)
           } else {

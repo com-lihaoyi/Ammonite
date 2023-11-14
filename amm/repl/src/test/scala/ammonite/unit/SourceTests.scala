@@ -3,14 +3,13 @@ package ammonite.unit
 
 import utest._
 import ammonite.compiler.tools.source.load
+import ammonite.TestUtils
 import ammonite.util.Util
 import ammonite.util.Util.Location
 
 import java.io.InputStream
 object SourceTests extends TestSuite{
-  val tests =
-    if (ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")) scala2Tests
-    else scala3Tests
+  val tests = if (TestUtils.scala2) scala2Tests else scala3Tests
   def scala2Tests = Tests{
 
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {

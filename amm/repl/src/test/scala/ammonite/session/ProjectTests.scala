@@ -3,6 +3,7 @@ package ammonite.session
 import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
+import ammonite.interp.api.IvyConstructor
 
 object ProjectTests extends TestSuite{
   val tests = Tests{
@@ -426,7 +427,7 @@ object ProjectTests extends TestSuite{
     }
 
     test("no sources"){
-      val sbv = ammonite.compiler.CompilerBuilder.scalaVersion.split('.').take(2).mkString(".")
+      val sbv = IvyConstructor.scalaBinaryVersion(ammonite.compiler.CompilerBuilder.scalaVersion)
 
       val core =
         s"""
