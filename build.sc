@@ -73,10 +73,7 @@ object Deps {
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.16"
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
-  def fansi(scalaVersion: String) = {
-    val fansiVersion = if (scalaVersion.startsWith("3.0.")) "0.3.1" else "0.4.0"
-    ivy"com.lihaoyi::fansi:$fansiVersion"
-  }
+  val fansi = ivy"com.lihaoyi::fansi:0.4.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
@@ -274,7 +271,7 @@ object terminal extends Cross[TerminalModule](binCrossScalaVersions:_*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule{
   def ivyDeps = T{
     super.ivyDeps() ++ Agg(
-      Deps.fansi(crossScalaVersion),
+      Deps.fansi,
       Deps.sourcecode
     )
   }
@@ -292,7 +289,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         Deps.osLib,
         Deps.typename(crossScalaVersion),
         Deps.scalaCollectionCompat,
-        Deps.fansi(crossScalaVersion),
+        Deps.fansi,
         Deps.pprint
       )
     }
