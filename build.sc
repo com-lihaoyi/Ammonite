@@ -624,7 +624,6 @@ class MainModule(val crossScalaVersion: String)
   object test extends Tests with PatchScala3Library{
     def moduleDeps = super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
-      // Deps.shapeless,
       Deps.scalaJava8Compat
     )
 
