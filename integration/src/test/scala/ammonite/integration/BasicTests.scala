@@ -41,7 +41,7 @@ object BasicTests extends TestSuite{
     test("scriptWithSymbols"){
       if (!Util.windowsPlatform){
         val dirAddr =
-          os.pwd/"target"/"test"/"resources"/'ammonite/'integration/'basic
+          os.pwd/"target"/"test"/"resources"/"ammonite"/"integration"/"basic"
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         os.remove.all(scriptAddr)

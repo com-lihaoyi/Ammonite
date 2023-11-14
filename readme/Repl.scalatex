@@ -1035,7 +1035,7 @@
       @p
         Then instantiate it with this code anywhere within your program:
 
-      @hl.ref('integration/'src/'test/'scala/'ammonite/'integration/"TestMain.scala")
+      @hl.ref("integration"/"src"/"test"/"scala"/"ammonite"/"integration"/"TestMain.scala")
 
       @p
         You can configure the instantiated REPL by passing in arguments to the
@@ -1059,7 +1059,7 @@
         available within the "main" project, and not just in the unit tests.
         Then, anywhere within your program, you can place a breakpoint via:
 
-      @hl.ref(wd/'integration/'src/'test/'scala/'ammonite/'integration/"TestMain.scala")
+      @hl.ref(wd/"integration"/"src"/"test"/"scala"/"ammonite"/"integration"/"TestMain.scala")
 
       @p
         And when your program reaches that point, it will pause and open up an
