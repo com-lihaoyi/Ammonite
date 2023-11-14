@@ -53,8 +53,8 @@ object SourceTests extends TestSuite{
       test("stdLibScala"){
         test("direct"){
           val is2_13_3_orLower = {
-            val ver = ammonite.compiler.CompilerBuilder.scalaVersion
-            !ver.startsWith("3.") || !ver.startsWith("2.13.") ||
+            val ver = scala.util.Properties.versionNumberString
+            !ver.startsWith("2.13.") ||
               scala.util.Try(ver.stripPrefix("2.13.").toInt).toOption.exists(_ <= 3)
           }
           check(
