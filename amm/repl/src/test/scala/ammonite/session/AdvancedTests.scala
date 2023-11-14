@@ -528,7 +528,7 @@ object AdvancedTests extends TestSuite{
     test("loadURL"){
       if (check.scala2) {
         val sbv = {
-          val sv = if (check.scalaVersion.startsWith("3.")) "2.13" else check.scalaVersion
+          val sv = check.scalaVersion
           if (sv.forall(c => c.isDigit || c == '.'))
             sv.split('.').take(2).mkString(".")
           else

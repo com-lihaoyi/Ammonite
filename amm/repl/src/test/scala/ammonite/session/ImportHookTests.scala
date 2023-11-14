@@ -91,9 +91,7 @@ object ImportHookTests extends TestSuite{
         }
 
         test("explicitBinaryVersion"){
-          val sbv =
-            if (check.scalaVersion.startsWith("3.")) "2.13"
-            else IvyConstructor.scalaBinaryVersion(check.scalaVersion)
+          val sbv = IvyConstructor.scalaBinaryVersion(check.scalaVersion)
           check.session(s"""
             @ import scalatags.Text.all._
             error: ${check.notFound("scalatags")}

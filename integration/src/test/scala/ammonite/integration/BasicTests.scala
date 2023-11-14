@@ -219,15 +219,9 @@ object BasicTests extends TestSuite{
           )
 
           // 2. build & publish code locally
-          val compatScalaVersion =
-           if (scalaVersion.startsWith("3."))
-             // should be the right 2.13 version
-             scala.util.Properties.versionNumberString
-           else
-             scalaVersion
           os.proc("sbt", "-J-Xmx1g", "-batch", "-no-colors", "publishLocal").call(
             env = Map(
-              "SCALA_VERSION" -> compatScalaVersion,
+              "SCALA_VERSION" -> scalaVersion,
               "FIRST_RUN" -> s"$firstRun",
               "VERSION" -> version
             ),
