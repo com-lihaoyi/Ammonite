@@ -13,7 +13,7 @@ object TermState{
     TermState.unapply(ti.ts)
   }
   def unapply(ti: TermAction): Option[(LazyList[Int], Vector[Char], Int, fansi.Str)] = ti match{
-    case ts: TermState => TermState.unapply(ts)
+    case ts: TermState => Some((ts.inputs, ts.buffer, ts.cursor, ts.msg))
     case _ => None
   }
 
