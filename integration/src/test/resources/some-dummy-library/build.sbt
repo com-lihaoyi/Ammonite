@@ -1,3 +1,5 @@
+val scalaV = sys.env("SCALA_VERSION")
+val circeVersion = if(scalaV.startsWith("3.")) "0.14.6" else "0.12.0-M3"
 
 lazy val root = (project in file(".")).
   settings(
@@ -6,9 +8,9 @@ lazy val root = (project in file(".")).
     version := sys.env("VERSION"),
     scalaVersion := sys.env("SCALA_VERSION"),
     libraryDependencies += {
-      if (java.lang.Boolean.parseBoolean(sys.env("FIRST_RUN")))
-        "io.circe" %% "circe-core" % "0.12.0-M3"
+      if (sys.env("FIRST_RUN").toBoolean)
+        "io.circe" %% "circe-core" % circeVersion
       else
-        "io.argonaut" %% "argonaut" % "6.2.3"
+        "io.argonaut" %% "argonaut" % "6.2.6"
     }
   )

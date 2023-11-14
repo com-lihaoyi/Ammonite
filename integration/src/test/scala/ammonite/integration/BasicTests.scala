@@ -194,12 +194,13 @@ object BasicTests extends TestSuite{
       // test disabled on windows because sbt not available
       if (!Util.windowsPlatform) {
         val buildRoot = os.pwd/"target"/"some-dummy-library"
+        os.makeDir.all(buildRoot)
         os.copy.over(intTestResources/"some-dummy-library", buildRoot)
         val dummyScala = buildRoot/"src"/"main"/"scala"/"dummy"/"Dummy.scala"
         // using the same home to share the ivymap cache across runs
         val home = os.temp.dir()
 
-        val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+        val sbv = ammonite.compiler.CompilerBuilder.scalaVersion.split('.').take(2).mkString(".")
         val previous = os.home / ".ivy2" / "local" / "com.lihaoyi" / ("some-dummy-library_" + sbv)
         os.remove.all(previous)
 
@@ -222,7 +223,7 @@ object BasicTests extends TestSuite{
           os.proc("sbt", "-J-Xmx1g", "-batch", "-no-colors", "publishLocal").call(
             env = Map(
               "SCALA_VERSION" -> scalaVersion,
-              "FIRST_RUN" -> s"$firstRun",
+              "FIRST_RUN" -> firstRun.toString,
               "VERSION" -> version
             ),
             cwd = buildRoot,

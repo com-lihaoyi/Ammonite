@@ -81,7 +81,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: ${check.notFound("scalatags")}
 
-            @ import $$ivy.`com.lihaoyi::scalatags:0.7.0 compat`
+            @ import $$ivy.`com.lihaoyi::scalatags:0.12.0`
 
             @ import scalatags.Text.all._
 
@@ -96,7 +96,7 @@ object ImportHookTests extends TestSuite{
             @ import scalatags.Text.all._
             error: ${check.notFound("scalatags")}
 
-            @ import $$ivy.`com.lihaoyi:scalatags_$sbv:0.7.0`
+            @ import $$ivy.`com.lihaoyi:scalatags_$sbv:0.12.0`
 
             @ import scalatags.Text.all._
 

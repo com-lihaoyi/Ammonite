@@ -38,7 +38,6 @@ object Sample{
       Seq(
         sys.env.getOrElse("AMMONITE_ASSEMBLY", "amm"),
         "--color", "true",
-        "--no-remote-logging",
         "--no-home-predef",
       ),
       s"${ammoniteCode.trim}\nexit\n",

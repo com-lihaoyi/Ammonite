@@ -31,7 +31,6 @@ object TestUtils {
       executable,
       extraAmmArgs,
       if (thin) Seq("--thin") else Nil,
-      "--no-remote-logging",
       "--home",
       home,
       replStandaloneResources / name,
