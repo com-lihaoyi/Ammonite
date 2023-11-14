@@ -35,12 +35,11 @@ val commitsSinceTaggedVersion = {
 
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16", "2.12.17", "2.12.18")
 val scala2_13Versions = Seq("2.13.0", "2.13.1", "2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10", "2.13.11", "2.13.12")
-val scala31Versions = Seq("3.1.0", "3.1.1", "3.1.2", "3.1.3")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
 val scala33Versions = Seq("3.3.0", "3.3.1")
-val scala3Versions = scala31Versions ++ scala32Versions ++ scala33Versions
+val scala3Versions = scala32Versions ++ scala33Versions
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala31Versions.last, scala32Versions.last, scala33Versions.last)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala32Versions.last, scala33Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || (sv.startsWith("2.13.") && sv != "2.13.0")
 }
@@ -98,7 +97,7 @@ object Deps {
   def scalaReflect(scalaVersion: String) = ivy"org.scala-lang:scala-reflect:${scalaVersion}"
   def typename(sv: String) = {
     val ver =
-      if (sv.startsWith("3.0") || sv.startsWith("3.1")) "1.0.0"
+      if (sv.startsWith("3.1")) "1.0.0"
       else "1.1.0"
     ivy"org.tpolecat::typename:$ver"
   }
@@ -114,8 +113,20 @@ object Deps {
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.0"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
-  val trees = ivy"org.scalameta::trees:$scalametaVersion"
-  val upickle = ivy"com.lihaoyi::upickle:3.1.3"
+  val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
+  // version pinned to the minor version scalameta common depends on
+  def scalapbRuntime(sv: String) = {
+    val ver =
+      if (sv.startsWith("3.2")) "0.11.13"
+      else "0.11.14"
+    ivy"com.thesamet.scalapb::scalapb-runtime:$ver"
+  }
+  def upickle(sv: String) = {
+    val ver =
+      if (sv.startsWith("3.2")) "3.1.0"
+      else "3.1.3"
+    ivy"com.lihaoyi::upickle:$ver"
+  }
   val utest = ivy"com.lihaoyi::utest:0.8.1"
 }
 
@@ -206,39 +217,8 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
       if (sv.startsWith("2.13.") || sv.startsWith("3."))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.13-or-3"))
       else Nil
-    val extraDir5 =
-      if (sv.startsWith("3.") && !sv.startsWith("3.0.0"))
-        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.1+"))
-      else Nil
-    val extraDir6 = {
-      val dirNames =
-        if (sv.startsWith("3.")) {
-          if (sv.startsWith("3.0.")) Seq("scala-3.0-only")
-          else Seq("scala-3.1+")
-        }
-        else Nil
-      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
-    }
-    val extraDir7 = {
-      val dirNames =
-        if (sv.startsWith("3.")) {
-          if (sv.startsWith("3.0.") || (sv.startsWith("3.1.") && sv != "3.1.3")) Seq("scala-3.0.0-3.1.2")
-          else Seq("scala-3.1.3+")
-        }
-        else Nil
-      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
-    }
-    val extraDir8 = {
-      val dirNames =
-        if (sv.startsWith("3.")) {
-          if (sv.startsWith("3.0.") || sv.startsWith("3.1.")) Seq("scala-3.0-3.1")
-          else Seq("scala-3.2+")
-        }
-        else Nil
-      dirNames.map(n => PathRef(millSourcePath / "src" / "main" / n))
-    }
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++ extraDir7 ++ extraDir8
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
@@ -333,7 +313,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def crossFullScalaVersion = true
     def ivyDeps = Agg(
       Deps.classPathUtil,
-      Deps.upickle,
+      Deps.upickle(crossScalaVersion),
       Deps.requests,
       Deps.mainargs,
       Deps.coursierDependencyInterface
@@ -419,16 +399,16 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       Deps.bsp4j,
       Deps.fastparse
     ) ++ Agg(
-      Deps.trees
+      Deps.scalametaCommon
     ).map(dep =>
       if(isScala3(crossScalaVersion))
         dep.withDottyCompat(crossScalaVersion)
            // we remove transitive _2.13 dependencies from Scala 3 and
            // then we add it back with _3
-           .exclude("com.lihaoyi" -> s"sourcecode_2.13")
-           .exclude("org.scala-lang.modules" -> s"scala-collection-compat_2.13")
+           .exclude("com.lihaoyi" -> "sourcecode_2.13")
+           .exclude("com.thesamet.scalapb" -> "scalapb-runtime_2.13")
       else dep
-    ) ++ (if(isScala3(crossScalaVersion)) Agg(Deps.sourcecode, Deps.scalaCollectionCompat) else Agg.empty[Dep])
+    ) ++ (if(isScala3(crossScalaVersion)) Agg(Deps.sourcecode, Deps.scalapbRuntime(crossScalaVersion)) else Agg.empty[Dep])
   }
 
 //  object `test-runner` extends mill.scalalib.SbtModule {
