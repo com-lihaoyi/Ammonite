@@ -62,7 +62,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
   val frames = Ref(List(Frame.createInitial(initialClassLoader)))
   val sess0 = new SessionApiImpl(frames)
 
-  val baseImports = ammonite.main.Defaults.replImports ++ Interpreter.predefImports
+  val baseImports = ammonite.main.Defaults.replImports(compilerBuilder.scalaVersion) ++ Interpreter.predefImports
   val basePredefs = Seq(
     PredefInfo(Name("testPredef"), predef._1, false, predef._2)
   )

@@ -1,9 +1,8 @@
-
 package ammonite.main
 
 import java.io.InputStream
 
-import ammonite.util.{ImportData, Imports, Util}
+import ammonite.util.{ImportData, Imports, Name, Util}
 import coursierapi.Dependency
 
 import scala.io.Codec
@@ -21,14 +20,20 @@ object Defaults{
     )
   }
 
-  val replImports = Imports(
-    ImportData("""ammonite.repl.ReplBridge.value.{
-      codeColorsImplicit,
-      tprintColorsImplicit,
-      show
-    }""")
-  )
-  def ammoniteHome = os.Path(System.getProperty("user.home"))/".ammonite"
+  def replImports(scalaVersion: String) = {
+    val sharedFields = Seq("codeColorsImplicit", "tprintColorsImplicit", "show")
+    val fields = if (scalaVersion.startsWith("2.")) sharedFields :+ "typeOf" else sharedFields
+    val importss = fields.map(field =>
+      ImportData(
+        Name(field),
+        Name(field),
+        Name("_root_") :: Name("ammonite") :: Name("repl") :: Name("ReplBridge") :: Name("value") :: Nil,
+        ImportData.Term
+      )
+    )
+    Imports(importss)
+  }
+  def ammoniteHome = os.Path(System.getProperty("user.home")) / ".ammonite"
 
   def alreadyLoadedDependencies(
     resourceName: String = "amm-dependencies.txt"

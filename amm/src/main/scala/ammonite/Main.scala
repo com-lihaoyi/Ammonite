@@ -113,7 +113,7 @@ case class Main(predefCode: String = "",
 
     loadedPredefFile.right.map{ predefFileInfoOpt =>
       val augmentedImports =
-        if (defaultPredef) Defaults.replImports ++ Interpreter.predefImports
+        if (defaultPredef) Defaults.replImports(compilerBuilder.scalaVersion) ++ Interpreter.predefImports
         else Imports()
 
       val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
