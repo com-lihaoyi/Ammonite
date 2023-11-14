@@ -22,7 +22,7 @@ object ProjectTests extends TestSuite{
     test("playframework"){
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec(os.rel/'basic/"PlayFramework.sc")
+          val evaled = exec(os.rel/"basic"/"PlayFramework.sc")
           assert(evaled.out.text().contains("Hello bar"))
         }
       }
@@ -44,7 +44,7 @@ object ProjectTests extends TestSuite{
       // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
       if (!Util.windowsPlatform) {
         if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec(os.rel / 'basic/"Spark2.sc")
+          val evaled = exec(os.rel / "basic"/"Spark2.sc")
           assert(evaled.out.text().contains("fake db write"))
         }
       }

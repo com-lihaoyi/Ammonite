@@ -31,7 +31,7 @@ private[sshd] class ShellSession(remoteShell: ShellSession.Server)
    * called by ssh server to instrument this session
    * with a callback that it finished serving a user
    */
-  override def setExitCallback(exit: ExitCallback) {
+  override def setExitCallback(exit: ExitCallback) = {
     this.exit = exit
   }
 
