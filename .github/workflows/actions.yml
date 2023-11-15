@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         java-version: [8, 11]
-        scala-version: [2.12.18, 2.13.12, 3.3.1]
+        scala-version: [2.12.18, 2.13.12, 3.2.2, 3.3.1]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,12 +24,13 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
       - run: ./mill -i unitTest "${{ matrix.scala-version }}"
+      - run: ./mill -i unitTest "${{ matrix.scala-version }}"
   itest:
     strategy:
       fail-fast: false
       matrix:
         java-version: [8, 11]
-        scala-version: [2.12.18, 2.13.12, 3.3.1]
+        scala-version: [2.12.18, 2.13.12, 3.2.2, 3.3.1]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -39,3 +40,13 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
       - run: ./mill -i integrationTest ${{ matrix.scala-version }}
+  publishLocal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - run: ./mill -i __.publishLocal

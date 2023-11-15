@@ -365,6 +365,12 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def ivyDeps = Agg(
         Deps.coursierInterface
       )
+      override def docJar = if (isScala3(crossScalaVersion)) T {
+        val outDir = T.ctx().dest
+        val javadocDir = outDir / "javadoc"
+        os.makeDir.all(javadocDir)
+        mill.api.Result.Success(mill.modules.Jvm.createJar(Agg(javadocDir))(outDir))
+      } else super.docJar
       def constantsSourceDir = T {
         val dir = T.dest / "src"
         val dest = dir / "Constants.scala"
@@ -698,14 +704,14 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 
-def unitTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
+def unitTest(scalaVersion: String) = T.command{
   terminal(scalaVersion).test.test()()
   amm.repl(scalaVersion).test.test()()
   amm(scalaVersion).test.test()()
   sshd(scalaVersion).test.test()()
 }
 
-def integrationTest(scalaVersion: String = sys.env("TRAVIS_SCALA_VERSION")) = T.command{
+def integrationTest(scalaVersion: String) = T.command{
   integration(scalaVersion).test.test()()
 }
 
