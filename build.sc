@@ -141,7 +141,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule
     else Agg[Dep]()
   }
   trait Tests extends super.Tests with TestModule.Utest{
-    def ivyDeps = Agg(Deps.utest)
+    def ivyDeps = super.ivyDeps() ++ Agg(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   def allIvyDeps = T{transitiveIvyDeps() ++ scalaLibraryIvyDeps()}
@@ -299,7 +299,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
     def crossFullScalaVersion = true
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.classPathUtil,
       Deps.upickle(crossScalaVersion),
       Deps.requests,
@@ -335,10 +335,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
           )
         else
           Agg[Dep](
-            ivy"org.scala-lang:scala3-compiler_3:${scalaVersion()}",
+            ivy"org.scala-lang::scala3-compiler:${scalaVersion()}",
             ivy"org.ow2.asm:asm:9.3"
           )
-        scalaSpecificDeps ++ Agg(
+        super.ivyDeps() ++ scalaSpecificDeps ++ Agg(
           Deps.javassist,
           Deps.javaparserCore
         )
@@ -360,7 +360,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def moduleDeps = Seq(amm.compiler.interface(), amm.util())
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
-      def ivyDeps = Agg(
+      def ivyDeps = super.ivyDeps() ++ Agg(
         Deps.coursierInterface
       )
       override def docJar = if (isScala3(crossScalaVersion)) T {
@@ -389,7 +389,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), amm.runtime(), amm.compiler.interface())
     def crossFullScalaVersion = true
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.bsp4j,
       Deps.fastparse
     ) ++ Agg(
@@ -406,7 +406,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
 //  object `test-runner` extends mill.scalalib.SbtModule {
 //    def scalaVersion = "2.12.8"
-//    def ivyDeps = Agg(
+//    def ivyDeps = super.ivyDeps() ++ Agg(
 //      ivy"com.lihaoyi::mill-scalalib:${sys.props("MILL_VERSION")}"
 //    )
 //  }
@@ -418,7 +418,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       def crossFullScalaVersion = true
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(amm.util(), interp.api())
-      def ivyDeps = Agg(
+      def ivyDeps = super.ivyDeps() ++ Agg(
         Deps.mainargs,
         Deps.geny
       )
@@ -445,7 +445,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       terminal(),
       amm.compiler.interface()
     )
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.jlineTerminal,
       Deps.jlineJna,
       Deps.jlineReader,
@@ -453,7 +453,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
     def compileIvyDeps = super.compileIvyDeps() ++ (if(isScala3(crossScalaVersion)) Agg.empty[Dep] else Agg(Deps.scalaReflect(scalaVersion())))
 
-    object test extends Tests with AmmDependenciesResourceFileModule with PatchScala3Library {
+    object test extends Tests with AmmDependenciesResourceFileModule {
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.scalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
@@ -485,27 +485,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
 }
 
-trait PatchScala3Library extends JavaModule {
-
-  def transitiveIvyDeps = T{
-    val l = super.transitiveIvyDeps()
-    l.map { dep =>
-      if (dep.dep.module.name.value == "scala3-library")
-        dep.copy(
-          dep = dep.dep.withModule(
-            dep.dep.module
-              .withName(coursier.ModuleName(dep.dep.module.name.value + "_3"))
-          ),
-          cross = CrossVersion.Constant("", true)
-        )
-      else dep
-    }
-  }
-
-}
-
-class MainModule(val crossScalaVersion: String)
-  extends AmmModule with PatchScala3Library {
+class MainModule(val crossScalaVersion: String) extends AmmModule {
 
   def crossFullScalaVersion = true
 
@@ -588,7 +568,7 @@ class MainModule(val crossScalaVersion: String)
       }
   }
 
-  object test extends Tests with PatchScala3Library{
+  object test extends super.Tests {
     def moduleDeps = super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.scalaJava8Compat
@@ -653,11 +633,12 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions:_*)
 class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule{
   def moduleDeps = Seq(amm())
-  def ivyDeps = T{
-    if (scalaVersion().startsWith("2.13."))
-      Agg(Deps.cask)
-    else
-      Agg.empty
+  def ivyDeps = T{ super.ivyDeps() ++ (
+      if (scalaVersion().startsWith("2.13."))
+        Agg(Deps.cask)
+      else
+        Agg.empty
+    )
   }
   object test extends Tests {
     def testLauncher = T {
@@ -676,7 +657,7 @@ object sshd extends Cross[SshdModule](fullCrossScalaVersions:_*)
 class SshdModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(amm())
   def crossFullScalaVersion = true
-  def ivyDeps = Agg(
+  def ivyDeps = super.ivyDeps() ++ Agg(
     // sshd-core 1.3.0 requires java8
     Deps.sshdCore,
     Deps.bcprovJdk15on
