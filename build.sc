@@ -152,6 +152,9 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
   def skipBloop =
     // no need to expose the modules for old Scala versions support in Bloop / Metals
     !binCrossScalaVersions.contains(crossScalaVersion)
+  def artifactName = T{
+    "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
+  }
   def testFramework = "utest.runner.Framework"
   def isScala2 = T { scalaVersion().startsWith("2.") }
   def scalacOptions = T {
@@ -485,19 +488,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
       )
     }
   }
-
-  // When built with crossScalaVersion == 3.x, amm itself is still compiled with
-  // Scala 2 (using dotty compatibility mode), and is published as
-  // com.lihaoyi:ammonite-cross-23_2.13.x, in order not to conflict with the main
-  // Scala 2.13.x amm module. In order to still publish a com.lihaoyi:ammonite_3.x module,
-  // we build an empty module, and have it depend on com.lihaoyi:ammonite-cross-23_2.13.x.
-  object helper extends Cross[HelperModule](scala3Versions: _*)
-  class HelperModule(val crossScalaVersion: String) extends AmmModule {
-    def artifactName = "ammonite"
-    def crossFullScalaVersion = true
-    def mainClass = Some("ammonite.AmmoniteMain")
-    def moduleDeps = Seq(amm())
-  }
 }
 
 trait PatchScala3Library extends JavaModule {
@@ -525,6 +515,8 @@ class MainModule(val crossScalaVersion: String)
   def crossFullScalaVersion = true
 
   def mainClass = Some("ammonite.AmmoniteMain")
+
+  def artifactName = "ammonite"
 
   def moduleDeps = Seq(
     terminal(),
