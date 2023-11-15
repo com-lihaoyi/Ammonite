@@ -691,11 +691,15 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 
-def unitTest(scalaVersion: String) = T.command{
-  terminal(scalaVersion).test.test()()
-  amm.repl(scalaVersion).test.test()()
-  amm(scalaVersion).test.test()()
-  sshd(scalaVersion).test.test()()
+def unitTest(scalaBinaryVersion: String) = {
+  def cross[T <: AmmInternalModule](module: Cross[T]) =
+    module.items.find(_._1.head.asInstanceOf[String].startsWith(scalaBinaryVersion)).last._2
+  T.command{
+    cross(terminal).test.test()()
+    cross(amm.repl).test.test()()
+    cross(amm).test.test()()
+    cross(sshd).test.test()()
+  }
 }
 
 def integrationTest(scalaVersion: String) = T.command{
