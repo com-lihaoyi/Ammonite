@@ -140,6 +140,15 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule
     if (isScala2()) Agg(Deps.acyclic)
     else Agg[Dep]()
   }
+  override def scalaLibraryIvyDeps = T {
+    val scalaV = scalaVersion()
+    val scalaO = scalaOrganization()
+    if (isScala3(scalaV)) Agg(
+      ivy"$scalaO::scala3-library:$scalaV"
+    ) else Agg(
+      ivy"$scalaO:scala-library:$scalaV"
+    )
+  }
   trait Tests extends super.Tests with TestModule.Utest{
     def ivyDeps = super.ivyDeps() ++ Agg(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
@@ -680,7 +689,7 @@ def unitTest(scalaBinaryVersion: String) = {
       .collectFirst {
         case (List(key: String), mod) if key.startsWith(scalaBinaryVersion) => mod
       }
-      .getOrElse(sys.error(s"$module doens't have versions for $scalaBinaryVersion"))
+      .getOrElse(sys.error(s"$module doesn't have versions for $scalaBinaryVersion"))
 
   T.command{
     cross(terminal).test.test()()
