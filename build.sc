@@ -693,7 +693,14 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
 
 def unitTest(scalaBinaryVersion: String) = {
   def cross[T <: AmmInternalModule](module: Cross[T]) =
-    module.items.find(_._1.head.asInstanceOf[String].startsWith(scalaBinaryVersion)).last._2
+    module
+      .items
+      .reverse
+      .collectFirst {
+        case (List(key: String), mod) if key.startsWith(scalaBinaryVersion) => mod
+      }
+      .getOrElse(sys.error(s"$module doens't have versions for $scalaBinaryVersion"))
+
   T.command{
     cross(terminal).test.test()()
     cross(amm.repl).test.test()()
