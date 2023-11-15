@@ -39,7 +39,7 @@ val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
 val scala33Versions = Seq("3.3.0", "3.3.1")
 val scala3Versions = scala32Versions ++ scala33Versions
 
-val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala32Versions.last, scala33Versions.last)
+val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala32Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || sv.startsWith("2.13.")
 }
@@ -120,42 +120,13 @@ object Deps {
   val utest = ivy"com.lihaoyi::utest:0.8.1"
 }
 
-// Adapted from https://github.com/lihaoyi/mill/blob/0.9.3/scalalib/src/MiscModule.scala/#L80-L100
-// Compared to the original code, we added the custom Resolver,
-// and ensure `scalaVersion()` rather than `crossScalaVersion` is used
-// when computing paths, as the former is always a valid Scala version,
-// while the latter can be a 3.x version while we compile using Scala 2.x
-// (and later rely on dotty compatibility to mix Scala 2 / Scala 3 modules).
-trait CrossSbtModule extends mill.scalalib.SbtModule with mill.scalalib.CrossModuleBase { outer =>
-
-  override def sources = T.sources {
-    super.sources() ++
-      mill.scalalib.CrossModuleBase.scalaVersionPaths(
-        scalaVersion(),
-        s => millSourcePath / "src" / 'main / s"scala-$s"
-      )
-
-  }
-  trait Tests extends super.Tests {
-    override def millSourcePath = outer.millSourcePath
-    override def sources = T.sources {
-      super.sources() ++
-        mill.scalalib.CrossModuleBase.scalaVersionPaths(
-          scalaVersion(),
-          s => millSourcePath / "src" / 'test / s"scala-$s"
-        )
-    }
-  }
-}
-
-trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
+trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule.Utest{
   def skipBloop =
     // no need to expose the modules for old Scala versions support in Bloop / Metals
     !binCrossScalaVersions.contains(crossScalaVersion)
   def artifactName = T{
     "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   }
-  def testFramework = "utest.runner.Framework"
   def isScala2 = T { scalaVersion().startsWith("2.") }
   def scalacOptions = T {
     if (isScala2()) Seq("-P:acyclic:force")
@@ -219,6 +190,30 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
   def repositories = super.repositories ++ Seq(
     mvn"https://scala-ci.typesafe.com/artifactory/scala-integration"
   )
+  override implicit def crossSbtModuleResolver: mill.define.Cross.Resolver[CrossModuleBase] =
+    new mill.define.Cross.Resolver[CrossModuleBase] {
+      def resolve[V <: CrossModuleBase](c: Cross[V]): V = {
+        crossScalaVersion
+          .split('.')
+          .inits
+          .filter { v =>
+            if(isScala3(crossScalaVersion)) v.length != 2 else v.length != 1
+          }
+          .flatMap(prefix =>
+            c.items
+              .map(_._2)
+              .find(_.crossScalaVersion.split('.').startsWith(prefix))
+          )
+          .collectFirst { case x => x }
+          .getOrElse{
+            throw new Exception(
+              s"Unable to find compatible cross version between $crossScalaVersion and " +
+                c.items.map(_._2.crossScalaVersion).mkString(",")
+            )
+          }
+
+      }
+    }
 }
 trait AmmModule extends AmmInternalModule with PublishModule{
   def publishVersion = buildVersion
@@ -829,7 +824,7 @@ def publishDocs() = {
         "readme/run",
       ).call(
         env = Map(
-          "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
+          "AMMONITE_ASSEMBLY" -> amm(scala2_13Versions.head).assembly().path.toString,
           "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
         )
       )
