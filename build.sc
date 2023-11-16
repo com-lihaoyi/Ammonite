@@ -40,12 +40,13 @@ val scala33Versions = Seq("3.3.0", "3.3.1")
 val scala3Versions = scala32Versions ++ scala33Versions
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala32Versions.last)
+val assemblyCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || sv.startsWith("2.13.")
 }
 val fullCrossScalaVersions = scala2_12Versions ++ scala2_13Versions ++ scala3Versions
 
-val latestAssemblies = binCrossScalaVersions.map(amm(_).assembly)
+val latestAssemblies = assemblyCrossScalaVersions.map(amm(_).assembly)
 
 println("GITHUB REF " + sys.env.get("GITHUB_REF"))
 
@@ -116,9 +117,14 @@ object Deps {
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule.Utest{
-  def skipBloop =
+  // We need it to be a Boolean, not T[Boolean]
+  def isCrossFullScalaVersion: Boolean = false
+  def crossFullScalaVersion = T { isCrossFullScalaVersion }
+  def skipBloop = {
+    val versions = if(isCrossFullScalaVersion) assemblyCrossScalaVersions else binCrossScalaVersions
     // no need to expose the modules for old Scala versions support in Bloop / Metals
-    !binCrossScalaVersions.contains(crossScalaVersion)
+    !versions.contains(crossScalaVersion)
+  }
   def artifactName = T{
     "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   }
@@ -302,7 +308,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object runtime extends Cross[RuntimeModule](fullCrossScalaVersions:_*)
   class RuntimeModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
-    def crossFullScalaVersion = true
+    def isCrossFullScalaVersion = true
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.classPathUtil,
       Deps.upickle(crossScalaVersion),
@@ -315,7 +321,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   object compiler extends Cross[CompilerModule](fullCrossScalaVersions:_*) {
     object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions:_*)
     class CompilerInterfaceModule(val crossScalaVersion: String) extends AmmModule{
-      def crossFullScalaVersion = true
+      def isCrossFullScalaVersion = true
       def moduleDeps = Seq(amm.util())
       def exposedClassPath = T{
         runClasspath() ++
@@ -328,7 +334,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   class CompilerModule(val crossScalaVersion: String) extends AmmModule{
     def supports3 = true
     def moduleDeps = Seq(amm.compiler.interface(), amm.util(), amm.repl.api())
-    def crossFullScalaVersion = true
+    def isCrossFullScalaVersion = true
     def ivyDeps = T {
       val scalaSpecificDeps =
         if (isScala2())
@@ -362,7 +368,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     object api extends Cross[InterpApiModule](fullCrossScalaVersions:_*)
     class InterpApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
       def moduleDeps = Seq(amm.compiler.interface(), amm.util())
-      def crossFullScalaVersion = true
+      def isCrossFullScalaVersion = true
       def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
       def ivyDeps = super.ivyDeps() ++ Agg(
         Deps.coursierInterface
@@ -392,7 +398,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
   }
   class InterpModule(val crossScalaVersion: String) extends AmmModule{
     def moduleDeps = Seq(amm.util(), amm.runtime(), amm.compiler.interface())
-    def crossFullScalaVersion = true
+    def isCrossFullScalaVersion = true
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.bsp4j,
       Deps.fastparse
@@ -419,7 +425,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
     object api extends Cross[ReplApiModule](fullCrossScalaVersions:_*)
     class ReplApiModule(val crossScalaVersion: String) extends AmmModule with AmmDependenciesResourceFileModule{
-      def crossFullScalaVersion = true
+      def isCrossFullScalaVersion = true
       def dependencyResourceFileName = "amm-dependencies.txt"
       def moduleDeps = Seq(amm.util(), interp.api())
       def ivyDeps = super.ivyDeps() ++ Agg(
@@ -442,7 +448,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
   }
   class ReplModule(val crossScalaVersion: String) extends AmmModule{
-    def crossFullScalaVersion = true
+    def isCrossFullScalaVersion = true
     def moduleDeps = Seq(
       amm.util(),
       amm.runtime(), amm.interp(),
@@ -491,7 +497,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
 
 class MainModule(val crossScalaVersion: String) extends AmmModule {
 
-  def crossFullScalaVersion = true
+  def isCrossFullScalaVersion = true
 
   def mainClass = Some("ammonite.AmmoniteMain")
 
@@ -660,7 +666,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
 object sshd extends Cross[SshdModule](fullCrossScalaVersions:_*)
 class SshdModule(val crossScalaVersion: String) extends AmmModule{
   def moduleDeps = Seq(amm())
-  def crossFullScalaVersion = true
+  def isCrossFullScalaVersion = true
   def ivyDeps = super.ivyDeps() ++ Agg(
     // sshd-core 1.3.0 requires java8
     Deps.sshdCore,
@@ -780,7 +786,7 @@ def publishExecutable() = {
       )
     }
 
-    for ((version, jar) <- binCrossScalaVersions.zip(latestAssemblyJars)) {
+    for ((version, jar) <- assemblyCrossScalaVersions.zip(latestAssemblyJars)) {
       println("MASTER COMMIT: Publishing Executable for Scala " + version)
       //Prepare executable
 
@@ -810,6 +816,7 @@ def publishExecutable() = {
 }
 
 def publishDocs() = {
+  val ammoniteAssembly = amm(scala2_13Versions.last).assembly
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
   if (!isMasterCommit) T.command{
@@ -820,7 +827,7 @@ def publishDocs() = {
         "readme/run",
       ).call(
         env = Map(
-          "AMMONITE_ASSEMBLY" -> amm(scala2_13Versions.head).assembly().path.toString,
+          "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
           "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
         )
       )
@@ -876,7 +883,7 @@ def publishDocs() = {
 
     ).call(
       env = Map(
-        "AMMONITE_ASSEMBLY" -> amm("2.13.1").assembly().path.toString,
+        "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
         "CONSTANTS_FILE" -> constantsFile.toString
       )
     )

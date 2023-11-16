@@ -1,11 +1,15 @@
-name: Release (5)
+name: Release
 on:
   push:
     branches:
       - main
       - 2.x
 jobs:
-  release3:
+  release:
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4, 5]
+      fail-fast: false
     runs-on: ubuntu-latest
     env:
       SONATYPE_PGP_SECRET: ${{ secrets.SONATYPE_PGP_SECRET }}
@@ -23,4 +27,4 @@ jobs:
         with:
           java-version: '8'
       - run: test -z "$SONATYPE_PGP_SECRET" || echo "$SONATYPE_PGP_SECRET" | base64 --decode | gpg --import --no-tty --batch --yes
-      - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts 5 5
+      - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts --shard ${{ matrix.shard }} --divisionCount 5
