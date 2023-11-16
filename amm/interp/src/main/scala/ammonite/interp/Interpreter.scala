@@ -157,7 +157,7 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
   def watch(p: os.Path) = watchedValues.append(
     (Watchable.Path(p), Watchable.pathSignature(p))
   )
-  def watchValue[T](v: => T) = watchedValues.append((() => v.hashCode, v.hashCode()))
+  def watchValue[T](v: => T) = watchedValues.append((new Watchable { def poll() = v.hashCode.toLong }, v.hashCode().toLong))
 
   def resolveSingleImportHook(
     source: CodeSource,
@@ -213,11 +213,6 @@ class Interpreter(val compilerBuilder: CompilerBuilder,
                          hookedStmts: Seq[String],
                          source: CodeSource,
                          wrapperPath: Seq[Name]): Res[ImportHookInfo] = synchronized{
-
-    // Fake an update to the classpath to force re-creation of the compiler
-    // Workaround for https://github.com/scala/bug/issues/11564#issuecomment-501834821,
-    // which I caused in 2.13.0 and should be fixed in 2.13.1
-    if (scala.util.Properties.versionNumberString == "2.13.0") headFrame.addClasspath(Nil)
 
     for (hookImports <- Res.map(importTrees)(resolveSingleImportHook(source, _, wrapperPath)))
     yield ImportHookInfo(

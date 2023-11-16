@@ -11,7 +11,7 @@ import utest._
  */
 object MainTests extends TestSuite{
   def exec(p: String, args: String*) =
-    new InProcessMainMethodRunner(InProcessMainMethodRunner.base / 'mains / p, Nil, args)
+    new InProcessMainMethodRunner(InProcessMainMethodRunner.base / "mains" / p, Nil, args)
 
   def stripInvisibleMargin(s: String): String = {
     val lines = Predef.augmentString(s).lines.toArray
@@ -40,7 +40,7 @@ object MainTests extends TestSuite{
     // logic revolves around handling arguments. Make sure this fails properly
     test("badAmmoniteFlag"){
       val evaled = new InProcessMainMethodRunner(
-        InProcessMainMethodRunner.base / 'mains/"Hello.sc",
+        InProcessMainMethodRunner.base / "mains"/"Hello.sc",
         List("--doesnt-exist"),
         Nil
       )
@@ -98,8 +98,7 @@ object MainTests extends TestSuite{
           assert(out.contains(expected.trim))
         }
         test("emptyArg"){
-          val isScala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
-          if (isScala2) {
+          if (TestUtils.scala2) {
             val evaled = exec("ArgList.sc", "")
             assert(evaled.success)
           } else {
@@ -146,7 +145,7 @@ object MainTests extends TestSuite{
       }
 
       test("full"){
-        val evaled = exec("Args.sc", "-i", "3", "-s", "Moo", (os.pwd/'omg/'moo).toString)
+        val evaled = exec("Args.sc", "-i", "3", "-s", "Moo", (os.pwd/"omg"/"moo").toString)
         assert(evaled.success)
         assert(evaled.out == ("\"Hello! MooMooMoo moo.\"" + Util.newLine))
       }
@@ -172,8 +171,8 @@ object MainTests extends TestSuite{
       val argsUsageMsg =
         s"""Expected Signature: main
            |  -i <int>
-           |  -s <str>
-           |  --path <path>""".stripMargin
+           |  --path <path>
+           |  -s <str>""".stripMargin
       test("tooFew"){
         val evaled = exec("Args.sc", "3")
         assert(!evaled.success)
@@ -282,8 +281,8 @@ object MainTests extends TestSuite{
             s"""Invalid argument -i <int> failed to parse "foo" due to $exMsg
                |Expected Signature: main
                |  -i <int>
-               |  -s <str>
                |  --path <path>
+               |  -s <str>
                |""".stripMargin
           )
         ))

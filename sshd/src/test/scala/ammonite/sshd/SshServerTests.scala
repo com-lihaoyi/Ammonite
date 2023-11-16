@@ -6,7 +6,6 @@ import utest._
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
-import scala.language.postfixOps
 import SshTestingUtils._
 
 object SshServerTests extends TestSuite with ScalaCheckSupport {
@@ -49,7 +48,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
           client.connect()
           val shell = new Shell(client)
           shell.connect()
-          Await.result(remoteShellGetsExecuted.future, 5 seconds)
+          Await.result(remoteShellGetsExecuted.future, 5.seconds)
         }
       }
     }
@@ -60,7 +59,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
           client.connect()
           assert(client.isConnected)
           for (channel <- rejectedChannelTypes) cantConnectToChannel(client, channel)
-          check(forAll { randomChannel:String =>
+          check(forAll { (randomChannel: String) =>
             cantConnectToChannel(client, randomChannel)
           })
         }

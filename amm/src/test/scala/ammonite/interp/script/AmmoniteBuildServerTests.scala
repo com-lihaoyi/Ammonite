@@ -20,7 +20,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       FutureConverters.toScala(f)
   }
 
-  val scriptBase = os.pwd/'amm/'src/'test/'resources/'bsp
+  val scriptBase = os.pwd/"amm"/"src"/"test"/"resources"/"bsp"
 
   val wd = os.temp.dir(deleteOnExit = true)
 

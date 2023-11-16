@@ -1,13 +1,12 @@
 package ammonite.session
 
 import ammonite.TestRepl
+import ammonite.TestUtils
 import ammonite.compiler.CodeClassWrapper
 import utest._
 
 object SerializationTests extends TestSuite{
-  val tests =
-    if (ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")) scala2Tests
-    else scala3Tests
+  val tests = if (TestUtils.scala2) scala2Tests else scala3Tests
   def scala2Tests = Tests{
     println("SerializationTests")
     val check = new TestRepl {

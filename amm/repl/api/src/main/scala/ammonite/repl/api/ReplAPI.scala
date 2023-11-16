@@ -2,12 +2,7 @@ package ammonite.repl.api
 
 import ammonite.util._
 
-import scala.reflect.runtime.universe._
-
-
-
-
-trait ReplAPI {
+trait ReplAPI extends ReplAPIScalaVersionSpecific {
 
   /**
    * Read/writable prompt for the shell. Use this to change the
@@ -46,19 +41,6 @@ trait ReplAPI {
    * current session
    */
   def history: History
-
-  /**
-   * Get the `Type` object of [[T]]. Useful for finding
-   * what its methods are and what you can do with it
-   */
-  def typeOf[T: WeakTypeTag]: Type
-
-  /**
-   * Get the `Type` object representing the type of `t`. Useful
-   * for finding what its methods are and what you can do with it
-   *
-   */
-  def typeOf[T: WeakTypeTag](t: => T): Type
 
   /**
    * Throw away the current scala.tools.nsc.Global and get a new one

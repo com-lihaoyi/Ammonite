@@ -5,16 +5,11 @@ import ammonite.repl.api.ReplAPI
 import ammonite.util.{Bind, _}
 import ammonite.util.Util.newLine
 
-import scala.reflect.runtime.universe._
-
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.reflect.classTag
 
-trait FullReplAPI extends ReplAPI{ replApi =>
-
-  def typeOf[T: WeakTypeTag] = scala.reflect.runtime.universe.weakTypeOf[T]
-  def typeOf[T: WeakTypeTag](t: => T) = scala.reflect.runtime.universe.weakTypeOf[T]
+trait FullReplAPI extends ReplAPI with FullReplAPIScalaVersionSpecific { replApi =>
 
   protected val colors: Ref[Colors]
 

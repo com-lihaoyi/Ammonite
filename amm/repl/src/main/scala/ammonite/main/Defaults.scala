@@ -1,9 +1,8 @@
-
 package ammonite.main
 
 import java.io.InputStream
 
-import ammonite.util.{ImportData, Imports, Util}
+import ammonite.util.Util
 import coursierapi.Dependency
 
 import scala.io.Codec
@@ -11,7 +10,7 @@ import scala.io.Codec
 /**
   * Constants used in the default configuration for the Ammonite REPL
   */
-object Defaults{
+object Defaults extends DefaultsScalaVersionSpecific {
 
   val welcomeBanner = {
     def ammoniteVersion = ammonite.Constants.version
@@ -21,15 +20,7 @@ object Defaults{
     )
   }
 
-  val replImports = Imports(
-    ImportData("""ammonite.repl.ReplBridge.value.{
-      codeColorsImplicit,
-      tprintColorsImplicit,
-      show,
-      typeOf
-    }""")
-  )
-  def ammoniteHome = os.Path(System.getProperty("user.home"))/".ammonite"
+  def ammoniteHome = os.Path(System.getProperty("user.home")) / ".ammonite"
 
   def alreadyLoadedDependencies(
     resourceName: String = "amm-dependencies.txt"

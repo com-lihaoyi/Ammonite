@@ -33,15 +33,15 @@ object BasicTests extends TestSuite{
     )
 
     test("hello"){
-      val evaled = exec(os.rel / 'basic/"Hello.sc")
-      assert(evaled.out.trim == "Hello World")
+      val evaled = exec(os.rel / "basic"/"Hello.sc")
+      assert(evaled.out.trim() == "Hello World")
     }
 
     //make sure scripts with symbols in path names work fine
     test("scriptWithSymbols"){
       if (!Util.windowsPlatform){
         val dirAddr =
-          os.pwd/'target/'test/'resources/'ammonite/'integration/'basic
+          os.pwd/"target"/"test"/"resources"/"ammonite"/"integration"/"basic"
         val weirdScriptName = "script%#.@*+叉燒.sc"
         val scriptAddr = dirAddr/weirdScriptName
         os.remove.all(scriptAddr)
@@ -53,24 +53,24 @@ object BasicTests extends TestSuite{
           scriptAddr
           // Somehow this is being set of travis and causing weird errors/warnings
         ).call(env = Map("_JAVA_OPTIONS" -> null))
-        assert(evaled.out.trim == "Script Worked!!" && evaled.err.text().isEmpty)
+        assert(evaled.out.trim() == "Script Worked!!" && evaled.err.text().isEmpty)
       }
     }
     test("scalacNotLoadedByCachedScripts"){
       val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
-        os.rel/'basic/"Print.sc",
+        os.rel/"basic"/"Print.sc",
         tmpDir
       )
       val evaled2 = execWithJavaOptsSet(
-        os.rel/'basic/"Print.sc",
+        os.rel/"basic"/"Print.sc",
         tmpDir
       )
       val compilerPackage =
         if (isScala2) "scala.tools.nsc"
         else "dotty.tools.dotc"
-      val count1 = substrCount(evaled1.out.trim, compilerPackage)
-      val count2 = substrCount(evaled2.out.trim, compilerPackage)
+      val count1 = substrCount(evaled1.out.trim(), compilerPackage)
+      val count2 = substrCount(evaled2.out.trim(), compilerPackage)
       //These numbers might fail in future but basic point is to keep count2
       //very low whereas count1 will be inevitably bit higher
       if (isScala2) {
@@ -87,16 +87,16 @@ object BasicTests extends TestSuite{
         else "dotty.tools.dotc.parsing"
       val tmpDir = os.temp.dir()
       val evaled1 = execWithJavaOptsSet(
-        os.rel/'basic/"Print.sc",
+        os.rel/"basic"/"Print.sc",
         tmpDir
       )
-      assert(evaled1.out.trim.contains(parserPackage))
+      assert(evaled1.out.trim().contains(parserPackage))
 
       val evaled2 = execWithJavaOptsSet(
-        os.rel/'basic/"Print.sc",
+        os.rel/"basic"/"Print.sc",
         tmpDir
         )
-      assert(!evaled2.out.trim.contains(parserPackage))
+      assert(!evaled2.out.trim().contains(parserPackage))
     }
 
 
@@ -109,14 +109,14 @@ object BasicTests extends TestSuite{
         "--thin",
         scriptAddr
       ).call()
-      assert(evaled.out.trim == "Worked!!" )
+      assert(evaled.out.trim() == "Worked!!" )
     }
 
     test("complex"){
       // Spire not published for 2.12
       if (scala.util.Properties.versionNumberString.contains("2.11")) {
-        val evaled = exec(os.rel / 'basic / "Complex.sc")
-        assert(evaled.out.trim.contains("Spire Interval [0, 10]"))
+        val evaled = exec(os.rel / "basic" / "Complex.sc")
+        assert(evaled.out.trim().contains("Spire Interval [0, 10]"))
       }
     }
 
@@ -153,27 +153,27 @@ object BasicTests extends TestSuite{
     test("sourceExternal"){
       // Re-enable when source support is added in Scala 3
       if (isScala2)
-        exec(os.rel/'basic / "SourceDownload.sc")
+        exec(os.rel / "basic" / "SourceDownload.sc")
       else
         "Disabled in Scala 3"
     }
 
     test("classloaders"){
-      val evaled = exec(os.rel / 'basic / "Resources.sc")
+      val evaled = exec(os.rel / "basic" / "Resources.sc")
       assert(evaled.out.text().contains("1745"))
     }
     test("testSilentScriptRunning"){
-      val evaled1 = exec(os.rel / 'basic/"Hello.sc")
+      val evaled1 = exec(os.rel / "basic" / "Hello.sc")
       // check Compiling Script is being printed
 
       assert(evaled1.err.text().contains("Compiling"))
-      val evaled2 = execSilent(os.rel / 'basic/"Hello.sc")
+      val evaled2 = execSilent(os.rel / "basic" / "Hello.sc")
       // make sure with `-s` flag script running is silent
       assert(!evaled2.err.text().contains("Compiling"))
     }
     test("testSilentRunningWithExceptions"){
       val errorMsg = intercept[os.SubprocessException]{
-        exec(os.rel / 'basic/"Failure.sc")
+        exec(os.rel / "basic" / "Failure.sc")
       }.result.err.text()
 
       val expected =
@@ -183,7 +183,7 @@ object BasicTests extends TestSuite{
     }
     test("testSilentIvyExceptions"){
       val errorMsg = intercept[os.SubprocessException]{
-        exec(os.rel / 'basic/"wrongIvyCordinates.sc")
+        exec(os.rel / "basic" / "wrongIvyCordinates.sc")
       }.result.err.text()
 
 
@@ -193,13 +193,14 @@ object BasicTests extends TestSuite{
 
       // test disabled on windows because sbt not available
       if (!Util.windowsPlatform) {
-        val buildRoot = os.pwd/'target/"some-dummy-library"
+        val buildRoot = os.pwd/"target"/"some-dummy-library"
+        os.makeDir.all(buildRoot)
         os.copy.over(intTestResources/"some-dummy-library", buildRoot)
-        val dummyScala = buildRoot/'src/'main/'scala/'dummy/"Dummy.scala"
+        val dummyScala = buildRoot/"src"/"main"/"scala"/"dummy"/"Dummy.scala"
         // using the same home to share the ivymap cache across runs
         val home = os.temp.dir()
 
-        val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+        val sbv = ammonite.compiler.CompilerBuilder.scalaVersion.split('.').take(2).mkString(".")
         val previous = os.home / ".ivy2" / "local" / "com.lihaoyi" / ("some-dummy-library_" + sbv)
         os.remove.all(previous)
 
@@ -219,16 +220,10 @@ object BasicTests extends TestSuite{
           )
 
           // 2. build & publish code locally
-          val compatScalaVersion =
-           if (scalaVersion.startsWith("3."))
-             // should be the right 2.13 version
-             scala.util.Properties.versionNumberString
-           else
-             scalaVersion
           os.proc("sbt", "-J-Xmx1g", "-batch", "-no-colors", "publishLocal").call(
             env = Map(
-              "SCALA_VERSION" -> compatScalaVersion,
-              "FIRST_RUN" -> s"$firstRun",
+              "SCALA_VERSION" -> scalaVersion,
+              "FIRST_RUN" -> firstRun.toString,
               "VERSION" -> version
             ),
             cwd = buildRoot,
@@ -237,7 +232,7 @@ object BasicTests extends TestSuite{
           )
 
           // 3. use published artifact in a script
-          val evaled = execWithHome(home, os.rel / 'basic / script)
+          val evaled = execWithHome(home, os.rel / "basic" / script)
           assert(evaled.out.text().contains(theThing))
         }
 
@@ -257,13 +252,13 @@ object BasicTests extends TestSuite{
     // to make sure things work end-to-end
     test("multiMain"){
       def positiveArgsTest() = {
-        val evaled = exec(os.rel / 'basic/"MultiMain.sc", "functionB", "2", "foo")
+        val evaled = exec(os.rel / "basic" / "MultiMain.sc", "functionB", "2", "foo")
 
         val out = evaled.out.text()
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
       def specifyMainTest() = {
-        val evaled = intercept[os.SubprocessException](exec(os.rel / 'basic/"MultiMain.sc"))
+        val evaled = intercept[os.SubprocessException](exec(os.rel / "basic" / "MultiMain.sc"))
 
         val out = evaled.result.err.text()
         val expected = Util.normalizeNewlines(

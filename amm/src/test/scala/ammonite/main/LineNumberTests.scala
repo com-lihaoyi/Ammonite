@@ -24,7 +24,7 @@ object LineNumberTests extends TestSuite{
 
     test("sourcecode"){
       if (isScala2) {
-        val path = InProcessMainMethodRunner.base / 'lineNumbers / "sourceCodeMetadata.sc"
+        val path = InProcessMainMethodRunner.base / "lineNumbers" / "sourceCodeMetadata.sc"
         checkErrorMessage(
           file = path,
           s"""sourceCodeMetadata.sc
@@ -38,7 +38,7 @@ object LineNumberTests extends TestSuite{
     //as `\r\n` counts as 2 so less number of surrounding chars are shown on windows
     test("errorTest"){
       if(!Util.windowsPlatform) {
-        val path = InProcessMainMethodRunner.base / 'lineNumbers / "ErrorLineNumberTest.sc"
+        val path = InProcessMainMethodRunner.base / "lineNumbers" / "ErrorLineNumberTest.sc"
         checkErrorMessage(
           file = path,
           expected = Util.normalizeNewlines(
@@ -59,7 +59,7 @@ object LineNumberTests extends TestSuite{
 
     test("multipleCompilationUnitErrorTest1"){
       if(!Util.windowsPlatform) {
-        val path = InProcessMainMethodRunner.base / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest1.sc"
+        val path = InProcessMainMethodRunner.base / "lineNumbers"/"MultipleCompilationUnitErrorMsgTest1.sc"
           checkErrorMessage(
           file = path,
           expected = Util.normalizeNewlines(
@@ -81,7 +81,7 @@ object LineNumberTests extends TestSuite{
 
     test("multipleCompilationUnitErrorTest2"){
       if(!Util.windowsPlatform) {
-        val path = InProcessMainMethodRunner.base / 'lineNumbers/"MultipleCompilationUnitErrorMsgTest2.sc"
+        val path = InProcessMainMethodRunner.base / "lineNumbers"/"MultipleCompilationUnitErrorMsgTest2.sc"
         checkErrorMessage(
           file = path,
           expected = Util.normalizeNewlines(
@@ -101,7 +101,7 @@ object LineNumberTests extends TestSuite{
     }
 
     test("compilationErrorWithCommentsAtTop") {
-      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorWithCommentsAtTop.sc"
+      val path = InProcessMainMethodRunner.base / "lineNumbers"/"compilationErrorWithCommentsAtTop.sc"
       checkErrorMessage(
         file = path,
         expected = Util.normalizeNewlines(
@@ -123,7 +123,7 @@ object LineNumberTests extends TestSuite{
     }
 
     test("compilationErrorInSecondBlock") {
-      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorInSecondBlock.sc"
+      val path = InProcessMainMethodRunner.base / "lineNumbers"/"compilationErrorInSecondBlock.sc"
       checkErrorMessage(
         file = path,
         expected = Util.normalizeNewlines(
@@ -143,7 +143,7 @@ object LineNumberTests extends TestSuite{
     }
 
     test("compilationErrorInFourthBlock") {
-      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorInFourthBlock.sc"
+      val path = InProcessMainMethodRunner.base / "lineNumbers"/"compilationErrorInFourthBlock.sc"
       checkErrorMessage(
         file = path,
         expected = Util.normalizeNewlines(
@@ -163,7 +163,7 @@ object LineNumberTests extends TestSuite{
     }
 
     test("compilationErrorInClass") {
-      val path = InProcessMainMethodRunner.base / 'lineNumbers/"compilationErrorInClass.sc"
+      val path = InProcessMainMethodRunner.base / "lineNumbers"/"compilationErrorInClass.sc"
       checkErrorMessage(
         file = path,
         expected =
@@ -175,7 +175,7 @@ object LineNumberTests extends TestSuite{
     }
 
     test("CompilationErrorLineNumberTest") {
-      val path = InProcessMainMethodRunner.base / 'lineNumbers / "CompilationErrorLineNumberTest.sc"
+      val path = InProcessMainMethodRunner.base / "lineNumbers" / "CompilationErrorLineNumberTest.sc"
       checkErrorMessage(
         file = path,
         expected = Util.normalizeNewlines(
@@ -196,7 +196,7 @@ object LineNumberTests extends TestSuite{
 
     test("RuntimeCompilationErrorLineNumberTest") - {
       checkErrorMessage(
-        file = InProcessMainMethodRunner.base / 'lineNumbers/"RuntimeCompilationErrorLineNumberTest.sc",
+        file = InProcessMainMethodRunner.base / "lineNumbers"/"RuntimeCompilationErrorLineNumberTest.sc",
         expected = s"(RuntimeCompilationErrorLineNumberTest.sc:6)"
       )
     }

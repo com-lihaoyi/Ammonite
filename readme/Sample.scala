@@ -22,7 +22,7 @@ object Sample{
 
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
-    val path = os.pwd/'target/'cache/(key.hashCode + cacheVersion).toString
+    val path = os.pwd/"target"/"cache"/(key.hashCode + cacheVersion).toString
     try os.read(path)
     catch { case e : Throwable =>
       val newValue = calc
@@ -38,7 +38,6 @@ object Sample{
       Seq(
         sys.env.getOrElse("AMMONITE_ASSEMBLY", "amm"),
         "--color", "true",
-        "--no-remote-logging",
         "--no-home-predef",
       ),
       s"${ammoniteCode.trim}\nexit\n",

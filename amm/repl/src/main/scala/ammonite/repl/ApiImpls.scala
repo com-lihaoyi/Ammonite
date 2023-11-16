@@ -12,7 +12,7 @@ import java.util.Locale
 import scala.collection.mutable
 
 class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
-  def frames = frames0()
+  def frames: List[Frame] = frames0()
   val namedFrames = mutable.Map.empty[String, List[Frame]]
 
   def childFrame(parent: Frame) = new Frame(
@@ -69,10 +69,10 @@ class SessionApiImpl(frames0: => StableRef[List[Frame]]) extends Session{
 }
 trait ReplApiImpl extends FullReplAPI{
 
-  implicit def tprintColorsImplicit = pprint.TPrintColors(
+  implicit def tprintColorsImplicit: pprint.TPrintColors = pprint.TPrintColors(
     typeColor = colors().`type`()
   )
-  implicit val codeColorsImplicit = new CodeColors{
+  implicit val codeColorsImplicit: CodeColors = new CodeColors{
     def comment = colors().comment()
     def `type` = colors().`type`()
     def literal = colors().literal()

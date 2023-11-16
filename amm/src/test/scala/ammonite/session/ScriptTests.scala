@@ -73,21 +73,21 @@ object ScriptTests extends TestSuite{
         test("syntaxError"){
           val errorChunk =
             if (check.scala2)
-          """
-            @ val r = res
-            error: not found: value res
-            val r = res
-                    ^
-            Compilation Failed
-          """
+              """
+   |            @ val r = res
+   |            error: not found: value res
+   |            val r = res
+   |                    ^
+   |            Compilation Failed
+   |          """.stripMargin
             else
-          """
-            @ val r = res
-            error: val r = res
-                    ^^^
-                    Not found: res
-            Compilation Failed
-          """
+              """
+   |            @ val r = res
+   |            error: val r = res
+   |                    ^^^
+   |                    Not found: res
+   |            Compilation Failed
+   |          """.stripMargin
           check.session(s"""
             @ import os._
 
@@ -100,21 +100,21 @@ object ScriptTests extends TestSuite{
         test("compilationError"){
           val errorChunk =
             if (check.scala2)
-          """
-            @ val r = res
-            error: not found: value res
-            val r = res
-                    ^
-            Compilation Failed
-          """
+              """
+   |            @ val r = res
+   |            error: not found: value res
+   |            val r = res
+   |                    ^
+   |            Compilation Failed
+   |          """.stripMargin
             else
-          """
-            @ val r = res
-            error: val r = res
-                    ^^^
-                    Not found: res
-            Compilation Failed
-          """
+              """
+   |            @ val r = res
+   |            error: val r = res
+   |                    ^^^
+   |                    Not found: res
+   |            Compilation Failed
+   |          """.stripMargin
           check.session(s"""
             @  import os._
 
@@ -136,21 +136,21 @@ object ScriptTests extends TestSuite{
         test("multiBlockError"){
           val errorChunk =
             if (check.scala2)
-          """
-            @ val r2 = res2
-            error: not found: value res2
-            val r2 = res2
-                     ^
-            Compilation Failed
-          """
+              """
+    |            @ val r2 = res2
+    |            error: not found: value res2
+    |            val r2 = res2
+    |                     ^
+    |            Compilation Failed
+    |          """.stripMargin
             else
-          """
-            @ val r2 = res2
-            error: val r2 = res2
-                     ^^^^
-                     Not found: res2
-            Compilation Failed
-          """
+              """
+    |            @ val r2 = res2
+    |            error: val r2 = res2
+    |                    ^^^^
+    |                    Not found: res2
+    |            Compilation Failed
+    |          """.stripMargin
           check.session(s"""
             @ import os._
 

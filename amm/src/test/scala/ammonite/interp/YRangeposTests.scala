@@ -17,7 +17,7 @@ object YRangeposTests extends TestSuite {
     }
 
     val scriptFolderPath =
-      os.pwd / 'amm / 'src / 'test / 'resources / 'scriptCompilerSettings
+      os.pwd / "amm" / "src" / "test" / "resources" / "scriptCompilerSettings"
 
     def simpleTest() = {
       // This tests shows that enabling Yrangepos does not mess with ammonite's
@@ -40,7 +40,7 @@ object YRangeposTests extends TestSuite {
       // behaviour, by checking that the line at which the error is found matches
       // the expected one in the file
       val expectedErrorMessage = "yRangeposError.sc:9: type mismatch;"
-      checkErrorMessage(InProcessMainMethodRunner.base / 'scriptCompilerSettings / "yRangeposError.sc",
+      checkErrorMessage(InProcessMainMethodRunner.base / "scriptCompilerSettings" / "yRangeposError.sc",
         expectedErrorMessage)
     }
     test("YrangeposError"){

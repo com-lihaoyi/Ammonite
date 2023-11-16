@@ -3,6 +3,7 @@ package ammonite.session
 import ammonite.DualTestRepl
 import ammonite.TestUtils._
 import utest._
+import ammonite.interp.api.IvyConstructor
 
 object ProjectTests extends TestSuite{
   val tests = Tests{
@@ -426,11 +427,11 @@ object ProjectTests extends TestSuite{
     }
 
     test("no sources"){
-      val sbv = scala.util.Properties.versionNumberString.split('.').take(2).mkString(".")
+      val sbv = IvyConstructor.scalaBinaryVersion(ammonite.compiler.CompilerBuilder.scalaVersion)
 
       val core =
         s"""
-            @ import $$ivy.`com.github.alexarchambault::case-app:2.0.0-M9 compat`
+            @ import $$ivy.`com.github.alexarchambault::case-app:2.1.0-M26`
 
             @ val cp = {
             @   repl.sess
@@ -440,7 +441,7 @@ object ProjectTests extends TestSuite{
             @ }
             cp: List[String] = ?
 
-            @ val found = cp.exists(_.endsWith("/case-app_$sbv-2.0.0-M9.jar"))
+            @ val found = cp.exists(_.endsWith("/case-app_$sbv-2.1.0-M26.jar"))
             found: Boolean = true
         """
 
@@ -449,7 +450,7 @@ object ProjectTests extends TestSuite{
           s"""
             $core
 
-            @ val sourcesFound = cp.exists(_.endsWith("/case-app_$sbv-2.0.0-M9-sources.jar"))
+            @ val sourcesFound = cp.exists(_.endsWith("/case-app_$sbv-2.1.0-M26-sources.jar"))
             sourcesFound: Boolean = true
            """
         )

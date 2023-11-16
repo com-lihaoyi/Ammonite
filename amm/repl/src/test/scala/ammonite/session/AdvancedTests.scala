@@ -47,7 +47,7 @@ object AdvancedTests extends TestSuite{
     }
 
     test("exit"){
-      check.result("exit", Res.Exit())
+      check.result("exit", Res.Exit(()))
     }
     test("skip"){
       check.result("", Res.Skip)
@@ -412,7 +412,7 @@ object AdvancedTests extends TestSuite{
     }
     test("loadingModulesInPredef"){
 
-      val dir = os.pwd/'amm/'src/'test/'resources/'scripts/'predefWithLoad
+      val dir = os.pwd/"amm"/"src"/"test"/"resources"/"scripts"/"predefWithLoad"
       test("loadExec"){
         val c1 = new DualTestRepl() {
           override def predef = (
@@ -477,8 +477,7 @@ object AdvancedTests extends TestSuite{
 
     test("dontRefreshCompiler"){
       test{
-        // Conditional check due to https://github.com/scala/bug/issues/11564
-        if (scala.util.Properties.versionNumberString != "2.13.0") check.session("""
+        check.session("""
           @ val c1 = repl.compiler
 
           @ val n = 2
@@ -498,8 +497,7 @@ object AdvancedTests extends TestSuite{
       }
 
       test("preconfigured"){
-        // Conditional check due to https://github.com/scala/bug/issues/11564
-        if (scala.util.Properties.versionNumberString != "2.13.0") check.session("""
+        check.session("""
           @ val c0 = repl.compiler
 
           @ interp.preConfigureCompiler(_ => ())
@@ -528,7 +526,7 @@ object AdvancedTests extends TestSuite{
     test("loadURL"){
       if (check.scala2) {
         val sbv = {
-          val sv = if (check.scalaVersion.startsWith("3.")) "2.13" else check.scalaVersion
+          val sv = check.scalaVersion
           if (sv.forall(c => c.isDigit || c == '.'))
             sv.split('.').take(2).mkString(".")
           else

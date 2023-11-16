@@ -7,7 +7,7 @@ import ammonite.util.Util
 
 object AutocompleteTests extends TestSuite{
   class Completer{
-    val check = new DualTestRepl()
+  val check = new DualTestRepl()
     def apply(caretCode: String,
                  cmp: (Set[String]) => Set[String],
                  sigs: (Set[String]) => Set[String] = _ => Set()) = {
@@ -181,27 +181,27 @@ object AutocompleteTests extends TestSuite{
             "def >(x: Char): Boolean",
             "def >(x: Byte): Boolean"
           )
-        else
-          Set(
-            "def >>>(x: Long): Int",
-            "def >>>(x: Int): Int",
-            "def >>(x: Long): Int",
-            "def >>(x: Int): Int",
-            "def >=(x: Long): Boolean",
-            "def >=(x: Int): Boolean",
-            "def >=(x: Short): Boolean",
-            "def >=(x: Char): Boolean",
-            "def >=(x: Byte): Boolean",
-            "def >=(x: Double): Boolean",
-            "def >=(x: Float): Boolean",
-            "def >(x: Long): Boolean",
-            "def >(x: Int): Boolean",
-            "def >(x: Short): Boolean",
-            "def >(x: Char): Boolean",
-            "def >(x: Byte): Boolean",
-            "def >(x: Double): Boolean",
-            "def >(x: Float): Boolean"
-          )
+          else
+            Set(
+              "def >>>(x: Long): Int",
+              "def >>>(x: Int): Int",
+              "def >>(x: Long): Int",
+              "def >>(x: Int): Int",
+              "def >=(x: Long): Boolean",
+              "def >=(x: Int): Boolean",
+              "def >=(x: Short): Boolean",
+              "def >=(x: Char): Boolean",
+              "def >=(x: Byte): Boolean",
+              "def >=(x: Double): Boolean",
+              "def >=(x: Float): Boolean",
+              "def >(x: Long): Boolean",
+              "def >(x: Int): Boolean",
+              "def >(x: Short): Boolean",
+              "def >(x: Char): Boolean",
+              "def >(x: Byte): Boolean",
+              "def >(x: Double): Boolean",
+              "def >(x: Float): Boolean"
+            )
         complete( """val x = 1; x + x.<from>><caret>""",
           Set(">>", ">>>") -- _,
           expected ^ _

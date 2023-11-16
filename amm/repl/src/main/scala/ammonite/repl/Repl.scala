@@ -54,7 +54,7 @@ class Repl(input: InputStream,
   val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
     s"""
     val ${b.name} =
-      ammonite.repl.ReplBridge.value.Internal.replArgs($idx).value.asInstanceOf[${b.typeTag.tpe}]
+      ammonite.repl.ReplBridge.value.Internal.replArgs($idx).value.asInstanceOf[${b.typeName.value}]
     """
   }.mkString(newLine)
 
