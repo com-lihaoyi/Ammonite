@@ -1,0 +1,5 @@
+{
+    "value": "@ 2>/dev/null # 2>nul & echo off & goto BOF\r\n:\nexec java -Xmx500m -XX:+UseG1GC $JAVA_OPTS -cp \"$0\" 'ammonite.AmmoniteMain' \"$@\"\nexit\n\r\n:BOF\r\nsetlocal\r\n@echo off\r\njava -Xmx500m -XX:+UseG1GC %JAVA_OPTS% -cp \"%~dpnx0\" ammonite.AmmoniteMain %*\r\nendlocal\r\nexit /B %errorlevel%\r\n",
+    "valueHash": 1180122806,
+    "inputsHash": 1786912577
+}

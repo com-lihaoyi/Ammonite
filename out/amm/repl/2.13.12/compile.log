@@ -1,0 +1,10 @@
+[0m[[0m[0minfo[0m] [0m[0mcompiling 10 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.12/compile.dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEndUtils.scala:26:59: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: List(_), Nil[0m
+[0m[[0m[33mwarn[0m] [0m[0m    ammonite.util.Util.transpose(grouped).iterator.flatMap{[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                          ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m2 deprecations[0m
+[0m[[0m[33mwarn[0m] [0m[0m2 deprecations (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0m4 deprecations in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mfour warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m

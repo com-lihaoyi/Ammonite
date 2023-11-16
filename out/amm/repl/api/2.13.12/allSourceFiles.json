@@ -1,0 +1,18 @@
+{
+    "value": [
+        "ref:c06a21b1:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/Util.scala",
+        "ref:c94fc97c:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/FrontEndAPI.scala",
+        "ref:e7773445:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/ReplAPI.scala",
+        "ref:3b769dc5:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/FrontEnd.scala",
+        "ref:eb60cf20:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/SessionChanged.scala",
+        "ref:c8f3f0ad:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/FullReplAPI.scala",
+        "ref:3a103173:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/runtime/tools/Tools.scala",
+        "ref:f4272473:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/runtime/tools/package.scala",
+        "ref:129cf2f6:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2/ammonite/repl/api/ReplAPIScalaVersionSpecific.scala",
+        "ref:46731680:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2/ammonite/repl/FullReplAPIScalaVersionSpecific.scala",
+        "ref:ae9f13fa:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2.13-or-3/ammonite/repl/api/History.scala",
+        "ref:05fe1e4d:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.12/generatedSources.dest/src/Constants.scala"
+    ],
+    "valueHash": 1832877360,
+    "inputsHash": -1298972765
+}

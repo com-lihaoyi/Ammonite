@@ -1,0 +1,26 @@
+{
+    "value": [
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/terminal/src/main/resources",
+        "ref:79166b26:/home/runner/work/Ammonite/Ammonite/out/terminal/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/resources",
+        "ref:d854f2f2:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/resources",
+        "ref:741d1181:/home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/resources",
+        "ref:ea9c30f4:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.12/dependencyFileResources.dest/extra-resources",
+        "ref:865c1e77:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/resources",
+        "ref:94c3f1a4:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/resources",
+        "ref:c9383586:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.12/dependencyFileResources.dest/extra-resources",
+        "ref:cba0db85:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/resources",
+        "ref:c11bdc45:/home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/resources",
+        "ref:ee8281af:/home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.12/compile.dest/classes",
+        "ref:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/resources",
+        "ref:5e06261c:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.12/compile.dest/classes"
+    ],
+    "valueHash": -1097145440,
+    "inputsHash": -709058138
+}
