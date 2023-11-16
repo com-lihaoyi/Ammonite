@@ -105,15 +105,10 @@ object Deps {
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.0"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
-  def typename(sv: String) = {
-    val ver =
-      if (sv.startsWith("3.1")) "1.0.0"
-      else "1.1.0"
-    ivy"org.tpolecat::typename:$ver"
-  }
+  val typename = ivy"org.tpolecat::typename:1.1.0"
   def upickle(sv: String) = {
     val ver =
-      if (sv.startsWith("3.2")) "3.1.0"
+      if (sv.startsWith("3.2.")) "3.1.0"
       else "3.1.3"
     ivy"com.lihaoyi::upickle:$ver"
   }
@@ -294,7 +289,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     def ivyDeps = T{
       super.ivyDeps() ++ Agg(
         Deps.osLib,
-        Deps.typename(crossScalaVersion),
+        Deps.typename,
         Deps.scalaCollectionCompat,
         Deps.fansi,
         Deps.pprint
