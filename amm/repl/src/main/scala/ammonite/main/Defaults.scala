@@ -2,7 +2,7 @@ package ammonite.main
 
 import java.io.InputStream
 
-import ammonite.util.{ImportData, Imports, Name, Util}
+import ammonite.util.Util
 import coursierapi.Dependency
 
 import scala.io.Codec
