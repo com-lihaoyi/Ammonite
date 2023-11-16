@@ -10,7 +10,7 @@ import scala.io.Codec
 /**
   * Constants used in the default configuration for the Ammonite REPL
   */
-object Defaults{
+object Defaults extends DefaultsScalaVersionSpecific {
 
   val welcomeBanner = {
     def ammoniteVersion = ammonite.Constants.version
@@ -20,19 +20,6 @@ object Defaults{
     )
   }
 
-  def replImports(scalaVersion: String) = {
-    val sharedFields = Seq("codeColorsImplicit", "tprintColorsImplicit", "show")
-    val fields = if (scalaVersion.startsWith("2.")) sharedFields :+ "typeOf" else sharedFields
-    val importss = fields.map(field =>
-      ImportData(
-        Name(field),
-        Name(field),
-        Name("_root_") :: Name("ammonite") :: Name("repl") :: Name("ReplBridge") :: Name("value") :: Nil,
-        ImportData.Term
-      )
-    )
-    Imports(importss)
-  }
   def ammoniteHome = os.Path(System.getProperty("user.home")) / ".ammonite"
 
   def alreadyLoadedDependencies(
