@@ -116,7 +116,7 @@ object Deps {
   val utest = ivy"com.lihaoyi::utest:0.8.1"
 }
 
-trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule.Utest{
+trait AmmInternalModule extends CrossSbtModule with Bloop.Module{
   // We need it to be a Boolean, not T[Boolean]
   def isCrossFullScalaVersion: Boolean = false
   def crossFullScalaVersion = T { isCrossFullScalaVersion }
