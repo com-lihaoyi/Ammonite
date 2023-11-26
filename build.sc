@@ -116,7 +116,7 @@ object Deps {
   val utest = ivy"com.lihaoyi::utest:0.8.1"
 }
 
-trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule.Utest{
+trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   // We need it to be a Boolean, not T[Boolean]
   def isCrossFullScalaVersion: Boolean = false
   def crossFullScalaVersion = T { isCrossFullScalaVersion }
@@ -150,7 +150,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module with TestModule
       ivy"$scalaO:scala-library:$scalaV"
     )
   }
-  trait Tests extends super.Tests with TestModule.Utest{
+  trait AmmTests extends super.Tests with TestModule.Utest{
     def ivyDeps = super.ivyDeps() ++ Agg(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
@@ -283,7 +283,7 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule{
       Deps.sourcecode
     )
   }
-  object test extends Tests{
+  object test extends AmmTests{
     def ivyDeps = super.ivyDeps() ++ Agg(Deps.sourcecode)
   }
 }
@@ -361,7 +361,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         transitiveSourceJars()
     }
 
-    object test extends Tests
+    object test extends AmmTests
   }
 
   object interp extends Cross[InterpModule](fullCrossScalaVersions:_*){
@@ -463,7 +463,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
     )
     def compileIvyDeps = super.compileIvyDeps() ++ (if(isScala3(crossScalaVersion)) Agg.empty[Dep] else Agg(Deps.scalaReflect(scalaVersion())))
 
-    object test extends Tests with AmmDependenciesResourceFileModule {
+    object test extends AmmTests with AmmDependenciesResourceFileModule {
       def crossScalaVersion = ReplModule.this.crossScalaVersion
       def scalaVersion = ReplModule.this.scalaVersion
       def dependencyResourceFileName = "amm-test-dependencies.txt"
@@ -578,7 +578,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule {
       }
   }
 
-  object test extends super.Tests {
+  object test extends AmmTests {
     def moduleDeps = super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.scalaJava8Compat
@@ -650,7 +650,7 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
         Agg.empty
     )
   }
-  object test extends Tests {
+  object test extends AmmTests {
     def testLauncher = T {
       if (scala.util.Properties.isWin)
         amm().launcher().path.toString
@@ -672,7 +672,7 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
     Deps.sshdCore,
     Deps.bcprovJdk15on
   )
-  object test extends Tests {
+  object test extends AmmTests {
     def ivyDeps = super.ivyDeps() ++ Agg(
       // slf4j-nop makes sshd server use logger that writes into the void
       Deps.slf4jNop,
