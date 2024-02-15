@@ -28,12 +28,23 @@ object LineNumberTests extends TestSuite{
             """compilationErrorInSecondBlock.sc:14: not found: value printnl
               |val res_0 = printnl("OK")
               |            ^""".stripMargin
-          else
-            s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:1:12$sp
-               |1 |val res_0 = printnl("OK")
-               |  |            ^^^^^^^
-               |  |            Not found: printnl
-               |Compilation Failed""".stripMargin
+          else {
+            val minorVersion = scalaVersion.split('.').tail.head.toInt
+            if (minorVersion >= 4) // for 3.4+
+              s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:1:12$sp
+                 |1 |val res_0 = printnl("OK")
+                 |  |            ^^^^^^^
+                 |  |Not found: printnl - did you mean print? or perhaps printf or println or println?
+                 |  |
+                 |  | longer explanation available when compiling with `-explain`
+                 |Compilation Failed""".stripMargin
+            else
+              s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:1:12$sp
+                 |1 |val res_0 = printnl("OK")
+                 |  |            ^^^^^^^
+                 |  |            Not found: printnl
+                 |Compilation Failed""".stripMargin
+          }
         )
       )
     }
