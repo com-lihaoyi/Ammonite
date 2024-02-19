@@ -78,7 +78,7 @@ object Deps {
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.5"
-  val javassist = ivy"org.javassist:javassist:3.21.0-GA"
+  val javassist = ivy"org.javassist:javassist:3.30.2-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
