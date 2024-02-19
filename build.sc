@@ -346,7 +346,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions:_*){
         else
           Agg[Dep](
             ivy"org.scala-lang::scala3-compiler:${scalaVersion()}",
-            ivy"org.ow2.asm:asm:9.3"
+            ivy"org.ow2.asm:asm:9.6"
           )
         super.ivyDeps() ++ scalaSpecificDeps ++ Agg(
           Deps.javassist,
