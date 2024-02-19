@@ -70,7 +70,7 @@ object Deps {
   val acyclic = ivy"com.lihaoyi:::acyclic:0.3.9"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
-  val cask = ivy"com.lihaoyi::cask:0.6.0"
+  val cask = ivy"com.lihaoyi::cask:0.6.7"
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.16"
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
