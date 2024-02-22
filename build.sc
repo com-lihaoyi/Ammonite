@@ -34,7 +34,7 @@ val commitsSinceTaggedVersion = {
 }
 
 val scala2_12Versions = 8.to(19).map(v => s"2.12.${v}")
-val scala2_13Versions = 2.to(12).map(v => s"2.13.${v}")
+val scala2_13Versions = 2.to(13).map(v => s"2.13.${v}")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
 val scala33Versions = Seq("3.3.0", "3.3.1")
 val scala3Versions = scala32Versions ++ scala33Versions
