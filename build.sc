@@ -687,7 +687,10 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 
-/** Selects all cross module instances, that match the given predicate. */
+/**
+ * Selects all cross module instances, that match the given predicate.
+ * In Mill 0.11, this can be hopefully replaced with a simple filter on the `crossValue`.
+ */
 def selectCrossPrefix[T <: Module, V](
     crossModule: Cross[T],
     predicate: String => Boolean
