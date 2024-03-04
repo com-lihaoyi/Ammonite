@@ -1,10 +1,7 @@
 #!/usr/bin/env amm
 // HttpApi.sc
 
-import $ivy.{
-  `com.lihaoyi::requests:0.2.0 compat`,
-  `com.lihaoyi::ujson:0.7.5 compat`
-}
+import $ivy.{`com.lihaoyi::requests:0.2.0 compat`, `com.lihaoyi::ujson:0.7.5 compat`}
 
 lazy val jsonPlaceHolderBase =
   Option(System.getenv("JSONPLACEHOLDER")).getOrElse {
@@ -17,13 +14,12 @@ def addPost(title: String, body: String) = {
     requests.post(
       s"$jsonPlaceHolderBase/posts",
       data = Seq(
-        "title"  -> title,
-        "body"   -> body,
+        "title" -> title,
+        "body" -> body,
         "userId" -> "1"
       )
     ).text()
   ).obj.get("id").map(_.num.toInt).getOrElse(0)
-
 
 }
 
@@ -34,7 +30,7 @@ def comments(postId: Int) = {
       .get(s"$jsonPlaceHolderBase/comments?postId=$postId")
       .text()
   )
-  val names = for{
+  val names = for {
     item <- json.arr
     name <- item.obj.get("name")
   } yield name.str

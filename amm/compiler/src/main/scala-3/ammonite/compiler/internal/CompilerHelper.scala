@@ -10,6 +10,8 @@ object CompilerHelper {
     List(new Parser),
     List(new TyperPhase)
   )
-  def messageAndPos(messageRenderer: MessageRendering, diagnostic: Diagnostic)(implicit ctx: Context) =
+  def messageAndPos(messageRenderer: MessageRendering, diagnostic: Diagnostic)(implicit
+      ctx: Context
+  ) =
     messageRenderer.messageAndPos(diagnostic)
 }

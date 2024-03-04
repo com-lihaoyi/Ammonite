@@ -10,17 +10,17 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 final class ScriptCompiler(
-  compilerBuilder: CompilerBuilder,
-  storage: Storage,
-  printer: Printer, // TODO Remove this
-  codeWrapper: CodeWrapper,
-  initialClassLoader: ClassLoader,
-  initialImports: Imports,
-  classPathWhitelist: Set[Seq[String]],
-  wd: Option[os.Path],
-  outputDirectory: Option[os.Path],
-  generateSemanticDbs: Boolean,
-  inMemoryCache: Boolean
+    compilerBuilder: CompilerBuilder,
+    storage: Storage,
+    printer: Printer, // TODO Remove this
+    codeWrapper: CodeWrapper,
+    initialClassLoader: ClassLoader,
+    initialImports: Imports,
+    classPathWhitelist: Set[Seq[String]],
+    wd: Option[os.Path],
+    outputDirectory: Option[os.Path],
+    generateSemanticDbs: Boolean,
+    inMemoryCache: Boolean
 ) {
 
   import ScriptProcessor.SeqOps
@@ -29,12 +29,12 @@ final class ScriptCompiler(
 
   /** Compiles a script, along with its dependencies */
   def compile(
-    module: Script,
-    processor: ScriptProcessor,
-    doCompile: (Script, Script.ResolvedDependencies) => ScriptCompileResult = compile(_, _)
+      module: Script,
+      processor: ScriptProcessor,
+      doCompile: (Script, Script.ResolvedDependencies) => ScriptCompileResult = compile(_, _)
   ): (
-    Map[Script, Seq[Diagnostic]],
-    Either[String, Seq[AmmCompiler.Output]]
+      Map[Script, Seq[Diagnostic]],
+      Either[String, Seq[AmmCompiler.Output]]
   ) = {
 
     val diagnostics = new mutable.HashMap[Script, Seq[Diagnostic]]
@@ -76,8 +76,8 @@ final class ScriptCompiler(
    * written on disk.
    */
   def compile(
-    module: Script,
-    dependencies: Script.ResolvedDependencies
+      module: Script,
+      dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult =
     compileIfNeeded(moduleSettings(module), module, dependencies)
 
@@ -85,8 +85,8 @@ final class ScriptCompiler(
    * Reads compilation output from cache.
    */
   def compileFromCache(
-    script: Script,
-    dependencies: Script.ResolvedDependencies
+      script: Script,
+      dependencies: Script.ResolvedDependencies
   ): Option[ScriptCompileResult] = {
     val settingsArgs = moduleSettings(script)
     compileFromCache(settingsArgs, script, dependencies)
@@ -149,9 +149,9 @@ final class ScriptCompiler(
   }
 
   private final case class InMemoryCacheKey(
-    settings: Seq[String],
-    script: Script,
-    dependencies: Script.ResolvedDependencies
+      settings: Seq[String],
+      script: Script,
+      dependencies: Script.ResolvedDependencies
   ) {
     def stale: Boolean =
       script.codeSource.path.exists { path =>
@@ -178,14 +178,14 @@ final class ScriptCompiler(
         try os.remove.all(dir)
         catch {
           case _: java.nio.file.DirectoryNotEmptyException =>
-            // Can happen on Windows, if any of the file we try to delete is opened elsewhere
+          // Can happen on Windows, if any of the file we try to delete is opened elsewhere
         }
-   }
+    }
 
   private def compileFromCache(
-    settingsArgs: Seq[String],
-    script: Script,
-    dependencies: Script.ResolvedDependencies
+      settingsArgs: Seq[String],
+      script: Script,
+      dependencies: Script.ResolvedDependencies
   ): Option[ScriptCompileResult] =
     if (inMemoryCache && script.codeSource.path.nonEmpty) {
       cleanUpCache()
@@ -195,9 +195,9 @@ final class ScriptCompiler(
       None
 
   private def compileIfNeeded(
-    settingsArgs: Seq[String],
-    script: Script,
-    dependencies: Script.ResolvedDependencies
+      settingsArgs: Seq[String],
+      script: Script,
+      dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult =
     if (inMemoryCache && script.codeSource.path.nonEmpty) {
       val key = InMemoryCacheKey(settingsArgs, script, dependencies)
@@ -211,9 +211,9 @@ final class ScriptCompiler(
       doCompile(settingsArgs, script, dependencies)
 
   private def doCompile(
-    settingsArgs: Seq[String],
-    module: Script,
-    dependencies: Script.ResolvedDependencies
+      settingsArgs: Seq[String],
+      module: Script,
+      dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult = {
 
     val compiler = new SingleScriptCompiler(

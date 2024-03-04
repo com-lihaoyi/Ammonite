@@ -12,26 +12,25 @@ import dotc.core.Contexts.FreshContext
 import dotty.tools.io.AbstractFile
 import scala.collection.mutable
 
-
 /**
-  * Wraps up the `Compiler` and `Pressy`, ensuring that they get properly
-  * initialized before use. Mostly deals with ensuring the object lifecycles
-  * are properly dealt with; `Compiler` and `Pressy` are the ones which deal
-  * with the compiler's nasty APIs
-  *
-  * Exposes a simple API where you can just call methods like `compilerClass`
-  * `configureCompiler` any-how and not worry about ensuring the necessary
-  * compiler objects are initialized, or worry about initializing them more
-  * than necessary
-  */
+ * Wraps up the `Compiler` and `Pressy`, ensuring that they get properly
+ * initialized before use. Mostly deals with ensuring the object lifecycles
+ * are properly dealt with; `Compiler` and `Pressy` are the ones which deal
+ * with the compiler's nasty APIs
+ *
+ * Exposes a simple API where you can just call methods like `compilerClass`
+ * `configureCompiler` any-how and not worry about ensuring the necessary
+ * compiler objects are initialized, or worry about initializing them more
+ * than necessary
+ */
 class CompilerLifecycleManager(
-  rtCacheDir: Option[Path],
-  headFrame: => ammonite.util.Frame,
-  dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-  classPathWhitelist: Set[Seq[String]],
-  initialClassLoader: ClassLoader,
-  val outputDir: Option[Path],
-  initialSettings: Seq[String]
+    rtCacheDir: Option[Path],
+    headFrame: => ammonite.util.Frame,
+    dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
+    classPathWhitelist: Set[Seq[String]],
+    initialClassLoader: ClassLoader,
+    val outputDir: Option[Path],
+    initialSettings: Seq[String]
 ) extends ammonite.compiler.iface.CompilerLifecycleManager {
 
   def scalaVersion = dotc.config.Properties.versionNumberString
@@ -39,8 +38,7 @@ class CompilerLifecycleManager(
   def forceInit(): Unit = init(force = true)
   def init(): Unit = init(force = false)
 
-
-  private[this] object Internal{
+  private[this] object Internal {
     outputDir.map(os.Path(_, os.pwd)).foreach(os.makeDir.all(_))
     val dynamicClasspath = AbstractFile.getDirectory(outputDir.getOrElse(os.temp.dir().toNIO))
     var compiler: ammonite.compiler.Compiler = null
@@ -51,9 +49,7 @@ class CompilerLifecycleManager(
     var (lastFrame, lastFrameVersion) = (headFrame, headFrame.version)
   }
 
-
   import Internal._
-
 
   // Public to expose it in the REPL so people can poke at it at runtime
   // Not for use within Ammonite! Use one of the other methods to ensure
@@ -63,11 +59,10 @@ class CompilerLifecycleManager(
 
   // def pressy: Pressy = Internal.pressy
 
-  def preprocess(fileName: String) = synchronized{
+  def preprocess(fileName: String) = synchronized {
     init()
     compiler.preprocessor(fileName)
   }
-
 
   // We lazily force the compiler to be re-initialized by setting the
   // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
@@ -76,12 +71,14 @@ class CompilerLifecycleManager(
   // re-initializations by about 2/3, each of which costs about 30ms and
   // probably creates a pile of garbage
 
-  def init(force: Boolean = false) = synchronized{
-    if (compiler == null ||
-        (headFrame ne lastFrame) ||
-        headFrame.version != lastFrameVersion ||
-        Internal.preConfiguredSettingsChanged ||
-        force) {
+  def init(force: Boolean = false) = synchronized {
+    if (
+      compiler == null ||
+      (headFrame ne lastFrame) ||
+      headFrame.version != lastFrameVersion ||
+      Internal.preConfiguredSettingsChanged ||
+      force
+    ) {
 
       lastFrame = headFrame
       lastFrameVersion = headFrame.version
@@ -107,19 +104,19 @@ class CompilerLifecycleManager(
   }
 
   def complete(
-    offset: Int,
-    previousImports: String,
-    snippet: String
-  ): (Int, Seq[String], Seq[String]) = synchronized{
+      offset: Int,
+      previousImports: String,
+      snippet: String
+  ): (Int, Seq[String], Seq[String]) = synchronized {
     init()
     Internal.compiler.complete(offset, previousImports, snippet)
   }
 
   def compileClass(
-    processed: ammonite.compiler.iface.Preprocessor.Output,
-    printer: Printer,
-    fileName: String
-  ): Option[ammonite.compiler.iface.Compiler.Output] = synchronized{
+      processed: ammonite.compiler.iface.Preprocessor.Output,
+      printer: Printer,
+      fileName: String
+  ): Option[ammonite.compiler.iface.Compiler.Output] = synchronized {
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
@@ -138,9 +135,9 @@ class CompilerLifecycleManager(
     compiled
   }
 
-  def configureCompiler(callback: DottyCompiler => Unit) = synchronized{
+  def configureCompiler(callback: DottyCompiler => Unit) = synchronized {
     onCompilerInit.append(callback)
-    if (compiler != null){
+    if (compiler != null) {
       callback(compiler.compiler)
     }
   }

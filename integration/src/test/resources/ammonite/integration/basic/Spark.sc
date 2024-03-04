@@ -1,15 +1,14 @@
-
 import $ivy.{
-`org.apache.hadoop:hadoop-common:2.5.1`,
-`org.apache.hadoop:hadoop-auth:2.5.1`,
-`commons-configuration:commons-configuration:1.9`,
-`commons-collections:commons-collections:3.2.1`,
-`commons-lang:commons-lang:2.6`,
-`org.apache.spark::spark-core:2.1.1`,
-`org.apache.spark::spark-repl:2.1.1`,
-`org.apache.spark::spark-network-common:2.1.1`,
-`org.apache.spark::spark-network-shuffle:2.1.1`,
-`org.eclipse.jetty.aggregate:jetty-all-server:8.1.14.v20131031`
+  `org.apache.hadoop:hadoop-common:2.5.1`,
+  `org.apache.hadoop:hadoop-auth:2.5.1`,
+  `commons-configuration:commons-configuration:1.9`,
+  `commons-collections:commons-collections:3.2.1`,
+  `commons-lang:commons-lang:2.6`,
+  `org.apache.spark::spark-core:2.1.1`,
+  `org.apache.spark::spark-repl:2.1.1`,
+  `org.apache.spark::spark-network-common:2.1.1`,
+  `org.apache.spark::spark-network-shuffle:2.1.1`,
+  `org.eclipse.jetty.aggregate:jetty-all-server:8.1.14.v20131031`
 }
 
 import java.net.InetAddress
@@ -19,7 +18,6 @@ import org.eclipse.jetty.server.handler.{DefaultHandler, HandlerList, ResourceHa
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 import org.eclipse.jetty.util.resource.Resource
 import org.apache.spark.{SparkConf, SparkContext}
-
 
 val server = {
   val server = new Server()

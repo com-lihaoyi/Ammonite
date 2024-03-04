@@ -14,32 +14,30 @@ import scala.collection.mutable
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
 
-
 /**
-  * Wraps up the `Compiler` and `Pressy`, ensuring that they get properly
-  * initialized before use. Mostly deals with ensuring the object lifecycles
-  * are properly dealt with; `Compiler` and `Pressy` are the ones which deal
-  * with the compiler's nasty APIs
-  *
-  * Exposes a simple API where you can just call methods like `compilerClass`
-  * `configureCompiler` any-how and not worry about ensuring the necessary
-  * compiler objects are initialized, or worry about initializing them more
-  * than necessary
-  */
+ * Wraps up the `Compiler` and `Pressy`, ensuring that they get properly
+ * initialized before use. Mostly deals with ensuring the object lifecycles
+ * are properly dealt with; `Compiler` and `Pressy` are the ones which deal
+ * with the compiler's nasty APIs
+ *
+ * Exposes a simple API where you can just call methods like `compilerClass`
+ * `configureCompiler` any-how and not worry about ensuring the necessary
+ * compiler objects are initialized, or worry about initializing them more
+ * than necessary
+ */
 class CompilerLifecycleManager(
-  rtCacheDir: Option[Path],
-  headFrame: => ammonite.util.Frame,
-  dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-  classPathWhitelist: Set[Seq[String]],
-  initialClassLoader: ClassLoader,
-  val outputDir: Option[Path],
-  initialSettings: Seq[String]
+    rtCacheDir: Option[Path],
+    headFrame: => ammonite.util.Frame,
+    dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
+    classPathWhitelist: Set[Seq[String]],
+    initialClassLoader: ClassLoader,
+    val outputDir: Option[Path],
+    initialSettings: Seq[String]
 ) extends ICompilerLifecycleManager {
 
   def scalaVersion = scala.util.Properties.versionNumberString
 
-
-  private[this] object Internal{
+  private[this] object Internal {
     val dynamicClasspath = new VirtualDirectory("(memory)", None)
     var compiler: Compiler = null
     val onCompilerInit = mutable.Buffer.empty[scala.tools.nsc.Global => Unit]
@@ -50,9 +48,7 @@ class CompilerLifecycleManager(
     var (lastFrame, lastFrameVersion) = (headFrame, headFrame.version)
   }
 
-
   import Internal._
-
 
   // Public to expose it in the REPL so people can poke at it at runtime
   // Not for use within Ammonite! Use one of the other methods to ensure
@@ -62,11 +58,10 @@ class CompilerLifecycleManager(
 
   def pressy: Pressy = Internal.pressy
 
-  def preprocess(fileName: String) = synchronized{
+  def preprocess(fileName: String) = synchronized {
     init()
     compiler.preprocessor(fileName)
   }
-
 
   // We lazily force the compiler to be re-initialized by setting the
   // compilerStale flag. Otherwise, if we re-initialized the compiler eagerly,
@@ -75,12 +70,14 @@ class CompilerLifecycleManager(
   // re-initializations by about 2/3, each of which costs about 30ms and
   // probably creates a pile of garbage
 
-  def init(force: Boolean = false) = synchronized{
-    if (compiler == null ||
-        (headFrame ne lastFrame) ||
-        headFrame.version != lastFrameVersion ||
-        Internal.preConfiguredSettingsChanged ||
-        force) {
+  def init(force: Boolean = false) = synchronized {
+    if (
+      compiler == null ||
+      (headFrame ne lastFrame) ||
+      headFrame.version != lastFrameVersion ||
+      Internal.preConfiguredSettingsChanged ||
+      force
+    ) {
 
       lastFrame = headFrame
       lastFrameVersion = headFrame.version
@@ -89,7 +86,8 @@ class CompilerLifecycleManager(
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
       val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
-      val (success, trailingSettings) = settings.processArguments(initialSettings.toList, processAll = true)
+      val (success, trailingSettings) =
+        settings.processArguments(initialSettings.toList, processAll = true)
       if (!success)
         System.err.println(s"Error processing initial settings ${initialSettings.mkString(" ")}")
       onSettingsInit.foreach(_(settings))
@@ -129,14 +127,16 @@ class CompilerLifecycleManager(
     }
   }
 
-  def complete(offset: Int, previousImports: String, snippet: String) = synchronized{
+  def complete(offset: Int, previousImports: String, snippet: String) = synchronized {
     init()
     pressy.complete(offset, previousImports, snippet)
   }
 
-  def compileClass(processed: Preprocessor.Output,
-                   printer: Printer,
-                   fileName: String): Option[ICompiler.Output] = synchronized{
+  def compileClass(
+      processed: Preprocessor.Output,
+      printer: Printer,
+      fileName: String
+  ): Option[ICompiler.Output] = synchronized {
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
@@ -155,9 +155,9 @@ class CompilerLifecycleManager(
     compiled
   }
 
-  def configureCompiler(callback: scala.tools.nsc.Global => Unit) = synchronized{
+  def configureCompiler(callback: scala.tools.nsc.Global => Unit) = synchronized {
     onCompilerInit.append(callback)
-    if (compiler != null){
+    if (compiler != null) {
       callback(compiler.compiler)
     }
   }

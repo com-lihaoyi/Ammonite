@@ -10,6 +10,5 @@ interp.load.ivy(
 )
 
 @
-
 // Code using the dependencies
 val serializer = new net.sf.json.xml.XMLSerializer

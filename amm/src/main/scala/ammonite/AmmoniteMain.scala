@@ -16,7 +16,7 @@ import scala.concurrent.duration.Duration
 // needed to support deprecated Main.main
 import acyclic.skipped
 
-object AmmoniteMain{
+object AmmoniteMain {
 
   /**
    * The command-line entry point, which does all the argument parsing before
@@ -38,17 +38,18 @@ object AmmoniteMain{
    * can be unit tested without spinning up lots of separate, expensive
    * processes
    */
-  def main0(args: List[String],
-            stdIn: InputStream,
-            stdOut: OutputStream,
-            stdErr: OutputStream): Boolean = {
+  def main0(
+      args: List[String],
+      stdIn: InputStream,
+      stdOut: OutputStream,
+      stdErr: OutputStream
+  ): Boolean = {
     val printErr = new PrintStream(stdErr)
     val printOut = new PrintStream(stdOut)
 
-
     val customName = s"Ammonite REPL & Script-Runner, ${ammonite.Constants.version}"
     val customDoc = "usage: amm [ammonite-options] [script-file [script-options]]"
-    Config.parser.constructEither(args, customName = customName, customDoc = customDoc) match{
+    Config.parser.constructEither(args, customName = customName, customDoc = customDoc) match {
       case Left(msg) =>
         printErr.println(msg)
         false
@@ -68,13 +69,18 @@ object AmmoniteMain{
           Await.result(shutdownFuture, Duration.Inf)
           printErr.println("BSP server done")
           true
-        }else if (cliConfig.core.showVersion.value){
+        } else if (cliConfig.core.showVersion.value) {
           printOut.println(customName)
           true
-        }else{
+        } else {
 
           val runner = new MainRunner(
-            cliConfig, printOut, printErr, stdIn, stdOut, stdErr,
+            cliConfig,
+            printOut,
+            printErr,
+            stdIn,
+            stdOut,
+            stdErr,
             os.pwd
           )
 
@@ -83,7 +89,7 @@ object AmmoniteMain{
             runner.printInfo(msg)
           }
 
-          (cliConfig.core.code, cliConfig.rest.value.toList) match{
+          (cliConfig.core.code, cliConfig.rest.value.toList) match {
             case (Some(code), Nil) =>
               runner.runCode(code)
 
@@ -93,7 +99,6 @@ object AmmoniteMain{
               true
 
             case (None, head :: rest) if head.startsWith("-") =>
-
               val failureMsg =
                 "Unknown Ammonite option: " + head + Util.newLine +
                   "Use --help to list possible options"
@@ -108,12 +113,5 @@ object AmmoniteMain{
         }
     }
   }
-
-
-
-
-
-
-
 
 }

@@ -3,8 +3,8 @@ package ammonite.integration
 import ammonite.util.Util
 
 /**
-  * Created by haoyi on 6/4/16.
-  */
+ * Created by haoyi on 6/4/16.
+ */
 object TestUtils {
   val scalaVersion = ammonite.compiler.CompilerBuilder.scalaVersion
   val isScala2 = scalaVersion.startsWith("2.")
@@ -16,17 +16,20 @@ object TestUtils {
       Seq(ammAssembly)
     else
       Seq("bash", ammAssembly)
-  val intTestResources = os.pwd/"integration"/"src"/"test"/"resources"
-  val replStandaloneResources = intTestResources/"ammonite"/"integration"
-  val shellAmmoniteResources = os.pwd/"shell"/"src"/"main"/"resources"/"ammonite"/"shell"
+  val intTestResources = os.pwd / "integration" / "src" / "test" / "resources"
+  val replStandaloneResources = intTestResources / "ammonite" / "integration"
+  val shellAmmoniteResources =
+    os.pwd / "shell" / "src" / "main" / "resources" / "ammonite" / "shell"
 
-  //we use an empty predef file here to isolate the tests from external forces.
-  def execBase(name: os.RelPath,
-               extraAmmArgs: Seq[String],
-               home: os.Path,
-               args: Seq[String],
-               thin: Boolean,
-               extraEnv: Iterable[(String, String)]) = {
+  // we use an empty predef file here to isolate the tests from external forces.
+  def execBase(
+      name: os.RelPath,
+      extraAmmArgs: Seq[String],
+      home: os.Path,
+      args: Seq[String],
+      thin: Boolean,
+      extraEnv: Iterable[(String, String)]
+  ) = {
     os.proc(
       executable,
       extraAmmArgs,
@@ -52,12 +55,12 @@ object TestUtils {
     execBase(name, Seq("-s"), os.temp.dir(), args, thin = true, Nil)
 
   /**
-    *Counts number of non-overlapping occurrences of `subs` in `s`
-    */
+   * Counts number of non-overlapping occurrences of `subs` in `s`
+   */
   def substrCount(s: String, subs: String, count: Int = 0, ptr: Int = 0): Int = {
-    s.indexOf(subs, ptr) match{
+    s.indexOf(subs, ptr) match {
       case -1 => count
-      case x => substrCount(s, subs, count+1, x + subs.length)
+      case x => substrCount(s, subs, count + 1, x + subs.length)
     }
   }
 

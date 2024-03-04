@@ -1,6 +1,6 @@
 /**
-  * Single-file play framework application!
-  */
+ * Single-file play framework application!
+ */
 import $ivy.{
   `com.typesafe.play::play:2.5.0`,
   `com.typesafe.play::play-netty-server:2.5.0`,
@@ -10,8 +10,10 @@ import $ivy.{
 import play.core.server._, play.api.routing.sird._, play.api.mvc._
 val server = NettyServer.fromRouter(new ServerConfig(
   rootDir = new java.io.File("."),
-  port = Some(19000), sslPort = None,
-  address = "0.0.0.0", mode = play.api.Mode.Dev,
+  port = Some(19000),
+  sslPort = None,
+  address = "0.0.0.0",
+  mode = play.api.Mode.Dev,
   properties = System.getProperties,
   configuration = play.api.Configuration(
     "play.server.netty" -> Map(
@@ -29,6 +31,6 @@ val server = NettyServer.fromRouter(new ServerConfig(
 }
 try {
   println(requests.get("http://localhost:19000/hello/bar").text())
-} finally{
+} finally {
   server.stop()
 }

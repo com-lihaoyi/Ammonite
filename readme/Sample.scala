@@ -4,7 +4,7 @@ import java.io.{BufferedReader, ByteArrayOutputStream, InputStreamReader}
 
 import scalatags.Text.all._
 
-object Sample{
+object Sample {
   println("Initializing Sample")
 
   val loading = attr("loading")
@@ -12,8 +12,8 @@ object Sample{
 
   def curlCommand(curlUrl: String) =
     s"""$$ sudo sh -c '(echo "#!/usr/bin/env sh" && curl -L """ +
-    curlUrl +
-    ") > /usr/local/bin/amm && chmod +x /usr/local/bin/amm' && amm"
+      curlUrl +
+      ") > /usr/local/bin/amm && chmod +x /usr/local/bin/amm' && amm"
   val replCurl = curlCommand(ammonite.Constants.curlUrl)
   val unstableCurl = curlCommand(ammonite.Constants.unstableCurlUrl)
   val cygwinSed = """$ sed -i '0,/"\$0"/{s/"\$0"/`cygpath -w "\$0"`/}' /usr/local/bin/amm"""
@@ -22,12 +22,13 @@ object Sample{
 
   val cacheVersion = 6
   def cached(key: Any)(calc: => String) = {
-    val path = os.pwd/"target"/"cache"/(key.hashCode + cacheVersion).toString
+    val path = os.pwd / "target" / "cache" / (key.hashCode + cacheVersion).toString
     try os.read(path)
-    catch { case e : Throwable =>
-      val newValue = calc
-      os.write.over(path, newValue, createFolders=true)
-      newValue
+    catch {
+      case e: Throwable =>
+        val newValue = calc
+        os.write.over(path, newValue, createFolders = true)
+        newValue
     }
   }
 
@@ -37,8 +38,9 @@ object Sample{
     val out = exec(
       Seq(
         sys.env.getOrElse("AMMONITE_ASSEMBLY", "amm"),
-        "--color", "true",
-        "--no-home-predef",
+        "--color",
+        "true",
+        "--no-home-predef"
       ),
       s"${ammoniteCode.trim}\nexit\n",
       args = Map("JAVA_OPTS" -> "-Xmx600m")
@@ -51,31 +53,28 @@ object Sample{
     raw(rawHtmlString)
   }
 
+  def exec(command: Seq[String], input: String, args: Map[String, String] = Map.empty): String =
+    cached(("exec", command, input, args)) {
 
+      println("====================EXECUTING====================")
+      println(command)
+      println(input)
+      println(args)
 
-  def exec(command: Seq[String],
-           input: String,
-           args: Map[String, String] = Map.empty): String = cached(("exec", command, input, args)){
-
-    println("====================EXECUTING====================")
-    println(command)
-    println(input)
-    println(args)
-
-    try {
-      val p = os.proc(command)
+      try {
+        val p = os.proc(command)
           .call(cwd = os.pwd, env = args, stdin = input)
-      val resultString = p.out.string
+        val resultString = p.out.string
 
-      println("====================RESULT====================")
-      println(resultString)
-      println("==============================================")
-      resultString
-    } catch {
-      case e: os.SubprocessException =>
-        throw new RuntimeException("Non-zero exit value for subprocess: " + e.result.exitCode)
+        println("====================RESULT====================")
+        println(resultString)
+        println("==============================================")
+        resultString
+      } catch {
+        case e: os.SubprocessException =>
+          throw new RuntimeException("Non-zero exit value for subprocess: " + e.result.exitCode)
+      }
     }
-  }
 
   def compare(bashCode: String, ammoniteCode: String) = {
     val customPrompt = "__bash__"

@@ -1,11 +1,7 @@
 // Test Code
 
-object test{
-
-
+object test {
 
   val x = noSuchObject.badFunction
 
 }
-
-

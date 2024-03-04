@@ -1,12 +1,10 @@
 // Test Code
-object test{
+object test {
 
-val x = interp
+  val x = interp
 }
 println(test.x)
 
 @
-
 def f = "Hello"
-println(System.lineSeparator*2 + "It has executed")
-
+println(System.lineSeparator * 2 + "It has executed")

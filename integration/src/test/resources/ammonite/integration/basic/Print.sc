@@ -1,1 +1,1 @@
-println(os.list(os.pwd/"out"))
+println(os.list(os.pwd / "out"))

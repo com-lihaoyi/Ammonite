@@ -12,21 +12,21 @@ import coursierapi.{Dependency, Repository}
 import scala.collection.mutable
 
 final case class ScriptProcessor(
-  scalaVersion: String,
-  parser: Parser,
-  codeWrapper: CodeWrapper,
-  dependencyLoader: DependencyLoader,
-  defaultRepositories: Seq[Repository],
-  extraPluginDependencies: Seq[Dependency] = Nil,
-  wd: os.Path = os.pwd,
-  importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
+    scalaVersion: String,
+    parser: Parser,
+    codeWrapper: CodeWrapper,
+    dependencyLoader: DependencyLoader,
+    defaultRepositories: Seq[Repository],
+    extraPluginDependencies: Seq[Dependency] = Nil,
+    wd: os.Path = os.pwd,
+    importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) { self =>
 
   import ScriptProcessor._
 
   def load(
-    code: String,
-    codeSource: CodeSource
+      code: String,
+      codeSource: CodeSource
   ): Script = {
 
     val rawCode = Interpreter.skipSheBangLine(code)
@@ -57,9 +57,9 @@ final case class ScriptProcessor(
     }
 
     def hookResults(
-      hookPrefix: Seq[String],
-      hook: ImportHook,
-      tree: ImportTree
+        hookPrefix: Seq[String],
+        hook: ImportHook,
+        tree: ImportTree
     ): Either[Diagnostic, Seq[ImportHook.Result]] = {
       val r = hook.handle(
         codeSource,
@@ -188,7 +188,6 @@ object ScriptProcessor {
     modules
       .map(_.dependencies.copy(scriptDependencies = Nil))
       .foldLeft(Script.Dependencies())(_ + _)
-
 
   private[interp] implicit class SeqOps[T](private val l: Seq[T]) extends AnyVal {
     def traverse[L, R](f: T => Either[L, R]): Either[Seq[L], Seq[R]] = {

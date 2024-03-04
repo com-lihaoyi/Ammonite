@@ -12,25 +12,25 @@ object CompilerExtensions {
     private def compilerManager = api._compilerManager.asInstanceOf[CompilerLifecycleManager]
 
     /**
-      * Configures the current compiler, or if the compiler hasn't been initialized
-      * yet, registers the configuration callback and applies it to the compiler
-      * when it ends up being initialized later
-      */
+     * Configures the current compiler, or if the compiler hasn't been initialized
+     * yet, registers the configuration callback and applies it to the compiler
+     * when it ends up being initialized later
+     */
     def configureCompiler(c: dotty.tools.dotc.Compiler => Unit): Unit =
       compilerManager.configureCompiler(c)
 
     /**
-      * Pre-configures the next compiler context. Useful for tuning options that are
-      * used during parsing.
-      */
+     * Pre-configures the next compiler context. Useful for tuning options that are
+     * used during parsing.
+     */
     def preConfigureCompiler(c: dotty.tools.dotc.core.Contexts.FreshContext => Unit): Unit =
       compilerManager.preConfigureCompiler(c)
 
     /**
-      * Directory where the byte code resulting from compiling the user code is written.
-      * This is non-empty only if the `--output-directory` or `--tmp-output-directory` options
-      * are passed to Ammonite upon launch.
-      */
+     * Directory where the byte code resulting from compiling the user code is written.
+     * This is non-empty only if the `--output-directory` or `--tmp-output-directory` options
+     * are passed to Ammonite upon launch.
+     */
     def outputDir: Option[Path] =
       compilerManager.outputDir
   }
@@ -41,6 +41,7 @@ object CompilerExtensions {
 
     def initialContext: dotty.tools.dotc.core.Contexts.Context =
       compilerManager.compiler.initialCtx
+
     /**
      * Access the compiler to do crazy things if you really want to!
      */

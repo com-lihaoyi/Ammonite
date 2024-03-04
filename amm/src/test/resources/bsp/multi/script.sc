@@ -13,6 +13,3 @@ val json = foo.asJson.noSpaces
 val decodedFoo = decode[Foo](json)
 
 val helloFromJupyter = jupyter.Displayers.registration
-
-
-

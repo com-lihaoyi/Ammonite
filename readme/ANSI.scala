@@ -4,7 +4,7 @@ import scala.collection.mutable
 import scalatags.Text.all._
 
 object ANSI {
- 
+
   // http://flatuicolors.com/
   val red = "#c0392b"
   val green = "#27ae60"
@@ -18,20 +18,20 @@ object ANSI {
   val foregrounds = Map[fansi.Attr, String](
     fansi.Color.Black -> black,
     fansi.Color.Red -> red,
-    fansi.Color.Green-> green,
-    fansi.Color.Yellow-> yellow,
+    fansi.Color.Green -> green,
+    fansi.Color.Yellow -> yellow,
     fansi.Color.Blue -> blue,
-    fansi.Color.Magenta-> magenta,
+    fansi.Color.Magenta -> magenta,
     fansi.Color.Cyan -> cyan,
     fansi.Color.White -> white
   )
   val backgrounds = Map[fansi.Attr, String](
     fansi.Back.Black -> black,
     fansi.Back.Red -> red,
-    fansi.Back.Green-> green,
-    fansi.Back.Yellow-> yellow,
+    fansi.Back.Green -> green,
+    fansi.Back.Yellow -> yellow,
     fansi.Back.Blue -> blue,
-    fansi.Back.Magenta-> magenta,
+    fansi.Back.Magenta -> magenta,
     fansi.Back.Cyan -> cyan,
     fansi.Back.White -> white
   )
@@ -57,7 +57,7 @@ object ANSI {
       ))
     }
 
-    while(i < parsed.length){
+    while (i < parsed.length) {
       if (colors(i) != previousColor && snippetBuffer.nonEmpty) createSnippet()
       previousColor = colors(i)
       snippetBuffer += chars(i)

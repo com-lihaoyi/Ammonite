@@ -1,12 +1,10 @@
-
 //Code to check runtime error ilne numbers
 
-object foo{
+object foo {
 
-  def f(i: Int): Double = 5/i
+  def f(i: Int): Double = 5 / i
 
 }
 
 @
-
 println(foo.f(0))

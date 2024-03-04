@@ -20,7 +20,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       FutureConverters.toScala(f)
   }
 
-  val scriptBase = os.pwd/"amm"/"src"/"test"/"resources"/"bsp"
+  val scriptBase = os.pwd / "amm" / "src" / "test" / "resources" / "bsp"
 
   val wd = os.temp.dir(deleteOnExit = true)
 
@@ -566,8 +566,8 @@ object AmmoniteBuildServerTests extends TestSuite {
       val otherScriptUri = (wd / otherScriptPath).toNIO.toUri.toASCIIString
 
       def semanticDb(
-        scalacOptionsItem: ScalacOptionsItem,
-        scriptPath: os.RelPath
+          scalacOptionsItem: ScalacOptionsItem,
+          scriptPath: os.RelPath
       ): TextDocument = {
         import scala.meta.internal.semanticdb._
 
@@ -679,7 +679,6 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
-
   }
 
   class BspScriptRunner(wd: os.Path, script: Seq[os.Path]) {
@@ -762,7 +761,7 @@ object AmmoniteBuildServerTests extends TestSuite {
           val targets = buildTargetsResp.getTargets()
           assert(targets.asScala.nonEmpty)
           val scalaTarget = targets.get(0).getData().asInstanceOf[ScalaBuildTarget]
-          
+
           if (isScala2) {
             assert(scalaTarget.getScalaVersion().startsWith("2"))
             assert(scalaTarget.getScalaBinaryVersion().startsWith("2"))

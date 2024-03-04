@@ -1,12 +1,10 @@
-
 //adsfasdfasd
 println("Hello")
 
 //Comment before an empty line
 
 @
-
-class numPair(a: Int, b: Int){
+class numPair(a: Int, b: Int) {
 
   val num1 = a
   val num2 = b
@@ -20,4 +18,3 @@ def functionSwap(nums: numPair) = {
   nums.a = nums.a ^ nums.b
 
 }
-

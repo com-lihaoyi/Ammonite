@@ -16,30 +16,29 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
 
   def file: java.io.File = null
 
-  private def dirPath(path: String)  = path.split('/').toSeq.filter(_.nonEmpty)
-  private def dirName(path: String)  = splitPath(path, front = true)
+  private def dirPath(path: String) = path.split('/').toSeq.filter(_.nonEmpty)
+  private def dirName(path: String) = splitPath(path, front = true)
   private def baseName(path: String) = splitPath(path, front = false)
   private def splitPath(path0: String, front: Boolean): String = {
     val isDir = path0.charAt(path0.length - 1) == '/'
-    val path  = if (isDir) path0.substring(0, path0.length - 1) else path0
-    val idx   = path.lastIndexOf('/')
+    val path = if (isDir) path0.substring(0, path0.length - 1) else path0
+    val idx = path.lastIndexOf('/')
 
     if (idx < 0)
       if (front) "/"
       else path
-    else
-    if (front) path.substring(0, idx + 1)
+    else if (front) path.substring(0, idx + 1)
     else path.substring(idx + 1)
   }
   override def underlyingSource = Some(this)
   def isDirectory = true
   def lookupName(name: String, directory: Boolean) = unsupported()
   def lookupNameUnchecked(name: String, directory: Boolean) = unsupported()
-  def create()  = unsupported()
-  def delete()  = unsupported()
-  def output    = unsupported()
+  def create() = unsupported()
+  def delete() = unsupported()
+  def output = unsupported()
   def container = unsupported()
-  def absolute  = unsupported()
+  def absolute = unsupported()
 
   abstract class Entry(path: String) extends VirtualFile(baseName(path), path) {
     // have to keep this name for compat with sbt's compiler-interface
@@ -85,35 +84,35 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
   }
 
   private def ensureDir(
-    dirs: collection.mutable.Map[Seq[String], DirEntry],
-    path: String,
-    zipEntry: ZipEntry
+      dirs: collection.mutable.Map[Seq[String], DirEntry],
+      path: String,
+      zipEntry: ZipEntry
   ): DirEntry =
     dirs.get(dirPath(path)) match {
       case Some(v) => v
       case None =>
         val parent = ensureDir(dirs, dirName(path), null)
-        val dir    = new DirEntry(path)
+        val dir = new DirEntry(path)
         parent.entries(baseName(path)) = dir
         dirs(dirPath(path)) = dir
         dir
     }
 
   private def getDir(
-    dirs: collection.mutable.Map[Seq[String], DirEntry],
-    entry: ZipEntry
+      dirs: collection.mutable.Map[Seq[String], DirEntry],
+      entry: ZipEntry
   ): DirEntry = {
     if (entry.isDirectory) ensureDir(dirs, entry.getName, entry)
     else ensureDir(dirs, dirName(entry.getName), null)
   }
 
-
   private lazy val dirs: Map[Seq[String], DirEntry] = {
-    val root     = new DirEntry("/")
-    val dirs     = collection.mutable.HashMap[Seq[String], DirEntry](Nil -> root)
-    val in       = new ZipInputStream(new ByteArrayInputStream(Streamable.bytes(input)))
+    val root = new DirEntry("/")
+    val dirs = collection.mutable.HashMap[Seq[String], DirEntry](Nil -> root)
+    val in = new ZipInputStream(new ByteArrayInputStream(Streamable.bytes(input)))
 
-    @annotation.tailrec def loop() {
+    @annotation.tailrec
+    def loop() {
       val zipEntry = in.getNextEntry
 
       if (zipEntry != null) {
@@ -125,7 +124,7 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
             else {
               val content = {
                 val baos = new java.io.ByteArrayOutputStream
-                val b = Array.ofDim[Byte](16*1024)
+                val b = Array.ofDim[Byte](16 * 1024)
 
                 def loop() {
                   val read = in.read(b, 0, b.length)
@@ -154,8 +153,8 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
   def iterator: Iterator[AbstractFile] =
     dirs(Nil).iterator
 
-  def name  = url.getFile
-  def path  = url.getPath
+  def name = url.getFile
+  def path = url.getPath
   def input = url.openStream()
   def lastModified =
     try url.openConnection().getLastModified
@@ -164,10 +163,9 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
   override def canEqual(other: Any) = other.isInstanceOf[CustomURLZipArchive]
   override def hashCode() = url.hashCode
   override def equals(that: Any) = that match {
-    case x: CustomURLZipArchive=> url == x.url
-    case _                => false
+    case x: CustomURLZipArchive => url == x.url
+    case _ => false
   }
-
 
   def allDirsByDottedName: collection.Map[String, DirEntry] = {
     dirs.map {
@@ -178,7 +176,7 @@ final class CustomURLZipArchive(val url: java.net.URL) extends AbstractFile with
 
 }
 
-object CustomURLZipArchive{
+object CustomURLZipArchive {
   def closeZipFile = false
   private val is2_12_11 = scala.util.Properties.versionNumberString == "2.12.11"
 }
