@@ -1,4 +1,6 @@
-import mill._, scalalib._, publish._
+import mill._
+import scalalib._
+import publish._
 import mill.contrib.bloop.Bloop
 import mill.scalalib.api.ZincWorkerUtil._
 import coursier.mavenRepositoryString
@@ -6,6 +8,9 @@ import $file.ci.upload
 
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
+import mill.define.Command
+import mill.testrunner.TestRunner
+import scala.util.chaining.scalaUtilChainingOps
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
@@ -682,26 +687,38 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 
-def unitTest(scalaBinaryVersion: String) = {
-  def cross[T <: AmmInternalModule](module: Cross[T]) =
+def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
+  def cross[T <: AmmInternalModule](module: Cross[T]): Seq[T] = {
     module
       .items
       .reverse
-      .collectFirst {
+      .collect {
         case (List(key: String), mod) if key.startsWith(scalaBinaryVersion) => mod
       }
-      .getOrElse(sys.error(s"$module doesn't have versions for $scalaBinaryVersion"))
+      .tap { mods =>
+        if (mods.isEmpty) sys.error(s"$module doesn't have versions for $scalaBinaryVersion")
+      }
+  }
 
-  T.command{
-    cross(terminal).test.test()()
-    cross(amm.repl).test.test()()
-    cross(amm).test.test()()
-    cross(sshd).test.test()()
+  val tests =  Seq(
+    cross(terminal).map(_.test),
+    cross(amm.repl).map(_.test),
+    cross(amm).map(_.test),
+    cross(sshd).map(_.test)
+  ).flatten
+
+  val log = T.task {
+    T.log.outputStream.println(s"Testing modules: ${tests.mkString(", ")}")
+  }
+
+  T.command {
+    log()
+    T.traverse(tests)(_.testCached)()
   }
 }
 
-def integrationTest(scalaVersion: String) = T.command{
-  integration(scalaVersion).test.test()()
+def integrationTest(scalaVersion: String) = T.command {
+  integration(scalaVersion).test.testCached()
 }
 
 def generateConstantsFile(version: String = buildVersion,
