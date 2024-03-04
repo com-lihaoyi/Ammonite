@@ -76,6 +76,6 @@ jobs:
   publishExecutable:
     if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
     needs: [ test, itest ]
-    uses: ./.github/workflows/publishDocs.yml
+    uses: ./.github/workflows/publishExecutable.yml
     secrets:
       AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
