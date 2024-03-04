@@ -687,29 +687,28 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 
-def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
-  def cross[T <: AmmInternalModule](module: Cross[T]): Seq[T] = {
-    module
-      .items
-      .reverse
-      .collect {
-        case (List(key: String), mod) if key.startsWith(scalaBinaryVersion) => mod
-      }
-      .tap { mods =>
-        if (mods.isEmpty) sys.error(s"$module doesn't have versions for $scalaBinaryVersion")
-      }
+/** Selects all cross module instances, that match the given predicate. */
+def selectCrossPrefix[T <: Module, V](
+    crossModule: Cross[T],
+    predicate: String => Boolean
+)(accessor: T => V): Seq[V] =
+  crossModule.items.collect {
+    case (List(key: String), mod) if predicate(key) => accessor(mod)
   }
+    .tap { mods =>
+      if (mods.isEmpty) sys.error(s"No matching cross-instances found in ${crossModule}")
+    }
 
-  val tests =  Seq(
-    cross(terminal).map(_.test),
-    cross(amm.repl).map(_.test),
-    cross(amm).map(_.test),
-    cross(sshd).map(_.test)
+def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
+  val pred = (_: String).startsWith(scalaBinaryVersion)
+  val tests = Seq(
+    selectCrossPrefix(terminal, pred)(_.test),
+    selectCrossPrefix(amm.repl, pred)(_.test),
+    selectCrossPrefix(amm, pred)(_.test),
+    selectCrossPrefix(sshd, pred)(_.test)
   ).flatten
 
-  val log = T.task {
-    T.log.outputStream.println(s"Testing modules: ${tests.mkString(", ")}")
-  }
+  val log = T.task { T.log.outputStream.println(s"Testing modules: ${tests.mkString(", ")}") }
 
   T.command {
     log()
@@ -717,8 +716,10 @@ def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestRunn
   }
 }
 
-def integrationTest(scalaVersion: String) = T.command {
-  integration(scalaVersion).test.testCached()
+def integrationTest(scalaVersion: String = "") = T.command {
+  T.traverse(
+    selectCrossPrefix(integration, _.startsWith(scalaVersion))(_.test)
+  )(_.testCached)()
 }
 
 def generateConstantsFile(version: String = buildVersion,
