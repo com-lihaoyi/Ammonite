@@ -1,14 +1,25 @@
 name: Release
 on:
-  push:
-    branches:
-      - main
-      - 2.x
+  #  push:
+  #    branches:
+  #      - main
+  #      - 2.x
+  workflow_call:
+    secrets:
+      SONATYPE_PGP_SECRET:
+        required: true
+      SONATYPE_DEPLOY_USER:
+        required: true
+      SONATYPE_DEPLOY_PASSWORD:
+        required: true
+      SONATYPE_PGP_PASSWORD:
+        required: true
+
 jobs:
   release:
     strategy:
       matrix:
-        shard: [1, 2, 3, 4, 5]
+        shard: [ 1, 2, 3, 4, 5 ]
       fail-fast: false
     runs-on: ubuntu-latest
     env:
