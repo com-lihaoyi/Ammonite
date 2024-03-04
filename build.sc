@@ -36,7 +36,7 @@ val commitsSinceTaggedVersion = {
 val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16", "2.12.17", "2.12.18")
 val scala2_13Versions = Seq("2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10", "2.13.11", "2.13.12")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
-val scala33Versions = Seq("3.3.0", "3.3.1")
+val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
 val scala3Versions = scala32Versions ++ scala33Versions
 
 val binCrossScalaVersions = Seq(scala2_12Versions.last, scala2_13Versions.last, scala32Versions.last)
@@ -191,8 +191,14 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
       if (sv.startsWith("2.13.") || sv.startsWith("3."))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.13-or-3"))
       else Nil
+    val extraDir5 =
+      if (sv.startsWith("3.3") && sv.stripPrefix("3.3.").toInt >= 2)
+        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.3.2+"))
+      else if (sv.startsWith("3"))
+        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.3.1"))
+      else Nil
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4
+    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5
   }
   def externalSources = T{
     resolveDeps(allIvyDeps, sources = true)()
