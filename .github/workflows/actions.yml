@@ -1,19 +1,23 @@
-name: Tests
+name: CI
 on:
   push:
     branches:
       - main
       - 2.x
   pull_request:
-    branches:
-      - main
-      - 2.x
+
+# cancel older runs of a pull request;
+# this will not cancel anything for normal git pushes
+concurrency:
+  group: cancel-old-pr-runs-${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   test:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [8, 11]
+        java-version: [8, 11, 17]
         scala-binary-version: [2.12, 2.13, 3]
     runs-on: ubuntu-latest
     steps:
@@ -23,13 +27,14 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java-version }}
-      - run: ./mill -i unitTest "${{ matrix.scala-binary-version }}"
+      - run: ./mill -i -k unitTest "${{ matrix.scala-binary-version }}"
+
   itest:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [8, 11]
-        scala-version: [2.12.19, 2.13.13, 3.2.2, 3.3.1]
+        java-version: [8, 11, 17]
+        scala-version: [2.12, 2.13, 3]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -38,12 +43,13 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java-version }}
-      - run: ./mill -i integrationTest ${{ matrix.scala-version }}
+      - run: ./mill -i -k integrationTest ${{ matrix.scala-version }}
+
   publishLocal:
     strategy:
       fail-fast: false
       matrix:
-        scala-version: [2.12.19, 2.13.13, 3.2.2]
+        scala-version: [2.12.19, 2.13.13, 3.3.3]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -52,4 +58,24 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 8
-      - run: ./mill -i __[${{ matrix.scala-version }}].__.publishLocal
+      - run: ./mill -i -k __[${{ matrix.scala-version }}].__.publishLocal
+
+  release:
+    if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
+    needs: [ test, itest, publishLocal ]
+    uses: ./.github/workflows/release.yml
+    secrets: inherit
+
+  publishDosc:
+    if: github.repository == 'com-lihaoyi/Ammonite' && github.ref == 'refs/heads/main'
+    needs: [ test, itest ]
+    uses: ./.github/workflows/publishDocs.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+
+  publishExecutable:
+    if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
+    needs: [ test, itest ]
+    uses: ./.github/workflows/publishExecutable.yml
+    secrets:
+      AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
