@@ -1,19 +1,25 @@
 name: Publish Executable
 on:
-  push:
-    branches:
-      - main
-      - 2.x
+#  push:
+#    branches:
+#      - main
+#      - 2.x
+  workflow_call:
+    secrets:
+      AMMONITE_BOT_AUTH_TOKEN:
+        required: true
+
 jobs:
   publishExecutable:
     runs-on: ubuntu-latest
     env:
       AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: '8'
+          distribution: temurin
       - run: ./mill -i publishExecutable
