@@ -172,7 +172,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   // why is this here?
-  def allIvyDeps = T { transitiveIvyDeps().map(_.toDep) }
+  def allIvyDeps = T { transitiveIvyDeps().map(_.toDep) ++ scalaLibraryIvyDeps() }
   def sources = T.sources {
     val sv = scalaVersion()
     val extraDir =
