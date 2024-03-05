@@ -735,13 +735,15 @@ def selectCrossPrefix[T <: Cross.Module[_], V](
       if (mods.isEmpty) sys.error(s"No matching cross-instances found in ${crossModule}")
     }
 
-def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestResult])]] = {
-  val pred = (_: String).startsWith(scalaBinaryVersion)
+def unitTest(scalaVersion: String = "") = T.command {
+  val predBinVer = (_: String).startsWith(scalaVersion.split("[.]", 3).take(2).mkString("."))
+  val predFullVer = (_: String).startsWith(scalaVersion)
   val tests = Seq(
-    selectCrossPrefix(terminal, pred)(_.test),
-    selectCrossPrefix(amm.repl, pred)(_.test),
-    selectCrossPrefix(amm, pred)(_.test),
-    selectCrossPrefix(sshd, pred)(_.test)
+    selectCrossPrefix(terminal, predBinVer)(_.test),
+    selectCrossPrefix(amm.compiler, predFullVer)(_.test),
+    selectCrossPrefix(amm.repl, predFullVer)(_.test),
+    selectCrossPrefix(amm, predFullVer)(_.test),
+    selectCrossPrefix(sshd, predFullVer)(_.test)
   ).flatten
 
   val log = T.task { T.log.outputStream.println(s"Testing modules: ${tests.mkString(", ")}") }
