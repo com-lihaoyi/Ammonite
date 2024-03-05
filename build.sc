@@ -77,7 +77,7 @@ object Deps {
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.56"
   val cask = ivy"com.lihaoyi::cask:0.6.0"
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
-  val coursierInterface = ivy"io.get-coursier:interface:1.0.16"
+  val coursierInterface = ivy"io.get-coursier:interface:1.0.19"
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
   val fansi = ivy"com.lihaoyi::fansi:0.4.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
