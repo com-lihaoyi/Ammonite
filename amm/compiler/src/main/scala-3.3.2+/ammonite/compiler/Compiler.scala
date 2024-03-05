@@ -445,7 +445,7 @@ class Compiler(
         "java.lang.Object.finalize"
       )
 
-      blacklist(s.showFullName) ||
+      blacklist(s.fullName.toString) ||
       s.isOneOf(Flags.GivenOrImplicit) ||
       // Cache objects, which you should probably never need to
       // access directly, and apart from that have annoyingly long names

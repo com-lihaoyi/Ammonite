@@ -1,4 +1,6 @@
-import mill._, scalalib._, publish._
+import mill._
+import scalalib._
+import publish._
 import mill.contrib.bloop.Bloop
 import mill.scalalib.api.ZincWorkerUtil._
 import coursier.mavenRepositoryString
@@ -6,6 +8,9 @@ import $file.ci.upload
 
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
+import mill.define.Command
+import mill.testrunner.TestRunner
+import scala.util.chaining.scalaUtilChainingOps
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
@@ -33,10 +38,10 @@ val commitsSinceTaggedVersion = {
     .toInt
 }
 
-val scala2_12Versions = Seq("2.12.8", "2.12.9", "2.12.10", "2.12.11", "2.12.12", "2.12.13", "2.12.14", "2.12.15", "2.12.16", "2.12.17", "2.12.18")
-val scala2_13Versions = Seq("2.13.2", "2.13.3", "2.13.4", "2.13.5", "2.13.6", "2.13.7", "2.13.8", "2.13.9", "2.13.10", "2.13.11", "2.13.12")
+val scala2_12Versions = 9.to(19).map(v => s"2.12.${v}")
+val scala2_13Versions = 2.to(13).map(v => s"2.13.${v}")
 val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
-val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2")
+val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
 val scala34Versions = Seq("3.4.0")
 val scala3Versions = scala32Versions ++ scala33Versions ++ scala34Versions
 
@@ -65,7 +70,7 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.1.0-M5"
 val fastparseVersion = "3.0.2"
-val scalametaVersion = "4.8.13"
+val scalametaVersion = "4.8.15"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi:::acyclic:0.3.11"
@@ -103,8 +108,8 @@ object Deps {
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.34"
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
-  val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.12"
-  val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.0"
+  val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.36"
+  val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.1"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
   val typename = ivy"org.tpolecat::typename:1.1.0"
@@ -114,7 +119,7 @@ object Deps {
       else "3.1.3"
     ivy"com.lihaoyi::upickle:$ver"
   }
-  val utest = ivy"com.lihaoyi::utest:0.8.1"
+  val utest = ivy"com.lihaoyi::utest:0.8.2"
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
@@ -692,26 +697,42 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule{
   }
 }
 
-def unitTest(scalaBinaryVersion: String) = {
-  def cross[T <: AmmInternalModule](module: Cross[T]) =
-    module
-      .items
-      .reverse
-      .collectFirst {
-        case (List(key: String), mod) if key.startsWith(scalaBinaryVersion) => mod
-      }
-      .getOrElse(sys.error(s"$module doesn't have versions for $scalaBinaryVersion"))
+/**
+ * Selects all cross module instances, that match the given predicate.
+ * In Mill 0.11, this can be hopefully replaced with a simple filter on the `crossValue`.
+ */
+def selectCrossPrefix[T <: Module, V](
+    crossModule: Cross[T],
+    predicate: String => Boolean
+)(accessor: T => V): Seq[V] =
+  crossModule.items.collect {
+    case (List(key: String), mod) if predicate(key) => accessor(mod)
+  }
+    .tap { mods =>
+      if (mods.isEmpty) sys.error(s"No matching cross-instances found in ${crossModule}")
+    }
 
-  T.command{
-    cross(terminal).test.test()()
-    cross(amm.repl).test.test()()
-    cross(amm).test.test()()
-    cross(sshd).test.test()()
+def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
+  val pred = (_: String).startsWith(scalaBinaryVersion)
+  val tests = Seq(
+    selectCrossPrefix(terminal, pred)(_.test),
+    selectCrossPrefix(amm.repl, pred)(_.test),
+    selectCrossPrefix(amm, pred)(_.test),
+    selectCrossPrefix(sshd, pred)(_.test)
+  ).flatten
+
+  val log = T.task { T.log.outputStream.println(s"Testing modules: ${tests.mkString(", ")}") }
+
+  T.command {
+    log()
+    T.traverse(tests)(_.testCached)()
   }
 }
 
-def integrationTest(scalaVersion: String) = T.command{
-  integration(scalaVersion).test.test()()
+def integrationTest(scalaVersion: String = "") = T.command {
+  T.traverse(
+    selectCrossPrefix(integration, _.startsWith(scalaVersion))(_.test)
+  )(_.testCached)()
 }
 
 def generateConstantsFile(version: String = buildVersion,
