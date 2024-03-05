@@ -1,9 +1,14 @@
 name: Publish Executable
 on:
-  push:
-    branches:
-      - main
-      - 2.x
+#  push:
+#    branches:
+#      - main
+#      - 2.x
+  workflow_call:
+    secrets:
+      AMMONITE_BOT_AUTH_TOKEN:
+        required: true
+
 jobs:
   publishExecutable:
     runs-on: ubuntu-latest

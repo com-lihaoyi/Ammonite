@@ -1,8 +1,13 @@
 name: Publish Docs
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
+  workflow_call:
+    secrets:
+      DEPLOY_KEY:
+        required: true
+
 jobs:
   publishDocs:
     runs-on: ubuntu-latest
