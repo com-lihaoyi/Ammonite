@@ -172,7 +172,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
   // why is this here?
-//  def allIvyDeps = T { transitiveIvyDeps() ++ scalaLibraryIvyDeps() }
+  def allIvyDeps = T { transitiveIvyDeps().map(_.toDep) }
   def sources = T.sources {
     val sv = scalaVersion()
     val extraDir =
@@ -223,7 +223,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5
   }
   def externalSources = T {
-    resolveDeps(transitiveIvyDeps, sources = true)()
+    resolveDeps(T.task { allIvyDeps().map(bindDependency()) }, sources = true)()
   }
   def repositoriesTask = T.task {
     super.repositoriesTask() ++ Seq(
@@ -269,13 +269,13 @@ trait AmmModule extends AmmInternalModule with PublishModule {
   )
 
   def transitiveJars: T[Agg[PathRef]] = T {
-    mill.define.Target.traverse(transitiveModuleDeps)(m =>
+    mill.define.Target.traverse(this +: moduleDeps)(m =>
       T.task { m.jar() }
     )()
   }
 
   def transitiveSourceJars: T[Agg[PathRef]] = T {
-    mill.define.Target.traverse(transitiveModuleDeps)(m =>
+    mill.define.Target.traverse(this +: moduleDeps)(m =>
       T.task { m.sourceJar() }
     )()
   }
