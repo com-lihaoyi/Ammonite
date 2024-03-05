@@ -285,8 +285,7 @@ trait AmmModule extends AmmInternalModule with PublishModule {
 trait AmmDependenciesResourceFileModule extends JavaModule {
   def dependencyResourceFileName: String
   def dependencyFileResources = T {
-//    val deps0 = T.task { compileIvyDeps() ++ transitiveIvyDeps() }()
-    val deps0 = transitiveCompileIvyDeps()
+    val deps0 = compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps()
     val (_, res) = mill.modules.Jvm.resolveDependenciesMetadata(
       repositoriesTask(),
       deps0.map(_.dep), // .map(resolveCoursierDependency().apply(_)),
