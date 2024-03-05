@@ -12,11 +12,12 @@ import mill.contrib.bloop.Bloop
 import mill.define.Command
 import mill.main.Tasks
 import mill.scalalib._
-import mill.scalalib.publish._
 import mill.scalalib.api.ZincWorkerUtil._
+import mill.scalalib.publish._
 import mill.testrunner.TestResult
-import scala.util.chaining.scalaUtilChainingOps
 import scala.concurrent.{Await, ExecutionContext, Future, duration}
+import scala.util.chaining.scalaUtilChainingOps
+import scala.util.control.NonFatal
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
@@ -34,15 +35,15 @@ val isPublishableCommit =
       publishBranches.exists(suffix => x.endsWith(s"/${suffix}"))
     )
 
-val latestTaggedVersion = os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+val latestTaggedVersion = os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim()
 
-val gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim
+val gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim()
 
 val commitsSinceTaggedVersion = {
   os.proc("git", "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
     .call()
     .out
-    .trim
+    .trim()
     .toInt
 }
 
@@ -69,10 +70,10 @@ val (buildVersion, unstable) = scala.util.Try(
   os.proc("git", "describe", "--exact-match", "--tags", "--always", gitHead)
     .call()
     .out
-    .trim
+    .trim()
 ).toOption match {
   case None =>
-    val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim
+    val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim()
     (s"$latestTaggedVersion-$commitsSinceTaggedVersion-$gitHash", true)
   case Some(tagName) => (tagName, false)
 }
@@ -286,7 +287,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule {
   def dependencyResourceFileName: String
   def dependencyFileResources = T {
     val deps0 = compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps()
-    val (_, res) = mill.modules.Jvm.resolveDependenciesMetadata(
+    val (_, res) = mill.util.Jvm.resolveDependenciesMetadata(
       repositoriesTask(),
       deps0.map(_.dep), // .map(resolveCoursierDependency().apply(_)),
       deps0.filter(_.force).map(_.dep), // .map(resolveCoursierDependency().apply(_)),
@@ -407,7 +408,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         val outDir = T.ctx().dest
         val javadocDir = outDir / "javadoc"
         os.makeDir.all(javadocDir)
-        mill.api.Result.Success(mill.modules.Jvm.createJar(Agg(javadocDir))(outDir))
+        mill.api.Result.Success(mill.util.Jvm.createJar(Agg(javadocDir))(outDir))
       }
       else super.docJar
       def constantsSourceDir = T {
@@ -511,7 +512,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
           amm.repl.api().exposedClassPath() ++
             amm.compiler().exposedClassPath() ++
             Seq(compile().classes) ++
-            resolveDeps(T.task { compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps() })()
+            resolveDeps(T.task { this.compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps() })()
         )
       }
 
@@ -564,7 +565,7 @@ trait MainModule extends AmmModule {
       externalSources()
 
   def prependShellScript = T {
-    mill.modules.Jvm.launcherUniversalScript(
+    mill.util.Jvm.launcherUniversalScript(
       mainClass().get,
       Agg("$0"),
       Agg("%~dpnx0"),
@@ -657,7 +658,7 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
   val thinClasspathEntries = replApiCp.map(_.path).flatMap { cpRoot =>
     if (os.isFile(cpRoot) && cpRoot.ext == "jar") {
       val zip = new java.util.zip.ZipFile(cpRoot.toIO)
-      import collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       for (e <- zip.entries().asScala) yield e.getName
     } else if (os.isDir(cpRoot)) {
       for (sub <- os.walk(cpRoot)) yield sub.relativeTo(cpRoot).toString
@@ -891,7 +892,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
         )
       )
     } catch {
-      case e =>
+      case NonFatal(e) =>
         println(e)
         e.printStackTrace()
         throw e
@@ -1019,7 +1020,7 @@ def publishSonatype(
         ),
         readTimeout = 600000,
         connectTimeout = 600000,
-        log = T.ctx().log,
+        log = T.log,
         workspace = T.workspace,
         env = T.env,
         awaitTimeout = 600000,
