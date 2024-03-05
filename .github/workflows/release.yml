@@ -34,8 +34,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: '8'
+          distribution: temurin
       - run: test -z "$SONATYPE_PGP_SECRET" || echo "$SONATYPE_PGP_SECRET" | base64 --decode | gpg --import --no-tty --batch --yes
       - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts --shard ${{ matrix.shard }} --divisionCount 5

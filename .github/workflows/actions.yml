@@ -24,9 +24,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
+          distribution: temurin
       - run: ./mill -i -k unitTest "${{ matrix.scala-binary-version }}"
 
   itest:
@@ -40,9 +41,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
+          distribution: temurin
       - run: ./mill -i -k integrationTest ${{ matrix.scala-version }}
 
   publishLocal:
@@ -55,9 +57,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: 8
+          distribution: temurin
       - run: ./mill -i -k __[${{ matrix.scala-version }}].__.publishLocal
 
   release:
