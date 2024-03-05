@@ -1,0 +1,28 @@
+[0m[[0m[0minfo[0m] [0m[0mcompiling 22 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.13/compile.dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/internal/CustomURLZipArchive.scala:74:18: reference to output is ambiguous;[0m
+[0m[[0m[33mwarn[0m] [0m[0mit is both defined in the enclosing class CustomURLZipArchive and inherited in the enclosing class File as method output (defined in class VirtualFile, inherited through parent class Entry)[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 2, symbols inherited from a superclass shadow symbols defined in an outer scope.[0m
+[0m[[0m[33mwarn[0m] [0m[0mSuch references are ambiguous in Scala 3. To continue using the inherited symbol, write `this.output`.[0m
+[0m[[0m[33mwarn[0m] [0m[0mOr use `-Wconf:msg=legacy-binding:s` to silence this warning. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m        val os = output[0m
+[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.13.12+/ammonite/compiler/MakeReporter.scala:33:9: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: ERROR, INFO, WARNING[0m
+[0m[[0m[33mwarn[0m] [0m[0m        severity match{[0m
+[0m[[0m[33mwarn[0m] [0m[0m        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/AmmonitePlugin.scala:261:24: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: List(_), Nil[0m
+[0m[[0m[33mwarn[0m] [0m[0m      val importType = items match{[0m
+[0m[[0m[33mwarn[0m] [0m[0m                       ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/SourceRuntime.scala:144:5: match may not be exhaustive.[0m
+[0m[[0m[33mwarn[0m] [0m[0mIt would fail on the following inputs: (Right(_), None), (Right(_), Some(_))[0m
+[0m[[0m[33mwarn[0m] [0m[0m    (loadSourceFrom(symbolOwnerCls, memberName, desc), value) match{[0m
+[0m[[0m[33mwarn[0m] [0m[0m    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m3 deprecations (since 2.11.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0m23 deprecations (since 2.13.0)[0m
+[0m[[0m[33mwarn[0m] [0m[0m3 deprecations (since 2.13.3)[0m
+[0m[[0m[33mwarn[0m] [0m[0m18 deprecations (since 2.13.7)[0m
+[0m[[0m[33mwarn[0m] [0m[0m47 deprecations in total; re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m2 feature warnings; re-run with -feature for details[0m
+[0m[[0m[33mwarn[0m] [0m[0m10 warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m

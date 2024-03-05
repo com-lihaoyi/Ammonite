@@ -1,0 +1,27 @@
+{
+    "value": [
+        "qref:472461d4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.13/scala-compiler-2.13.13-sources.jar",
+        "qref:1d4c1467:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.13/3.0.2/scalaparse_2.13-3.0.2-sources.jar",
+        "qref:e75a2be1:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.0.1/scala-xml_2.13-2.0.1-sources.jar",
+        "qref:44baeda9:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA-sources.jar",
+        "qref:e59161fe:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/javaparser/javaparser-core/3.2.5/javaparser-core-3.2.5-sources.jar",
+        "qref:e4e437dd:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.13/scala-library-2.13.13-sources.jar",
+        "qref:7f5fdae3:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.9.3/os-lib_2.13-0.9.3-sources.jar",
+        "qref:2234cce0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0-sources.jar",
+        "qref:a6e2d914:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.8.1/scala-collection-compat_2.13-2.8.1-sources.jar",
+        "qref:e242b580:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.4.0/fansi_2.13-0.4.0-sources.jar",
+        "qref:c02e5d95:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.8.1/pprint_2.13-0.8.1-sources.jar",
+        "qref:7a69fc52:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.5.4/mainargs_2.13-0.5.4-sources.jar",
+        "qref:0b17f865:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.0.0/geny_2.13-1.0.0-sources.jar",
+        "qref:8c835449:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.16/interface-1.0.16-sources.jar",
+        "qref:778f1302:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.13/scala-reflect-2.13.13-sources.jar",
+        "qref:d375403f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.12/java-diff-utils-4.12-sources.jar",
+        "qref:9f785927:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.24.1/jline-3.24.1-sources.jar",
+        "qref:a9b59de7:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0-sources.jar",
+        "qref:a5f98e37:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/3.0.2/fastparse_2.13-3.0.2-sources.jar",
+        "qref:39e8206b:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.3.0/sourcecode_2.13-0.3.0-sources.jar",
+        "qref:df8adc92:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36-sources.jar"
+    ],
+    "valueHash": 854524214,
+    "inputsHash": 1546581103
+}

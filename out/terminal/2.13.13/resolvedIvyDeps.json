@@ -1,0 +1,10 @@
+{
+    "value": [
+        "qref:93da3b5f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.13/0.3.11/acyclic_2.13.13-0.3.11.jar",
+        "qref:4d6ef644:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.4.0/fansi_2.13-0.4.0.jar",
+        "qref:700a456e:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.3.1/sourcecode_2.13-0.3.1.jar",
+        "qref:5b282006:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.13/scala-library-2.13.13.jar"
+    ],
+    "valueHash": 137043816,
+    "inputsHash": 1161767758
+}

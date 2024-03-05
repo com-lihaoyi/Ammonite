@@ -1,0 +1,7 @@
+[0m[[0m[0minfo[0m] [0m[0mcompiling 15 Scala sources to /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.13/compile.dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompiler.scala:151:28: The outer reference in this type test cannot be checked at run time.[0m
+[0m[[0m[33mwarn[0m] [0m[0m  private final case class InMemoryCacheKey([0m
+[0m[[0m[33mwarn[0m] [0m[0m                           ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m42 deprecations (since 2.13.0); re-run with -deprecation for details[0m
+[0m[[0m[33mwarn[0m] [0m[0mtwo warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m

@@ -1,0 +1,21 @@
+{
+    "value": [
+        "ref:cae56c68:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/IvyThing.scala",
+        "ref:46f54e66:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/Interpreter.scala",
+        "ref:0e3d7a52:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/DependencyLoader.scala",
+        "ref:273eab5e:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompiler.scala",
+        "ref:f1a730d6:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptProcessor.scala",
+        "ref:0cd67e13:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/Diagnostic.scala",
+        "ref:f685bc43:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/Script.scala",
+        "ref:af86408e:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/AmmoniteBuildServer.scala",
+        "ref:58d86e92:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/DummyBuildServerImplems.scala",
+        "ref:0fbe2c86:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompileResult.scala",
+        "ref:00c076bb:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCache.scala",
+        "ref:8b37f42c:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/SingleScriptCompiler.scala",
+        "ref:3c5ac7e4:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/SemanticdbProcessor.scala",
+        "ref:6ca13172:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/PredefInitialization.scala",
+        "ref:f0398a82:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/Watchable.scala"
+    ],
+    "valueHash": -1341602998,
+    "inputsHash": 816354581
+}

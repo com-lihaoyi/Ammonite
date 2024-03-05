@@ -1,0 +1,12 @@
+{
+    "value": [
+        "ref:b96ac973:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/Compiler.scala",
+        "ref:6a5892c5:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/CodeWrapper.scala",
+        "ref:76a7766b:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/Preprocessor.scala",
+        "ref:d60b6076:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/CompilerBuilder.scala",
+        "ref:7ffd4ea7:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/CompilerLifecycleManager.scala",
+        "ref:9364cfa7:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/Parser.scala"
+    ],
+    "valueHash": -1697538946,
+    "inputsHash": 2021766091
+}

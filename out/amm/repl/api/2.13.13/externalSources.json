@@ -1,0 +1,18 @@
+{
+    "value": [
+        "qref:7a69fc52:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.5.4/mainargs_2.13-0.5.4-sources.jar",
+        "qref:0b17f865:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.0.0/geny_2.13-1.0.0-sources.jar",
+        "qref:e4e437dd:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.13/scala-library-2.13.13-sources.jar",
+        "qref:7f5fdae3:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.9.3/os-lib_2.13-0.9.3-sources.jar",
+        "qref:2234cce0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0-sources.jar",
+        "qref:a6e2d914:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.8.1/scala-collection-compat_2.13-2.8.1-sources.jar",
+        "qref:e242b580:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.4.0/fansi_2.13-0.4.0-sources.jar",
+        "qref:c02e5d95:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.8.1/pprint_2.13-0.8.1-sources.jar",
+        "qref:8c835449:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.16/interface-1.0.16-sources.jar",
+        "qref:778f1302:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.13/scala-reflect-2.13.13-sources.jar",
+        "qref:39e8206b:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.3.0/sourcecode_2.13-0.3.0-sources.jar",
+        "qref:df8adc92:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36-sources.jar"
+    ],
+    "valueHash": -1055983099,
+    "inputsHash": -1135760438
+}

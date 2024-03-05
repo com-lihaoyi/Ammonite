@@ -1,0 +1,16 @@
+{
+    "value": [
+        "ref:e991af37:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/main/Defaults.scala",
+        "ref:f72860bf:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/PPrints.scala",
+        "ref:a1193b97:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/package.scala",
+        "ref:b5f95565:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEndUtils.scala",
+        "ref:1575765e:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/ApiImpls.scala",
+        "ref:515ec794:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEnds.scala",
+        "ref:70023c29:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/Repl.scala",
+        "ref:42fa4463:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/Signaller.scala",
+        "ref:b202e6d5:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/AmmoniteFrontEnd.scala",
+        "ref:bb2cb165:/home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala-2/ammonite/main/DefaultsScalaVersionSpecific.scala"
+    ],
+    "valueHash": -615482965,
+    "inputsHash": -241529208
+}
