@@ -320,7 +320,7 @@ object AdvancedTests extends TestSuite{
         check.session("""
           @ // Compiler plugins imported without `.$plugin` are not loaded
 
-          @ import $ivy.`org.typelevel:::kind-projector:0.13.2`
+          @ import $ivy.`org.typelevel:::kind-projector:0.13.3`
 
           @ trait TC0[F[_]]
           defined trait TC0
@@ -330,7 +330,7 @@ object AdvancedTests extends TestSuite{
 
           @ // You need to use `import $plugin.$ivy`
 
-          @ import $plugin.$ivy.`org.typelevel:::kind-projector:0.13.2`
+          @ import $plugin.$ivy.`org.typelevel:::kind-projector:0.13.3`
 
           @ trait TC[F[_]]
           defined trait TC
