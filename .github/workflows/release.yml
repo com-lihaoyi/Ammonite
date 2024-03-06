@@ -1,14 +1,25 @@
 name: Release
 on:
-  push:
-    branches:
-      - main
-      - 2.x
+  #  push:
+  #    branches:
+  #      - main
+  #      - 2.x
+  workflow_call:
+    secrets:
+      SONATYPE_PGP_SECRET:
+        required: true
+      SONATYPE_DEPLOY_USER:
+        required: true
+      SONATYPE_DEPLOY_PASSWORD:
+        required: true
+      SONATYPE_PGP_PASSWORD:
+        required: true
+
 jobs:
   release:
     strategy:
       matrix:
-        shard: [1, 2, 3, 4, 5]
+        shard: [ 1, 2, 3, 4, 5 ]
       fail-fast: false
     runs-on: ubuntu-latest
     env:
@@ -20,11 +31,12 @@ jobs:
       LC_MESSAGES: "en_US.UTF-8"
       LC_ALL: "en_US.UTF-8"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: '8'
+          distribution: temurin
       - run: test -z "$SONATYPE_PGP_SECRET" || echo "$SONATYPE_PGP_SECRET" | base64 --decode | gpg --import --no-tty --batch --yes
       - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts --shard ${{ matrix.shard }} --divisionCount 5
