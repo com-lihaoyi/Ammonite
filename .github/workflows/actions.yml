@@ -47,6 +47,18 @@ jobs:
           distribution: temurin
       - run: ./mill -i -k integrationTest ${{ matrix.scala-version }}
 
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+      - run: ./mill -i publishDocs --skipDeploy true
+
   publishLocal:
     strategy:
       fail-fast: false
@@ -65,20 +77,20 @@ jobs:
 
   release:
     if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
-    needs: [ test, itest, publishLocal ]
+    needs: [ test, itest, site, publishLocal ]
     uses: ./.github/workflows/release.yml
     secrets: inherit
 
   publishDosc:
     if: github.repository == 'com-lihaoyi/Ammonite' && github.ref == 'refs/heads/main'
-    needs: [ test, itest ]
+    needs: [ test, itest, site ]
     uses: ./.github/workflows/publishDocs.yml
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 
   publishExecutable:
     if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
-    needs: [ test, itest ]
+    needs: [ test, itest, site ]
     uses: ./.github/workflows/publishExecutable.yml
     secrets:
       AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}

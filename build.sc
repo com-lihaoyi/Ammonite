@@ -5,11 +5,12 @@ import mill.contrib.bloop.Bloop
 import mill.scalalib.api.ZincWorkerUtil._
 import coursier.mavenRepositoryString
 import $file.ci.upload
-
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
 import mill.define.Command
 import mill.testrunner.TestRunner
+import os.CommandResult
+
 import scala.util.chaining.scalaUtilChainingOps
 
 val ghOrg = "com-lihaoyi"
@@ -862,7 +863,7 @@ def publishExecutable() = {
   }
 }
 
-def publishDocs() = {
+def publishDocs(skipDeploy: Boolean = false): Command[CommandResult] = {
   val ammoniteAssembly = amm(scala2_13Versions.last).assembly
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
@@ -935,7 +936,12 @@ def publishDocs() = {
         "CONSTANTS_FILE" -> constantsFile.toString
       )
     )
-    os.proc("ci/deploy_master_docs.sh").call()
+    if (skipDeploy) {
+      println("Skip deployment")
+    } else {
+      println("Deploying ...")
+      os.proc("ci/deploy_master_docs.sh").call()
+    }
   }
 }
 
