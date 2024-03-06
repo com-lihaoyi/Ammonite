@@ -2,22 +2,21 @@ package ammonite.session
 
 import ammonite.DualTestRepl
 import utest._
-object EulerTests extends TestSuite{
-  val tests = Tests{
+object EulerTests extends TestSuite {
+  val tests = Tests {
     println("EulerTests")
     val check = new DualTestRepl()
 
-
     // Taken from https://pavelfatin.com/scala-for-project-euler/
     // Thanks Pavel!
-    test("p1"){
+    test("p1") {
       // Add all the natural numbers below one thousand that are multiples of 3 or 5.*
       check.session("""
         @ val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0).sum
         r: Int = 233168
       """)
     }
-    test("p2"){
+    test("p2") {
       // Find the sum of all the even-valued terms in the
       // Fibonacci sequence which do not exceed four million.*
       check.session("""
@@ -28,7 +27,7 @@ object EulerTests extends TestSuite{
         r: Int = 4613732
       """)
     }
-    test("p3"){
+    test("p3") {
       // Find the largest prime factor of a composite number.*
       check.session("""
         @ def factors(n: Long): List[Long] = {
@@ -40,10 +39,9 @@ object EulerTests extends TestSuite{
 
         @ factors(600851475143L).last
         res1: Long = 6857L
-        """
-      )
+        """)
     }
-    test("p4"){
+    test("p4") {
       // Find the largest palindrome made from the product of two 3-digit numbers.*
       // Doesn't work due to RangePosition problem
       check.session("""
@@ -56,7 +54,7 @@ object EulerTests extends TestSuite{
         res0: Int = 906609
       """)
     }
-    test("p5"){
+    test("p5") {
       // What is the smallest number divisible by each of the numbers 1 to 10?*
       // Original value was 20, but 10 runs a lot quicker
       check.session("""
@@ -64,7 +62,7 @@ object EulerTests extends TestSuite{
         res0: Int = 2520
       """)
     }
-    test("p6"){
+    test("p6") {
       // What is the difference between the sum of the squares and the
       // square of the sums?*
       check.session("""
@@ -77,7 +75,7 @@ object EulerTests extends TestSuite{
         res2: Int = 25164150
       """)
     }
-    test("p7"){
+    test("p7") {
       // Find the 10001st prime.*
       check.session("""
         @ lazy val ps: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
@@ -88,7 +86,7 @@ object EulerTests extends TestSuite{
         res1: Int = 104743
       """)
     }
-    test("p8"){
+    test("p8") {
       // Discover the largest product of five consecutive digits in the 1000-digit number.*
       val data =
         """73167176531330624919225119674426574742355349194934
@@ -124,7 +122,7 @@ object EulerTests extends TestSuite{
         res1: Int = 40824
       """)
     }
-    test("p9"){
+    test("p9") {
       // Find the only Pythagorean triplet, {a, b, c}, for which a + b + c = 1000.*
       check.session("""
         @ val limit = (1 to 1000).find(n => n + math.sqrt(n) >= 1000).get
@@ -142,7 +140,7 @@ object EulerTests extends TestSuite{
         rs: IndexedSeq[Int] = Vector(31875000)
       """)
     }
-    test("p10"){
+    test("p10") {
       // Calculate the sum of all the primes below 200,000.*
       // Originally 2,000,000, reduced to 200,000 for perf
       check.session("""
@@ -152,10 +150,9 @@ object EulerTests extends TestSuite{
 
         @ ps.view.takeWhile(_ < 200000).foldLeft(0L)(_ + _)
         res1: Long = 1709600813L
-        """
-      )
+        """)
     }
-    test("p11"){
+    test("p11") {
       // What is the greatest product of four numbers
       // on the same straight line in the 20 by 20 grid?*
       val data =
@@ -203,7 +200,7 @@ object EulerTests extends TestSuite{
         res5: Int = 70600674
       """)
     }
-    test("p12"){
+    test("p12") {
       // What is the value of the first triangle number to have over five hundred divisors?*
       check.session("""
         @ lazy val ts: Stream[Int] = 0 #:: ts.zipWithIndex.map(p => p._1 + p._2 + 1)
@@ -220,7 +217,7 @@ object EulerTests extends TestSuite{
         res2: Int = 76576500
       """)
     }
-    test("p13"){
+    test("p13") {
       // Find the first ten digits of the sum of one-hundred 50-digit numbers.*
       val data = """37107287533902102798797998220837590246510135740250
                    |46376937677490009712648124896970078050417018260538
@@ -330,7 +327,7 @@ object EulerTests extends TestSuite{
       """)
 
     }
-    test("p14"){
+    test("p14") {
       // Find the longest sequence using a starting number under one million.*
       check.session("""
         @ def from(n: Long, c: Int = 0): Int = {
@@ -347,7 +344,7 @@ object EulerTests extends TestSuite{
       """)
 
     }
-    test("p15"){
+    test("p15") {
       // Starting in the top left corner in a 20 by 20 grid,
       // how many routes are there to the bottom right corner?*
       check.session("""
@@ -363,14 +360,14 @@ object EulerTests extends TestSuite{
         res2: Long = 137846528820L
       """)
     }
-    test("p16"){
+    test("p16") {
       // What is the sum of the digits of the number 2^1000?*
       check.session("""
         @ BigInt(2).pow(1000).toString.view.map(_.asDigit).sum
         res0: Int = 1366
       """)
     }
-    test("p17"){
+    test("p17") {
       // How many letters would be needed to write all
       // the numbers in words from 1 to 1000?*
       check.session("""
@@ -394,8 +391,7 @@ object EulerTests extends TestSuite{
       """)
     }
 
-
-    test("p18"){
+    test("p18") {
       // Find the maximum sum travelling from the top of the triangle to the base.*
       val data = """75
                    |95 64
@@ -429,8 +425,8 @@ object EulerTests extends TestSuite{
         @ assert(r == 1074) // 2 ms
       """)
     }
-    test("p19"){
-      //How many Sundays fell on the first of the month during the twentieth century?*
+    test("p19") {
+      // How many Sundays fell on the first of the month during the twentieth century?*
       check.session("""
         @ val lengths = Array(31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
@@ -447,7 +443,7 @@ object EulerTests extends TestSuite{
         r: Int = 171
       """)
     }
-    test("p20"){
+    test("p20") {
       // Find the sum of digits in 100!*
       check.session("""
         @ def f(n: BigInt): BigInt = if(n < 2) 1 else n * f(n - 1)
@@ -456,7 +452,7 @@ object EulerTests extends TestSuite{
         r: Int = 648
       """)
     }
-    test("p21"){
+    test("p21") {
       // Evaluate the sum of all amicable pairs under 1000.*
       // Originally 10000, shorted to 1000 for performance
       check.session("""
@@ -472,7 +468,7 @@ object EulerTests extends TestSuite{
         r: Int = 504
       """)
     }
-    test("p22"){
+    test("p22") {
       // Smaller than the real dataset, because the real dataset
       // is too big to copy & paste into the unit test code.
       val data = "\"\"\"" + """
@@ -547,7 +543,7 @@ object EulerTests extends TestSuite{
 //      """)
 //    }
 
-    test("p24"){
+    test("p24") {
       // What is the thousanth lexicographic permutation of the digits
       // 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?*
       check.session("""
@@ -560,7 +556,7 @@ object EulerTests extends TestSuite{
         r: Long = 124658793L
       """)
     }
-    test("p25"){
+    test("p25") {
       // What is the first term in the Fibonacci sequence to contain 1000 digits?*
       check.session("""
         @ lazy val fs: Stream[BigInt] = {
@@ -572,7 +568,7 @@ object EulerTests extends TestSuite{
       """)
     }
 
-    test("p26"){
+    test("p26") {
       // Find the value of d < 100 for which 1/d contains the longest recurring cycle.*
       // Originally 1000, reduced to 100 for perf
       check.session("""
@@ -585,7 +581,7 @@ object EulerTests extends TestSuite{
         r: Int = 97
       """)
     }
-    test("p27"){
+    test("p27") {
       // Find a quadratic formula that produces the maximum number of
       // primes for consecutive values of n.*
       // Originally -999 to 1000, reduced to -99 to 100 to speed it up a bit
@@ -605,7 +601,7 @@ object EulerTests extends TestSuite{
       """)
     }
 
-    test("p28"){
+    test("p28") {
       // What is the sum of both diagonals in a 1001 by 1001 spiral?*
       check.session("""
         @ def cs(n: Int, p: Int): Stream[Int] =
@@ -616,7 +612,7 @@ object EulerTests extends TestSuite{
       """)
     }
 
-    test("p29"){
+    test("p29") {
       // How many distinct terms are in the sequence generated by ab
       // for 2 ≤ a ≤ 100 and 2 ≤ b ≤ 100?*
       check.session("""
@@ -630,7 +626,7 @@ object EulerTests extends TestSuite{
       """)
     }
 
-    test("p30"){
+    test("p30") {
       // Find the sum of all the numbers that can be written as
       // the sum of fifth powers of their digits.*
       check.session("""
@@ -644,7 +640,7 @@ object EulerTests extends TestSuite{
         r: Int = 443839
       """)
     }
-    test("p31"){
+    test("p31") {
       // Investigating combinations of English currency denominations.*
       check.session("""
         @ def f(ms: List[Int], n: Int): Int = ms match {
@@ -657,7 +653,7 @@ object EulerTests extends TestSuite{
         r: Int = 73682
       """)
     }
-    test("p32"){
+    test("p32") {
       // Find the sum of all numbers that can be written as pandigital products.*
       check.session("""
         @ val ms = for {

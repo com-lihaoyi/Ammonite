@@ -22,12 +22,10 @@ trait AmmClassPath extends ClassPath {
     ammList(inPackage.dottedString)
   }
 
-
   def ammClasses(inPackage: String): Seq[ClassFileEntry]
   def classes(inPackage: scala.tools.nsc.classpath.PackageName): Seq[ClassFileEntry] = {
     ammClasses(inPackage.dottedString)
   }
-
 
   def ammHasPackage(pkg: String): Boolean
   def hasPackage(pkg: scala.tools.nsc.classpath.PackageName) = ammHasPackage(pkg.dottedString)

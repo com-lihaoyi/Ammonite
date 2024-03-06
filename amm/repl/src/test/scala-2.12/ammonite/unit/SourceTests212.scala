@@ -1,16 +1,14 @@
 package ammonite.unit
 
-
 import utest._
 import ammonite.compiler.tools.source.load
 import ammonite.util.Util
 import ammonite.util.Util.Location
 //import fastparse.utils.{ElemSetHelper, Generator, IndexedParserInput}
 
-object SourceTests212 extends TestSuite{
-  val tests = Tests{
+object SourceTests212 extends TestSuite {
+  val tests = Tests {
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
-
 
       val loadedFileName = loaded.fileName
       assert(loadedFileName == expectedFileName)
@@ -24,9 +22,8 @@ object SourceTests212 extends TestSuite{
       assert(nearby.contains(expected))
     }
 
-
-    test("objectInfo"){
-      test("fieldsAreTreatedAsObjects"){
+    test("objectInfo") {
+      test("fieldsAreTreatedAsObjects") {
         // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
         check(
           load(com.github.javaparser.JavaToken.INVALID),
@@ -36,8 +33,8 @@ object SourceTests212 extends TestSuite{
       }
 
     }
-    test("objectMemberInfo"){
-      test("implementedBySuperclass"){
+    test("objectMemberInfo") {
+      test("implementedBySuperclass") {
         // The file has changed names since earlier versions...
 
         val list: List[Int] = List(1, 2, 3)
@@ -49,7 +46,7 @@ object SourceTests212 extends TestSuite{
       }
 
     }
-    test("staticMethod"){
+    test("staticMethod") {
       // Can't use Java Std Lib methods because SBT screws up classloaders in test suite
       check(
         load(com.github.javaparser.JavaParser.parseBlock _),
@@ -58,23 +55,21 @@ object SourceTests212 extends TestSuite{
       )
     }
 
-    test("fuzz"){
+    test("fuzz") {
       // Feed a bunch of arbitrary classes and methods from a variety of places
       // through our location-finder logic to try and find edge cases where
       // things misbehave or blow up
 
-
       /**
-        * We only bother to run these "fuzz"-style tests under Scala 2.12,
-        * because they're too fragile w.r.t. traits/methods moving around
-        * between major versions of Scala. Nevertheless, this should give us a
-        * reasonable amount of confidence that the functionality works across
-        * a range of inputs, and the earlier unit tests should give us some
-        * confidence it works across a range of Scala versions
-        */
+       * We only bother to run these "fuzz"-style tests under Scala 2.12,
+       * because they're too fragile w.r.t. traits/methods moving around
+       * between major versions of Scala. Nevertheless, this should give us a
+       * reasonable amount of confidence that the functionality works across
+       * a range of inputs, and the earlier unit tests should give us some
+       * confidence it works across a range of Scala versions
+       */
 
-      test("List"){
-
+      test("List") {
 
         test("head") - check(load(List().head), "IterableLike.scala", "def head")
         test("apply") - check(load(List().apply _), "LinearSeqOptimized.scala", "def apply")
@@ -94,12 +89,13 @@ object SourceTests212 extends TestSuite{
         test("mkString") - check(load(List().mkString _), "TraversableOnce.scala", "def mkString")
         test("aggregate") - check(
           load(List().aggregate _),
-          "TraversableOnce.scala", "def aggregate"
+          "TraversableOnce.scala",
+          "def aggregate"
         )
 
         //    These result in a divering implicit expansion, even in plain Scala
-  //      test("min") - check(load(List().min _), "TraversableOnce.scala", "def min")
-  //      test("max") - check(load(List().max _), "TraversableOnce.scala", "def max")
+        //      test("min") - check(load(List().min _), "TraversableOnce.scala", "def min")
+        //      test("max") - check(load(List().max _), "TraversableOnce.scala", "def max")
 
         test("groupBy") - check(load(List().groupBy _), "TraversableLike.scala", "def groupBy")
         test("compose") - check(load(List().compose _), "Function1.scala", "def compose")
@@ -122,7 +118,7 @@ object SourceTests212 extends TestSuite{
           "def productIterator"
         )
       }
-      test("scalaz"){
+      test("scalaz") {
 
         test("base") - check(load(scalaz.==>>), "Map.scala", "object ==>>")
         // Some aliases the make our code shorter

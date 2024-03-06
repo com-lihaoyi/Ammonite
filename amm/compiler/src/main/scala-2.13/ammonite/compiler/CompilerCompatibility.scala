@@ -31,20 +31,23 @@ object CompilerCompatibility {
       }
   }
 
-  def interactiveAnalyzer(g: InteractiveGlobal,
-                          cl: ClassLoader): InteractiveAnalyzer { val global: g.type } = {
-    new { val global: g.type = g } with InteractiveAnalyzer {
-    }
+  def interactiveAnalyzer(
+      g: InteractiveGlobal,
+      cl: ClassLoader
+  ): InteractiveAnalyzer { val global: g.type } = {
+    new { val global: g.type = g } with InteractiveAnalyzer {}
   }
 
   def importInfo(g: Global)(t: g.Import) =
     new g.analyzer.ImportInfo(t, 0, false)
 
-  def initGlobal(settings: Settings,
-                 reporter: Reporter,
-                 jcp: AggregateClassPath,
-                 evalClassloader: ClassLoader,
-                 createPlugins: Global => List[Plugin]): Global = {
+  def initGlobal(
+      settings: Settings,
+      reporter: Reporter,
+      jcp: AggregateClassPath,
+      evalClassloader: ClassLoader,
+      createPlugins: Global => List[Plugin]
+  ): Global = {
 
     new nsc.Global(settings, reporter) { g =>
       override lazy val plugins = createPlugins(g)

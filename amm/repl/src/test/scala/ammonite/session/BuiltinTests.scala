@@ -7,12 +7,12 @@ import java.io.File
 
 import scala.collection.JavaConverters._
 import scala.collection.{immutable => imm}
-object BuiltinTests extends TestSuite{
+object BuiltinTests extends TestSuite {
 
-  val tests = Tests{
+  val tests = Tests {
     println("BuiltinTests")
     val check = new DualTestRepl()
-    test("basicConfig"){
+    test("basicConfig") {
       check.session("""
         @ // Set the shell prompt to be something else
 
@@ -56,7 +56,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
-    test("imports"){
+    test("imports") {
       check.session("""
         @ assert(repl.imports.toString == ""); assert(repl.fullImports.toString != "")
 
@@ -72,7 +72,7 @@ object BuiltinTests extends TestSuite{
       """)
     }
 
-    test("loadCP"){
+    test("loadCP") {
       check.session("""
         @ val javaSrc = os.pwd/"amm"/"src"/"test"/"resources"/"loadable"/"hello"/"Hello.java"
 
@@ -91,7 +91,11 @@ object BuiltinTests extends TestSuite{
     test("importCp") {
       test {
         val catsCp = coursierapi.Fetch.create()
-          .addDependencies(coursierapi.Dependency.of("org.typelevel", "cats-core_" + check.scalaBinaryVersion, "2.9.0"))
+          .addDependencies(coursierapi.Dependency.of(
+            "org.typelevel",
+            "cats-core_" + check.scalaBinaryVersion,
+            "2.9.0"
+          ))
           .fetch()
           .asScala
           .map(os.Path(_, os.pwd))
@@ -110,7 +114,11 @@ object BuiltinTests extends TestSuite{
 
       test {
         val catsCp = coursierapi.Fetch.create()
-          .addDependencies(coursierapi.Dependency.of("org.typelevel", "cats-core_" + check.scalaBinaryVersion, "2.9.0"))
+          .addDependencies(coursierapi.Dependency.of(
+            "org.typelevel",
+            "cats-core_" + check.scalaBinaryVersion,
+            "2.9.0"
+          ))
           .fetch()
           .asScala
         val cpStr = catsCp.map(_.toString).mkString(File.pathSeparator)
@@ -124,7 +132,7 @@ object BuiltinTests extends TestSuite{
         """)
       }
     }
-    test("settings"){
+    test("settings") {
       val fruitlessTypeTestWarningMessageBlahBlahBlah =
         "fruitless type test: a value of type List[Int] cannot also be a List[Double]"
 
@@ -183,7 +191,7 @@ object BuiltinTests extends TestSuite{
         res10: Boolean = false
       """)
     }
-    test("infoLogging"){
+    test("infoLogging") {
       if (check.scala2)
         check.session("""
           @ 1 + 1
@@ -199,8 +207,7 @@ object BuiltinTests extends TestSuite{
         "Disabled in Scala 3"
     }
 
-
-    test("saveLoad"){
+    test("saveLoad") {
       check.session(
         s"""
         @ val veryImportant = 1
@@ -238,9 +245,10 @@ object BuiltinTests extends TestSuite{
 
         @ import scalatags.Text.all._
         error: ${check.notFound("scalatags")}
-        """)
+        """
+      )
     }
-    test("saveLoad2"){
+    test("saveLoad2") {
       check.session("""
         @ val (x, y) = (1, 2)
         x: Int = 1
@@ -274,7 +282,7 @@ object BuiltinTests extends TestSuite{
         res11: Int = -1
                     """)
     }
-    test("discardLoadCommandResult"){
+    test("discardLoadCommandResult") {
       test - check.session(s"""
         @ repl.sess.save("foo")
 
@@ -296,7 +304,7 @@ object BuiltinTests extends TestSuite{
         n0: Int = 2
       """)
     }
-    test("firstFrameNotFrozen"){
+    test("firstFrameNotFrozen") {
       check.session("""
         @ 2
         res0: Int = 2

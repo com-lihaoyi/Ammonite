@@ -16,19 +16,23 @@ object MakeReporter {
 
   type Reporter = scala.tools.nsc.reporters.Reporter
 
-  def makeReporter(errorLogger: (Position, String) => Unit,
-                   warningLogger: (Position, String) => Unit,
-                   infoLogger: (Position, String) => Unit,
-                   outerSettings: Settings): Reporter =
+  def makeReporter(
+      errorLogger: (Position, String) => Unit,
+      warningLogger: (Position, String) => Unit,
+      infoLogger: (Position, String) => Unit,
+      outerSettings: Settings
+  ): Reporter =
     new FilteringReporter {
 
-      def doReport(pos: scala.reflect.internal.util.Position,
-                   msg: String,
-                   severity: Severity): Unit =
+      def doReport(
+          pos: scala.reflect.internal.util.Position,
+          msg: String,
+          severity: Severity
+      ): Unit =
         display(pos, msg, severity)
 
       def display(pos: Position, msg: String, severity: Severity) =
-        severity match{
+        severity match {
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
             errorLogger(pos, msg)

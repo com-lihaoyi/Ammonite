@@ -5,17 +5,17 @@ import ammonite.TestUtils._
 import utest._
 import ammonite.interp.api.IvyConstructor
 
-object ProjectTests extends TestSuite{
-  val tests = Tests{
+object ProjectTests extends TestSuite {
+  val tests = Tests {
     println("ProjectTests")
     val check = new DualTestRepl()
-    test("load"){
-      test("ivy"){
-        test("standalone"){
-            // ivy or maven central are flaky =/
-            val tq = "\"\"\""
-            check.session(
-              s"""
+    test("load") {
+      test("ivy") {
+        test("standalone") {
+          // ivy or maven central are flaky =/
+          val tq = "\"\"\""
+          check.session(
+            s"""
           @ import scalatags.Text.all._
           error: ${check.notFound("scalatags")}
 
@@ -26,11 +26,12 @@ object ProjectTests extends TestSuite{
 
           @ a("omg", href:="www.google.com").render
           res2: String = "<a href=\\"www.google.com\\">omg</a>"
-        """)
+        """
+          )
         }
-        test("akkahttp"){
-            if (scala2_11) check.session(
-              """
+        test("akkahttp") {
+          if (scala2_11) check.session(
+            """
               @ import $ivy.`com.typesafe.akka::akka-http-experimental:1.0-M3`
 
               @ implicit val system = akka.actor.ActorSystem()
@@ -62,9 +63,10 @@ object ProjectTests extends TestSuite{
               res10: Boolean = true
 
               @ system.shutdown()
-             """)
+             """
+          )
         }
-        test("resolvers"){
+        test("resolvers") {
           check.session("""
             @ import $ivy.`com.github.jupyter:jvm-repr:0.4.0`
             error: Failed to resolve ivy dependencies
@@ -78,7 +80,7 @@ object ProjectTests extends TestSuite{
             @ import jupyter._
           """)
         }
-        test("resolversStatic"){
+        test("resolversStatic") {
           check.session("""
             @ import $repo.`https://jitpack.io`
 
@@ -88,7 +90,7 @@ object ProjectTests extends TestSuite{
           """)
         }
       }
-      test("code"){
+      test("code") {
         check.session("""
           @ repl.load("val x = 1")
 
@@ -98,7 +100,7 @@ object ProjectTests extends TestSuite{
       }
     }
 
-    test("shapeless"){
+    test("shapeless") {
       if (check.scala2)
         check.session("""
           @ import $ivy.`com.chuusai::shapeless:2.3.3`, shapeless._
@@ -118,7 +120,7 @@ object ProjectTests extends TestSuite{
         "Disabled in Scala 3"
     }
 
-    test("scalaz"){
+    test("scalaz") {
       check.session(s"""
         @ import $$ivy.`org.scalaz::scalaz-core:7.2.27 compat`, scalaz._, Scalaz._
 
@@ -126,13 +128,13 @@ object ProjectTests extends TestSuite{
         res1: Option[Int] = ${Print.Some(value = 3)}
       """)
     }
-    test("cats"){
+    test("cats") {
       check.session("""
         @ import $ivy.`org.typelevel::cats-core:2.0.0-M4 compat`, cats._
 
       """)
     }
-    test("guava"){
+    test("guava") {
       check.session("""
         @ import $ivy.`com.google.guava:guava:18.0`, com.google.common.collect._
 
@@ -145,7 +147,7 @@ object ProjectTests extends TestSuite{
         res3: Int = 2
       """)
     }
-    test("resources"){
+    test("resources") {
       // Disabled in Scala 3 for now. Getting weird typing errors, like
       //   exception while typing ammonite.ops.Callable1Implicit…
       //   java.lang.AssertionError: assertion failed:
@@ -164,7 +166,7 @@ object ProjectTests extends TestSuite{
         @ os.read(path) // Should work now
       """)
     }
-    test("scalaparse"){
+    test("scalaparse") {
       // For some reason this blows up in 2.11.x
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       if (scala2_12) check.session(s"""
@@ -181,7 +183,7 @@ object ProjectTests extends TestSuite{
       """)
     }
 
-    test("finagle"){
+    test("finagle") {
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       check.session("""
         @ import $ivy.`com.twitter::finagle-http:21.4.0 compat`
@@ -226,9 +228,9 @@ object ProjectTests extends TestSuite{
         @ server.close()
       """)
     }
-    test("spire"){
+    test("spire") {
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      //buggy in 2.10, spire not yet published for 2.12
+      // buggy in 2.10, spire not yet published for 2.12
       if (scala2_11)
         check.session(s"""
           @ import $$ivy.`org.spire-math::spire:0.11.0`
@@ -262,8 +264,8 @@ object ProjectTests extends TestSuite{
           @ mean(Rational(1, 2), Rational(3, 2), Rational(0))
           res10: Rational = 2/3
         """)
-          }
-    test("pegdown"){
+    }
+    test("pegdown") {
       val expectedType =
         // probably a TPrint bug in Scala 3…
         if (check.scala2) "org.pegdown.ast.SimpleNode.Type" else "Type"
@@ -273,10 +275,11 @@ object ProjectTests extends TestSuite{
 
            @ org.pegdown.ast.SimpleNode.Type.HRule
            res1: $expectedType = HRule
-         """)
+         """
+      )
     }
 
-    test("deeplearning"){
+    test("deeplearning") {
       // DeepLearning.scala 2.0.0-RC0 isn't published for scala 2.13
       if (scala2_12) check.session(
         """
@@ -300,7 +303,7 @@ object ProjectTests extends TestSuite{
       )
     }
 
-    test("jadb"){
+    test("jadb") {
       // tests for jitpack and optional dependencies
       check.session(
         """
@@ -351,7 +354,7 @@ object ProjectTests extends TestSuite{
       )
     }
 
-    test("profiles"){
+    test("profiles") {
       val testCore =
         """
             @ import $ivy.`org.apache.spark::spark-sql:2.4.3`
@@ -372,7 +375,7 @@ object ProjectTests extends TestSuite{
             @     .openStream()
             @ )
         """
-      test("default"){
+      test("default") {
         // should load hadoop 2.6 stuff by default
         if (scala2_12)
           check.session(
@@ -384,7 +387,7 @@ object ProjectTests extends TestSuite{
             """
           )
       }
-      test("withProfile"){
+      test("withProfile") {
         // with the right profile, should load hadoop 3.1 stuff
         if (scala2_12)
           check.session(
@@ -405,7 +408,7 @@ object ProjectTests extends TestSuite{
           )
       }
     }
-    test("onlyJarLikeArtifactTypes"){
+    test("onlyJarLikeArtifactTypes") {
       check.session(
         """
            @ import $ivy.`log4j:log4j:1.2.17`
@@ -426,7 +429,7 @@ object ProjectTests extends TestSuite{
       )
     }
 
-    test("no sources"){
+    test("no sources") {
       val sbv = IvyConstructor.scalaBinaryVersion(ammonite.compiler.CompilerBuilder.scalaVersion)
 
       val core =
@@ -445,7 +448,7 @@ object ProjectTests extends TestSuite{
             found: Boolean = true
         """
 
-      test("default"){
+      test("default") {
         check.session(
           s"""
             $core
@@ -456,7 +459,7 @@ object ProjectTests extends TestSuite{
         )
       }
 
-      test("disabled"){
+      test("disabled") {
         check.session(
           s"""
             @ interp.resolutionHooks += { fetch =>
@@ -473,7 +476,7 @@ object ProjectTests extends TestSuite{
       }
     }
 
-    test("extra artifact types"){
+    test("extra artifact types") {
       val core =
         """
             @ import $ivy.`com.almworks.sqlite4java:libsqlite4java-linux-amd64:1.0.392`
@@ -490,7 +493,7 @@ object ProjectTests extends TestSuite{
             defined function soFound
         """
 
-      test("default"){
+      test("default") {
         check.session(
           s"""
             $core
@@ -501,7 +504,7 @@ object ProjectTests extends TestSuite{
         )
       }
 
-      test("with so"){
+      test("with so") {
         check.session(
           s"""
             @ interp.resolutionHooks += { fetch =>
@@ -519,4 +522,3 @@ object ProjectTests extends TestSuite{
 
   }
 }
-

@@ -4,11 +4,11 @@ import ammonite.{DualTestRepl, TestUtils}
 import utest._
 
 import scala.collection.{immutable => imm}
-object FailureTests extends TestSuite{
-  val tests = Tests{
+object FailureTests extends TestSuite {
+  val tests = Tests {
     println("FailureTests")
     val check = new DualTestRepl()
-    test("compileFailure"){
+    test("compileFailure") {
       if (check.scala2)
         check.session(s"""
           @ doesnt_exist
@@ -46,7 +46,7 @@ object FailureTests extends TestSuite{
           Compilation Failed
         """)
     }
-    test("compilerCrash"){
+    test("compilerCrash") {
       // Make sure compiler crashes provide the appropriate error
       // messaging, and the REPL continues functioning after
       if (TestUtils.scala2_11) check.session("""
@@ -60,21 +60,23 @@ object FailureTests extends TestSuite{
         res1: Int = 2
       """)
     }
-    test("ivyFail"){
+    test("ivyFail") {
       check.session("""
         @ import $ivy.`com.lihaoyi::upickle-doest-exist:0.1.0`
         error: Failed to resolve ivy dependencies
       """)
     }
 
-    test("exceptionHandling"){
-      check.fail("""throw new Exception("lol", new Exception("hoho"))""", x =>
-        // It contains the things we want
-        x.contains("java.lang.Exception: lol") &&
-        x.contains("java.lang.Exception: hoho") &&
-        // and none of the stuff we don't want
-        !x.contains("evaluatorRunPrinter") &&
-        !x.contains("Something unexpected went wrong =(")
+    test("exceptionHandling") {
+      check.fail(
+        """throw new Exception("lol", new Exception("hoho"))""",
+        x =>
+          // It contains the things we want
+          x.contains("java.lang.Exception: lol") &&
+            x.contains("java.lang.Exception: hoho") &&
+            // and none of the stuff we don't want
+            !x.contains("evaluatorRunPrinter") &&
+            !x.contains("Something unexpected went wrong =(")
       )
     }
 
@@ -85,9 +87,10 @@ object FailureTests extends TestSuite{
             |
             |
             | 1 / 0
-            |""".stripMargin, x =>
+            |""".stripMargin,
+          x =>
             x.contains("/ by zero") &&
-            x.contains("cmd0.sc:4") // check that the line number is correct
+              x.contains("cmd0.sc:4") // check that the line number is correct
 
         )
       }
@@ -96,15 +99,16 @@ object FailureTests extends TestSuite{
     test("lineNumbersInStackTrace2") {
       if (check.scala2) {
         check.fail(
-        """
-          |{
-          |
-          | // block command
-          | 1 / 0
-          |}
-          |""".stripMargin, x =>
-          x.contains("/ by zero") &&
-          x.contains("cmd0.sc:5") // check that the line number is correct
+          """
+            |{
+            |
+            | // block command
+            | 1 / 0
+            |}
+            |""".stripMargin,
+          x =>
+            x.contains("/ by zero") &&
+              x.contains("cmd0.sc:5") // check that the line number is correct
         )
       }
     }
@@ -122,8 +126,8 @@ object FailureTests extends TestSuite{
           |""".stripMargin,
         x =>
           x.contains("/ by zero") &&
-          !x.contains("cmd0.sc:") &&
-          x.contains("cell0.sc:")
+            !x.contains("cmd0.sc:") &&
+            x.contains("cell0.sc:")
       )
     }
   }
