@@ -956,15 +956,18 @@ def publishSonatype(publishArtifacts: mill.main.Tasks[PublishModule.PublishData]
     }
     if (isPublishableCommit)
       new SonatypePublisher(
-        "https://oss.sonatype.org/service/local",
-        "https://oss.sonatype.org/content/repositories/snapshots",
-        sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
-        true,
-        Seq("--passphrase", sys.env("SONATYPE_PGP_PASSWORD"), "--no-tty", "--pinentry-mode", "loopback", "--batch", "--yes", "-a", "-b"),
-        600000,
-        600000,
-        T.ctx().log,
-        600000,
+        uri = "https://oss.sonatype.org/service/local",
+        snapshotUri = "https://oss.sonatype.org/content/repositories/snapshots",
+        credentials = sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
+        signed = true,
+        gpgArgs = Seq("--passphrase", sys.env("SONATYPE_PGP_PASSWORD"), "--no-tty", "--pinentry-mode", "loopback", "--batch", "--yes", "-a", "-b"),
+        readTimeout = 600000,
+        connectTimeout = 600000,
+        log = T.ctx().log,
+        workspace = T.workspace,
+        env = T.env,
+        awaitTimeout = 600000,
+        stagingRelease = true
       ).publishAll(
         true,
         x:_*
