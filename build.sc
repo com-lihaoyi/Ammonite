@@ -863,7 +863,7 @@ def publishExecutable() = {
   }
 }
 
-def publishDocs(skipDeploy: Boolean = false): Command[Any] = {
+def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
   val ammoniteAssembly = amm(scala2_13Versions.last).assembly
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
@@ -885,6 +885,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Any] = {
         e.printStackTrace()
         throw e
     }
+    ()
   }
   else T.command {
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
@@ -942,6 +943,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Any] = {
       println("Deploying ...")
       os.proc("ci/deploy_master_docs.sh").call()
     }
+    ()
   }
 }
 
