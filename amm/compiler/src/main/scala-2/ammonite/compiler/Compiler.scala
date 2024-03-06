@@ -1,6 +1,5 @@
 package ammonite.compiler
 
-
 import java.io.OutputStream
 import java.nio.file.{Files, Path, Paths}
 
@@ -23,7 +22,6 @@ import scala.tools.nsc.{CustomZipAndJarFileLookupFactory, Global, Settings}
 import scala.tools.nsc.interactive.Response
 import scala.tools.nsc.plugins.Plugin
 
-
 /**
  * Encapsulates (almost) all the ickiness of Scalac so it doesn't leak into
  * the rest of the codebase. Makes use of a good amount of mutable state
@@ -41,16 +39,19 @@ trait Compiler extends ICompiler {
   var userCodeNestingLevel = -1
 
 }
-object Compiler{
+object Compiler {
+
   /**
-    * Writes files to dynamicClasspath. Needed for loading cached classes.
-    */
-  def addToClasspath(classFiles: Traversable[(String, Array[Byte])],
-                     dynamicClasspath: VirtualDirectory,
-                     outputDir: Option[Path]): Unit = {
+   * Writes files to dynamicClasspath. Needed for loading cached classes.
+   */
+  def addToClasspath(
+      classFiles: Traversable[(String, Array[Byte])],
+      dynamicClasspath: VirtualDirectory,
+      outputDir: Option[Path]
+  ): Unit = {
 
     val outputDir0 = outputDir.map(os.Path(_, os.pwd))
-    for((name, bytes) <- classFiles){
+    for ((name, bytes) <- classFiles) {
       val elems = name.split('/').toList
       val output = writeDeep(dynamicClasspath, elems)
       output.write(bytes)
@@ -62,8 +63,7 @@ object Compiler{
 
   }
 
-  def writeDeep(d: VirtualDirectory,
-                path: List[String]): OutputStream = path match {
+  def writeDeep(d: VirtualDirectory, path: List[String]): OutputStream = path match {
     case head :: Nil => d.fileNamed(head).output
     case head :: rest =>
       writeDeep(
@@ -76,8 +76,8 @@ object Compiler{
   }
 
   /**
-    * Converts a bunch of bytes into Scalac's weird VirtualFile class
-    */
+   * Converts a bunch of bytes into Scalac's weird VirtualFile class
+   */
   def makeFile(src: Array[Byte], name: String) = {
     val segments = name.split("/", -1)
 
@@ -101,24 +101,24 @@ object Compiler{
     )
   }
 
-
-
-  def apply(classpath: Seq[java.net.URL],
-            dynamicClasspath: VirtualDirectory,
-            outputDir: Option[Path],
-            evalClassloader: => ClassLoader,
-            pluginClassloader: => ClassLoader,
-            shutdownPressy: () => Unit,
-            reporterOpt: Option[MakeReporter.Reporter],
-            settings: Settings,
-            classPathWhitelist: Set[Seq[String]],
-            initialClassPath: Seq[java.net.URL],
-            lineNumberModifier: Boolean = true): Compiler = new Compiler{
+  def apply(
+      classpath: Seq[java.net.URL],
+      dynamicClasspath: VirtualDirectory,
+      outputDir: Option[Path],
+      evalClassloader: => ClassLoader,
+      pluginClassloader: => ClassLoader,
+      shutdownPressy: () => Unit,
+      reporterOpt: Option[MakeReporter.Reporter],
+      settings: Settings,
+      classPathWhitelist: Set[Seq[String]],
+      initialClassPath: Seq[java.net.URL],
+      lineNumberModifier: Boolean = true
+  ): Compiler = new Compiler {
 
     def preprocessor(fileName: String, markGeneratedSections: Boolean): Preprocessor =
       new DefaultPreprocessor(parse(fileName, _), markGeneratedSections)
 
-    if(sys.env.contains("DIE"))???
+    if (sys.env.contains("DIE")) ???
     val PluginXML = "scalac-plugin.xml"
     lazy val plugins0 = {
       import scala.collection.JavaConverters._
@@ -152,13 +152,13 @@ object Compiler{
           catch { case _: ClassNotFoundException => None }
       } yield (name, className, classOpt)
 
-      val notFound = plugins.collect{case (name, className, None) => (name, className) }
+      val notFound = plugins.collect { case (name, className, None) => (name, className) }
       if (notFound.nonEmpty) {
         for ((name, className) <- notFound.sortBy(_._1))
           Console.err.println(s"Implementation $className of plugin $name not found.")
       }
 
-      plugins.collect{case (name, _, Some(cls)) => name -> cls }
+      plugins.collect { case (name, _, Some(cls)) => name -> cls }
     }
 
     var errorLogger: String => Unit = s => ()
@@ -208,7 +208,9 @@ object Compiler{
       }
 
       val scalac = CompilerCompatibility.initGlobal(
-        settings, reporter, jcp,
+        settings,
+        reporter,
+        jcp,
         evalClassloader,
         createPlugins = g => {
           List(
@@ -233,11 +235,14 @@ object Compiler{
               (name, cls) <- plugins0
               plugin = Plugin.instantiate(cls, g)
               initOk =
-              try plugin.init(pluginSettings.getOrElse(name, Nil), g.globalError)
-              catch { case ex: Exception =>
-                Console.err.println(s"Warning: disabling plugin $name, initialization failed: $ex")
-                false
-              }
+                try plugin.init(pluginSettings.getOrElse(name, Nil), g.globalError)
+                catch {
+                  case ex: Exception =>
+                    Console.err.println(
+                      s"Warning: disabling plugin $name, initialization failed: $ex"
+                    )
+                    false
+                }
               if initOk
             } yield plugin
           }
@@ -253,25 +258,24 @@ object Compiler{
       (vd, reporter, scalac)
     }
 
-
     /**
      * Compiles a blob of bytes and spits of a list of classfiles
-      * importsLen0 is the length of topWrapper appended above code by wrappedCode function
-      * It is passed to AmmonitePlugin to decrease this much offset from each AST node
-      * corresponding to the actual code so as to correct the line numbers in error report
+     * importsLen0 is the length of topWrapper appended above code by wrappedCode function
+     * It is passed to AmmonitePlugin to decrease this much offset from each AST node
+     * corresponding to the actual code so as to correct the line numbers in error report
      */
-    def compile(src: Array[Byte],
-                printer: Printer,
-                importsLen0: Int,
-                userCodeNestingLevel: Int,
-                fileName: String): Option[ICompiler.Output] = {
+    def compile(
+        src: Array[Byte],
+        printer: Printer,
+        importsLen0: Int,
+        userCodeNestingLevel: Int,
+        fileName: String
+    ): Option[ICompiler.Output] = {
 
       def enumerateVdFiles(d: VirtualDirectory): Iterator[AbstractFile] = {
         val (subs, files) = d.iterator.partition(_.isDirectory)
         files ++ subs.map(_.asInstanceOf[VirtualDirectory]).flatMap(enumerateVdFiles)
       }
-
-
 
       compiler.reporter.reset()
       this.errorLogger = printer.error
@@ -292,7 +296,7 @@ object Compiler{
 
         shutdownPressy()
 
-        val files = for(x <- outputFiles if x.name.endsWith(".class")) yield {
+        val files = for (x <- outputFiles if x.name.endsWith(".class")) yield {
           val segments = x.path.split("/").toList.tail
           val output = writeDeep(dynamicClasspath, segments)
           output.write(x.toByteArray)
@@ -314,7 +318,6 @@ object Compiler{
       }
     }
 
-
     def parse(fileName: String, line: String): Either[String, Seq[Global#Tree]] = {
       val errors = mutable.Buffer.empty[String]
       val warnings = mutable.Buffer.empty[String]
@@ -331,7 +334,6 @@ object Compiler{
     }
   }
 
-
   def prepareJarCp(jarDeps: Seq[java.net.URL], settings: Settings) = {
     jarDeps.filter(x => x.getPath.endsWith(".jar") || Classpath.canBeOpenedAsJar(x))
       .flatMap { x =>
@@ -340,8 +342,7 @@ object Compiler{
           if (Files.exists(path)) {
             val arc = new FileZipArchive(path.toFile)
             Seq(CompilerCompatibility.createZipJarFactory(arc, settings))
-          }
-          else
+          } else
             Nil
         } else {
           val arc = new internal.CustomURLZipArchive(x)
@@ -359,17 +360,20 @@ object Compiler{
         Nil
     }
   }
+
   /**
-    * Code to initialize random bits and pieces that are needed
-    * for the Scala compiler to function, common between the
-    * normal and presentation compiler
-    */
-  def initGlobalClasspath(dirDeps: Seq[java.net.URL],
-                          jarDeps: Seq[java.net.URL],
-                          dynamicClasspath: VirtualDirectory,
-                          settings: Settings,
-                          classPathWhitelist: Set[Seq[String]],
-                          initialClassPath: Seq[java.net.URL]) = {
+   * Code to initialize random bits and pieces that are needed
+   * for the Scala compiler to function, common between the
+   * normal and presentation compiler
+   */
+  def initGlobalClasspath(
+      dirDeps: Seq[java.net.URL],
+      jarDeps: Seq[java.net.URL],
+      dynamicClasspath: VirtualDirectory,
+      settings: Settings,
+      classPathWhitelist: Set[Seq[String]],
+      initialClassPath: Seq[java.net.URL]
+  ) = {
 
     val (initialDirDeps, newDirDeps) = dirDeps.partition(initialClassPath.contains)
     val (initialJarDeps, newJarDeps) = jarDeps.partition(initialClassPath.contains)
@@ -378,7 +382,7 @@ object Compiler{
 
     val newDirCp = prepareDirCp(newDirDeps)
     val initialDirCp = prepareDirCp(initialDirDeps)
-    val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath){
+    val dynamicCP = new VirtualDirectoryClassPath(dynamicClasspath) {
 
       override def getSubDir(packageDirName: String): Option[AbstractFile] = {
         val pathParts = packageDirName.split('/')
@@ -412,7 +416,6 @@ object Compiler{
       classPathWhitelist
     )
     val jcp = new AggregateClassPath(Seq(staticCP, dynamicCP) ++ newJarCp ++ newDirCp)
-
 
     jcp
   }

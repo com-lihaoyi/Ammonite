@@ -1,9 +1,8 @@
 /**
-  * Various common, "dumb" data-structures that represent common things that
-  * are passed around inside Ammonite
-  */
+ * Various common, "dumb" data-structures that represent common things that
+ * are passed around inside Ammonite
+ */
 package ammonite.util
-
 
 import java.io.PrintStream
 
@@ -11,38 +10,37 @@ import _root_.org.tpolecat.typename._
 
 import scala.reflect.NameTransformer
 
-
 /**
-  * Information about a particular predef file or snippet. [[hardcoded]]
-  * represents whether or not we cache the snippet forever regardless of
-  * classpath, which is true for many "internal" predefs which only do
-  * imports from Ammonite's own packages and don't rely on external code
-  */
+ * Information about a particular predef file or snippet. [[hardcoded]]
+ * represents whether or not we cache the snippet forever regardless of
+ * classpath, which is true for many "internal" predefs which only do
+ * imports from Ammonite's own packages and don't rely on external code
+ */
 case class PredefInfo(name: Name, code: String, hardcoded: Boolean, path: Option[os.Path])
 
 /**
-  * Exception for reporting script compilation failures
-  */
+ * Exception for reporting script compilation failures
+ */
 class CompilationError(message: String) extends Exception(message)
 
 /**
-  * A unique key for a piece of code that gets run in a particular environment;
-  * contains the hash of the code and the hash of the environment stored
-  * separately, so you can e.g. compare the [[env]] hash even if you don't have
-  * the code available
-  */
+ * A unique key for a piece of code that gets run in a particular environment;
+ * contains the hash of the code and the hash of the environment stored
+ * separately, so you can e.g. compare the [[env]] hash even if you don't have
+ * the code available
+ */
 case class Tag(code: String, env: String, classPathWhitelistHash: String)
 
 /**
-  * Represents a single identifier in Scala source code, e.g. "scala" or
-  * "println" or "`Hello-World`".
-  *
-  * Holds the value "raw", with all special characters intact, e.g.
-  * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
-  * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
-  * useful for accessing names as-seen-from the Java/JVM side of things
-  */
-case class Name(raw: String){
+ * Represents a single identifier in Scala source code, e.g. "scala" or
+ * "println" or "`Hello-World`".
+ *
+ * Holds the value "raw", with all special characters intact, e.g.
+ * "Hello-World". Can be used [[backticked]] e.g. "`Hello-World`", useful for
+ * embedding in Scala source code, or [[encoded]] e.g. "Hello$minusWorld",
+ * useful for accessing names as-seen-from the Java/JVM side of things
+ */
+case class Name(raw: String) {
   assert(
     NameTransformer.decode(raw) == raw,
     "Name() must be created with un-encoded text"
@@ -53,27 +51,74 @@ case class Name(raw: String){
   def backticked = Name.backtickWrap(raw)
 }
 
-object Name{
+object Name {
 
   val alphaKeywords = Set(
-    "abstract", "case", "catch", "class", "def", "do", "else",
-    "extends", "false", "finally", "final", "finally", "forSome",
-    "for", "if", "implicit", "import", "lazy", "match", "new",
-    "null", "object", "override", "package", "private", "protected",
-    "return", "sealed", "super", "this", "throw", "trait", "try",
-    "true", "type", "val", "var", "while", "with", "yield", "_", "macro"
+    "abstract",
+    "case",
+    "catch",
+    "class",
+    "def",
+    "do",
+    "else",
+    "extends",
+    "false",
+    "finally",
+    "final",
+    "finally",
+    "forSome",
+    "for",
+    "if",
+    "implicit",
+    "import",
+    "lazy",
+    "match",
+    "new",
+    "null",
+    "object",
+    "override",
+    "package",
+    "private",
+    "protected",
+    "return",
+    "sealed",
+    "super",
+    "this",
+    "throw",
+    "trait",
+    "try",
+    "true",
+    "type",
+    "val",
+    "var",
+    "while",
+    "with",
+    "yield",
+    "_",
+    "macro"
   )
   val symbolKeywords = Set(
-    ":", ";", "=>", "=", "<-", "<:", "<%", ">:", "#", "@", "\u21d2", "\u2190"
+    ":",
+    ";",
+    "=>",
+    "=",
+    "<-",
+    "<:",
+    "<%",
+    ">:",
+    "#",
+    "@",
+    "\u21d2",
+    "\u2190"
   )
   val blockCommentStart = "/*"
   val lineCommentStart = "//"
 
   /**
-    * Custom implementation of ID parsing, instead of using the ScalaParse
-    * version. This lets us avoid loading FastParse and ScalaParse entirely if
-    * we're running a cached script, which shaves off 200-300ms of startup time.
-    */
+   * Custom implementation of ID parsing, instead of using the ScalaParse
+   * version. This lets us avoid loading FastParse and ScalaParse entirely if
+   * we're running a cached script, which shaves off 200-300ms of startup time.
+   */
   def backtickWrap(s: String) = {
     if (s.isEmpty) "``"
     else if (s(0) == '`' && s.last == '`') s
@@ -88,30 +133,33 @@ object Name{
         chunk.forall(c => c.isLetter || c.isDigit || c == '$') ||
         (
           chunk.forall(validOperator) &&
-          // operators can only come last
-          index == chunks.length - 1 &&
-          // but cannot be preceded by only a _
-          !(chunks.lift(index - 1).exists(_ == "") && index - 1== 0))
+            // operators can only come last
+            index == chunks.length - 1 &&
+            // but cannot be preceded by only a _
+            !(chunks.lift(index - 1).exists(_ == "") && index - 1 == 0)
+        )
       }
 
       val firstLetterValid = s(0).isLetter || s(0) == '_' || s(0) == '$' || validOperator(s(0))
 
       val valid =
         validChunks &&
-        firstLetterValid &&
-        !alphaKeywords.contains(s) &&
-        !symbolKeywords.contains(s) &&
-        !s.contains(blockCommentStart) &&
-        !s.contains(lineCommentStart)
+          firstLetterValid &&
+          !alphaKeywords.contains(s) &&
+          !symbolKeywords.contains(s) &&
+          !s.contains(blockCommentStart) &&
+          !s.contains(lineCommentStart)
 
       if (valid) s else '`' + s + '`'
     }
   }
 }
+
 /**
  * Encapsulates a read-write cell that can be passed around
  */
-trait StableRef[T]{
+trait StableRef[T] {
+
   /**
    * Get the current value of the this [[StableRef]] at this instant in time
    */
@@ -123,7 +171,8 @@ trait StableRef[T]{
   def update(t: T): Unit
 }
 
-trait Ref[T] extends StableRef[T]{
+trait Ref[T] extends StableRef[T] {
+
   /**
    * Return a function that can be used to get the value of this [[Ref]]
    * at any point in time
@@ -137,10 +186,10 @@ trait Ref[T] extends StableRef[T]{
   def bind(t: => T): Unit
 }
 
-object Ref{
+object Ref {
   implicit def refer[T](t: T): Ref[T] = Ref(t)
 
-  def live[T](value0: () => T) = new Ref[T]{
+  def live[T](value0: () => T) = new Ref[T] {
     var value: () => T = value0
     def live() = value
     def apply() = value()
@@ -154,7 +203,7 @@ object Ref{
 /**
  * Nice pattern matching for chained exceptions
  */
-object Ex{
+object Ex {
   def unapplySeq(t: Throwable): Option[Seq[Throwable]] = {
     def rec(t: Throwable): List[Throwable] = {
       t match {
@@ -166,10 +215,7 @@ object Ex{
   }
 }
 
-
-
-
-trait CodeColors{
+trait CodeColors {
   def `type`: fansi.Attrs
   def literal: fansi.Attrs
   def comment: fansi.Attrs
@@ -190,18 +236,20 @@ trait CodeColors{
  * @param selected The color of text selected in the line-editor
  * @param error The color used to print error messages of all kinds
  */
-case class Colors(prompt: Ref[fansi.Attrs],
-                  ident: Ref[fansi.Attrs],
-                  `type`: Ref[fansi.Attrs],
-                  literal: Ref[fansi.Attrs],
-                  prefix: Ref[fansi.Attrs],
-                  comment: Ref[fansi.Attrs],
-                  keyword: Ref[fansi.Attrs],
-                  selected: Ref[fansi.Attrs],
-                  error: Ref[fansi.Attrs],
-                  warning: Ref[fansi.Attrs],
-                  info: Ref[fansi.Attrs])
-object Colors{
+case class Colors(
+    prompt: Ref[fansi.Attrs],
+    ident: Ref[fansi.Attrs],
+    `type`: Ref[fansi.Attrs],
+    literal: Ref[fansi.Attrs],
+    prefix: Ref[fansi.Attrs],
+    comment: Ref[fansi.Attrs],
+    keyword: Ref[fansi.Attrs],
+    selected: Ref[fansi.Attrs],
+    error: Ref[fansi.Attrs],
+    warning: Ref[fansi.Attrs],
+    info: Ref[fansi.Attrs]
+)
+object Colors {
 
   def Default = Colors(
     fansi.Color.Magenta,
@@ -217,9 +265,17 @@ object Colors{
     fansi.Color.Blue
   )
   def BlackWhite = Colors(
-    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
-    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty,
-    fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty,
+    fansi.Attrs.Empty
   )
 }
 
@@ -228,38 +284,45 @@ object Colors{
  * REPL so it can re-create the bindings inside the REPL's scope
  */
 case class Bind[T](name: String, value: T)(implicit val typeName: TypeName[T])
-object Bind{
-  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit typeName: TypeName[T]): Bind[T] = {
+object Bind {
+  implicit def ammoniteReplArrowBinder[T](t: (String, T))(implicit
+      typeName: TypeName[T]
+  ): Bind[T] = {
     Bind(t._1, t._2)(typeName)
   }
 }
-/**
-  * Encapsulates the ways the Ammonite REPL prints things. Does not print
-  * a trailing newline by default; you have to add one yourself.
-  *
-  * @param outStream Direct access to print to stdout
-  * @param errStream Direct access to print to stderr
-  * @param resultStream Direct access to print the result of the entered code
-  * @param warning How you want it to print a compile warning
-  * @param error How you want it to print a compile error
-  * @param info How you want to print compile info logging. *Not* the same
-  *             as `out`, which is used to print runtime output.
-  */
-case class Printer(outStream: PrintStream,
-                   errStream: PrintStream,
-                   resultStream: PrintStream,
-                   warning: String => Unit,
-                   error: String => Unit,
-                   info: String => Unit)
 
-case class ImportTree(prefix: Seq[String],
-                      mappings: Option[ImportTree.ImportMapping],
-                      start: Int,
-                      end: Int) {
+/**
+ * Encapsulates the ways the Ammonite REPL prints things. Does not print
+ * a trailing newline by default; you have to add one yourself.
+ *
+ * @param outStream Direct access to print to stdout
+ * @param errStream Direct access to print to stderr
+ * @param resultStream Direct access to print the result of the entered code
+ * @param warning How you want it to print a compile warning
+ * @param error How you want it to print a compile error
+ * @param info How you want to print compile info logging. *Not* the same
+ *             as `out`, which is used to print runtime output.
+ */
+case class Printer(
+    outStream: PrintStream,
+    errStream: PrintStream,
+    resultStream: PrintStream,
+    warning: String => Unit,
+    error: String => Unit,
+    info: String => Unit
+)
+
+case class ImportTree(
+    prefix: Seq[String],
+    mappings: Option[ImportTree.ImportMapping],
+    start: Int,
+    end: Int
+) {
   lazy val strippedPrefix: Seq[String] =
     prefix.takeWhile(_(0) == '$').map(_.stripPrefix("$"))
 }
 
-object ImportTree{
+object ImportTree {
   type ImportMapping = Seq[(String, Option[String])]
 }

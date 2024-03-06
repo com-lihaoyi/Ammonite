@@ -1,46 +1,47 @@
 package ammonite.terminal
 
-
-
 import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
-  * Encapsulates the common configuration and logic around reading a single
-  * line of input
-  */
-class LineReader(width: Int,
-                 prompt: Prompt,
-                 reader: java.io.Reader,
-                 writer: java.io.Writer,
-                 filters: Filter,
-                 displayTransform: (Vector[Char], Int) => (fansi.Str, Int) =
-                  LineReader.noTransform) {
+ * Encapsulates the common configuration and logic around reading a single
+ * line of input
+ */
+class LineReader(
+    width: Int,
+    prompt: Prompt,
+    reader: java.io.Reader,
+    writer: java.io.Writer,
+    filters: Filter,
+    displayTransform: (Vector[Char], Int) => (fansi.Str, Int) =
+      LineReader.noTransform
+) {
 
   lazy val ansi = new AnsiNav(writer)
 
-
   /**
-    * Erases the previous line and re-draws it with the new buffer and
-    * cursor.
-    *
-    * Relies on `ups` to know how "tall" the previous line was, to go up
-    * and erase that many rows in the console. Performs a lot of horrific
-    * math all over the place, incredibly prone to off-by-ones, in order
-    * to at the end of the day position the cursor in the right spot.
-    */
-  def redrawLine(buffer: fansi.Str,
-                 cursor: Int,
-                 ups: Int,
-                 rowLengths: IndexedSeq[Int],
-                 fullPrompt: Boolean = true,
-                 newlinePrompt: Boolean = false) = {
+   * Erases the previous line and re-draws it with the new buffer and
+   * cursor.
+   *
+   * Relies on `ups` to know how "tall" the previous line was, to go up
+   * and erase that many rows in the console. Performs a lot of horrific
+   * math all over the place, incredibly prone to off-by-ones, in order
+   * to at the end of the day position the cursor in the right spot.
+   */
+  def redrawLine(
+      buffer: fansi.Str,
+      cursor: Int,
+      ups: Int,
+      rowLengths: IndexedSeq[Int],
+      fullPrompt: Boolean = true,
+      newlinePrompt: Boolean = false
+  ) = {
 
     val promptLine =
       if (fullPrompt) prompt.full
       else prompt.lastLine
 
-    val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
+    val promptWidth = if (newlinePrompt) 0 else prompt.lastLine.length
     val actualWidth = width - promptWidth
 
     ansi.up(ups)
@@ -66,11 +67,10 @@ class LineReader(width: Int,
     // without fear of wrapping
     val newlineReplacement =
       if (newlinePrompt) Array(lineStuffer, '\n')
-      else Array('\n', " " * prompt.lastLine.length:_*)
-
+      else Array('\n', " " * prompt.lastLine.length: _*)
 
     writer.write(
-      buffer.render.flatMap{
+      buffer.render.flatMap {
         case '\n' => newlineReplacement.toSeq
         case x => Seq(x)
       }.toArray
@@ -104,9 +104,7 @@ class LineReader(width: Int,
     (lastOffsetCursor, rendered)
   }
   @tailrec
-  final def readChar(lastState: TermState,
-                     ups: Int,
-                     fullPrompt: Boolean = true): Option[String] = {
+  final def readChar(lastState: TermState, ups: Int, fullPrompt: Boolean = true): Option[String] = {
     val moreInputComing = reader.ready()
 
     // This is lazy because we don't always need it; in particular, we don't
@@ -122,7 +120,7 @@ class LineReader(width: Int,
 
     val narrowWidth = width - prompt.lastLine.length
     val newlinePrompt = rowLengths.exists(_ >= narrowWidth)
-    val promptWidth = if(newlinePrompt) 0 else prompt.lastLine.length
+    val promptWidth = if (newlinePrompt) 0 else prompt.lastLine.length
     val actualWidth = width - promptWidth
     val newlineUp = if (newlinePrompt) 1 else 0
 
@@ -163,8 +161,12 @@ class LineReader(width: Int,
 
       case Result(s) =>
         redrawLine(
-          rendered, lastState.buffer.length,
-          oldCursorY + newlineUp, rowLengths, false, newlinePrompt
+          rendered,
+          lastState.buffer.length,
+          oldCursorY + newlineUp,
+          rowLengths,
+          false,
+          newlinePrompt
         )
         writer.write("\n\r")
         writer.flush()
@@ -181,77 +183,74 @@ class LineReader(width: Int,
   }
 }
 
-
-
-object LineReader{
+object LineReader {
 
   /**
-    * Computes how tall a line of text is when wrapped at `width`.
-    *
-    * Even 0-character lines still take up one row!
-    *
-    * width = 2
-    * 0 -> 1
-    * 1 -> 1
-    * 2 -> 1
-    * 3 -> 2
-    * 4 -> 2
-    * 5 -> 3
-    */
+   * Computes how tall a line of text is when wrapped at `width`.
+   *
+   * Even 0-character lines still take up one row!
+   *
+   * width = 2
+   * 0 -> 1
+   * 1 -> 1
+   * 2 -> 1
+   * 3 -> 2
+   * 4 -> 2
+   * 5 -> 3
+   */
   def fragHeight(length: Int, width: Int) = math.max(1, (length - 1) / width + 1)
 
   def splitBuffer(buffer: Vector[Char]) = {
     val frags = mutable.ArrayBuffer.empty[Int]
     frags.append(0)
-    for(c <- buffer){
+    for (c <- buffer) {
       if (c == '\n') frags.append(0)
       else frags(frags.length - 1) = frags.last + 1
     }
     frags.toIndexedSeq
   }
-  def calculateHeight(buffer: Vector[Char],
-                      width: Int,
-                      prompt: String): Seq[Int] = {
+  def calculateHeight(buffer: Vector[Char], width: Int, prompt: String): Seq[Int] = {
     val rowLengths = splitBuffer(buffer).toVector
 
     calculateHeight0(rowLengths, width - prompt.length)
   }
 
   /**
-    * Given a buffer with characters and newlines, calculates how high
-    * the buffer is and where the cursor goes inside of it.
-    */
-  def calculateHeight0(rowLengths: IndexedSeq[Int],
-                       width: Int): IndexedSeq[Int] = {
+   * Given a buffer with characters and newlines, calculates how high
+   * the buffer is and where the cursor goes inside of it.
+   */
+  def calculateHeight0(rowLengths: IndexedSeq[Int], width: Int): IndexedSeq[Int] = {
     val fragHeights =
       rowLengths
         .inits
         .toVector
         .reverse // We want shortest-to-longest, inits gives longest-to-shortest
         .filter(_.nonEmpty) // Without the first empty prefix
-        .map{ x =>
-        fragHeight(
-          // If the frag barely fits on one line, give it
-          // an extra spot for the cursor on the next line
-          x.last + 1,
-          width
-        )
-      }
+        .map { x =>
+          fragHeight(
+            // If the frag barely fits on one line, give it
+            // an extra spot for the cursor on the next line
+            x.last + 1,
+            width
+          )
+        }
     //    Debug("fragHeights " + fragHeights)
     fragHeights
   }
 
-  def positionCursor(cursor: Int,
-                     rowLengths: IndexedSeq[Int],
-                     fragHeights: IndexedSeq[Int],
-                     width: Int) = {
+  def positionCursor(
+      cursor: Int,
+      rowLengths: IndexedSeq[Int],
+      fragHeights: IndexedSeq[Int],
+      width: Int
+  ) = {
     var leftoverCursor = cursor
     //    Debug("leftoverCursor " + leftoverCursor)
     var totalPreHeight = 0
     var done = false
     // Don't check if the cursor exceeds the last chunk, because
     // even if it does there's nowhere else for it to go
-    for(i <- 0 until rowLengths.length -1 if !done) {
+    for (i <- 0 until rowLengths.length - 1 if !done) {
       // length of frag and the '\n' after it
       val delta = rowLengths(i) + 1
       //      Debug("delta " + delta)
@@ -260,7 +259,7 @@ object LineReader{
         //        Debug("nextCursor " + nextCursor)
         leftoverCursor = nextCursor
         totalPreHeight += fragHeights(i)
-      }else done = true
+      } else done = true
     }
 
     val cursorY = totalPreHeight + leftoverCursor / width
@@ -277,9 +276,7 @@ object Prompt {
   implicit def construct(prompt: String): Prompt = {
     val parsedPrompt = fansi.Str(prompt)
     val index = parsedPrompt.plainText.lastIndexOf('\n')
-    val (_, last) = parsedPrompt.splitAt(index+1)
+    val (_, last) = parsedPrompt.splitAt(index + 1)
     Prompt(parsedPrompt, last)
   }
 }
-
-

@@ -13,27 +13,29 @@ import coursierapi.Dependency
 
 import scala.annotation.tailrec
 
-class Repl(input: InputStream,
-           output: OutputStream,
-           error: OutputStream,
-           storage: Storage,
-           baseImports: Imports,
-           basePredefs: Seq[PredefInfo],
-           customPredefs: Seq[PredefInfo],
-           wd: os.Path,
-           welcomeBanner: Option[String],
-           replArgs: IndexedSeq[Bind[_]] = Vector.empty,
-           initialColors: Colors = Colors.Default,
-           replCodeWrapper: CodeWrapper,
-           scriptCodeWrapper: CodeWrapper,
-           alreadyLoadedDependencies: Seq[Dependency],
-           importHooks: Map[Seq[String], ImportHook],
-           compilerBuilder: CompilerBuilder,
-           parser: Parser,
-           initialClassLoader: ClassLoader =
-             classOf[ammonite.repl.api.ReplAPI].getClassLoader,
-           classPathWhitelist: Set[Seq[String]],
-           warnings: Boolean) { repl =>
+class Repl(
+    input: InputStream,
+    output: OutputStream,
+    error: OutputStream,
+    storage: Storage,
+    baseImports: Imports,
+    basePredefs: Seq[PredefInfo],
+    customPredefs: Seq[PredefInfo],
+    wd: os.Path,
+    welcomeBanner: Option[String],
+    replArgs: IndexedSeq[Bind[_]] = Vector.empty,
+    initialColors: Colors = Colors.Default,
+    replCodeWrapper: CodeWrapper,
+    scriptCodeWrapper: CodeWrapper,
+    alreadyLoadedDependencies: Seq[Dependency],
+    importHooks: Map[Seq[String], ImportHook],
+    compilerBuilder: CompilerBuilder,
+    parser: Parser,
+    initialClassLoader: ClassLoader =
+      classOf[ammonite.repl.api.ReplAPI].getClassLoader,
+    classPathWhitelist: Set[Seq[String]],
+    warnings: Boolean
+) { repl =>
 
   val prompt = Ref("@ ")
 
@@ -51,7 +53,7 @@ class Repl(input: InputStream,
   val (colors, printer) =
     Interpreter.initPrinters(initialColors, output, error, true)
 
-  val argString = replArgs.zipWithIndex.map{ case (b, idx) =>
+  val argString = replArgs.zipWithIndex.map { case (b, idx) =>
     s"""
     val ${b.name} =
       ammonite.repl.ReplBridge.value.Internal.replArgs($idx).value.asInstanceOf[${b.typeName.value}]
@@ -61,11 +63,10 @@ class Repl(input: InputStream,
   val frames = Ref(List(ammonite.runtime.Frame.createInitial(initialClassLoader)))
 
   /**
-    * The current line number of the REPL, used to make sure every snippet
-    * evaluated can have a distinct name that doesn't collide.
-    */
+   * The current line number of the REPL, used to make sure every snippet
+   * evaluated can have a distinct name that doesn't collide.
+   */
   var currentLine = 0
-
 
   val sess0 = new SessionApiImpl(frames)
 
@@ -118,10 +119,10 @@ class Repl(input: InputStream,
         def width = frontEnd().width
         def height = frontEnd().height
 
-        object load extends ReplLoad with (String => Unit){
+        object load extends ReplLoad with (String => Unit) {
 
           def apply(line: String) = {
-            interp.processExec(line, currentLine, () => currentLine += 1) match{
+            interp.processExec(line, currentLine, () => currentLine += 1) match {
               case Res.Failure(s) => throw new CompilationError(s)
               case Res.Exception(t, s) => throw t
               case _ =>
@@ -162,16 +163,15 @@ class Repl(input: InputStream,
     // code paths, but then the fixed overhead gets larger so not really worth it
     val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
     val stmts = parser.split(code).get.toOption.get
-    interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/)
+    interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/ )
   }
-
 
   sess0.save()
   interp.createFrame()
 
   val reader = new InputStreamReader(input)
 
-  def action() = for{
+  def action() = for {
     _ <- Catching {
       case Ex(e: ThreadDeath) =>
         Thread.interrupted()
@@ -198,18 +198,17 @@ class Repl(input: InputStream,
       colors(),
       interp.compilerManager.complete(_, importsForCompletion.toString, _),
       storage.fullHistory(),
-      addHistory = (code) => if (code != "") {
-        storage.fullHistory() = storage.fullHistory() :+ code
-        history = history :+ code
-      }
+      addHistory = (code) =>
+        if (code != "") {
+          storage.fullHistory() = storage.fullHistory() :+ code
+          history = history :+ code
+        }
     )
     out <- interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
   } yield {
     printer.outStream.println()
     out
   }
-
-
 
   def run(): Any = {
     welcomeBanner
@@ -224,7 +223,7 @@ class Repl(input: InputStream,
         printer.error,
         lastException = _,
         colors()
-      ) match{
+      ) match {
         case None =>
           printer.outStream.println()
           loop()
@@ -239,9 +238,9 @@ class Repl(input: InputStream,
   }
 }
 
-object Repl{
+object Repl {
   def handleOutput(interp: Interpreter, res: Res[Evaluated]): Unit = {
-    res match{
+    res match {
       case Res.Skip => // do nothing
       case Res.Exit(value) => interp.compilerManager.shutdownPressy()
       case Res.Success(ev) =>
@@ -251,12 +250,14 @@ object Repl{
       case _ => ()
     }
   }
-  def handleRes(res: Res[Any],
-                printInfo: String => Unit,
-                printError: String => Unit,
-                setLastException: Throwable => Unit,
-                colors: Colors): Option[Any] = {
-    res match{
+  def handleRes(
+      res: Res[Any],
+      printInfo: String => Unit,
+      printError: String => Unit,
+      setLastException: Throwable => Unit,
+      colors: Colors
+  ): Option[Any] = {
+    res match {
       case Res.Exit(value) =>
         printInfo("Bye!")
         Some(value)
@@ -274,10 +275,12 @@ object Repl{
         None
     }
   }
-  def highlightFrame(f: StackTraceElement,
-                     error: fansi.Attrs,
-                     highlightError: fansi.Attrs,
-                     source: fansi.Attrs) = {
+  def highlightFrame(
+      f: StackTraceElement,
+      error: fansi.Attrs,
+      highlightError: fansi.Attrs,
+      source: fansi.Attrs
+  ) = {
     val src =
       if (f.isNativeMethod) source("Native Method")
       else if (f.getFileName == null) source("Unknown Source")
@@ -290,8 +293,8 @@ object Repl{
       }
 
     val prefix :+ clsName = f.getClassName.split('.').toSeq
-    val prefixString = prefix.map(_+'.').mkString("")
-    val clsNameString = clsName //.replace("$", error("$"))
+    val prefixString = prefix.map(_ + '.').mkString("")
+    val clsNameString = clsName // .replace("$", error("$"))
     val method =
       error(prefixString) ++ highlightError(clsNameString) ++ error(".") ++
         highlightError(f.getMethodName)
@@ -303,10 +306,12 @@ object Repl{
     x.takeWhile(x => !cutoff(x.getMethodName))
   }
 
-  def showException(ex: Throwable,
-                    error: fansi.Attrs,
-                    highlightError: fansi.Attrs,
-                    source: fansi.Attrs) = {
+  def showException(
+      ex: Throwable,
+      error: fansi.Attrs,
+      highlightError: fansi.Attrs,
+      source: fansi.Attrs
+  ) = {
 
     val traces = Ex.unapplySeq(ex).get.map(exception =>
       error(exception.toString + newLine +

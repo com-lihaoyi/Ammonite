@@ -6,12 +6,12 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
-object EvaluatorTests extends TestSuite{
+object EvaluatorTests extends TestSuite {
 
-  val tests = Tests{
+  val tests = Tests {
     println("EvaluatorTests")
     val check = new DualTestRepl()
-    test("simpleExpressions"){
+    test("simpleExpressions") {
       check.session("""
         @ 1 + 2
         res0: Int = 3
@@ -23,7 +23,7 @@ object EvaluatorTests extends TestSuite{
         res2: Int = 6
       """)
     }
-    test("vals"){
+    test("vals") {
       check.session("""
         @ val x = 10L
         x: Long = 10L
@@ -44,7 +44,7 @@ object EvaluatorTests extends TestSuite{
         res5: String = "class"
       """)
     }
-    test("lazyvals"){
+    test("lazyvals") {
       // It actually appears when I ask for it, and the
       // actual evaluation happens in the correct order
       check.session("""
@@ -74,7 +74,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    test("vars"){
+    test("vars") {
       check.session("""
         @ var x: Int = 10
         x: Int = 10
@@ -89,7 +89,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    test("defs"){
+    test("defs") {
       check.session("""
         @ def sumItAll[T: Numeric](i: Seq[T]): T = {i.sum}
         defined function sumItAll
@@ -101,7 +101,7 @@ object EvaluatorTests extends TestSuite{
         res2: Long = 15L
       """)
     }
-    test("types"){
+    test("types") {
       val aliasedType =
         if (check.scala2) "Funky" else "Array[Array[String]]"
       val aliasedType2 =
@@ -120,7 +120,7 @@ object EvaluatorTests extends TestSuite{
         arr: $aliasedType2 = Array(Array(123))
       """)
     }
-    test("library"){
+    test("library") {
       // x and y pprinted value is test("non") - empty iterator' up to 2.12.6,
       // '<iterator>' since 2.12.7, hence the '?' (don't check the value)
       check.session("""
@@ -135,7 +135,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    test("classes"){
+    test("classes") {
       val objWrapperPrefix =
         if (check.scala2) "" else "ammonite.$sess.cmd2."
       val classWrapperCmd3Prefix =
@@ -188,7 +188,7 @@ object EvaluatorTests extends TestSuite{
       // CO != res3 should test roughly the same thing
     }
 
-    test("packageImport"){
+    test("packageImport") {
       check.session("""
         @ import java.util._
 
@@ -196,7 +196,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    test("nesting"){
+    test("nesting") {
       check.session("""
         @ val x = 1
         x: Int = 1
@@ -217,7 +217,7 @@ object EvaluatorTests extends TestSuite{
         res5: Int = 2
       """)
     }
-    test("nestedImports"){
+    test("nestedImports") {
       check.session("""
         @ class Foo { object values { def a = "a" }; override def toString = "Foo" }
         defined class Foo
@@ -230,7 +230,7 @@ object EvaluatorTests extends TestSuite{
         a0: String = "a"
       """)
     }
-    test("multistatement"){
+    test("multistatement") {
       check.session(s"""
         @ ;1; 2L; '3';
         res0_0: Int = 1
@@ -255,7 +255,7 @@ object EvaluatorTests extends TestSuite{
       """)
     }
 
-    test("multiassign"){
+    test("multiassign") {
       check.session("""
         @ val (a, b) = (1, 2)
         a: Int = 1
@@ -271,7 +271,7 @@ object EvaluatorTests extends TestSuite{
         d: Int = 4
       """)
     }
-    test("parsingProblems"){
+    test("parsingProblems") {
       check.session("""
         @ (1 + 1)
         res0: Int = 2
@@ -293,7 +293,7 @@ object EvaluatorTests extends TestSuite{
         res3: Seq[Int] = List(1)
       """)
     }
-    test("backticks"){
+    test("backticks") {
       check.session("""
         @ val `1+1` = 1
         `1+1`: Int = 1
@@ -364,7 +364,7 @@ object EvaluatorTests extends TestSuite{
 
       """)
     }
-    test("referenceTraitFromPreviousCommand"){
+    test("referenceTraitFromPreviousCommand") {
       // When class-based wrapping is enabled, the second command references a trait from the
       // first one, and this case has to be handled by the "used earlier definitions" mechanism.
       check.session("""
