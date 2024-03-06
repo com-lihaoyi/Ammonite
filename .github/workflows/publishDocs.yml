@@ -1,20 +1,26 @@
 name: Publish Docs
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
+  workflow_call:
+    secrets:
+      DEPLOY_KEY:
+        required: true
+
 jobs:
   publishDocs:
     runs-on: ubuntu-latest
     env:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v4
         with:
           java-version: '8'
+          distribution: temurin
       - name: publish docs
         shell: 'script -q -e -c "bash {0}"'
         run: echo "Hello World" && ./mill -i publishDocs
