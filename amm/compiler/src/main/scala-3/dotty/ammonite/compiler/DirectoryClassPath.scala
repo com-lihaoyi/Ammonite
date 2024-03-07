@@ -18,8 +18,7 @@ case class DirectoryClassPath(dir: JFile)
       val wrappedClassFile = new dotty.tools.io.File(classFile.toPath)
       val abstractClassFile = new PlainFile(wrappedClassFile)
       Some(abstractClassFile)
-    }
-    else None
+    } else None
   }
 
   protected def createFileEntry(file: AbstractFile): classpath.ClassFileEntryImpl =

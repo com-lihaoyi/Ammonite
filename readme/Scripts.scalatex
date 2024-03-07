@@ -30,7 +30,7 @@
 
   @p
     As an example, Ammonite's own
-    @lnk("Continuous Integration Scripts", "https://github.com/lihaoyi/Ammonite/tree/master/ci")
+    @lnk("Continuous Integration Scripts", "https://github.com/lihaoyi/Ammonite/tree/main/ci")
     are written as @code{.sc} Scala Scripts, as are @lnk("Haoyi's blog",
     "https://github.com/lihaoyi/blog") and @lnk("resume",
     "https://github.com/lihaoyi/Resume"). These are all examples of using

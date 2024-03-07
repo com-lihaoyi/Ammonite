@@ -15,22 +15,26 @@ import ammonite.util.Util.newLine
 import scala.tools.nsc.interactive.{Global => InteractiveGlobal}
 import scala.tools.nsc.classpath.AggregateClassPath
 import scala.tools.nsc.reporters.Reporter
+
 /**
  * Nice wrapper for the presentation compiler.
  */
-trait Pressy{
+trait Pressy {
+
   /**
-    * Ask for autocompletion at a particular spot in the code, returning
-    * possible things that can be completed at that location. May try various
-    * different completions depending on where the `index` is placed, but
-    * the outside caller probably doesn't care.
-    *
-    * The returned index gives the position from which the possible replacements
-    * should be inserted.
-    */
-  def complete(snippetIndex: Int,
-               previousImports: String,
-               snippet: String): (Int, Seq[String], Seq[String])
+   * Ask for autocompletion at a particular spot in the code, returning
+   * possible things that can be completed at that location. May try various
+   * different completions depending on where the `index` is placed, but
+   * the outside caller probably doesn't care.
+   *
+   * The returned index gives the position from which the possible replacements
+   * should be inserted.
+   */
+  def complete(
+      snippetIndex: Int,
+      previousImports: String,
+      snippet: String
+  ): (Int, Seq[String], Seq[String])
   def compiler: nsc.interactive.Global
   def shutdownPressy(): Unit
 }
@@ -40,11 +44,13 @@ object Pressy {
    * Encapsulates all the logic around a single instance of
    * `nsc.interactive.Global` and other data specific to a single completion
    */
-  class Run(val pressy: nsc.interactive.Global,
-            currentFile: BatchSourceFile,
-            dependencyCompleteOpt: Option[String => (Int, Seq[String])],
-            allCode: String,
-            index: Int){
+  class Run(
+      val pressy: nsc.interactive.Global,
+      currentFile: BatchSourceFile,
+      dependencyCompleteOpt: Option[String => (Int, Seq[String])],
+      allCode: String,
+      index: Int
+  ) {
 
     val blacklistedPackages = Set("shaded")
 
@@ -113,6 +119,7 @@ object Pressy {
     val r = new Response[pressy.Tree]
     pressy.askTypeAt(new OffsetPosition(currentFile, index), r)
     val tree = r.get.fold(x => x, e => throw e)
+
     /**
      * Search for terms to autocomplete not just from the local scope,
      * but from any packages and package objects accessible from the
@@ -146,15 +153,15 @@ object Pressy {
     }
     def handleTypeCompletion(position: Int, decoded: String, offset: Int) = {
 
-      val r = ask(position,  pressy.askTypeCompletion)
+      val r = ask(position, pressy.askTypeCompletion)
       val prefix = if (decoded == "<error>") "" else decoded
       (position + offset, handleCompletion(r, prefix))
     }
 
-    def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask{ () =>
+    def handleCompletion(r: List[pressy.Member], prefix: String) = pressy.ask { () =>
       r.filter(_.sym.name.decoded.startsWith(prefix))
         .filter(m => !blacklisted(m.sym))
-        .map{ x  =>
+        .map { x =>
           (
             memberToString(x),
             if (x.sym.name.decoded != prefix) None
@@ -165,44 +172,43 @@ object Pressy {
 
     def prefixed: (Int, Seq[(String, Option[String])]) = tree match {
       case t @ pressy.Select(qualifier, name) =>
-
         val dotOffset = if (qualifier.pos.point == t.pos.point) 0 else 1
 
-        //In scala 2.10.x if we call pos.end on a scala.reflect.internal.util.Position
-        //that is not a range, a java.lang.UnsupportedOperationException is thrown.
-        //We check here if Position is a range before calling .end on it.
-        //This is not needed for scala 2.11.x.
+        // In scala 2.10.x if we call pos.end on a scala.reflect.internal.util.Position
+        // that is not a range, a java.lang.UnsupportedOperationException is thrown.
+        // We check here if Position is a range before calling .end on it.
+        // This is not needed for scala 2.11.x.
         if (qualifier.pos.isRange) {
           handleTypeCompletion(qualifier.pos.end, name.decoded, dotOffset)
         } else {
-          //not prefixed
+          // not prefixed
           (0, Seq.empty)
         }
 
-      case t @ pressy.Import(expr, selectors)  =>
+      case t @ pressy.Import(expr, selectors) =>
         // If the selectors haven't been defined yet...
         if (selectors.head.name.toString == "<error>") {
           if (expr.tpe.toString == "<error>") {
-              // If the expr is badly typed, try to scope complete it
-              if (expr.isInstanceOf[pressy.Ident]) {
-                val exprName =  expr.asInstanceOf[pressy.Ident].name.decoded
-                val pos =
-                  // Without the first case, things like `import <caret>` are
-                  // returned a wrong position.
-                  if (exprName == "<error>") expr.pos.point - 1
-                  else expr.pos.point
-                pos -> handleCompletion(
-                  ask(expr.pos.point, pressy.askScopeCompletion),
-                  // if it doesn't have a name at all, accept anything
-                  if (exprName == "<error>") "" else exprName
-                )
-              } else (expr.pos.point, Seq.empty)
+            // If the expr is badly typed, try to scope complete it
+            if (expr.isInstanceOf[pressy.Ident]) {
+              val exprName = expr.asInstanceOf[pressy.Ident].name.decoded
+              val pos =
+                // Without the first case, things like `import <caret>` are
+                // returned a wrong position.
+                if (exprName == "<error>") expr.pos.point - 1
+                else expr.pos.point
+              pos -> handleCompletion(
+                ask(expr.pos.point, pressy.askScopeCompletion),
+                // if it doesn't have a name at all, accept anything
+                if (exprName == "<error>") "" else exprName
+              )
+            } else (expr.pos.point, Seq.empty)
           } else {
             // If the expr is well typed, type complete
             // the next thing
             handleTypeCompletion(expr.pos.end, "", 1)
           }
-        }else {
+        } else {
           val isImportIvy = expr.isInstanceOf[pressy.Ident] &&
             expr.asInstanceOf[pressy.Ident].name.decoded == "$ivy"
           val selector = selectors
@@ -247,12 +253,12 @@ object Pressy {
 
         index -> pressy.ask(() =>
           comps.filter(m => !blacklisted(m.sym))
-               .map { s => (memberToString(s), None) }
+            .map { s => (memberToString(s), None) }
         )
     }
     def ask(index: Int, query: (Position, Response[List[pressy.Member]]) => Unit) = {
       val position = new OffsetPosition(currentFile, index)
-      //if a match can't be found awaitResponse throws an Exception.
+      // if a match can't be found awaitResponse throws an Exception.
       val result = Try(Compiler.awaitResponse[List[pressy.Member]](query(position, _)))
       result match {
         case Success(scopes) => scopes.filter(_.accessible)
@@ -261,13 +267,15 @@ object Pressy {
     }
 
   }
-  def apply(classpath: Seq[java.net.URL],
-            dynamicClasspath: VirtualDirectory,
-            evalClassloader: => ClassLoader,
-            settings: Settings,
-            dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
-            classPathWhitelist: Set[Seq[String]],
-            initialClassPath: Seq[java.net.URL]): Pressy = new Pressy {
+  def apply(
+      classpath: Seq[java.net.URL],
+      dynamicClasspath: VirtualDirectory,
+      evalClassloader: => ClassLoader,
+      settings: Settings,
+      dependencyCompleteOpt: => Option[String => (Int, Seq[String])],
+      classPathWhitelist: Set[Seq[String]],
+      initialClassPath: Seq[java.net.URL]
+  ): Pressy = new Pressy {
 
     @volatile var cachedPressy: nsc.interactive.Global = null
 
@@ -275,10 +283,12 @@ object Pressy {
       if (cachedPressy == null) cachedPressy = initPressy
       cachedPressy
     }
-    def initInteractiveGlobal(settings: Settings,
-                              reporter: Reporter,
-                              jcp: AggregateClassPath,
-                              evalClassloader: ClassLoader): InteractiveGlobal = {
+    def initInteractiveGlobal(
+        settings: Settings,
+        reporter: Reporter,
+        jcp: AggregateClassPath,
+        evalClassloader: ClassLoader
+    ): InteractiveGlobal = {
       new nsc.interactive.Global(settings, reporter) { g =>
         // Actually jcp, avoiding a path-dependent type issue in 2.10 here
         override def classPath = jcp
@@ -295,7 +305,7 @@ object Pressy {
     def initPressy = {
       val (dirDeps, jarDeps) = classpath.partition { u =>
         u.getProtocol == "file" &&
-          java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
+        java.nio.file.Files.isDirectory(java.nio.file.Paths.get(u.toURI))
       }
       val jcp = Compiler.initGlobalClasspath(
         dirDeps,
@@ -318,7 +328,8 @@ object Pressy {
       val pressy = compiler
       val currentFile = new BatchSourceFile(
         Compiler.makeFile(allCode.getBytes, name = "Current.sc"),
-        allCode)
+        allCode
+      )
 
       val r = new Response[Unit]
       pressy.askReload(List(currentFile), r)
