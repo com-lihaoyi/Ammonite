@@ -1050,6 +1050,6 @@ def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String, ttl: St
   else s"Missing ${missing.size} of ${coords.size} published artifacts: ${
       missing.mkString("\n- ", "\n- ", "")
     }"
-  if(missing.isEmpty) Result.Success("All artifacts published")
+  if(missing.isEmpty) Result.Success(s"All artifacts published for version ${version}")
   else Result.Failure(msg)
 }
