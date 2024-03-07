@@ -890,8 +890,10 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
   else T.command {
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
-    val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-    os.write(os.pwd / "deploy_key", deployKey)
+    if (!skipDeploy) {
+      val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+      os.write(os.pwd / "deploy_key", deployKey)
+    }
 
     val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
       if (!unstable) {
