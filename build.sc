@@ -1,17 +1,22 @@
+// plugins
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
 import $file.ci.upload
-
-import mill._
-import scalalib._
-import publish._
-import mill.contrib.bloop.Bloop
-import mill.scalalib.api.ZincWorkerUtil._
+// imports
+import java.util.concurrent.atomic.AtomicInteger
+import scala.concurrent.{Await, ExecutionContext, Future, duration}
+import scala.util.chaining.scalaUtilChainingOps
 import coursier.mavenRepositoryString
+import mill._
+import mill.api.Result
+import mill.contrib.bloop.Bloop
 import mill.define.Command
+import mill.main.Tasks
+import mill.scalalib._
+import mill.scalalib.publish._
+import mill.scalalib.api.ZincWorkerUtil._
 import mill.testrunner.TestRunner
 
-import scala.util.chaining.scalaUtilChainingOps
 
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
@@ -1018,3 +1023,33 @@ def publishSonatype(
         x: _*
       )
   }
+
+/**
+ * Somethime, the Mill publish command fails although the Sonatype publishing went through.
+ * This command checks, whether all artifacts are publshed.
+ * Run with:
+ * {{{
+ * mill checkPublishedArtifacts __.publishSelfDependency {version}
+ * }}}
+ */
+def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String) = T.command {
+  val coords = T.sequence(artifacts.value)()
+  val next = new AtomicInteger(0)
+  val fut = coords.map { coord =>
+    Future {
+      val dep = s"${coord.group}:${coord.id}:${version}"
+      println(s"[${next.incrementAndGet()}/${coords.size}] Checking ${dep}")
+      val res = os.proc("cs", "complete-dep", dep)
+        .call().out.text().trim()
+      // println(res)
+      Option.when(!res.contains(version))(dep)
+    }(ExecutionContext.global)
+  }
+  val missing = fut.map(Await.result(_, duration.Duration.Inf)).flatten
+  val msg = if (missing.size == coords.size) s"All artifacts missing for version ${version}"
+  else s"Missing ${missing.size} of ${coords.size} published artifacts: ${
+      missing.mkString("\n- ", "\n- ", "")
+    }"
+  if(missing.isEmpty) Result.Success("All artifacts published")
+  else Result.Failure(msg)
+}
