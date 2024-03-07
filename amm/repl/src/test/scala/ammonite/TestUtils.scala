@@ -17,17 +17,21 @@ object TestUtils {
   def scala2 = ammonite.compiler.CompilerBuilder.scalaVersion.startsWith("2.")
 
   def createTestInterp(
-    storage: Storage,
-    predefImports: Imports = Imports(),
-    predef: String = ""
+      storage: Storage,
+      predefImports: Imports = Imports(),
+      predef: String = ""
   ) = {
     val initialClassLoader = Thread.currentThread().getContextClassLoader
     val startFrame = Frame.createInitial(initialClassLoader)
     val printStream = new PrintStream(System.out)
     val interpParams = Interpreter.Parameters(
       printer = Printer(
-        printStream, new PrintStream(System.err), printStream,
-        println, println, println
+        printStream,
+        new PrintStream(System.err),
+        printStream,
+        println,
+        println,
+        println
       ),
       storage = storage,
       wd = os.pwd,
@@ -40,7 +44,6 @@ object TestUtils {
     val interp = new Interpreter(
       ammonite.compiler.CompilerBuilder(),
       () => ammonite.compiler.Parsers,
-
       getFrame = () => startFrame,
       createFrame = () => throw new Exception("unsupported"),
       replCodeWrapper = DefaultCodeWrapper,

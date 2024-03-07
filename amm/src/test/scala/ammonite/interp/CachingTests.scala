@@ -9,14 +9,16 @@ import ammonite.interp.api.IvyConstructor._
 import ammonite.util.{Res, Util}
 import utest._
 
-object CachingTests extends TestSuite{
-  val tests = Tests{
+object CachingTests extends TestSuite {
+  val tests = Tests {
     println("ScriptTests")
 
-    def runScript(wd: os.Path,
-                  path: os.Path,
-                  interp: ammonite.interp.Interpreter,
-                  scriptArgs: Seq[String] = Nil) =
+    def runScript(
+        wd: os.Path,
+        path: os.Path,
+        interp: ammonite.interp.Interpreter,
+        scriptArgs: Seq[String] = Nil
+    ) =
       Scripts.runScript(wd, path, interp, scriptArgs) match {
         case Res.Success(_) =>
         case Res.Skip =>
@@ -25,17 +27,16 @@ object CachingTests extends TestSuite{
         case Res.Exit(_) => throw new Exception("Unexpected exit call from script")
       }
 
-    val scriptPath = os.pwd/"amm"/"src"/"test"/"resources"/"scripts"
+    val scriptPath = os.pwd / "amm" / "src" / "test" / "resources" / "scripts"
 
-    val resourcesPath = os.pwd/"amm"/"src"/"test"/"resources"
+    val resourcesPath = os.pwd / "amm" / "src" / "test" / "resources"
 
-
-    val tempDir = os.temp.dir(prefix="ammonite-tester")
-    test("noAutoIncrementWrapper"){
+    val tempDir = os.temp.dir(prefix = "ammonite-tester")
+    test("noAutoIncrementWrapper") {
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      runScript(os.pwd, scriptPath/"ThreeBlocks.sc", interp)
-      try{
+      runScript(os.pwd, scriptPath / "ThreeBlocks.sc", interp)
+      try {
         Class.forName("cmd0")
         assert(false)
       } catch {
@@ -43,14 +44,14 @@ object CachingTests extends TestSuite{
         case e: Exception => assert(false)
       }
     }
-    test("blocks"){
+    test("blocks") {
       def check(fileName: String, expected: Int) = {
         val storage = Storage.InMemory()
         val interp = createTestInterp(storage)
         val n0 = storage.compileCache.size
 
         assert(n0 == 0)
-        runScript(os.pwd, scriptPath/fileName, interp)
+        runScript(os.pwd, scriptPath / fileName, interp)
 
         val n = storage.compileCache.size
         assert(n == expected)
@@ -61,7 +62,7 @@ object CachingTests extends TestSuite{
       test - check("ThreeBlocks.sc", 3)
     }
 
-    test("processModuleCaching"){
+    test("processModuleCaching") {
       def check(script: os.RelPath) = {
         val storage = new Storage.Folder(tempDir)
 
@@ -70,7 +71,7 @@ object CachingTests extends TestSuite{
           predefImports = Interpreter.predefImports
         )
 
-        runScript(os.pwd, resourcesPath/script, interp1)
+        runScript(os.pwd, resourcesPath / script, interp1)
 
         assert(interp1.compilerManager.compiler != null)
         val interp2 = createTestInterp(
@@ -79,25 +80,26 @@ object CachingTests extends TestSuite{
         )
         assert(interp2.compilerManager.compiler == null)
 
-        runScript(os.pwd, resourcesPath/script, interp2)
+        runScript(os.pwd, resourcesPath / script, interp2)
         assert(interp2.compilerManager.compiler == null)
       }
 
-      test("testOne") - check(os.rel/"scriptLevelCaching"/"scriptTwo.sc")
-      test("testTwo") - check(os.rel/"scriptLevelCaching"/"scriptOne.sc")
-      test("testThree") - check(os.rel/"scriptLevelCaching"/"QuickSort.sc")
-      test("testLoadModule") - check(os.rel/"scriptLevelCaching"/"testLoadModule.sc")
-      test("testFileImport") - check(os.rel/"scriptLevelCaching"/"testFileImport.sc")
-      test("testIvyImport") - check(os.rel/"scriptLevelCaching"/"ivyCacheTest.sc")
-      test("testIvyResource"){
-        if (!scala2_12) check(os.rel/"scriptLevelCaching"/"ivyCachedResourceTest.sc")
+      test("testOne") - check(os.rel / "scriptLevelCaching" / "scriptTwo.sc")
+      test("testTwo") - check(os.rel / "scriptLevelCaching" / "scriptOne.sc")
+      test("testThree") - check(os.rel / "scriptLevelCaching" / "QuickSort.sc")
+      test("testLoadModule") - check(os.rel / "scriptLevelCaching" / "testLoadModule.sc")
+      test("testFileImport") - check(os.rel / "scriptLevelCaching" / "testFileImport.sc")
+      test("testIvyImport") - check(os.rel / "scriptLevelCaching" / "ivyCacheTest.sc")
+      test("testIvyResource") {
+        if (!scala2_12) check(os.rel / "scriptLevelCaching" / "ivyCachedResourceTest.sc")
       }
 
     }
 
-    test("testRunTimeExceptionForCachedScripts"){
+    test("testRunTimeExceptionForCachedScripts") {
       val storage = new Storage.Folder(tempDir)
-      val numFile = os.pwd/"amm"/"target"/"test"/"resources"/"scriptLevelCaching"/"num.value"
+      val numFile =
+        os.pwd / "amm" / "target" / "test" / "resources" / "scriptLevelCaching" / "num.value"
       os.remove.all(numFile)
       os.write(numFile, "1", createFolders = true)
       val interp1 = createTestInterp(
@@ -107,7 +109,7 @@ object CachingTests extends TestSuite{
 
       runScript(
         os.pwd,
-        resourcesPath/"scriptLevelCaching"/"runTimeExceptions.sc",
+        resourcesPath / "scriptLevelCaching" / "runTimeExceptions.sc",
         interp1
       )
 
@@ -117,17 +119,17 @@ object CachingTests extends TestSuite{
       )
       val Res.Exception(ex, _) = Scripts.runScript(
         os.pwd,
-        resourcesPath/"scriptLevelCaching"/"runTimeExceptions.sc",
+        resourcesPath / "scriptLevelCaching" / "runTimeExceptions.sc",
         interp2
       )
 
       assert(
         interp2.compilerManager.compiler == null &&
-        ex.toString == "java.lang.ArithmeticException: / by zero"
+          ex.toString == "java.lang.ArithmeticException: / by zero"
       )
     }
 
-    test("persistence"){
+    test("persistence") {
 
       val tempDir = os.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
@@ -135,27 +137,27 @@ object CachingTests extends TestSuite{
 
       val interp1 = createTestInterp(new Storage.Folder(tempDir))
       val interp2 = createTestInterp(new Storage.Folder(tempDir))
-      runScript(os.pwd, scriptPath/"OneBlock.sc", interp1)
-      runScript(os.pwd, scriptPath/"OneBlock.sc", interp2)
+      runScript(os.pwd, scriptPath / "OneBlock.sc", interp1)
+      runScript(os.pwd, scriptPath / "OneBlock.sc", interp2)
       val n1 = interp1.compilationCount
       val n2 = interp2.compilationCount
       assert(n1 == 1) // OneBlock.sc
       assert(n2 == 0) // both should be cached
     }
-    test("tags"){
+    test("tags") {
       val storage = Storage.InMemory()
       val interp = createTestInterp(storage)
-      runScript(os.pwd, scriptPath/"TagBase.sc", interp)
-      runScript(os.pwd, scriptPath/"TagPrevCommand.sc", interp)
+      runScript(os.pwd, scriptPath / "TagBase.sc", interp)
+      runScript(os.pwd, scriptPath / "TagPrevCommand.sc", interp)
 
       implicit val sv = ammonite.interp.api.ScalaVersion(interp.scalaVersion)
       interp.loadIvy("com.lihaoyi" %% "scalatags" % "0.7.0")
-      runScript(os.pwd, scriptPath/"TagBase.sc", interp)
+      runScript(os.pwd, scriptPath / "TagBase.sc", interp)
       val n = storage.compileCache.size
       assert(n == 4) // two blocks for each loaded file
     }
 
-    test("compilerInit"){
+    test("compilerInit") {
       val tempDir = os.Path(
         java.nio.file.Files.createTempDirectory("ammonite-tester-x")
       )
@@ -169,12 +171,12 @@ object CachingTests extends TestSuite{
         predefImports = Interpreter.predefImports
       )
 
-      runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp1)
-      runScript(os.pwd, scriptPath/"cachedCompilerInit.sc", interp2)
+      runScript(os.pwd, scriptPath / "cachedCompilerInit.sc", interp1)
+      runScript(os.pwd, scriptPath / "cachedCompilerInit.sc", interp2)
       assert(interp2.compilationCount == 0)
     }
 
-    test("changeScriptInvalidation"){
+    test("changeScriptInvalidation") {
       // This makes sure that the compile caches are properly utilized, and
       // flushed, in a variety of circumstances: changes to the number of
       // blocks in the predef, predefs containing magic imports, and changes
@@ -189,9 +191,9 @@ object CachingTests extends TestSuite{
         """)
       val scriptFile = os.temp("""div("<('.'<)", y).render""")
 
-      def processAndCheckCompiler(f: ammonite.compiler.iface.Compiler => Boolean) ={
+      def processAndCheckCompiler(f: ammonite.compiler.iface.Compiler => Boolean) = {
         val interp = createTestInterp(
-          new Storage.Folder(tempDir){
+          new Storage.Folder(tempDir) {
             override val predef = predefFile
           },
           predefImports = Interpreter.predefImports
@@ -224,7 +226,7 @@ object CachingTests extends TestSuite{
       processAndCheckCompiler(_ != null)
       processAndCheckCompiler(_ == null)
     }
-    test("changeImportedScriptInvalidation"){
+    test("changeImportedScriptInvalidation") {
 
       val storageFolder = os.temp.dir()
 
@@ -242,8 +244,7 @@ object CachingTests extends TestSuite{
         val ident = tmpFile.last.stripSuffix(".sc")
         (tmpFile, ident)
       }
-      test("simple"){
-
+      test("simple") {
 
         val (upstream, upstreamIdent) = createScript(
           """println("barr")
@@ -255,14 +256,13 @@ object CachingTests extends TestSuite{
 
         val (downstream, _) = createScript(
           s"""import $$file.$upstreamIdent
-            |println("hello11")
-            |
-            |println($upstreamIdent.x)
+             |println("hello11")
+             |
+             |println($upstreamIdent.x)
           """.stripMargin,
-          dir = upstream/os.up,
+          dir = upstream / os.up,
           name = "downstream"
         )
-
 
         // Upstream, downstream
         runScript(downstream, 2)
@@ -289,10 +289,9 @@ object CachingTests extends TestSuite{
           s"""import $$file.$upstreamIdent
              |println("hello")
              |
-            |println($upstreamIdent.x)
+             |println($upstreamIdent.x)
           """.stripMargin
         )
-
 
         runScript(downstream, 1)
         runScript(downstream, 0)
@@ -340,7 +339,7 @@ object CachingTests extends TestSuite{
         runScript(downstream, 0)
       }
 
-      test("diamond"){
+      test("diamond") {
         val (upstream, upstreamIdent) = createScript(
           """println("uppstreamm")
             |val x = 1
@@ -355,7 +354,7 @@ object CachingTests extends TestSuite{
              |val a = $upstreamIdent.x + 1
              |
            """.stripMargin,
-          dir = upstream/os.up,
+          dir = upstream / os.up,
           name = "middleA"
         )
 
@@ -365,7 +364,7 @@ object CachingTests extends TestSuite{
              |val b = $upstreamIdent.x + 2
              |
            """.stripMargin,
-          dir = upstream/os.up,
+          dir = upstream / os.up,
           name = "middleB"
         )
 
@@ -375,10 +374,9 @@ object CachingTests extends TestSuite{
              |println("downstreammm")
              |println($middleAIdent.a + $middleBIdent.b)
           """.stripMargin,
-          dir = upstream/os.up,
+          dir = upstream / os.up,
           name = "downstream"
         )
-
 
         // upstream + middleA + middleB + downstream
         // ensure we don't compile `upstream` twice when it's depended upon twice
@@ -391,7 +389,6 @@ object CachingTests extends TestSuite{
         runScript(downstream, 1)
         runScript(downstream, 0)
         runScript(downstream, 0)
-
 
         os.write.append(middleA, Util.newLine + "val dummy = 1")
 

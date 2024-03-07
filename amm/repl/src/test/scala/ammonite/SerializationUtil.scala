@@ -10,8 +10,7 @@ object SerializationUtil {
     try {
       oos.writeObject(m)
       baos.toByteArray
-    }
-    finally oos.close()
+    } finally oos.close()
   }
 
   def deserialize(b: Array[Byte], loader: ClassLoader): AnyRef = {
@@ -24,18 +23,19 @@ object SerializationUtil {
   // from akka.util
 
   /**
-    * ClassLoaderObjectInputStream tries to utilize the provided ClassLoader
-    * to load Classes and falls back to ObjectInputStreams resolver.
-    *
-    * @param classLoader - the ClassLoader which is to be used primarily
-    * @param is - the InputStream that is wrapped
-    */
+   * ClassLoaderObjectInputStream tries to utilize the provided ClassLoader
+   * to load Classes and falls back to ObjectInputStreams resolver.
+   *
+   * @param classLoader - the ClassLoader which is to be used primarily
+   * @param is - the InputStream that is wrapped
+   */
   class ClassLoaderObjectInputStream(
-    classLoader: ClassLoader,
-    is: InputStream
+      classLoader: ClassLoader,
+      is: InputStream
   ) extends ObjectInputStream(is) {
     override protected def resolveClass(objectStreamClass: ObjectStreamClass): Class[_] =
-      try Class.forName(objectStreamClass.getName, false, classLoader) catch {
+      try Class.forName(objectStreamClass.getName, false, classLoader)
+      catch {
         case cnfe: ClassNotFoundException ⇒ super.resolveClass(objectStreamClass)
       }
   }

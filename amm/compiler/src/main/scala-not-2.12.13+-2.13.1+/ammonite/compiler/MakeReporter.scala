@@ -12,19 +12,21 @@ import scala.tools.nsc.plugins.Plugin
 import scala.tools.nsc.reporters.AbstractReporter
 import scala.tools.nsc.typechecker.Analyzer
 
-object MakeReporter{
+object MakeReporter {
 
   type Reporter = AbstractReporter
 
-  def makeReporter(errorLogger: (Position, String) => Unit,
-                   warningLogger: (Position, String) => Unit,
-                   infoLogger: (Position, String) => Unit,
-                   outerSettings: Settings): Reporter =
+  def makeReporter(
+      errorLogger: (Position, String) => Unit,
+      warningLogger: (Position, String) => Unit,
+      infoLogger: (Position, String) => Unit,
+      outerSettings: Settings
+  ): Reporter =
     new AbstractReporter {
       def displayPrompt(): Unit = ???
 
       def display(pos: Position, msg: String, severity: Severity) = {
-        severity match{
+        severity match {
           case ERROR =>
             Classpath.traceClasspathProblem(s"ERROR: $msg")
             errorLogger(pos, msg)

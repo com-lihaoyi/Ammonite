@@ -18,15 +18,15 @@ abstract class CompilerLifecycleManager {
   def init(force: Boolean = false): Unit
 
   def complete(
-    offset: Int,
-    previousImports: String,
-    snippet: String
+      offset: Int,
+      previousImports: String,
+      snippet: String
   ): (Int, Seq[String], Seq[String])
 
   def compileClass(
-    processed: Preprocessor.Output,
-    printer: Printer,
-    fileName: String
+      processed: Preprocessor.Output,
+      printer: Printer,
+      fileName: String
   ): Option[Compiler.Output]
 
   def addToClasspath(classFiles: ClassFiles): Unit

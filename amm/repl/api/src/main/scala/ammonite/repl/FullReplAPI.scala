@@ -23,7 +23,6 @@ trait FullReplAPI extends ReplAPI with FullReplAPIScalaVersionSpecific { replApi
       |description of how to use the REPL, check out https://ammonite.io
     """.stripMargin.trim
 
-
   protected[this] def replArgs0: IndexedSeq[Bind[_]]
   protected[this] def internal0: FullReplAPI.Internal =
     new FullReplAPI.Internal {
@@ -33,9 +32,9 @@ trait FullReplAPI extends ReplAPI with FullReplAPIScalaVersionSpecific { replApi
     }
 
   /**
-    * This stuff is used for the REPL-generated code that prints things;
-    * shouldn't really be used by users, but needs to be public and accessible
-    */
+   * This stuff is used for the REPL-generated code that prints things;
+   * shouldn't really be used by users, but needs to be public and accessible
+   */
   lazy val Internal: FullReplAPI.Internal = internal0
 }
 
@@ -48,16 +47,15 @@ object FullReplAPI {
 
     def combinePrints(iters: Iterator[String]*) = {
       iters.toIterator
-           .filter(_.nonEmpty)
-           .flatMap(Iterator(newLine) ++ _)
-           .drop(1)
+        .filter(_.nonEmpty)
+        .flatMap(Iterator(newLine) ++ _)
+        .drop(1)
     }
 
-    def print[T: pprint.TPrint](value: => T,
-                                ident: String,
-                                custom: Option[String])
-                               (implicit tcolors: pprint.TPrintColors,
-                                classTagT: ClassTag[T] = null) = {
+    def print[T: pprint.TPrint](value: => T, ident: String, custom: Option[String])(implicit
+        tcolors: pprint.TPrintColors,
+        classTagT: ClassTag[T] = null
+    ) = {
       // Here we use ClassTag to detect if T is an Unit.
       //
       // The default value null suppresses the compilation error when T is a singleton type,
@@ -70,7 +68,7 @@ object FullReplAPI {
       // We don't use WeakTypeTag or TypeTag because those type classes are too heavy-weight,
       // as Scalac will generate a huge amount of code for creating a TypeTag for refinement types.
       // See https://github.com/lihaoyi/Ammonite/issues/649 for further information.
-      // 
+      //
       // We do not check `value == ()`, because that would force evaluation of `value`, which
       // may be defined as a `lazy val` which the user explicitly does not want to evaluate
       val isUnit = classTagT == classTag[Unit]
@@ -83,8 +81,10 @@ object FullReplAPI {
         // pretty-printing of the main body
         val prefix = new pprint.Truncated(
           Iterator(
-            colors().ident()(ident).render, ": ",
-            implicitly[pprint.TPrint[T]].render(tcolors), " = "
+            colors().ident()(ident).render,
+            ": ",
+            implicitly[pprint.TPrint[T]].render(tcolors),
+            " = "
           ),
           pprinter().defaultWidth,
           pprinter().defaultHeight
@@ -108,7 +108,9 @@ object FullReplAPI {
     }
     def printDef(definitionLabel: String, ident: String) = {
       Iterator(
-        "defined ", colors().`type`()(definitionLabel).render, " ",
+        "defined ",
+        colors().`type`()(definitionLabel).render,
+        " ",
         colors().ident()(ident).render
       )
     }
@@ -119,4 +121,3 @@ object FullReplAPI {
 }
 
 object ReplBridge extends APIHolder[FullReplAPI]
-
