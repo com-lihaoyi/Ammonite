@@ -57,7 +57,7 @@ jobs:
         with:
           java-version: 17
           distribution: temurin
-      - run: ./mill -i publishDocs --skipDeploy true
+      - run: echo "Hello World" && ./mill -i publishDocs --skipDeploy true
 
   publishLocal:
     strategy:
