@@ -10,26 +10,28 @@ import fastparse.Parsed
 import ammonite.util.{Colors, Res}
 import ammonite.compiler.iface.Parser
 case class AmmoniteFrontEnd(
-  parser: Parser,
-  extraFilters: Filter = Filter.empty
-) extends FrontEnd{
+    parser: Parser,
+    extraFilters: Filter = Filter.empty
+) extends FrontEnd {
 
   def width = FrontEndUtils.width
   def height = FrontEndUtils.height
 
-  def action(input: InputStream,
-             reader: java.io.Reader,
-             output: OutputStream,
-             prompt: String,
-             colors: Colors,
-             compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-             history: IndexedSeq[String],
-             addHistory: String => Unit) = {
-    readLine(reader, output, prompt, colors, compilerComplete, history) match{
+  def action(
+      input: InputStream,
+      reader: java.io.Reader,
+      output: OutputStream,
+      prompt: String,
+      colors: Colors,
+      compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+      history: IndexedSeq[String],
+      addHistory: String => Unit
+  ) = {
+    readLine(reader, output, prompt, colors, compilerComplete, history) match {
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
-        parser.split(code, ignoreIncomplete = false).get match{
+        parser.split(code, ignoreIncomplete = false).get match {
           case Right(value) => Res.Success((code, value))
           case Left(error) => Res.Failure(error)
         }
@@ -38,16 +40,18 @@ case class AmmoniteFrontEnd(
 
   val cutPasteFilter = ReadlineFilters.CutPasteFilter()
 
-  def readLine(reader: java.io.Reader,
-               output: OutputStream,
-               prompt: String,
-               colors: Colors,
-               compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               history: IndexedSeq[String]) = {
+  def readLine(
+      reader: java.io.Reader,
+      output: OutputStream,
+      prompt: String,
+      colors: Colors,
+      compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+      history: IndexedSeq[String]
+  ) = {
 
     val writer = new OutputStreamWriter(output)
 
-    val autocompleteFilter: Filter = Filter.action(SpecialKeys.Tab){
+    val autocompleteFilter: Filter = Filter.action(SpecialKeys.Tab) {
       case TermState(rest, b, c, _) =>
         val (newCursor, completions, details) = TTY.withSttyOverride(TTY.restoreSigInt()) {
           compilerComplete(c, b.mkString)
@@ -79,18 +83,18 @@ case class AmmoniteFrontEnd(
           "|>"
         )
 
-        val completions2 = for(comp <- completions.filterNot(blacklisted.contains)) yield {
+        val completions2 = for (comp <- completions.filterNot(blacklisted.contains)) yield {
 
           val (left, right) = comp.splitAt(common.length)
           (colors.comment()(left) ++ right).render
         }
         val stdout =
           FrontEndUtils.printCompletions(completions2, details2)
-                       .mkString
+            .mkString
 
         if (details.nonEmpty || completions.isEmpty)
           Printing(TermState(rest, b, c), stdout)
-        else{
+        else {
           val newBuffer = b.take(newCursor) ++ common ++ b.drop(c)
           Printing(TermState(rest, newBuffer, newCursor + common.length), stdout)
         }
@@ -101,12 +105,13 @@ case class AmmoniteFrontEnd(
     val multilineFilter = Filter.action(
       SpecialKeys.NewLine,
       ti => parser.split(ti.ts.buffer.mkString).isEmpty
-    ){
+    ) {
       case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }
 
     val historyFilter = new HistoryFilter(
-      () => history.reverse, colors.comment()
+      () => history.reverse,
+      colors.comment()
     )
     val selectionFilter = GUILikeFilters.SelectionFilter(indent = 2)
 
@@ -124,15 +129,12 @@ case class AmmoniteFrontEnd(
       BasicFilters.all
     )
 
-
     val res = Terminal.readLine(
       prompt,
       reader,
       writer,
       allFilters,
       displayTransform = { (buffer, cursor) =>
-
-
         val highlighted = fansi.Str(parser.defaultHighlight(
           buffer.toVector,
           colors.comment(),
@@ -143,11 +145,17 @@ case class AmmoniteFrontEnd(
           fansi.Attr.Reset
         ).mkString)
         val (newBuffer, offset) = SelectionFilter.mangleBuffer(
-          selectionFilter, highlighted, cursor, colors.selected()
+          selectionFilter,
+          highlighted,
+          cursor,
+          colors.selected()
         )
 
         val newNewBuffer = HistoryFilter.mangleBuffer(
-          historyFilter, newBuffer, cursor, fansi.Underlined.On
+          historyFilter,
+          newBuffer,
+          cursor,
+          fansi.Underlined.On
         )
         (newNewBuffer, offset)
       }

@@ -19,7 +19,7 @@ import scala.tools.nsc.util.{ClassPath, ClassRepresentation}
 object CustomZipAndJarFileLookupFactory {
 
   private final class ZipArchiveClassPath(val zipUrl: URL)
-    extends ClassPath with NoSourcePaths with AmmClassPath{
+      extends ClassPath with NoSourcePaths with AmmClassPath {
 
     def zipFile: File = null
 
@@ -95,7 +95,6 @@ object CustomZipAndJarFileLookupFactory {
     protected def isRequiredFileType(file: AbstractFile): Boolean =
       !file.isDirectory && file.hasExtension("class")
   }
-
 
   def create(zipFile: AbstractFile, settings: Settings): ClassPath =
     new ZipArchiveClassPath(zipFile.toURL)

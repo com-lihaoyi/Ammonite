@@ -9,13 +9,13 @@ import scala.collection.{immutable => imm}
 import scala.util.Properties
 import ammonite.util.Util
 
-object ImportHookTests extends TestSuite{
+object ImportHookTests extends TestSuite {
 
-  val tests = Tests{
+  val tests = Tests {
     println("ImportHookTests")
     val check = new DualTestRepl()
-    test("repl"){
-      test("file"){
+    test("repl") {
+      test("file") {
         test("basic") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Basic
 
@@ -68,15 +68,14 @@ object ImportHookTests extends TestSuite{
           error: Cannot resolve $file import
         """)
 
-
         test("deepRenamed") - check.session("""
           @ import $file.amm.src.test.resources.importHooks.Deep.{DeepObject => DeepRenamed}
           error: Cannot resolve $file import
          """)
 
       }
-      test("ivy"){
-        test("basic"){
+      test("ivy") {
+        test("basic") {
           check.session(s"""
             @ import scalatags.Text.all._
             error: ${check.notFound("scalatags")}
@@ -90,7 +89,7 @@ object ImportHookTests extends TestSuite{
            """)
         }
 
-        test("explicitBinaryVersion"){
+        test("explicitBinaryVersion") {
           val sbv = IvyConstructor.scalaBinaryVersion(check.scalaVersion)
           check.session(s"""
             @ import scalatags.Text.all._
@@ -105,7 +104,7 @@ object ImportHookTests extends TestSuite{
            """)
         }
 
-        test("inline"){
+        test("inline") {
           check.session(s"""
             @ import scalatags.Text.all._
             error: ${check.notFound("scalatags")}
@@ -117,7 +116,7 @@ object ImportHookTests extends TestSuite{
            """)
         }
 
-        test("inlineFull"){
+        test("inlineFull") {
           // no more macroparadise in 2.13
           if (scala2_12 && scala.util.Properties.versionNumberString != "2.12.10") {
             check.session("""
@@ -132,11 +131,11 @@ object ImportHookTests extends TestSuite{
           }
         }
       }
-      test("url"){
+      test("url") {
         val scriptUrl =
           "https://raw.githubusercontent.com/lihaoyi/Ammonite/" +
-          "master/amm/src/test/resources/scripts/Annotation.sc"
-        test("basic"){
+            "master/amm/src/test/resources/scripts/Annotation.sc"
+        test("basic") {
           check.session(s"""
           @ import $$url.`$scriptUrl`
           error: $$url import failed
@@ -147,7 +146,7 @@ object ImportHookTests extends TestSuite{
           res1: Int = 24
         """)
         }
-        test("inline"){
+        test("inline") {
           check.session(s"""
           @ import $$url.`$scriptUrl`
           error: $$url import failed
@@ -160,7 +159,7 @@ object ImportHookTests extends TestSuite{
         }
       }
     }
-    test("scripts"){
+    test("scripts") {
       test("file") - check.session("""
         @ import $file.amm.src.test.resources.importHooks.FileImport
 
@@ -175,7 +174,7 @@ object ImportHookTests extends TestSuite{
         res1: Int = 31339
        """)
 
-      test("ivy"){
+      test("ivy") {
         check.session("""
           @ import $file.amm.src.test.resources.importHooks.IvyImport
 

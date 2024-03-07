@@ -7,22 +7,26 @@ import ammonite.util.{Name, Res, Util}
 import fastparse.internal.Util.literalize
 
 /**
-  * Logic around using Ammonite as a script-runner; invoking scripts via the
-  * macro-generated [[Router]], and pretty-printing any output or error messages
-  */
+ * Logic around using Ammonite as a script-runner; invoking scripts via the
+ * macro-generated [[Router]], and pretty-printing any output or error messages
+ */
 object Scripts {
-  def runScript(wd: os.Path,
-                path: os.Path,
-                interp: ammonite.interp.Interpreter,
-                scriptArgs: Seq[String] = Nil) = {
+  def runScript(
+      wd: os.Path,
+      path: os.Path,
+      interp: ammonite.interp.Interpreter,
+      scriptArgs: Seq[String] = Nil
+  ) = {
     interp.watch(path)
     val (pkg, wrapper) = Util.pathToPackageWrapper(Seq(), path relativeTo wd)
     val genRoutesCode = "mainargs.ParserForMethods[$routesOuter.type]($routesOuter)"
 
-    for{
-      scriptTxt <- try Res.Success(Util.normalizeNewlines(os.read(path))) catch{
-        case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
-      }
+    for {
+      scriptTxt <-
+        try Res.Success(Util.normalizeNewlines(os.read(path)))
+        catch {
+          case e: NoSuchFileException => Res.Failure("Script file not found: " + path)
+        }
 
       processed <- interp.processModule(
         scriptTxt,
@@ -35,22 +39,22 @@ object Scripts {
         // `methodsymbol.annotations` ends up being empty.
         extraCode = Util.normalizeNewlines(
           s"""
-          |val $$routesOuter = this
-          |object $$routes
-          |extends scala.Function0[mainargs.ParserForMethods[$$routesOuter.type]]{
-          |  def apply() = $genRoutesCode
-          |}
+             |val $$routesOuter = this
+             |object $$routes
+             |extends scala.Function0[mainargs.ParserForMethods[$$routesOuter.type]]{
+             |  def apply() = $genRoutesCode
+             |}
           """.stripMargin
         ),
         hardcoded = true
       )
 
-      routeClsName <- processed.blockInfo.lastOption match{
+      routeClsName <- processed.blockInfo.lastOption match {
         case Some(meta) => Res.Success(meta.id.wrapperPath)
         case None => Res.Skip
       }
 
-      scriptMains = interp.scriptCodeWrapper match{
+      scriptMains = interp.scriptCodeWrapper match {
         case ammonite.compiler.DefaultCodeWrapper =>
           Option(
             interp
@@ -77,37 +81,37 @@ object Scripts {
         case _ => None
       }
 
-      res <- Util.withContextClassloader(interp.evalClassloader){
+      res <- Util.withContextClassloader(interp.evalClassloader) {
         scriptMains.filter(!_.mains.value.isEmpty) match {
           // If there are no @main methods, there's nothing to do
           case None =>
             if (scriptArgs.isEmpty) Res.Success(())
             else Res.Failure(
               "Script " + path.last +
-              " does not take arguments: " + scriptArgs.map(literalize(_)).mkString(" ")
+                " does not take arguments: " + scriptArgs.map(literalize(_)).mkString(" ")
             )
 
           // If there's one @main method, we run it with all args
           case Some(parser) =>
-            if (scriptArgs.take(1) == Seq("--help")){
+            if (scriptArgs.take(1) == Seq("--help")) {
               Res.Success(
-                new Object{
+                new Object {
                   override def toString() = parser.helpText(
                     totalWidth = 100,
                     docsOnNewLine = false
                   )
                 }
               )
-            }else mainargs.Invoker.runMains(
+            } else mainargs.Invoker.runMains(
               parser.mains,
               scriptArgs,
               allowPositional = true,
               allowRepeats = false
-            ) match{
+            ) match {
               case Left(earlyError) =>
                 Res.Failure(mainargs.Renderer.renderEarlyError(earlyError))
               case Right((mainData, result)) =>
-                result match{
+                result match {
                   case mainargs.Result.Success(x) => Res.Success(x)
                   case mainargs.Result.Failure.Exception(x: AmmoniteExit) => Res.Success(x.value)
                   case mainargs.Result.Failure.Exception(x) => Res.Exception(x, "")

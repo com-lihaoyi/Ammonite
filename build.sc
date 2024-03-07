@@ -1,15 +1,16 @@
+import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
+import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
+import $file.ci.upload
+
 import mill._
 import scalalib._
 import publish._
 import mill.contrib.bloop.Bloop
 import mill.scalalib.api.ZincWorkerUtil._
 import coursier.mavenRepositoryString
-import $file.ci.upload
-
-import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
-import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
 import mill.define.Command
 import mill.testrunner.TestRunner
+
 import scala.util.chaining.scalaUtilChainingOps
 
 val ghOrg = "com-lihaoyi"
@@ -78,7 +79,7 @@ val scalametaVersion = "4.9.1"
 object Deps {
   val acyclic = ivy"com.lihaoyi:::acyclic:0.3.11"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
-  val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk15on:1.70"
+  val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.77"
   val cask = ivy"com.lihaoyi::cask:0.6.7"
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.19"
@@ -97,7 +98,7 @@ object Deps {
   val pprint = ivy"com.lihaoyi::pprint:0.8.1"
   val requests = ivy"com.lihaoyi::requests:0.8.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.17.0"
-  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.8.1"
+  val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.11.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:1.0.2"
   val scalaparse = ivy"com.lihaoyi::scalaparse:$fastparseVersion"
@@ -862,7 +863,7 @@ def publishExecutable() = {
   }
 }
 
-def publishDocs() = {
+def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
   val ammoniteAssembly = amm(scala2_13Versions.last).assembly
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
@@ -884,12 +885,15 @@ def publishDocs() = {
         e.printStackTrace()
         throw e
     }
+    ()
   }
   else T.command {
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
-    val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
-    os.write(os.pwd / "deploy_key", deployKey)
+    if (!skipDeploy) {
+      val deployKey = sys.env("DEPLOY_KEY").replace("\\n", "\n")
+      os.write(os.pwd / "deploy_key", deployKey)
+    }
 
     val (stableKey, unstableKey, oldStableKeys, oldUnstableKeys) =
       if (!unstable) {
@@ -935,7 +939,13 @@ def publishDocs() = {
         "CONSTANTS_FILE" -> constantsFile.toString
       )
     )
-    os.proc("ci/deploy_master_docs.sh").call()
+    if (skipDeploy) {
+      println("Skip deployment")
+    } else {
+      println("Deploying ...")
+      os.proc("ci/deploy_master_docs.sh").call()
+    }
+    ()
   }
 }
 
@@ -981,11 +991,11 @@ def publishSonatype(
     }
     if (isPublishableCommit)
       new SonatypePublisher(
-        "https://oss.sonatype.org/service/local",
-        "https://oss.sonatype.org/content/repositories/snapshots",
-        sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
-        true,
-        Seq(
+        uri = "https://oss.sonatype.org/service/local",
+        snapshotUri = "https://oss.sonatype.org/content/repositories/snapshots",
+        credentials = sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
+        signed = true,
+        gpgArgs = Seq(
           "--passphrase",
           sys.env("SONATYPE_PGP_PASSWORD"),
           "--no-tty",
@@ -996,10 +1006,13 @@ def publishSonatype(
           "-a",
           "-b"
         ),
-        600000,
-        600000,
-        T.ctx().log,
-        600000
+        readTimeout = 600000,
+        connectTimeout = 600000,
+        log = T.ctx().log,
+        workspace = T.workspace,
+        env = T.env,
+        awaitTimeout = 600000,
+        stagingRelease = true
       ).publishAll(
         true,
         x: _*
