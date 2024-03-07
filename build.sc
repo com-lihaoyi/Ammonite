@@ -1029,8 +1029,9 @@ def publishSonatype(
  * This command checks, whether all artifacts are publshed.
  * Run with:
  * {{{
- * mill checkPublishedArtifacts __.publishSelfDependency {version}
+ * mill checkPublishedArtifacts --artifacts __.publishSelfDependency --version {version} --ttl "1 sec"
  * }}}
+  * See also https://github.com/com-lihaoyi/Ammonite/pull/1453
  */
 def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String, ttl: String = "1 hour") = T.command {
   val coords = T.sequence(artifacts.value)()
