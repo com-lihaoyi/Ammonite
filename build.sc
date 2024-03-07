@@ -1032,14 +1032,14 @@ def publishSonatype(
  * mill checkPublishedArtifacts __.publishSelfDependency {version}
  * }}}
  */
-def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String) = T.command {
+def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String, ttl: String = "1 hour") = T.command {
   val coords = T.sequence(artifacts.value)()
   val next = new AtomicInteger(0)
   val fut = coords.map { coord =>
     Future {
       val dep = s"${coord.group}:${coord.id}:${version}"
       println(s"[${next.incrementAndGet()}/${coords.size}] Checking ${dep}")
-      val res = os.proc("cs", "complete-dep", dep)
+      val res = os.proc("cs", "complete-dep", dep, "-l", ttl)
         .call().out.text().trim()
       // println(res)
       Option.when(!res.contains(version))(dep)
