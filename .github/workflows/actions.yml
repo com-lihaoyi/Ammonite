@@ -58,6 +58,8 @@ jobs:
           java-version: 8
           distribution: temurin
       - run: echo "Hello World" && ./mill -i publishDocs --skipDeploy true
+        env:
+          TERM: xterm-256color
 
   publishLocal:
     strategy:
