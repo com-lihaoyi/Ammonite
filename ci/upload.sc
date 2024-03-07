@@ -1,12 +1,14 @@
 #!/usr/bin/env amm
 
 @main
-def apply(uploadedFile: os.Path,
-          tagName: String,
-          uploadName: String,
-          authKey: String,
-          ghOrg: String,
-          ghRepo: String): String = {
+def apply(
+    uploadedFile: os.Path,
+    tagName: String,
+    uploadName: String,
+    authKey: String,
+    ghOrg: String,
+    ghRepo: String
+): String = {
   println("upload.apply")
   println(uploadedFile)
   println(tagName)
@@ -16,7 +18,7 @@ def apply(uploadedFile: os.Path,
   println(ghRepo)
   val body = requests.get(
     s"https://api.github.com/repos/${ghOrg}/${ghRepo}/releases/tags/" + tagName,
-    headers = Seq("Authorization" -> s"token $authKey"),
+    headers = Seq("Authorization" -> s"token $authKey")
   )
 
   val parsed = ujson.read(body.text)
@@ -24,7 +26,6 @@ def apply(uploadedFile: os.Path,
   println(body)
 
   val snapshotReleaseId = parsed("id").num.toInt
-
 
   val uploadUrl =
     s"https://uploads.github.com/repos/${ghOrg}/${ghRepo}/releases/" +
@@ -36,11 +37,10 @@ def apply(uploadedFile: os.Path,
       "Content-Type" -> "application/octet-stream",
       "Authorization" -> s"token $authKey"
     ),
-    connectTimeout = 5000, 
+    connectTimeout = 5000,
     readTimeout = 60000,
     data = os.read.bytes(uploadedFile)
   ).text
-   
 
   println(res)
 

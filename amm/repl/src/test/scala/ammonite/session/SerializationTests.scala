@@ -5,15 +5,15 @@ import ammonite.TestUtils
 import ammonite.compiler.CodeClassWrapper
 import utest._
 
-object SerializationTests extends TestSuite{
+object SerializationTests extends TestSuite {
   val tests = if (TestUtils.scala2) scala2Tests else scala3Tests
-  def scala2Tests = Tests{
+  def scala2Tests = Tests {
     println("SerializationTests")
     val check = new TestRepl {
       override def codeWrapper = CodeClassWrapper
     }
 
-    test("closure"){
+    test("closure") {
       // User values from the REPL shouldn't be recomputed upon
       // deserialization. The test below checks that the value `a`, whose
       // computation is side-effecting, is indeed serialized along `closure`,
@@ -92,7 +92,8 @@ object SerializationTests extends TestSuite{
           @   costlySideEffect.absent("after deserialization")
           @ }}
 
-        """)
+        """
+      )
     }
   }
   def scala3Tests = Tests {

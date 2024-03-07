@@ -12,15 +12,15 @@ object IvyConstructor extends IvyConstructor {
   }
 
 }
-trait IvyConstructor{
-  implicit class GroupIdExt(groupId: String){
+trait IvyConstructor {
+  implicit class GroupIdExt(groupId: String) {
     def %(artifactId: String) = Module.of(groupId, artifactId)
     def %%(artifactId: String)(implicit sv: ScalaVersion) = Module.of(
       groupId,
       artifactId + "_" + IvyConstructor.scalaBinaryVersion(sv.value)
     )
   }
-  implicit class ArtifactIdExt(t: Module){
+  implicit class ArtifactIdExt(t: Module) {
     def %(version: String) = Dependency.of(t, version)
   }
 }

@@ -5,12 +5,14 @@ import ammonite.TestUtils._
 import utest._
 import ammonite.util.Util
 
-object AutocompleteTests extends TestSuite{
-  class Completer{
-  val check = new DualTestRepl()
-    def apply(caretCode: String,
-                 cmp: (Set[String]) => Set[String],
-                 sigs: (Set[String]) => Set[String] = _ => Set()) = {
+object AutocompleteTests extends TestSuite {
+  class Completer {
+    val check = new DualTestRepl()
+    def apply(
+        caretCode: String,
+        cmp: (Set[String]) => Set[String],
+        sigs: (Set[String]) => Set[String] = _ => Set()
+    ) = {
       val from = caretCode.indexOf("<from>")
       val caretCode0 =
         if (from < 0) caretCode
@@ -42,18 +44,22 @@ object AutocompleteTests extends TestSuite{
     def ^(s2: Set[T]): Set[T] = (s1 diff s2) | (s2 diff s1)
   }
 
-  val tests = Tests{
+  val tests = Tests {
     println("AutocompleteTests")
-    test("selection"){
-
+    test("selection") {
 
       // Not sure why clone and finalize don't appear in this list
       val anyCompletion = Set(
-        "!=", "==",
-        "toString", "equals", "hashCode",
-        "getClass", "asInstanceOf", "isInstanceOf"
+        "!=",
+        "==",
+        "toString",
+        "equals",
+        "hashCode",
+        "getClass",
+        "asInstanceOf",
+        "isInstanceOf"
       )
-      test("import") - checking{ complete =>
+      test("import") - checking { complete =>
         // these fail on Java 9, need investigation
         if (!Util.java9OrAbove && complete.check.scala2) {
           complete("""import <from><caret>""", Set("java", "javax", "scala") -- _)
@@ -79,26 +85,30 @@ object AutocompleteTests extends TestSuite{
           Set("LinkedHashMap", "LinkedHashSet", "LinkedList") ^ _
         )
         complete(
-          """import scala.uti.<caret>""", Set.empty[String] -- _
+          """import scala.uti.<caret>""",
+          Set.empty[String] -- _
         )
         complete(
-          """import scala.colltion.<caret>""", Set.empty[String] -- _
+          """import scala.colltion.<caret>""",
+          Set.empty[String] -- _
         )
         complete("""object X { import y<caret> ; def y(z: Int)""", Set.empty[String] -- _)
         complete(
-          """import scala.collection.immutable.List.{<from>em<caret>, fi}""", Set("empty") -- _
+          """import scala.collection.immutable.List.{<from>em<caret>, fi}""",
+          Set("empty") -- _
         )
         complete(
-          """import scala.collection.immutable.List.{em, <from>fi<caret>}""", Set("fill") -- _
+          """import scala.collection.immutable.List.{em, <from>fi<caret>}""",
+          Set("fill") -- _
         )
       }
 
-      test("scope") - checking{ complete =>
+      test("scope") - checking { complete =>
         // these fail on Java 9, need investigation
         if (!Util.java9OrAbove && complete.check.scala2) {
-          complete( """<caret>""", Set("scala") -- _)
-          complete( """Seq(1, 2, 3).map(argNameLol => <from><caret>)""", Set("argNameLol") -- _)
-          complete( """object Zomg{ <from><caret> }""", Set("Zomg") -- _)
+          complete("""<caret>""", Set("scala") -- _)
+          complete("""Seq(1, 2, 3).map(argNameLol => <from><caret>)""", Set("argNameLol") -- _)
+          complete("""object Zomg{ <from><caret> }""", Set("Zomg") -- _)
           complete(
             "<from>printl<caret>",
             Set("println") ^ _,
@@ -112,75 +122,62 @@ object AutocompleteTests extends TestSuite{
         //        Set("def println(x: Any): Unit", "def println(): Unit") ^
         //      )
       }
-      test("scopePrefix") - checking{ complete =>
+      test("scopePrefix") - checking { complete =>
         // these fail on Java 9, need investigation
         if (!Util.java9OrAbove && complete.check.scala2) {
-          complete( """<from>ammon<caret>""", Set("ammonite") ^ _)
+          complete("""<from>ammon<caret>""", Set("ammonite") ^ _)
 
           complete(
             """Seq(1, 2, 3).map(argNameLol => <from>argNam<caret>)""",
             Set("argNameLol") ^ _
           )
 
-          complete( """object Zomg{ <from>Zom<caret> }""", Set("Zomg") ^ _)
-          complete( """object Zomg{ <from>Zo<caret>m }""", Set("Zomg") ^ _)
-          complete( """object Zomg{ <from>Z<caret>om }""", Set("Zomg") ^ _)
-          complete( """object Zomg{ <from><caret>Zom }""", Set("Zomg") ^ _)
+          complete("""object Zomg{ <from>Zom<caret> }""", Set("Zomg") ^ _)
+          complete("""object Zomg{ <from>Zo<caret>m }""", Set("Zomg") ^ _)
+          complete("""object Zomg{ <from>Z<caret>om }""", Set("Zomg") ^ _)
+          complete("""object Zomg{ <from><caret>Zom }""", Set("Zomg") ^ _)
         }
       }
-      test("dot") - checking{ complete =>
-
-        complete( """java.math.<caret>""",
+      test("dot") - checking { complete =>
+        complete(
+          """java.math.<caret>""",
           Set("MathContext", "BigDecimal", "BigInteger", "RoundingMode") ^ _
         )
 
         val extra =
           if (scala2_12) Set()
           else Set("unless", "when")
-        complete( """scala.Option.<caret>""",
-          (anyCompletion ++ Set("apply", "empty") ++ extra) ^ _
-        )
+        complete("""scala.Option.<caret>""", (anyCompletion ++ Set("apply", "empty") ++ extra) ^ _)
 
-        complete( """Seq(1, 2, 3).map(_.<caret>)""",
-          (anyCompletion ++ Set("+", "-", "*", "/")) -- _
-        )
+        complete("""Seq(1, 2, 3).map(_.<caret>)""", (anyCompletion ++ Set("+", "-", "*", "/")) -- _)
 
-        complete( """val x = 1; x + (x.<caret>)""",
-          Set("-", "+", "*", "/") -- _
-        )
+        complete("""val x = 1; x + (x.<caret>)""", Set("-", "+", "*", "/") -- _)
 
       }
 
       def deepTests(complete: Completer) = {
-        complete( """<from>fromN<caret>""",
-          Set("scala.concurrent.duration.fromNow") ^ _
-        )
-        complete( """<from>Fut<caret>""",
+        complete("""<from>fromN<caret>""", Set("scala.concurrent.duration.fromNow") ^ _)
+        complete(
+          """<from>Fut<caret>""",
           Set("scala.concurrent.Future", "java.util.concurrent.Future") -- _
         )
-        complete( """SECO<caret>""",
-          Set("scala.concurrent.duration.SECONDS") ^ _
-        )
+        complete("""SECO<caret>""", Set("scala.concurrent.duration.SECONDS") ^ _)
       }
-      test("dotPrefix") - checking{ complete =>
-        complete( """java.math.<from>Big<caret>""",
-          Set("BigDecimal", "BigInteger") ^ _
-        )
-        complete( """scala.Option.option2<caret>""",
-          Set() ^ _
-        )
+      test("dotPrefix") - checking { complete =>
+        complete("""java.math.<from>Big<caret>""", Set("BigDecimal", "BigInteger") ^ _)
+        complete("""scala.Option.option2<caret>""", Set() ^ _)
 
         val expected =
           if (complete.check.scala2)
             Set(
-            "def >(x: Double): Boolean",
-            "def >(x: Float): Boolean",
-            "def >(x: Int): Boolean",
-            "def >(x: Short): Boolean",
-            "def >(x: Long): Boolean",
-            "def >(x: Char): Boolean",
-            "def >(x: Byte): Boolean"
-          )
+              "def >(x: Double): Boolean",
+              "def >(x: Float): Boolean",
+              "def >(x: Int): Boolean",
+              "def >(x: Short): Boolean",
+              "def >(x: Long): Boolean",
+              "def >(x: Char): Boolean",
+              "def >(x: Byte): Boolean"
+            )
           else
             Set(
               "def >>>(x: Long): Int",
@@ -202,11 +199,7 @@ object AutocompleteTests extends TestSuite{
               "def >(x: Double): Boolean",
               "def >(x: Float): Boolean"
             )
-        complete( """val x = 1; x + x.<from>><caret>""",
-          Set(">>", ">>>") -- _,
-          expected ^ _
-        )
-
+        complete("""val x = 1; x + x.<from>><caret>""", Set(">>", ">>>") -- _, expected ^ _)
 
         // https://issues.scala-lang.org/browse/SI-9153
         //
@@ -222,20 +215,20 @@ object AutocompleteTests extends TestSuite{
         //      complete("""Seq(1, 2, 3).map(_.<caret>compa)""", compares, ^)
       }
 
-      test("deep") - checking{ complete =>
+      test("deep") - checking { complete =>
         if (complete.check.scala2)
           deepTests(complete)
         else
           "Disabled in Scala 3"
       }
 
-      test("defTab") - checking{ complete =>
-        //Assert no NullPointerException was thrown. Does not verify any completions.
-        complete( """def<caret>""", Set.empty -- _)
+      test("defTab") - checking { complete =>
+        // Assert no NullPointerException was thrown. Does not verify any completions.
+        complete("""def<caret>""", Set.empty -- _)
       }
 
-      test("Array") - checking{ complete =>
-        //Test around https://github.com/lihaoyi/Ammonite/issues/252
+      test("Array") - checking { complete =>
+        // Test around https://github.com/lihaoyi/Ammonite/issues/252
         complete("""new Array<caret>""", Set() ^ _)
       }
 
@@ -249,7 +242,7 @@ object AutocompleteTests extends TestSuite{
       }
     }
 
-    test("backquotes"){
+    test("backquotes") {
       test("spaces") - checking { complete =>
         complete(
           """object x { val `Backquoted Bar` = 1 }; x.<caret>""",
@@ -265,7 +258,7 @@ object AutocompleteTests extends TestSuite{
       }
     }
 
-    test("dependencies"){
+    test("dependencies") {
       def dependenciesTests(complete: Completer) = {
         complete(
           """import $ivy.<from>`io.get-c<caret>`""",
@@ -315,4 +308,3 @@ object AutocompleteTests extends TestSuite{
     }
   }
 }
-

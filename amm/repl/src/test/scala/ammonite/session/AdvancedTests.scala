@@ -5,12 +5,11 @@ import ammonite.{DualTestRepl, TestRepl}
 import ammonite.util.Res
 import utest._
 
-
-object AdvancedTests extends TestSuite{
-  val tests = Tests{
+object AdvancedTests extends TestSuite {
+  val tests = Tests {
     println("AdvancedTests")
     val check = new DualTestRepl()
-    test("pprint"){
+    test("pprint") {
       check.session(s"""
         @ Seq.fill(10)(Seq.fill(3)("Foo"))
         res0: Seq[Seq[String]] = List(
@@ -46,15 +45,15 @@ object AdvancedTests extends TestSuite{
       """)
     }
 
-    test("exit"){
+    test("exit") {
       check.result("exit", Res.Exit(()))
     }
-    test("skip"){
+    test("skip") {
       check.result("", Res.Skip)
     }
 
-    test("predef"){
-      val check2 = new DualTestRepl{
+    test("predef") {
+      val check2 = new DualTestRepl {
         override def predef = (
           """
           import math.abs
@@ -79,8 +78,8 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
-    test("predefSettings"){
-      val check2 = new DualTestRepl{
+    test("predefSettings") {
+      val check2 = new DualTestRepl {
         override def predef = (
           if (scala2)
             """
@@ -102,7 +101,7 @@ object AdvancedTests extends TestSuite{
       """)
 
     }
-    test("macros"){
+    test("macros") {
       if (check.scala2)
         check.session("""
           @ import language.experimental.macros
@@ -152,7 +151,7 @@ object AdvancedTests extends TestSuite{
           @ assert(ammStackTrace.forall(_.contains("cmd3.sc")))
         """)
     }
-    test("typeScope"){
+    test("typeScope") {
       // TPrint issue in Scala 3?
       val cmBufferType =
         if (check.scala2) "collection.mutable.Buffer" else "Buffer"
@@ -176,13 +175,13 @@ object AdvancedTests extends TestSuite{
         res5: Buffer[Int] = ArrayBuffer(1)
       """)
     }
-    test("trappedType"){
+    test("trappedType") {
       check.session("""
         @ val nope = ammonite.Nope(2); val n = 2
         n: Int = 2
       """)
     }
-    test("unwrapping"){
+    test("unwrapping") {
       check.session("""
         @ {
         @   val x = 1
@@ -194,7 +193,7 @@ object AdvancedTests extends TestSuite{
         res0_2: Int = 3
       """)
     }
-    test("forceWrapping"){
+    test("forceWrapping") {
       check.session("""
         @ {{
         @   val x = 1
@@ -204,9 +203,9 @@ object AdvancedTests extends TestSuite{
         res0: Int = 3
       """)
     }
-    test("truncation"){
+    test("truncation") {
       // Need a way to capture stdout in tests to make these tests work
-      if(false) check.session("""
+      if (false) check.session("""
         @ Seq.fill(20)(100)
         res0: Seq[Int] = List(
           100,
@@ -266,7 +265,7 @@ object AdvancedTests extends TestSuite{
         ...
       """)
     }
-    test("private"){
+    test("private") {
       test("vals") - check.session(s"""
         @ private val x = 1; val y = x + 1
         y: Int = 2
@@ -289,7 +288,7 @@ object AdvancedTests extends TestSuite{
         
       """)
 
-      test("dontPrint"){
+      test("dontPrint") {
         check.session(
           """
           @ private object Foo { def get = "a" }; val s = Foo.get
@@ -312,10 +311,11 @@ object AdvancedTests extends TestSuite{
 
           @ private type T = String; private def foo(): T = "a"; val s: String = foo()
           s: String = "a"
-        """)
+        """
+        )
       }
     }
-    test("compilerPlugin") - retry(3){
+    test("compilerPlugin") - retry(3) {
       if (check.scala2)
         check.session("""
           @ // Compiler plugins imported without `.$plugin` are not loaded
@@ -348,7 +348,7 @@ object AdvancedTests extends TestSuite{
       else
         "Disabled"
     }
-    test("replApiUniqueness"){
+    test("replApiUniqueness") {
       // Make sure we can instantiate multiple copies of Interpreter, with each
       // one getting its own `ReplBridge`. This ensures that the various
       // Interpreters are properly encapsulated and don't interfere with each
@@ -376,8 +376,7 @@ object AdvancedTests extends TestSuite{
             if (scalaVer == "2.12.0" || scalaVer == "2.12.1") "2.1.0"
             else "2.1.1"
           s"""import $$plugin.$$ivy.`org.scalamacros:::paradise:$paradiseVersion`"""
-        }
-        else
+        } else
           "interp.configureCompiler(_.settings.YmacroAnnotations.value = true)"
 
       if (check.scala2)
@@ -401,7 +400,7 @@ object AdvancedTests extends TestSuite{
       else
         "Disabled in Scala 3"
     }
-    test("desugar"){
+    test("desugar") {
       if (check.scala2)
         check.session("""
           @ desugar{1 + 2 max 3}
@@ -410,14 +409,14 @@ object AdvancedTests extends TestSuite{
       else
         "Disabled in Scala 3"
     }
-    test("loadingModulesInPredef"){
+    test("loadingModulesInPredef") {
 
-      val dir = os.pwd/"amm"/"src"/"test"/"resources"/"scripts"/"predefWithLoad"
-      test("loadExec"){
+      val dir = os.pwd / "amm" / "src" / "test" / "resources" / "scripts" / "predefWithLoad"
+      test("loadExec") {
         val c1 = new DualTestRepl() {
           override def predef = (
-            os.read(dir/"PredefLoadExec.sc"),
-            Some(dir/"PredefLoadExec.sc")
+            os.read(dir / "PredefLoadExec.sc"),
+            Some(dir / "PredefLoadExec.sc")
           )
         }
         c1.session("""
@@ -425,11 +424,11 @@ object AdvancedTests extends TestSuite{
           previouslyLoaded: Int = 1337
         """)
       }
-      test("loadModule"){
-        val c2 = new DualTestRepl(){
+      test("loadModule") {
+        val c2 = new DualTestRepl() {
           override def predef = (
-            os.read(dir/"PredefLoadModule.sc"),
-            Some(dir/"PredefLoadModule.sc")
+            os.read(dir / "PredefLoadModule.sc"),
+            Some(dir / "PredefLoadModule.sc")
           )
         }
         c2.session("""
@@ -437,11 +436,11 @@ object AdvancedTests extends TestSuite{
           previouslyLoaded: Int = 1337
         """)
       }
-      test("importIvy"){
-        val c2 = new DualTestRepl(){
+      test("importIvy") {
+        val c2 = new DualTestRepl() {
           override def predef = (
-            os.read(dir/"PredefMagicImport.sc"),
-            Some(dir/"PredefMagicImport.sc")
+            os.read(dir / "PredefMagicImport.sc"),
+            Some(dir / "PredefMagicImport.sc")
           )
         }
         c2.session("""
@@ -453,7 +452,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
     }
-    test("bytecodeForReplClasses"){
+    test("bytecodeForReplClasses") {
       check.session("""
         @ case class Child(name: String)
 
@@ -468,15 +467,15 @@ object AdvancedTests extends TestSuite{
         res4: Boolean = true
       """)
     }
-    test("customBridge"){
+    test("customBridge") {
       check.session("""
         @ val s = test.message
         s: String = "ba"
       """)
     }
 
-    test("dontRefreshCompiler"){
-      test{
+    test("dontRefreshCompiler") {
+      test {
         check.session("""
           @ val c1 = repl.compiler
 
@@ -496,7 +495,7 @@ object AdvancedTests extends TestSuite{
         """)
       }
 
-      test("preconfigured"){
+      test("preconfigured") {
         check.session("""
           @ val c0 = repl.compiler
 
@@ -523,7 +522,7 @@ object AdvancedTests extends TestSuite{
       }
     }
 
-    test("loadURL"){
+    test("loadURL") {
       if (check.scala2) {
         val sbv = {
           val sv = check.scalaVersion
@@ -546,7 +545,7 @@ object AdvancedTests extends TestSuite{
       } else "Disabled in Scala 3"
     }
 
-    test("accessPressy"){
+    test("accessPressy") {
       if (check.scala2) check.session("""
         @ def typeAt(code: String, pos: Int) = {
         @   import scala.tools.nsc.interactive.Response
@@ -572,7 +571,7 @@ object AdvancedTests extends TestSuite{
       """) else "N/A in Scala 3"
     }
 
-    test("accessInMemoryClassMap"){
+    test("accessInMemoryClassMap") {
       check.session("""
         @ class Foo
         defined class Foo
@@ -595,7 +594,7 @@ object AdvancedTests extends TestSuite{
       """)
     }
 
-    test("given"){
+    test("given") {
       if (check.scala2) "N/A"
       else
         check.session("""
@@ -619,7 +618,7 @@ object AdvancedTests extends TestSuite{
           fooOrd: Ordering[Foo] = <given>
         """)
     }
-    test("extension-methods"){
+    test("extension-methods") {
       if (scala2) "N/A"
       else
         check.session("""
@@ -830,8 +829,7 @@ object AdvancedTests extends TestSuite{
                     ^
           """
         )
-      }
-      else {
+      } else {
         objCheck.session(
           """
             @ @deprecated("foo", "1.2") def value(): Int = 2

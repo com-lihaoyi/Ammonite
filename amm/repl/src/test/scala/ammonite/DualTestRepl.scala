@@ -4,8 +4,8 @@ import ammonite.compiler.CodeClassWrapper
 import ammonite.util.{Evaluated, Res}
 
 /**
-  * Wraps several [[TestRepl]], and runs its tests against all of them.
-  */
+ * Wraps several [[TestRepl]], and runs its tests against all of them.
+ */
 class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
@@ -46,8 +46,7 @@ class DualTestRepl { dual =>
     }
   def result(input: String, expected: Res[Evaluated]): Unit =
     repls.foreach(_.result(input, expected))
-  def fail(input: String,
-           failureCheck: String => Boolean = _ => true): Unit =
+  def fail(input: String, failureCheck: String => Boolean = _ => true): Unit =
     repls.foreach(_.fail(input, failureCheck))
 
   def notFound(name: String): String =

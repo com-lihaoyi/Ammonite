@@ -5,7 +5,6 @@ import java.net.URL
 import java.nio.file.{Path, Paths}
 import java.util.zip.{ZipFile, ZipInputStream}
 
-
 import io.github.retronym.java9rtexport.Export
 
 import scala.util.control.NonFatal
@@ -18,8 +17,8 @@ import scala.util.control.NonFatal
 object Classpath {
   val traceClasspathIssues =
     sys.props
-       .get("ammonite.trace-classpath")
-       .exists(_.toLowerCase == "true")
+      .get("ammonite.trace-classpath")
+      .exists(_.toLowerCase == "true")
 
   /**
    * In memory cache of all the jars used in the compiler. This takes up some
@@ -27,8 +26,8 @@ object Classpath {
    * want to do something.
    */
   def classpath(
-    classLoader: ClassLoader,
-    rtCacheDir: Option[Path]
+      classLoader: ClassLoader,
+      rtCacheDir: Option[Path]
   ): Vector[URL] = {
     lazy val actualRTCacheDir = rtCacheDir.filter { dir =>
       // no need to cache if the storage is in tmpdir
@@ -39,16 +38,15 @@ object Classpath {
     var current = classLoader
     val files = collection.mutable.Buffer.empty[java.net.URL]
     val seenClassLoaders = collection.mutable.Buffer.empty[ClassLoader]
-    while(current != null){
+    while (current != null) {
       seenClassLoaders.append(current)
-      current match{
+      current match {
         case t: java.net.URLClassLoader =>
           files.appendAll(t.getURLs)
         case _ =>
       }
       current = current.getParent
     }
-
 
     val sunBoot = System.getProperty("sun.boot.class.path")
     if (sunBoot != null) {
@@ -61,8 +59,10 @@ object Classpath {
       )
     } else {
       if (seenClassLoaders.contains(ClassLoader.getSystemClassLoader)) {
-        for (p <- System.getProperty("java.class.path")
-          .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")) {
+        for (
+          p <- System.getProperty("java.class.path")
+            .split(File.pathSeparatorChar) if !p.endsWith("sbt-launch.jar")
+        ) {
           val f = new File(p)
           if (f.exists())
             files.append(f.toURI.toURL)
@@ -97,7 +97,7 @@ object Classpath {
     } catch {
       case NonFatal(e) =>
         traceClasspathProblem(
-          s"Classpath element '$url' "+
+          s"Classpath element '$url' " +
             s"could not be opened as jar file because of $e"
         )
         false

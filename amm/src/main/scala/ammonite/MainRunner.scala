@@ -22,39 +22,43 @@ import scala.concurrent.duration.Duration
 import acyclic.skipped
 
 /**
-  * Bundles together:
-  *
-  * - All the code relying on [[cliConfig]]
-  * - Handling for the common input/output streams and print-streams
-  * - Logic around the watch-and-rerun flag
-  */
-class MainRunner(cliConfig: Config,
-                 outprintStream: PrintStream,
-                 errPrintStream: PrintStream,
-                 stdIn: InputStream,
-                 stdOut: OutputStream,
-                 stdErr: OutputStream,
-                 wd: os.Path){
+ * Bundles together:
+ *
+ * - All the code relying on [[cliConfig]]
+ * - Handling for the common input/output streams and print-streams
+ * - Logic around the watch-and-rerun flag
+ */
+class MainRunner(
+    cliConfig: Config,
+    outprintStream: PrintStream,
+    errPrintStream: PrintStream,
+    stdIn: InputStream,
+    stdOut: OutputStream,
+    stdErr: OutputStream,
+    wd: os.Path
+) {
 
   // for trapping exit when the --watch option is on
   if (cliConfig.core.watch.value && ammonite.util.Util.javaMajorVersion < 17)
     System.setSecurityManager(TrapExitSecurityManager)
 
   val colors =
-    if(cliConfig.core.color.getOrElse(ammonite.util.Util.isInteractive())) Colors.Default
+    if (cliConfig.core.color.getOrElse(ammonite.util.Util.isInteractive())) Colors.Default
     else Colors.BlackWhite
 
   def printInfo(s: String) = errPrintStream.println(colors.info()(s))
   def printError(s: String) = errPrintStream.println(colors.error()(s))
 
-  @tailrec final def watchLoop[T](isRepl: Boolean,
-                                  printing: Boolean,
-                                  run: Main => (Res[T], Seq[(Watchable, Long)])): Boolean = {
+  @tailrec final def watchLoop[T](
+      isRepl: Boolean,
+      printing: Boolean,
+      run: Main => (Res[T], Seq[(Watchable, Long)])
+  ): Boolean = {
     val (result, watched) = run(initMain(isRepl))
 
     val success = handleWatchRes(result, printing)
     if (!cliConfig.core.watch.value) success
-    else{
+    else {
       watchAndWait(watched)
       watchLoop(isRepl, printing, run)
     }
@@ -102,7 +106,7 @@ class MainRunner(cliConfig: Config,
         if (printing && value != ()) outprintStream.println(pprint.PPrinter.BlackWhite(value))
         true
 
-      case Res.Skip   => true // do nothing on success, everything's already happened
+      case Res.Skip => true // do nothing on success, everything's already happened
     }
     success
   }
@@ -112,7 +116,7 @@ class MainRunner(cliConfig: Config,
       new Storage.Folder(cliConfig.core.home, isRepl) {
         override def loadPredef = None
       }
-    }else{
+    } else {
       new Storage.Folder(cliConfig.core.home, isRepl)
     }
 
@@ -130,7 +134,10 @@ class MainRunner(cliConfig: Config,
       inputStream = stdIn,
       outputStream = stdOut,
       errorStream = stdErr,
-      welcomeBanner = cliConfig.repl.banner match{case "" => None case s => Some(s)},
+      welcomeBanner = cliConfig.repl.banner match {
+        case "" => None
+        case s => Some(s)
+      },
       verboseOutput = !cliConfig.core.silent.value,
       remoteLogging = !cliConfig.repl.noRemoteLogging.value,
       colors = colors,
@@ -143,7 +150,8 @@ class MainRunner(cliConfig: Config,
       compilerBuilder = ammonite.compiler.CompilerBuilder(
         outputDir = cliConfig.repl.outputDirectory.map(_.toNIO)
           .orElse {
-            if (cliConfig.repl.tmpOutputDirectory.value) Some(os.temp.dir(prefix = "ammonite-output").toNIO)
+            if (cliConfig.repl.tmpOutputDirectory.value)
+              Some(os.temp.dir(prefix = "ammonite-output").toNIO)
             else None
           }
       ),
@@ -152,14 +160,13 @@ class MainRunner(cliConfig: Config,
   }
 
 }
-object MainRunner{
+object MainRunner {
 
   /**
    * Polls for updates until either one of the input files changes,
    * or the enter key is pressed
-   * */
-  def statWatchWait(watched: Seq[(Watchable, Long)],
-                    stdIn: InputStream): Unit = {
+   */
+  def statWatchWait(watched: Seq[(Watchable, Long)], stdIn: InputStream): Unit = {
     val buffer = new Array[Byte](4 * 1024)
 
     def allWatchedUnchanged() =
@@ -176,10 +183,10 @@ object MainRunner{
     }
     @tailrec def lookForEnterKey(): Boolean = {
       if (stdIn.available() == 0) false
-      else stdIn.read(buffer)  match{
+      else stdIn.read(buffer) match {
         case 0 | -1 => false
         case n =>
-          buffer.indexOf('\n') match{
+          buffer.indexOf('\n') match {
             case -1 => lookForEnterKey()
             case i =>
               if (i >= n) lookForEnterKey()
@@ -189,6 +196,5 @@ object MainRunner{
     }
     statWatchWait0()
   }
-
 
 }
