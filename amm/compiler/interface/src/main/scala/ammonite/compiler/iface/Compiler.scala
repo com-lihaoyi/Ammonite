@@ -5,11 +5,11 @@ import ammonite.util.{Imports, Printer}
 abstract class Compiler {
 
   def compile(
-    src: Array[Byte],
-    printer: Printer,
-    importsLen: Int,
-    userCodeNestingLevel: Int,
-    fileName: String
+      src: Array[Byte],
+      printer: Printer,
+      importsLen: Int,
+      userCodeNestingLevel: Int,
+      fileName: String
   ): Option[Compiler.Output]
 
   def preprocessor(fileName: String, markGeneratedSections: Boolean = false): Preprocessor
@@ -19,10 +19,9 @@ abstract class Compiler {
 object Compiler {
 
   case class Output(
-    classFiles: Vector[(String, Array[Byte])],
-    imports: Imports,
-    usedEarlierDefinitions: Option[Seq[String]]
+      classFiles: Vector[(String, Array[Byte])],
+      imports: Imports,
+      usedEarlierDefinitions: Option[Seq[String]]
   )
 
 }
-

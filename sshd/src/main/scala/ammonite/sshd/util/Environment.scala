@@ -1,6 +1,5 @@
 package ammonite.sshd.util
 
-
 import java.io.{InputStream, OutputStream, PrintStream}
 
 /**
@@ -11,11 +10,12 @@ import java.io.{InputStream, OutputStream, PrintStream}
  * @param systemOut
  * @param systemErr
  */
-case class Environment(thread: Thread,
-                       contextClassLoader: ClassLoader,
-                       systemIn: InputStream,
-                       systemOut: PrintStream,
-                       systemErr: PrintStream
+case class Environment(
+    thread: Thread,
+    contextClassLoader: ClassLoader,
+    systemIn: InputStream,
+    systemOut: PrintStream,
+    systemErr: PrintStream
 )
 
 object Environment {

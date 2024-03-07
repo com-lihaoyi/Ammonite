@@ -2,11 +2,10 @@ package ammonite.terminal
 
 import utest._
 
+object NavigationTests extends TestSuite {
 
-object NavigationTests extends TestSuite{
-
-  val tests = Tests{
-    test("simple"){
+  val tests = Tests {
+    test("simple") {
       // Tests for a simple, not-wrap-around
       // grid of characters
       val check = Checker(
@@ -16,7 +15,6 @@ object NavigationTests extends TestSuite{
           e_fgh
           ijkl
         """
-
       )
 
       import check._
@@ -30,7 +28,7 @@ object NavigationTests extends TestSuite{
         (g, v) => (g, v)
       )
 
-      test("upsAndDowns"){
+      test("upsAndDowns") {
 
         test("down") - check(
           """
@@ -54,7 +52,8 @@ object NavigationTests extends TestSuite{
           e_fgh
           ijkl
           """,
-          up, down
+          up,
+          down
         )
         test("upup") - check(
           """
@@ -62,7 +61,8 @@ object NavigationTests extends TestSuite{
           efgh
           ijkl
           """,
-          up, up
+          up,
+          up
         )
         test("downdown") - check(
           """
@@ -70,7 +70,8 @@ object NavigationTests extends TestSuite{
           efgh
           ijkl_
           """,
-          down, down
+          down,
+          down
         )
         test("upupdown") - check(
           """
@@ -78,7 +79,9 @@ object NavigationTests extends TestSuite{
           _efgh
           ijkl
           """,
-          up, up, down
+          up,
+          up,
+          down
         )
         test("downdownup") - check(
           """
@@ -86,10 +89,12 @@ object NavigationTests extends TestSuite{
           efgh_
           ijkl
           """,
-          down, down, up
+          down,
+          down,
+          up
         )
       }
-      test("startEnd"){
+      test("startEnd") {
         test("end") - check(
           """
           abcd
@@ -108,7 +113,7 @@ object NavigationTests extends TestSuite{
         )
       }
     }
-    test("jagged"){
+    test("jagged") {
       // tests where the lines of characters
       // are of uneven lengths
       val check = Checker(
@@ -132,7 +137,8 @@ object NavigationTests extends TestSuite{
         s
         t_uvwxyz
         """,
-        down, down
+        down,
+        down
       )
       test("truncateBackUp") - check(
         """
@@ -142,7 +148,10 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        down, down, up, up
+        down,
+        down,
+        up,
+        up
       )
       test("upup") - check(
         """
@@ -152,7 +161,8 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        up, up
+        up,
+        up
       )
       test("endup") - check(
         """
@@ -162,10 +172,11 @@ object NavigationTests extends TestSuite{
         s
         tuvwxyz
         """,
-        end, up
+        end,
+        up
       )
     }
-    test("wrapping"){
+    test("wrapping") {
       // tests where some lines are so long that they start
       // wrapping onto the next ones. Navigating around they
       // should behave like separate lines
@@ -180,8 +191,8 @@ object NavigationTests extends TestSuite{
         """
       )
       import check._
-      test("updown"){
-        test{
+      test("updown") {
+        test {
           check
             .run(up)
             .check(
@@ -204,32 +215,32 @@ object NavigationTests extends TestSuite{
               """
             )
         }
-        test{
+        test {
           check
-          .run(down)
-          .check(
-            """
+            .run(down)
+            .check(
+              """
             abcdefg\
             hijk
             lmnopqr\
             s_
             tuvwxyz
             """
-          )
-          .run(down)
-          .check(
-            """
+            )
+            .run(down)
+            .check(
+              """
             abcdefg\
             hijk
             lmnopqr\
             s
             t_uvwxyz
             """
-          )
+            )
         }
 
       }
-      test("startend"){
+      test("startend") {
 
         test - check(
           """
@@ -259,7 +270,8 @@ object NavigationTests extends TestSuite{
           s
           tuvwxyz
           """,
-          up, home
+          up,
+          home
         )
         test - check(
           """
@@ -269,7 +281,10 @@ object NavigationTests extends TestSuite{
           s
           tuvwxyz
           """,
-          up, home, home, home
+          up,
+          home,
+          home,
+          home
         )
         test - check(
           """
@@ -279,11 +294,13 @@ object NavigationTests extends TestSuite{
           s
           tuvwxyz
           """,
-          up, up, end
+          up,
+          up,
+          end
         )
       }
     }
-    test("wordnav"){
+    test("wordnav") {
       // Tests of word-by-word navigation
       val check = Checker(
         width = 10,
@@ -296,7 +313,6 @@ object NavigationTests extends TestSuite{
         """
       )
       import check._
-
 
       test("leftRight") - check
         .run(wordLeft)
@@ -352,7 +368,6 @@ object NavigationTests extends TestSuite{
           """
         )
 
-
       test("manyRight") - check
         .run(wordRight)
         .check(
@@ -406,7 +421,7 @@ object NavigationTests extends TestSuite{
         )
 
       test("oneOffs") - check
-        .run((b, c) => (b, c+2))
+        .run((b, c) => (b, c + 2))
         .check(
           """
           s.dropPref\
@@ -436,7 +451,7 @@ object NavigationTests extends TestSuite{
           )
           """
         )
-        .run((b, c) => (b, c-2))
+        .run((b, c) => (b, c - 2))
         .check(
           """
           s.dropPref\

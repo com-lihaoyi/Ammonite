@@ -4,22 +4,21 @@ import utest._
 import TestUtils._
 
 /**
-  * Mostly already tested in the `ammonite.main` unit tests; one test case is
-  * left here just to verify end-to-end correctness
-  */
-object LineNumberTests extends TestSuite{
-  val tests = this{
+ * Mostly already tested in the `ammonite.main` unit tests; one test case is
+ * left here just to verify end-to-end correctness
+ */
+object LineNumberTests extends TestSuite {
+  val tests = this {
 
     def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
-      val e = intercept[os.SubprocessException]{
+      val e = intercept[os.SubprocessException] {
         exec(file)
       }.result.err.text()
       assert(TestUtils.containsLines(e, expected))
     }
 
-
     test("compilationErrorInSecondBlock") {
-      val path = os.rel/"lineNumbers"/"compilationErrorInSecondBlock.sc"
+      val path = os.rel / "lineNumbers" / "compilationErrorInSecondBlock.sc"
       val sp = " "
       checkErrorMessage(
         file = path,

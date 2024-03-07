@@ -4,22 +4,17 @@
  */
 package ammonite.runtime.tools
 
-
 import java.io.{BufferedReader, InputStreamReader}
-
 
 import ammonite.util.Util.newLine
 
 import scala.collection.{GenTraversableOnce, mutable}
 import scala.util.matching.Regex
 
-
-
-trait Grepper[T]{
-  def apply(t: T, s: Any)
-           (implicit pp: pprint.PPrinter = Grepper.defaultPPrint): Option[GrepResult]
+trait Grepper[T] {
+  def apply(t: T, s: Any)(implicit pp: pprint.PPrinter = Grepper.defaultPPrint): Option[GrepResult]
 }
-object Grepper{
+object Grepper {
   val defaultPPrint = pprint.PPrinter.BlackWhite.copy(defaultHeight = Int.MaxValue)
   implicit object Str extends Grepper[String] {
     def apply(t: String, s: Any)(implicit pp: pprint.PPrinter = defaultPPrint) = {
@@ -40,18 +35,18 @@ object Grepper{
 
 case class GrepResult(spans: Seq[(Int, Int)], text: fansi.Str)
 
-object GrepResult{
+object GrepResult {
   case class Color(highlight: fansi.Attrs, dotDotDotColor: fansi.Attrs)
-  object Color{
+  object Color {
     implicit val defaultColor: Color = Color(
       fansi.Back.Yellow ++ fansi.Color.Blue,
       fansi.Attrs.Empty
     )
   }
 
-  def grepResultRepr(grepResult: GrepResult,
-                     ctx: pprint.Tree.Ctx)
-                    (implicit highlightColor: Color) = {
+  def grepResultRepr(grepResult: GrepResult, ctx: pprint.Tree.Ctx)(implicit
+      highlightColor: Color
+  ) = {
     val outputSnippets = mutable.Buffer.empty[fansi.Str]
     val rangeBuffer = mutable.Buffer.empty[(Int, Int)]
     var remainingSpans = grepResult.spans.toList
@@ -62,17 +57,17 @@ object GrepResult{
     val width = ctx.width - ctx.leftOffset * 2 - 6
 
     /**
-      * Consume all the matches that have been aggregated in `rangeBuffer` and
-      * generate a single result snippet to show the user. Multiple ranges
-      * can turn up in the same snippet if they are close enough, and we do
-      * some math to make sure snippets...
-      *
-      * - Do not overlap
-      * - Are at most `width` wide
-      * - Have `...` if they're truncated on the left or right
-      * - Are roughly centered on the ranges they contain, as far as possible
-      *   given the above.
-      */
+     * Consume all the matches that have been aggregated in `rangeBuffer` and
+     * generate a single result snippet to show the user. Multiple ranges
+     * can turn up in the same snippet if they are close enough, and we do
+     * some math to make sure snippets...
+     *
+     * - Do not overlap
+     * - Are at most `width` wide
+     * - Have `...` if they're truncated on the left or right
+     * - Are roughly centered on the ranges they contain, as far as possible
+     *   given the above.
+     */
     def generateSnippet() = {
       val start = rangeBuffer.head._1
       val end = rangeBuffer.last._2
@@ -103,8 +98,8 @@ object GrepResult{
       val wideEnd = cap(0, shiftedEnd, grepResult.text.length)
 
       val colorRanges =
-        for((rangeStart, rangeEnd) <- rangeBuffer)
-        yield (highlightColor.highlight, rangeStart - wideStart, rangeEnd - wideStart)
+        for ((rangeStart, rangeEnd) <- rangeBuffer)
+          yield (highlightColor.highlight, rangeStart - wideStart, rangeEnd - wideStart)
 
       val colored = grepResult.text.substring(wideStart, wideEnd).overlayAll(colorRanges.toSeq)
 
@@ -121,7 +116,7 @@ object GrepResult{
     // the acceptable width, and when that happens consume all the stored spans
     // to generate a snippet. Generate one more snippet at the end too to use up
     // any un-consumed spans
-    while(remainingSpans.nonEmpty){
+    while (remainingSpans.nonEmpty) {
       val (start, end) = remainingSpans.head
       remainingSpans = remainingSpans.tail
       if (rangeBuffer.nonEmpty && end - rangeBuffer(0)._1 >= width) {
@@ -135,16 +130,14 @@ object GrepResult{
   }
 }
 
-
 /**
  * Lets you filter a list by searching for a matching string or
  * regex within the pretty-printed contents.
  */
 object grep {
-  def apply[T: Grepper]
-           (pat: T, str: Any)
-           (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
-           : Option[GrepResult] = {
+  def apply[T: Grepper](pat: T, str: Any)(implicit
+      c: pprint.PPrinter = Grepper.defaultPPrint
+  ): Option[GrepResult] = {
     implicitly[Grepper[T]].apply(pat, str)
   }
 
@@ -152,32 +145,32 @@ object grep {
    * Magic implicits used to turn the [T: PPrint](t: T) => Option[T]
    * into a real T => Option[T] by materializing PPrint[T] for various values of T
    */
-  object !{
-    implicit def FunkyFunc1(f: ![_])
-                           (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
-                           : Any => GenTraversableOnce[GrepResult] = {
+  object ! {
+    implicit def FunkyFunc1(f: ![_])(implicit
+        c: pprint.PPrinter = Grepper.defaultPPrint
+    ): Any => GenTraversableOnce[GrepResult] = {
       (x: Any) => f.apply(x)
     }
 
-    implicit def FunkyFunc2(f: ![_])
-                           (implicit c: pprint.PPrinter = Grepper.defaultPPrint)
-                           : Any => Boolean = {
+    implicit def FunkyFunc2(f: ![_])(implicit
+        c: pprint.PPrinter = Grepper.defaultPPrint
+    ): Any => Boolean = {
       x => f.apply(x).isDefined
     }
   }
 
-  case class ![T: Grepper](pat: T){
+  case class ![T: Grepper](pat: T) {
     def apply(str: Any)(implicit c: pprint.PPrinter = Grepper.defaultPPrint) = {
       grep.this.apply(pat, str)
     }
   }
 }
 
-case class tail(interval: Int, prefix: Int) extends Function[os.Path, Iterator[String]]{
+case class tail(interval: Int, prefix: Int) extends Function[os.Path, Iterator[String]] {
   def apply(arg: os.Path): Iterator[String] = {
     val is = os.read.inputStream(arg)
     val br = new BufferedReader(new InputStreamReader(is))
-    Iterator.continually{
+    Iterator.continually {
       val line = br.readLine()
       if (line == null) Thread.sleep(interval)
       Option(line)
@@ -192,10 +185,11 @@ case class tail(interval: Int, prefix: Int) extends Function[os.Path, Iterator[S
  * or use for other things.
  */
 object tail extends tail(100, 50)
+
 /**
-  * Records how long the given computation takes to run, returning the duration
-  * in addition to the return value of that computation
-  */
+ * Records how long the given computation takes to run, returning the duration
+ * in addition to the return value of that computation
+ */
 object time {
 
   def apply[T](t: => T) = {
@@ -207,22 +201,24 @@ object time {
   }
 }
 
-
-object browse{
+object browse {
   case class Strings(values: Seq[String])
-  object Strings{
+  object Strings {
     implicit def stringPrefix(s: String): Strings = Strings(Seq(s))
     implicit def stringSeqPrefix(s: Seq[String]): Strings = Strings(s)
   }
   // R -> show ansi-colors as colors, M -> show current-browse-% bar
   val lessViewer = Seq("less", "-RM")
-  def apply(t: Any,
-            viewer: Strings = lessViewer,
-            width: Integer = null,
-            height: Integer = 9999999,
-            indent: Integer = null)
-           (implicit pp: pprint.PPrinter = pprint.PPrinter.Color.copy(defaultHeight = Int.MaxValue),
-            wd: os.Path = os.pwd) = {
+  def apply(
+      t: Any,
+      viewer: Strings = lessViewer,
+      width: Integer = null,
+      height: Integer = 9999999,
+      indent: Integer = null
+  )(implicit
+      pp: pprint.PPrinter = pprint.PPrinter.Color.copy(defaultHeight = Int.MaxValue),
+      wd: os.Path = os.pwd
+  ) = {
 
     os.proc(
       viewer.values,

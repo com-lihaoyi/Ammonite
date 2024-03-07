@@ -9,8 +9,8 @@ import ch.epfl.scala.bsp4j.{BuildTargetEvent, BuildTargetEventKind, BuildTargetI
 import scala.collection.JavaConverters._
 
 final class ScriptCache(
-  proc: ScriptProcessor,
-  onBuildTargetEvents: Seq[BuildTargetEvent] => Unit
+    proc: ScriptProcessor,
+    onBuildTargetEvents: Seq[BuildTargetEvent] => Unit
 ) {
 
   private val cache = new ConcurrentHashMap[String, Script]
@@ -67,7 +67,7 @@ final class ScriptCache(
       previousOpt = Option(cache.put(id, script))
       if previousOpt.forall { newScript =>
         newScript.dependencies != script.dependencies ||
-          newScript.options != script.options
+        newScript.options != script.options
       }
     } yield {
       val event = new BuildTargetEvent(new BuildTargetIdentifier(id))

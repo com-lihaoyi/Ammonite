@@ -30,7 +30,7 @@ object YRangeposTests extends TestSuite {
       val res = Scripts.runScript(os.pwd, scriptFolderPath / "yRangepos.sc", interp)
       assert(res.isSuccess)
     }
-    test("Yrangepos"){
+    test("Yrangepos") {
       if (scala2) simpleTest()
       else "Disabled in Scala 3"
     }
@@ -40,10 +40,12 @@ object YRangeposTests extends TestSuite {
       // behaviour, by checking that the line at which the error is found matches
       // the expected one in the file
       val expectedErrorMessage = "yRangeposError.sc:9: type mismatch;"
-      checkErrorMessage(InProcessMainMethodRunner.base / "scriptCompilerSettings" / "yRangeposError.sc",
-        expectedErrorMessage)
+      checkErrorMessage(
+        InProcessMainMethodRunner.base / "scriptCompilerSettings" / "yRangeposError.sc",
+        expectedErrorMessage
+      )
     }
-    test("YrangeposError"){
+    test("YrangeposError") {
       if (scala2) errorTest()
       else "Disabled in Scala 3"
     }
