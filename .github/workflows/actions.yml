@@ -20,6 +20,11 @@ jobs:
         java-version: [ 8, 17 ]
         scala-binary-version: [ 2.12, 2.13, 3 ]
         include:
+          # Including lowest/highest versions that work with Java 21
+          - java-version: 21
+            scala-version: 2.12.18
+          - java-version: 21
+            scala-version: 2.12.19
           - java-version: 21
             scala-version: 2.13.11
           - java-version: 21
@@ -46,6 +51,11 @@ jobs:
         java-version: [ 8, 17 ]
         scala-version: [ 2.12, 2.13, 3 ]
         include:
+          # Including lowest/highest versions that work with Java 21
+          - java-version: 21
+            scala-version: 2.12.18
+          - java-version: 21
+            scala-version: 2.12.19
           - java-version: 21
             scala-version: 2.13.11
           - java-version: 21
