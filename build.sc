@@ -116,7 +116,7 @@ object Deps {
   val scalazCore = ivy"org.scalaz::scalaz-core:7.2.35"
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
-  val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.36"
+  val slf4jNop = ivy"org.slf4j:slf4j-nop:2.0.12"
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.1"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
