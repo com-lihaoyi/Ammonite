@@ -17,7 +17,6 @@ import mill.scalalib.publish._
 import mill.scalalib.api.ZincWorkerUtil._
 import mill.testrunner.TestRunner
 
-
 val ghOrg = "com-lihaoyi"
 val ghRepo = "Ammonite"
 val masterBranch = "main"
@@ -1031,26 +1030,31 @@ def publishSonatype(
  * {{{
  * mill checkPublishedArtifacts --artifacts __.publishSelfDependency --version {version} --ttl "1 sec"
  * }}}
-  * See also https://github.com/com-lihaoyi/Ammonite/pull/1453
+ * See also https://github.com/com-lihaoyi/Ammonite/pull/1453
  */
-def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String, ttl: String = "1 hour") = T.command {
-  val coords = T.sequence(artifacts.value)()
-  val next = new AtomicInteger(0)
-  val fut = coords.map { coord =>
-    Future {
-      val dep = s"${coord.group}:${coord.id}:${version}"
-      println(s"[${next.incrementAndGet()}/${coords.size}] Checking ${dep}")
-      val res = os.proc("cs", "complete-dep", dep, "-l", ttl)
-        .call().out.text().trim()
-      // println(res)
-      Option.when(!res.contains(version))(dep)
-    }(ExecutionContext.global)
+def checkPublishedArtifacts(artifacts: Tasks[Artifact], version: String, ttl: String = "1 hour") =
+  T.command {
+    val coords = T.sequence(artifacts.value)()
+    val next = new AtomicInteger(0)
+    val fut = coords.map { coord =>
+      Future {
+        val dep = s"${coord.group}:${coord.id}:${version}"
+        println(s"[${next.incrementAndGet()}/${coords.size}] Checking ${dep}")
+        val res = os.proc("cs", "complete-dep", dep, "-l", ttl)
+          .call().out.text().trim()
+        // println(res)
+        Option.when(!res.contains(version))(dep)
+      }(ExecutionContext.global)
+    }
+    val missing = fut.map(Await.result(_, duration.Duration.Inf)).flatten
+    if (missing.isEmpty) {
+      Result.Success(s"All artifacts published for version ${version}")
+    } else {
+      val msg =
+        if (missing.size == coords.size) s"All artifacts missing for version ${version}"
+        else s"Missing ${missing.size} of ${coords.size} published artifacts: ${
+            missing.mkString("\n- ", "\n- ", "")
+          }"
+      Result.Failure(msg)
+    }
   }
-  val missing = fut.map(Await.result(_, duration.Duration.Inf)).flatten
-  val msg = if (missing.size == coords.size) s"All artifacts missing for version ${version}"
-  else s"Missing ${missing.size} of ${coords.size} published artifacts: ${
-      missing.mkString("\n- ", "\n- ", "")
-    }"
-  if(missing.isEmpty) Result.Success(s"All artifacts published for version ${version}")
-  else Result.Failure(msg)
-}
