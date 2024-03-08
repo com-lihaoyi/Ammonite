@@ -45,14 +45,22 @@ val commitsSinceTaggedVersion = {
     .toInt
 }
 
-val scala2_12Versions = 9.to(19).map(v => s"2.12.${v}")
-val scala2_13Versions = 2.to(13).map(v => s"2.13.${v}")
-val scala32Versions = Seq("3.2.0", "3.2.1", "3.2.2")
+//val isJava21 = scala.util.Properties.isJavaAtLeast(21).tap {
+//  if (_) println("Java 21+: Skip building of modules requiring incompatible Scala versions")
+//}
+
+val scala2_12Versions = 9.to(19)
+//  .dropWhile(v => isJava21 && v < 18)
+  .map(v => s"2.12.${v}")
+val scala2_13Versions = 2.to(13)
+//  .dropWhile(v => isJava21 && v < 11)
+  .map(v => s"2.13.${v}")
 val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
-val scala3Versions = scala32Versions ++ scala33Versions
+//  .dropWhile(v => isJava21 && v == "3.3.0")
+val scala3Versions = scala33Versions
 
 val binCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last, scala32Versions.last)
+  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
 val assemblyCrossScalaVersions =
   Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
@@ -730,10 +738,12 @@ def selectCrossPrefix[T <: Module, V](
       if (mods.isEmpty) sys.error(s"No matching cross-instances found in ${crossModule}")
     }
 
-def unitTest(scalaBinaryVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
-  val pred = (_: String).startsWith(scalaBinaryVersion)
+def unitTest(scalaVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
+  val binPred = (v: String) =>
+    v.startsWith(scalaVersion.split("[.\\-]").take(if (v.startsWith("2")) 2 else 1).mkString("."))
+  val pred = (_: String).startsWith(scalaVersion)
   val tests = Seq(
-    selectCrossPrefix(terminal, pred)(_.test),
+    selectCrossPrefix(terminal, binPred)(_.test),
     selectCrossPrefix(amm.repl, pred)(_.test),
     selectCrossPrefix(amm, pred)(_.test),
     selectCrossPrefix(sshd, pred)(_.test)
