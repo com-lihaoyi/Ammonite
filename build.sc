@@ -108,7 +108,7 @@ object Deps {
   val mainargs = ivy"com.lihaoyi::mainargs:0.5.4"
   val osLib = ivy"com.lihaoyi::os-lib:0.9.3"
   val pprint = ivy"com.lihaoyi::pprint:0.8.1"
-  val requests = ivy"com.lihaoyi::requests:0.8.0"
+  val requests = ivy"com.lihaoyi::requests:0.8.2"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.17.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.11.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
