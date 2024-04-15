@@ -96,7 +96,7 @@ object Deps {
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.19"
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
-  val fansi = ivy"com.lihaoyi::fansi:0.4.0"
+  val fansi = ivy"com.lihaoyi::fansi:0.5.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = ivy"com.lihaoyi::geny:1.0.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.12"
