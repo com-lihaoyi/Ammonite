@@ -98,7 +98,7 @@ object Deps {
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
   val fansi = ivy"com.lihaoyi::fansi:0.4.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
-  val geny = ivy"com.lihaoyi::geny:1.0.0"
+  val geny = ivy"com.lihaoyi::geny:1.1.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.12"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
