@@ -135,7 +135,7 @@ object Deps {
       else "3.1.3"
     ivy"com.lihaoyi::upickle:$ver"
   }
-  val utest = ivy"com.lihaoyi::utest:0.8.2"
+  val utest = ivy"com.lihaoyi::utest:0.8.3"
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
