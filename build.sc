@@ -52,7 +52,7 @@ val commitsSinceTaggedVersion = {
 val scala2_12Versions = 9.to(19)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.${v}")
-val scala2_13Versions = 2.to(13)
+val scala2_13Versions = 2.to(14)
 //  .dropWhile(v => isJava21 && v < 11)
   .map(v => s"2.13.${v}")
 val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
@@ -89,16 +89,16 @@ val fastparseVersion = "3.0.2"
 val scalametaVersion = "4.9.1"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.11"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.12"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.78"
   val cask = ivy"com.lihaoyi::cask:0.9.1"
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.19"
   val coursierDependencyInterface = ivy"io.get-coursier::dependency-interface:0.2.3"
-  val fansi = ivy"com.lihaoyi::fansi:0.4.0"
+  val fansi = ivy"com.lihaoyi::fansi:0.5.0"
   val fastparse = ivy"com.lihaoyi::fastparse:$fastparseVersion"
-  val geny = ivy"com.lihaoyi::geny:1.0.0"
+  val geny = ivy"com.lihaoyi::geny:1.1.0"
   val javaparserCore = ivy"com.github.javaparser:javaparser-core:3.2.12"
   val javassist = ivy"org.javassist:javassist:3.21.0-GA"
   val jlineJna = ivy"org.jline:jline-terminal-jna:3.14.1"
@@ -107,9 +107,9 @@ object Deps {
   val jsch = ivy"com.jcraft:jsch:0.1.55"
   val mainargs = ivy"com.lihaoyi::mainargs:0.5.4"
   val osLib = ivy"com.lihaoyi::os-lib:0.10.0"
-  val pprint = ivy"com.lihaoyi::pprint:0.8.1"
+  val pprint = ivy"com.lihaoyi::pprint:0.9.0"
   val requests = ivy"com.lihaoyi::requests:0.8.2"
-  val scalacheck = ivy"org.scalacheck::scalacheck:1.17.0"
+  val scalacheck = ivy"org.scalacheck::scalacheck:1.17.1"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.11.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:1.0.2"
@@ -125,7 +125,7 @@ object Deps {
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.36"
-  val sourcecode = ivy"com.lihaoyi::sourcecode:0.3.1"
+  val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.1"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
   val typename = ivy"org.tpolecat::typename:1.1.0"
@@ -135,7 +135,7 @@ object Deps {
       else "3.1.3"
     ivy"com.lihaoyi::upickle:$ver"
   }
-  val utest = ivy"com.lihaoyi::utest:0.8.2"
+  val utest = ivy"com.lihaoyi::utest:0.8.3"
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
