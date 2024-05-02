@@ -52,7 +52,7 @@ val commitsSinceTaggedVersion = {
 val scala2_12Versions = 9.to(19)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.${v}")
-val scala2_13Versions = 2.to(13)
+val scala2_13Versions = 2.to(14)
 //  .dropWhile(v => isJava21 && v < 11)
   .map(v => s"2.13.${v}")
 val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
@@ -89,7 +89,7 @@ val fastparseVersion = "3.0.2"
 val scalametaVersion = "4.9.1"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.11"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.12"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.78"
   val cask = ivy"com.lihaoyi::cask:0.9.1"
