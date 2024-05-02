@@ -1,0 +1,18 @@
+{
+    "value": [
+        "ref:e1b1f622:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Util.scala",
+        "ref:cc853bf6:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Frame.scala",
+        "ref:48ec11c0:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala",
+        "ref:d06cedcc:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/WhiteListClassLoader.scala",
+        "ref:155c5c81:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/PositionOffsetConversion.scala",
+        "ref:3b757d28:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Classpath.scala",
+        "ref:e61d8725:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Imports.scala",
+        "ref:16609704:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/ReplClassLoader.scala",
+        "ref:778b3109:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Model.scala",
+        "ref:8059f6e6:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Position.scala",
+        "ref:415b3a2f:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/java/io/github/retronym/java9rtexport/Export.java",
+        "ref:e7edda12:/home/runner/work/Ammonite/Ammonite/amm/util/src/main/java/io/github/retronym/java9rtexport/Copy.java"
+    ],
+    "valueHash": -1465291583,
+    "inputsHash": -1233828875
+}

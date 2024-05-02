@@ -1,0 +1,14 @@
+{
+    "value": [
+        "ref:e3e88f34:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/Config.scala",
+        "ref:710012ec:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/TrapExitSecurityManager.scala",
+        "ref:4217f6ab:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/package.scala",
+        "ref:f55d8fef:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/Scripts.scala",
+        "ref:3667a821:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/ProxyFromEnv.scala",
+        "ref:1f97c5a1:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/Main.scala",
+        "ref:69f02bbb:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/AmmoniteMain.scala",
+        "ref:8bf32b50:/home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/MainRunner.scala"
+    ],
+    "valueHash": 1544374834,
+    "inputsHash": -1335503869
+}

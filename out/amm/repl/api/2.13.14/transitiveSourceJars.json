@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ref:12eb05e0:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.14/sourceJar.dest/out.jar",
+        "ref:2547ee1a:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.14/sourceJar.dest/out.jar",
+        "ref:275159a2:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.14/sourceJar.dest/out.jar"
+    ],
+    "valueHash": -666108687,
+    "inputsHash": -626488786
+}

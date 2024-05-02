@@ -1,0 +1,28 @@
+{
+    "value": [
+        "qref:f9202507:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.14/0.3.12/acyclic_2.13.14-0.3.12.jar",
+        "qref:d920eb12:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/class-path-util_2.13/0.1.4/class-path-util_2.13-0.1.4.jar",
+        "qref:aae203d8:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.13/3.1.3/upickle_2.13-3.1.3.jar",
+        "qref:d024ad87:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/requests_2.13/0.8.2/requests_2.13-0.8.2.jar",
+        "qref:2b7c8b63:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.5.4/mainargs_2.13-0.5.4.jar",
+        "qref:77e5afaa:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency-interface_2.13/0.2.3/dependency-interface_2.13-0.2.3.jar",
+        "qref:472d5ac4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+        "qref:fb741de5:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.9.3/os-lib_2.13-0.9.3.jar",
+        "qref:e7824d5b:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar",
+        "qref:9fdefe3c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.11.0/scala-collection-compat_2.13-2.11.0.jar",
+        "qref:9c205598:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.0/fansi_2.13-0.5.0.jar",
+        "qref:4996cefa:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar",
+        "qref:3b39aaef:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.19/interface-1.0.19.jar",
+        "qref:ac588051:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.0/geny_2.13-1.1.0.jar",
+        "qref:8dc6509a:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.13/3.1.3/ujson_2.13-3.1.3.jar",
+        "qref:67e5cc8d:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upack_2.13/3.1.3/upack_2.13-3.1.3.jar",
+        "qref:ae4ed663:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-implicits_2.13/3.1.3/upickle-implicits_2.13-3.1.3.jar",
+        "qref:0cb4bd4e:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency_2.13/0.2.3/dependency_2.13-0.2.3.jar",
+        "qref:d0c019f0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.14/scala-reflect-2.13.14.jar",
+        "qref:c69a5577:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar",
+        "qref:9a88caca:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar",
+        "qref:100831ba:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-core_2.13/3.1.3/upickle-core_2.13-3.1.3.jar"
+    ],
+    "valueHash": -2127309385,
+    "inputsHash": 2038092003
+}
