@@ -143,7 +143,8 @@ object BuiltinTests extends TestSuite {
       // In 2.12.13, I would have expected things like
       //   interp.configureCompiler(_.settings.Wconf.tryToSet(List("any:wv", "cat=unchecked:ws")))
       // to re-instate the expected warning below, to no avail :|
-      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 12) check.session(s"""
+      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 12) {
+        check.session(s"""
         @ // Disabling default Scala imports
 
         @ List(1, 2, 3) + "lol"
@@ -190,6 +191,17 @@ object BuiltinTests extends TestSuite {
         @ repl.compiler.settings.nowarnings.value
         res10: Boolean = false
       """)
+      } else if (!check.scala2) {
+        check.session("""
+          @ object X extends Dynamic
+          error: extension of type scala.Dynamic needs to be enabled
+
+          @ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, List("dynamics")))
+
+          @ object X extends Dynamic
+          defined object X
+        """)
+      }
     }
     test("infoLogging") {
       if (check.scala2)
