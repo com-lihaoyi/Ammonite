@@ -86,12 +86,12 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.1.0-M5"
 val fastparseVersion = "3.1.0"
-val scalametaVersion = "4.9.1"
+val scalametaVersion = "4.9.3"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi:::acyclic:0.3.12"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
-  val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.78"
+  val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.78.1"
   val cask = ivy"com.lihaoyi::cask:0.9.1"
   val classPathUtil = ivy"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = ivy"io.get-coursier:interface:1.0.19"
@@ -106,10 +106,10 @@ object Deps {
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.55"
   val mainargs = ivy"com.lihaoyi::mainargs:0.5.4"
-  val osLib = ivy"com.lihaoyi::os-lib:0.9.3"
+  val osLib = ivy"com.lihaoyi::os-lib:0.10.0"
   val pprint = ivy"com.lihaoyi::pprint:0.9.0"
   val requests = ivy"com.lihaoyi::requests:0.8.2"
-  val scalacheck = ivy"org.scalacheck::scalacheck:1.17.1"
+  val scalacheck = ivy"org.scalacheck::scalacheck:1.18.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.12.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
   val scalaJava8Compat = ivy"org.scala-lang.modules::scala-java8-compat:1.0.2"
@@ -121,7 +121,7 @@ object Deps {
       else "2.0.1"
     ivy"org.scala-lang.modules::scala-xml:$ver"
   }
-  val scalazCore = ivy"org.scalaz::scalaz-core:7.2.35"
+  val scalazCore = ivy"org.scalaz::scalaz-core:7.2.36"
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.36"
