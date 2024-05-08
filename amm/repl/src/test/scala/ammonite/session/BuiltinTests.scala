@@ -225,7 +225,7 @@ object BuiltinTests extends TestSuite {
           @ repl.initialContext.settings.explain.value(using repl.initialContext)
           res1: Boolean = false
 
-          @ interp.preConfigureCompiler(ctx => ctx.setSettings((dotty.tools.dotc.ScalacCommand.distill(scalacOptions.toArray, ctx.settings)(ctx.settingsState)(using ctx)).sstate))
+          @ interp.preConfigureCompiler(ctx => ctx.setSettings(ctx.settings.processArguments(scalacOptions, true, ctx.settingsState).sstate))
 
           @ repl.initialContext.settings.explain.value(using repl.initialContext)
           res3: Boolean = true
