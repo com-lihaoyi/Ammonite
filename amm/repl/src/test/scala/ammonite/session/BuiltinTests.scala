@@ -208,15 +208,15 @@ object BuiltinTests extends TestSuite {
     test("scalacOptions") {
       if (check.scala2)
         check.session("""
-          @ val scalacOptions = List("-Yrangepos:true")
+          @ val scalacOptions = List("-Yno-imports")
 
-          @ repl.compiler.settings.Yrangepos.value
+          @ repl.compiler.settings.noimports.value
           res1: Boolean = false
 
           @ interp.preConfigureCompiler(_.processArguments(scalacOptions, true))
 
-          @ repl.compiler.settings.Yrangepos.value
-          res3: Boolean = true
+          @ repl.compiler.settings.noimports.value
+          res3: scala.Boolean = true
         """)
       else
         check.session("""
