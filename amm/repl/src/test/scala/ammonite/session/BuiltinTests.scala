@@ -203,6 +203,32 @@ object BuiltinTests extends TestSuite {
         """)
       }
     }
+    test("scalacOptions") {
+      if (check.scala2)
+        check.session("""
+          @ val scalacOptions = List("-Yrangepos:true")
+
+          @ repl.compiler.settings.Yrangepos.value
+          res1: Boolean = false
+
+          @ interp.preConfigureCompiler(_.processArguments(scalacOptions, true))
+
+          @ repl.compiler.settings.Yrangepos.value
+          res3: Boolean = true
+        """)
+      else
+        check.session("""
+          @ val scalacOptions = List("-explain")
+
+          @ repl.initialContext.settings.explain.value(using repl.initialContext)
+          res1: Boolean = false
+
+          @ interp.preConfigureCompiler(ctx => ctx.setSettings((dotty.tools.dotc.ScalacCommand.distill(scalacOptions.toArray, ctx.settings)(ctx.settingsState)(using ctx)).sstate))
+
+          @ repl.initialContext.settings.explain.value(using repl.initialContext)
+          res3: Boolean = true
+        """)
+    }
     test("infoLogging") {
       if (check.scala2)
         check.session("""
