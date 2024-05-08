@@ -152,6 +152,8 @@ object BuiltinTests extends TestSuite {
 
         @ interp.configureCompiler(_.settings.noimports.value = true)
 
+        @ // interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.YnoImports, true)) // Dotty
+
         @ List(1, 2, 3) + "lol" // predef imports disappear
         error: not found: value List
 
