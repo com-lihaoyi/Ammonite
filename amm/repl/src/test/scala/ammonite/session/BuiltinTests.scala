@@ -143,7 +143,7 @@ object BuiltinTests extends TestSuite {
       // In 2.12.13, I would have expected things like
       //   interp.configureCompiler(_.settings.Wconf.tryToSet(List("any:wv", "cat=unchecked:ws")))
       // to re-instate the expected warning below, to no avail :|
-      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 12) {
+      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 19) {
         check.session(s"""
         @ // Disabling default Scala imports
 
