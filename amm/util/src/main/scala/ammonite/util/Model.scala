@@ -61,6 +61,7 @@ object Name {
     "def",
     "do",
     "else",
+    "export",
     "extends",
     "false",
     "finally",
