@@ -865,7 +865,7 @@ def publishExecutable() = {
         uploadedFile = os.temp(
           os.read(os.pwd / "amm-template.sh")
             .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
-            .replace("SCALA_VERSION=", s"SCALA_VERSION=$scalaBinaryVersion")
+            .replace("DEFAULT_SCALA_VERSION=", s"DEFAULT_SCALA_VERSION=$scalaBinaryVersion")
         ),
         tagName = latestTaggedVersion,
         uploadName = s"$scalaBinaryVersion-$buildVersion-bootstrap",
