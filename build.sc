@@ -446,8 +446,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
           // we remove transitive _2.13 dependencies from Scala 3 and
           // then we add it back with _3
           .exclude("com.lihaoyi" -> "sourcecode_2.13")
+          .exclude("org.scala-lang.modules" -> "scala-collection-compat_2.13")
       else dep
-    ) ++ (if (isScala3(crossScalaVersion)) Agg(Deps.sourcecode) else Agg.empty[Dep])
+    ) ++ (if (isScala3(crossScalaVersion)) Agg(Deps.sourcecode, Deps.scalaCollectionCompat)
+          else Agg.empty[Dep])
   }
 
 //  object `test-runner` extends mill.scalalib.SbtModule {
