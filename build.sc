@@ -57,16 +57,19 @@ val scala2_13Versions = 2.to(14)
   .map(v => s"2.13.${v}")
 val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
 //  .dropWhile(v => isJava21 && v == "3.3.0")
-val scala3Versions = scala33Versions
+val scala34Versions = Seq("3.4.2")
+
+val scala2Versions = scala2_12Versions ++ scala2_13Versions
+val scala3Versions = scala33Versions ++ scala34Versions
 
 val binCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
+  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last, scala34Versions.last)
 val assemblyCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
+  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last, scala34Versions.last)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || sv.startsWith("2.13.")
 }
-val fullCrossScalaVersions = scala2_12Versions ++ scala2_13Versions ++ scala3Versions
+val fullCrossScalaVersions = scala2Versions ++ scala3Versions
 
 val latestAssemblies = assemblyCrossScalaVersions.map(amm(_).assembly)
 
@@ -220,7 +223,12 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.13-or-3"))
       else Nil
     val extraDir5 =
-      if (sv.startsWith("3.3") && sv.stripPrefix("3.3.").toInt >= 2)
+      if (sv.startsWith("3.4"))
+        if (sv.stripPrefix("3.4.").toInt < 2)
+          sys.error("Scala 3.4.0 and 3.4.1 are incompatible with Ammonite")
+        else
+          Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.4.2+"))
+      else if (sv.startsWith("3.3") && sv.stripPrefix("3.3.").toInt >= 2)
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.3.2+"))
       else if (sv.startsWith("3"))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.3.1"))
