@@ -316,7 +316,7 @@ trait AmmDependenciesResourceFileModule extends JavaModule {
   }
 }
 
-object terminal extends Cross[TerminalModule](binCrossScalaVersions: _*)
+object terminal extends Cross[TerminalModule](fullCrossScalaVersions: _*)
 class TerminalModule(val crossScalaVersion: String) extends AmmModule {
   def ivyDeps = T {
     super.ivyDeps() ++ Agg(
@@ -330,7 +330,7 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule {
 }
 
 object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
-  object util extends Cross[UtilModule](binCrossScalaVersions: _*)
+  object util extends Cross[UtilModule](fullCrossScalaVersions: _*)
   class UtilModule(val crossScalaVersion: String) extends AmmModule {
     def moduleDeps = Seq()
     def ivyDeps = T {
