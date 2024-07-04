@@ -88,7 +88,7 @@ val (buildVersion, unstable) = scala.util.Try(
 }
 
 val bspVersion = "2.1.0-M5"
-val fastparseVersion = "3.1.0"
+val fastparseVersion = "3.1.1"
 val scalametaVersion = "4.9.7"
 
 object Deps {
