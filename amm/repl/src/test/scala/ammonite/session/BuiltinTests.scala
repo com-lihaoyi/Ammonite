@@ -139,11 +139,11 @@ object BuiltinTests extends TestSuite {
       // not sure why that one doesn't pass in 2.13
       // even disabling the noimports and imports settings instead of setting noimports to false
       // doesn't seem to reinstate imports
-      def sv = scala.util.Properties.versionNumberString
       // In 2.12.13, I would have expected things like
       //   interp.configureCompiler(_.settings.Wconf.tryToSet(List("any:wv", "cat=unchecked:ws")))
       // to re-instate the expected warning below, to no avail :|
-      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 19) {
+      // if 2.12.19 > fails re add condition: scala.util.Properties.versionNumberString.stripPrefix("2.12.").toInt <= 19
+      if (TestUtils.scala2_12) {
         check.session(s"""
         @ // Disabling default Scala imports
 
@@ -193,12 +193,16 @@ object BuiltinTests extends TestSuite {
         @ repl.compiler.settings.nowarnings.value
         res10: Boolean = false
       """)
-      } else if (!check.scala2) {
-        check.session("""
+      } else {
+        val configCompiler = if (check.scala2)
+          """@ interp.configureCompiler(_.settings.language.tryToSet(List("dynamics")))"""
+        else
+          """@ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, List("dynamics")))"""
+        check.session(s"""
           @ object X extends Dynamic
           error: extension of type scala.Dynamic needs to be enabled
 
-          @ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, List("dynamics")))
+          $configCompiler
 
           @ object X extends Dynamic
           defined object X
