@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         java-version: [ 8, 17 ]
-        scala-binary-version: [ 2.12, 2.13, 3.3, 3.4.2 ]
+        scala-binary-version: [ 2.12, 2.13, 3.3, 3.4.3 ]
         include:
           # Including lowest/highest versions that work with Java 21
           - java-version: 21
@@ -34,7 +34,7 @@ jobs:
           - java-version: 21
             scala-version: 3.3.3
           - java-version: 21
-            scala-version: 3.4.2
+            scala-version: 3.4.3
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
       fail-fast: false
       matrix:
         java-version: [ 8, 17 ]
-        scala-version: [ 2.12, 2.13, 3.3, 3.4.2 ]
+        scala-version: [ 2.12, 2.13, 3.3, 3.4.3 ]
         include:
           # Including lowest/highest versions that work with Java 21
           - java-version: 21
@@ -67,7 +67,7 @@ jobs:
           - java-version: 21
             scala-version: 3.3.3
           - java-version: 21
-            scala-version: 3.4.2
+            scala-version: 3.4.3
 
     runs-on: ubuntu-latest
     steps:
@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala-version: [ 2.12.19, 2.13.14, 3.3.3, 3.4.2 ]
+        scala-version: [ 2.12.19, 2.13.14, 3.3.3, 3.4.3 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
