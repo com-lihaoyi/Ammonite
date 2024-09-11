@@ -99,7 +99,7 @@ jobs:
 
   release:
     if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
-    needs: [ test, itest, site, publishLocal ]
+    needs: [ test, itest, site, compileAll ]
     uses: ./.github/workflows/release.yml
     secrets: inherit
 
