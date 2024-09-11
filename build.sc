@@ -575,8 +575,7 @@ trait MainModule extends AmmModule {
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++
-      externalSources() ++
-      Agg(thinWhitelist())
+      externalSources()
 
   def prependShellScript = T {
     mill.modules.Jvm.launcherUniversalScript(
@@ -593,6 +592,9 @@ trait MainModule extends AmmModule {
       amm.repl.api().exposedClassPath() ++
         amm.compiler().exposedClassPath()
     )
+  }
+  def localClasspath = T {
+    Seq(thinWhitelist()) ++ super.localClasspath()
   }
 
   def launcher = {
@@ -646,6 +648,7 @@ trait MainModule extends AmmModule {
 
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
+      Seq(thinWhitelist()) ++
       super.runClasspath() ++
         terminal().sources() ++
         amm.util().sources() ++
@@ -655,8 +658,8 @@ trait MainModule extends AmmModule {
         amm.interp().sources() ++
         amm.repl().sources() ++
         sources() ++
-        externalSources() ++
-        Agg(thinWhitelist())
+        externalSources()
+
 
   }
 }
