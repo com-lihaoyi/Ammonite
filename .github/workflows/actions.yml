@@ -111,7 +111,7 @@ jobs:
         with:
           java-version: 8
           distribution: temurin
-      - run: ./mill -i -k '__[__].__.publishLocal'
+      - run: ./mill -i -k '__.publishLocal'
 
   release:
     if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
