@@ -33,16 +33,22 @@ val isPublishableCommit =
       publishBranches.exists(suffix => x.endsWith(s"/${suffix}"))
     )
 
-val latestTaggedVersion = os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+val latestTaggedVersion = try{
+  os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+}catch{case e: os.SubprocessException =>
+  "dev"
+}
 
 val gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim
 
-val commitsSinceTaggedVersion = {
-  os.proc("git", "rev-list", gitHead, "--not", latestTaggedVersion, "--count")
-    .call()
-    .out
-    .trim
-    .toInt
+val commitsSinceTaggedVersion = latestTaggedVersion match{
+  case "dev" => 0
+  case latest =>
+    os.proc("git", "rev-list", gitHead, "--not", latest, "--count")
+      .call()
+      .out
+      .trim
+      .toInt
 }
 
 //val isJava21 = scala.util.Properties.isJavaAtLeast(21).tap {
