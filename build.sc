@@ -33,7 +33,11 @@ val isPublishableCommit =
       publishBranches.exists(suffix => x.endsWith(s"/${suffix}"))
     )
 
-val latestTaggedVersion = os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+val latestTaggedVersion = try{
+  os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+}catch{case e: os.SubprocessException =>
+  "dev"
+}
 
 val gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim
 
