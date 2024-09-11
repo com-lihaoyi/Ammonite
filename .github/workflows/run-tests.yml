@@ -1,4 +1,4 @@
-name: CI
+name: Run Tests
 on:
   push:
     branches:
@@ -105,7 +105,7 @@ jobs:
     uses: ./.github/workflows/release.yml
     secrets: inherit
 
-  publishDosc:
+  publishDocs:
     if: github.repository == 'com-lihaoyi/Ammonite' && github.ref == 'refs/heads/main'
     needs: [ test, itest, site ]
     uses: ./.github/workflows/publishDocs.yml
