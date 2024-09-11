@@ -1,0 +1,60 @@
+[0m[[0m[0minfo[0m] [0m[0mcompiling 2 Scala sources to /home/runner/work/Ammonite/Ammonite/out/mill-build/compile.dest/classes ...[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:38:62: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method trim,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0mval gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                             ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:82:6: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method trim,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m    .trim[0m
+[0m[[0m[33mwarn[0m] [0m[0m     ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:85:77: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method trim,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m    val gitHash = os.proc("git", "rev-parse", "--short", "HEAD").call().out.trim[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                            ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:36:89: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method trim,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0mval latestTaggedVersion = os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                                                                        ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:44:6: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method trim,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m    .trim[0m
+[0m[[0m[33mwarn[0m] [0m[0m     ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:528:34: reference to compileIvyDeps is ambiguous;[0m
+[0m[[0m[33mwarn[0m] [0m[0mit is both defined in the enclosing trait ReplModule and inherited in the enclosing object test as method compileIvyDeps (defined in trait JavaModule, inherited through parent trait AmmTests)[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 2, symbols inherited from a superclass shadow symbols defined in an outer scope.[0m
+[0m[[0m[33mwarn[0m] [0m[0mSuch references are ambiguous in Scala 3. To continue using the inherited symbol, write `this.compileIvyDeps`.[0m
+[0m[[0m[33mwarn[0m] [0m[0mOr use `-Wconf:msg=legacy-binding:s` to silence this warning. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m            resolveDeps(T.task { compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps() })()[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:905:12: This catches all Throwables. If this is really intended, use `case e : Throwable` to clear this warning.[0m
+[0m[[0m[33mwarn[0m] [0m[0m      case e =>[0m
+[0m[[0m[33mwarn[0m] [0m[0m           ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:301:33: value Jvm in package modules is deprecated (since Mill 0.11.0-M9): use mill.util.Jvm[0m
+[0m[[0m[33mwarn[0m] [0m[0m    val (_, res) = mill.modules.Jvm.resolveDependenciesMetadata([0m
+[0m[[0m[33mwarn[0m] [0m[0m                                ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:422:46: value Jvm in package modules is deprecated (since Mill 0.11.0-M9): use mill.util.Jvm[0m
+[0m[[0m[33mwarn[0m] [0m[0m        mill.api.Result.Success(mill.modules.Jvm.createJar(Agg(javadocDir))(outDir))[0m
+[0m[[0m[33mwarn[0m] [0m[0m                                             ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:581:18: value Jvm in package modules is deprecated (since Mill 0.11.0-M9): use mill.util.Jvm[0m
+[0m[[0m[33mwarn[0m] [0m[0m    mill.modules.Jvm.launcherUniversalScript([0m
+[0m[[0m[33mwarn[0m] [0m[0m                 ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/build.sc:673:28: object JavaConverters in package collection is deprecated (since 2.13.0): Use `scala.jdk.CollectionConverters` instead[0m
+[0m[[0m[33mwarn[0m] [0m[0m      for (e <- zip.entries().asScala) yield e.getName[0m
+[0m[[0m[33mwarn[0m] [0m[0m                           ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/ci/upload.sc:22:32: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method text,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m  val parsed = ujson.read(body.text)[0m
+[0m[[0m[33mwarn[0m] [0m[0m                               ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m/home/runner/work/Ammonite/Ammonite/ci/upload.sc:41:5: Auto-application to `()` is deprecated. Supply the empty argument list `()` explicitly to invoke method text,[0m
+[0m[[0m[33mwarn[0m] [0m[0mor remove the empty argument list from its definition (Java-defined methods are exempt).[0m
+[0m[[0m[33mwarn[0m] [0m[0mIn Scala 3, an unapplied method like this will be eta-expanded into a function. [quickfixable][0m
+[0m[[0m[33mwarn[0m] [0m[0m  ).text[0m
+[0m[[0m[33mwarn[0m] [0m[0m    ^[0m
+[0m[[0m[33mwarn[0m] [0m[0m13 warnings found[0m
+[0m[[0m[0minfo[0m] [0m[0mdone compiling[0m

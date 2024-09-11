@@ -1,0 +1,123 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "com.lihaoyi"
+                    },
+                    "name": {
+                        "value": "mill-contrib-bloop"
+                    },
+                    "attributes": {}
+                },
+                "version": "0.11.12",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": "coursier.core.MinimizedExclusions.ExcludeNone"
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "io.get-coursier"
+                    },
+                    "name": {
+                        "value": "coursier-launcher"
+                    },
+                    "attributes": {}
+                },
+                "version": "2.1.0-RC1",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": "coursier.core.MinimizedExclusions.ExcludeNone"
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "com.lihaoyi"
+                    },
+                    "name": {
+                        "value": "mill-moduledefs"
+                    },
+                    "attributes": {}
+                },
+                "version": "0.10.9",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": "coursier.core.MinimizedExclusions.ExcludeNone"
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "cross": {
+                "$type": "mill.scalalib.CrossVersion.Binary",
+                "platformed": false
+            },
+            "force": false
+        }
+    ],
+    "valueHash": -1108012000,
+    "inputsHash": -50592696
+}

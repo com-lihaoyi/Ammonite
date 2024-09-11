@@ -1,0 +1,2826 @@
+{
+    "value": [
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "com.lihaoyi"
+                    },
+                    "name": {
+                        "value": "mill-contrib-bloop_2.13"
+                    },
+                    "attributes": {}
+                },
+                "version": "0.11.12",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": {
+                        "$type": "coursier.core.MinimizedExclusions.ExcludeSpecific",
+                        "byOrg": [],
+                        "byModule": [],
+                        "specific": [
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fastparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.fusesource.jansi"
+                                },
+                                {
+                                    "value": "jansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault.windows-ansi"
+                                },
+                                {
+                                    "value": "windows-ansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "ujson_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-tree"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-classworlds"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.tukaani"
+                                },
+                                {
+                                    "value": "xz"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner-linenumbers_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-interfaces"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "requests_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-define_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upack_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-compiler"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "scalaparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-idea_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "geny_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-cache_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.slf4j"
+                                },
+                                {
+                                    "value": "slf4j-api"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "pprint_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-client"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner-entrypoint"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fansi_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-sbt"
+                                },
+                                {
+                                    "value": "test-interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-resolve_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-native-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna-platform"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-bsp_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-implicits_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-xml_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-proxy-setup"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-container-default"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "os-lib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-core"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mainargs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "sourcecode_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-archiver"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.typesafe"
+                                },
+                                {
+                                    "value": "config"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-collection-compat_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjar"
+                                },
+                                {
+                                    "value": "jarjar"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-moduledefs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-dynamic_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.java-diff-utils"
+                                },
+                                {
+                                    "value": "java-diff-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-codec"
+                                },
+                                {
+                                    "value": "commons-codec"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.xbean"
+                                },
+                                {
+                                    "value": "xbean-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-library"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.iq80.snappy"
+                                },
+                                {
+                                    "value": "snappy"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.jline"
+                                },
+                                {
+                                    "value": "jline"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-commons"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-lang3"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier.jniutils"
+                                },
+                                {
+                                    "value": "windows-jni-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-compress"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-io"
+                                },
+                                {
+                                    "value": "commons-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "javax.inject"
+                                },
+                                {
+                                    "value": "javax.inject"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjarabrams"
+                                },
+                                {
+                                    "value": "jarjar-abrams-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-eval_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.virtuslab.scala-cli"
+                                },
+                                {
+                                    "value": "config_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.luben"
+                                },
+                                {
+                                    "value": "zstd-jni"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-codesig_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault"
+                                },
+                                {
+                                    "value": "concurrent-reference-hash-map"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.plokhotnyuk.jsoniter-scala"
+                                },
+                                {
+                                    "value": "jsoniter-scala-core_2.13"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "io.get-coursier"
+                    },
+                    "name": {
+                        "value": "coursier-launcher_2.13"
+                    },
+                    "attributes": {}
+                },
+                "version": "2.1.0-RC1",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": {
+                        "$type": "coursier.core.MinimizedExclusions.ExcludeSpecific",
+                        "byOrg": [],
+                        "byModule": [],
+                        "specific": [
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fastparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.fusesource.jansi"
+                                },
+                                {
+                                    "value": "jansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault.windows-ansi"
+                                },
+                                {
+                                    "value": "windows-ansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "ujson_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-tree"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-classworlds"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.tukaani"
+                                },
+                                {
+                                    "value": "xz"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner-linenumbers_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-interfaces"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "requests_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-define_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upack_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-compiler"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "scalaparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-idea_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "geny_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-cache_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.slf4j"
+                                },
+                                {
+                                    "value": "slf4j-api"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "pprint_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-client"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner-entrypoint"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fansi_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-sbt"
+                                },
+                                {
+                                    "value": "test-interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-resolve_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-native-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna-platform"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-bsp_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-implicits_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-xml_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-proxy-setup"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-container-default"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "os-lib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-core"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mainargs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "sourcecode_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-archiver"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.typesafe"
+                                },
+                                {
+                                    "value": "config"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-collection-compat_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjar"
+                                },
+                                {
+                                    "value": "jarjar"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-moduledefs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-dynamic_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.java-diff-utils"
+                                },
+                                {
+                                    "value": "java-diff-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-codec"
+                                },
+                                {
+                                    "value": "commons-codec"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.xbean"
+                                },
+                                {
+                                    "value": "xbean-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-library"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.iq80.snappy"
+                                },
+                                {
+                                    "value": "snappy"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.jline"
+                                },
+                                {
+                                    "value": "jline"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-commons"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-lang3"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier.jniutils"
+                                },
+                                {
+                                    "value": "windows-jni-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-compress"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-io"
+                                },
+                                {
+                                    "value": "commons-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "javax.inject"
+                                },
+                                {
+                                    "value": "javax.inject"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjarabrams"
+                                },
+                                {
+                                    "value": "jarjar-abrams-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-eval_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.virtuslab.scala-cli"
+                                },
+                                {
+                                    "value": "config_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.luben"
+                                },
+                                {
+                                    "value": "zstd-jni"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-codesig_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault"
+                                },
+                                {
+                                    "value": "concurrent-reference-hash-map"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.plokhotnyuk.jsoniter-scala"
+                                },
+                                {
+                                    "value": "jsoniter-scala-core_2.13"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "com.lihaoyi"
+                    },
+                    "name": {
+                        "value": "mill-moduledefs_2.13"
+                    },
+                    "attributes": {}
+                },
+                "version": "0.10.9",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": {
+                        "$type": "coursier.core.MinimizedExclusions.ExcludeSpecific",
+                        "byOrg": [],
+                        "byModule": [],
+                        "specific": [
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fastparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.fusesource.jansi"
+                                },
+                                {
+                                    "value": "jansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault.windows-ansi"
+                                },
+                                {
+                                    "value": "windows-ansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "ujson_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-tree"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-classworlds"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.tukaani"
+                                },
+                                {
+                                    "value": "xz"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner-linenumbers_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-interfaces"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "requests_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-define_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upack_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-compiler"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "scalaparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-idea_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "geny_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-cache_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.slf4j"
+                                },
+                                {
+                                    "value": "slf4j-api"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "pprint_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-client"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner-entrypoint"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fansi_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-sbt"
+                                },
+                                {
+                                    "value": "test-interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-resolve_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-native-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna-platform"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-bsp_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-implicits_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-xml_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-proxy-setup"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-container-default"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "os-lib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-core"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mainargs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "sourcecode_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-archiver"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.typesafe"
+                                },
+                                {
+                                    "value": "config"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-collection-compat_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjar"
+                                },
+                                {
+                                    "value": "jarjar"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-moduledefs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-dynamic_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.java-diff-utils"
+                                },
+                                {
+                                    "value": "java-diff-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-codec"
+                                },
+                                {
+                                    "value": "commons-codec"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.xbean"
+                                },
+                                {
+                                    "value": "xbean-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-library"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.iq80.snappy"
+                                },
+                                {
+                                    "value": "snappy"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.jline"
+                                },
+                                {
+                                    "value": "jline"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-commons"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-lang3"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier.jniutils"
+                                },
+                                {
+                                    "value": "windows-jni-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-compress"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-io"
+                                },
+                                {
+                                    "value": "commons-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "javax.inject"
+                                },
+                                {
+                                    "value": "javax.inject"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjarabrams"
+                                },
+                                {
+                                    "value": "jarjar-abrams-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-eval_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.virtuslab.scala-cli"
+                                },
+                                {
+                                    "value": "config_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.luben"
+                                },
+                                {
+                                    "value": "zstd-jni"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-codesig_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault"
+                                },
+                                {
+                                    "value": "concurrent-reference-hash-map"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.plokhotnyuk.jsoniter-scala"
+                                },
+                                {
+                                    "value": "jsoniter-scala-core_2.13"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "force": false
+        },
+        {
+            "dep": {
+                "module": {
+                    "organization": {
+                        "value": "org.scala-lang"
+                    },
+                    "name": {
+                        "value": "scala-library"
+                    },
+                    "attributes": {}
+                },
+                "version": "2.13.14",
+                "configuration": {
+                    "value": "default(compile)"
+                },
+                "minimizedExclusions": {
+                    "data": {
+                        "$type": "coursier.core.MinimizedExclusions.ExcludeSpecific",
+                        "byOrg": [],
+                        "byModule": [],
+                        "specific": [
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fastparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.fusesource.jansi"
+                                },
+                                {
+                                    "value": "jansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault.windows-ansi"
+                                },
+                                {
+                                    "value": "windows-ansi"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "ujson_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-tree"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-classworlds"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.tukaani"
+                                },
+                                {
+                                    "value": "xz"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner-linenumbers_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-interfaces"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "requests_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-define_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upack_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-compiler"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "scalaparse_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-idea_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "geny_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-cache_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.slf4j"
+                                },
+                                {
+                                    "value": "slf4j-api"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "pprint_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-client"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-testrunner-entrypoint"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "fansi_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-sbt"
+                                },
+                                {
+                                    "value": "test-interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-resolve_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-native-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna-platform"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-bsp_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-implicits_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-xml_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-proxy-setup"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-container-default"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "interface"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-common"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "os-lib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-util_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.kohlschutter.junixsocket"
+                                },
+                                {
+                                    "value": "junixsocket-core"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib-worker-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mainargs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "sourcecode_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.codehaus.plexus"
+                                },
+                                {
+                                    "value": "plexus-archiver"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.typesafe"
+                                },
+                                {
+                                    "value": "config"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang.modules"
+                                },
+                                {
+                                    "value": "scala-collection-compat_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjar"
+                                },
+                                {
+                                    "value": "jarjar"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "net.java.dev.jna"
+                                },
+                                {
+                                    "value": "jna"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalanativelib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-moduledefs_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scalameta"
+                                },
+                                {
+                                    "value": "scalafmt-dynamic_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.java-diff-utils"
+                                },
+                                {
+                                    "value": "java-diff-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalajslib_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-codec"
+                                },
+                                {
+                                    "value": "commons-codec"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.xbean"
+                                },
+                                {
+                                    "value": "xbean-reflect"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.scala-lang"
+                                },
+                                {
+                                    "value": "scala-library"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-runner_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "upickle-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.iq80.snappy"
+                                },
+                                {
+                                    "value": "snappy"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.jline"
+                                },
+                                {
+                                    "value": "jline"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.ow2.asm"
+                                },
+                                {
+                                    "value": "asm-commons"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-lang3"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier.jniutils"
+                                },
+                                {
+                                    "value": "windows-jni-utils"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.apache.commons"
+                                },
+                                {
+                                    "value": "commons-compress"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.get-coursier"
+                                },
+                                {
+                                    "value": "coursier_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "commons-io"
+                                },
+                                {
+                                    "value": "commons-io"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "javax.inject"
+                                },
+                                {
+                                    "value": "javax.inject"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.eed3si9n.jarjarabrams"
+                                },
+                                {
+                                    "value": "jarjar-abrams-core_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-scalalib-api_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-eval_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "org.virtuslab.scala-cli"
+                                },
+                                {
+                                    "value": "config_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.luben"
+                                },
+                                {
+                                    "value": "zstd-jni"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.lihaoyi"
+                                },
+                                {
+                                    "value": "mill-main-codesig_2.13"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "io.github.alexarchambault"
+                                },
+                                {
+                                    "value": "concurrent-reference-hash-map"
+                                }
+                            ],
+                            [
+                                {
+                                    "value": "com.github.plokhotnyuk.jsoniter-scala"
+                                },
+                                {
+                                    "value": "jsoniter-scala-core_2.13"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                "publication": {
+                    "name": "",
+                    "type": {
+                        "value": ""
+                    },
+                    "ext": {
+                        "value": ""
+                    },
+                    "classifier": {
+                        "value": ""
+                    }
+                },
+                "optional": false,
+                "transitive": true
+            },
+            "force": true
+        }
+    ],
+    "valueHash": 1576776553,
+    "inputsHash": -821577319
+}

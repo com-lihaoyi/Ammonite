@@ -1,0 +1,33 @@
+{
+    "value": [
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/mill-build/compile-resources",
+        "qref:v0:5b0a8cd4:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/nashorn.jar",
+        "qref:v0:1effafde:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/localedata.jar",
+        "qref:v0:10a8be6c:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/jaccess.jar",
+        "qref:v0:8a8c1cca:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/cldrdata.jar",
+        "qref:v0:3b0ba018:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/sunec.jar",
+        "qref:v0:2cc1b96e:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/dnsns.jar",
+        "qref:v0:c5b764f9:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/sunpkcs11.jar",
+        "qref:v0:16210de5:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/sunjce_provider.jar",
+        "qref:v0:62579efc:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/zipfs.jar",
+        "qref:v0:bfc0be5c:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/resources.jar",
+        "qref:v0:5be8d0d6:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/rt.jar",
+        "qref:v0:7ca64879:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/jsse.jar",
+        "qref:v0:ea704461:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/jce.jar",
+        "qref:v0:bafdf2a8:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/charsets.jar",
+        "qref:v0:f23c6264:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/jfr.jar",
+        "qref:v0:412d852c:/home/runner/work/Ammonite/Ammonite/out/mill-launcher/0.11.12.jar",
+        "qref:v1:04678037:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mill-runner-linenumbers_2.13/0.11.12/mill-runner-linenumbers_2.13-0.11.12.jar",
+        "qref:v1:ec6c4a5c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.14/scala-compiler-2.13.14.jar",
+        "qref:v1:472d5ac4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+        "qref:v1:647bb4c6:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mill-moduledefs_2.13/0.10.9/mill-moduledefs_2.13-0.10.9.jar",
+        "qref:v1:d0c019f0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.14/scala-reflect-2.13.14.jar",
+        "qref:v1:c3fede0e:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.12/java-diff-utils-4.12.jar",
+        "qref:v1:aa1d7c9b:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.25.1/jline-3.25.1.jar",
+        "qref:v1:93dd03ee:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/5.14.0/jna-5.14.0.jar",
+        "qref:v1:589290b0:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.3.0/sourcecode_2.13-0.3.0.jar",
+        "ref:v0:e4e1dd8c:/home/runner/work/Ammonite/Ammonite/out/mill-build/compile.dest/classes"
+    ],
+    "valueHash": 1117273396,
+    "inputsHash": 935784597
+}

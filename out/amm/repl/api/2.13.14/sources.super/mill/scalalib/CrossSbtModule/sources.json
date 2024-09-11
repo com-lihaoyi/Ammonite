@@ -1,0 +1,11 @@
+{
+    "value": [
+        "ref:v0:42ed1fbb:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/java",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2.13.14",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2.13",
+        "ref:v0:e4585237:/home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2"
+    ],
+    "valueHash": -579262601,
+    "inputsHash": 140966414
+}

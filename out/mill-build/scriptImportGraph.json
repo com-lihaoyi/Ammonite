@@ -1,0 +1,22 @@
+{
+    "value": [
+        [
+            "/home/runner/work/Ammonite/Ammonite/ci/upload.sc",
+            [
+                -1059401450,
+                []
+            ]
+        ],
+        [
+            "/home/runner/work/Ammonite/Ammonite/build.sc",
+            [
+                729945683,
+                [
+                    "/home/runner/work/Ammonite/Ammonite/ci/upload.sc"
+                ]
+            ]
+        ]
+    ],
+    "valueHash": -30963318,
+    "inputsHash": -50592696
+}

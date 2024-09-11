@@ -1,0 +1,8 @@
+{
+    "value": [
+        "ref:v0:49d3e7de:/home/runner/work/Ammonite/Ammonite/out/mill-build/generateScriptSources.dest/millbuild/build.sc",
+        "ref:v0:128b1c91:/home/runner/work/Ammonite/Ammonite/out/mill-build/generateScriptSources.dest/millbuild/ci/upload.sc"
+    ],
+    "valueHash": -1227065629,
+    "inputsHash": -1082303689
+}

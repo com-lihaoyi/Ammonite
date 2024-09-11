@@ -1,0 +1,12 @@
+{
+    "value": [
+        "qref:v1:d27154c1:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mill-contrib-bloop_2.13/0.11.12/mill-contrib-bloop_2.13-0.11.12.jar",
+        "qref:v1:7437611e:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/coursier-launcher_2.13/2.1.0-RC1/coursier-launcher_2.13-2.1.0-RC1.jar",
+        "qref:v1:647bb4c6:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mill-moduledefs_2.13/0.10.9/mill-moduledefs_2.13-0.10.9.jar",
+        "qref:v1:472d5ac4:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.14/scala-library-2.13.14.jar",
+        "qref:v1:8dde530d:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/bloop-config_2.13/1.5.5/bloop-config_2.13-1.5.5.jar",
+        "qref:v1:fcabeafb:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/ai/kien/python-native-libs_2.13/0.2.4/python-native-libs_2.13-0.2.4.jar"
+    ],
+    "valueHash": 844086326,
+    "inputsHash": 1333674431
+}

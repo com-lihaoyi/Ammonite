@@ -1,0 +1,22 @@
+{
+    "value": [
+        "qref:v0:5b0a8cd4:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/nashorn.jar",
+        "qref:v0:1effafde:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/localedata.jar",
+        "qref:v0:10a8be6c:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/jaccess.jar",
+        "qref:v0:8a8c1cca:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/cldrdata.jar",
+        "qref:v0:3b0ba018:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/sunec.jar",
+        "qref:v0:2cc1b96e:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/dnsns.jar",
+        "qref:v0:c5b764f9:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/sunpkcs11.jar",
+        "qref:v0:16210de5:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/sunjce_provider.jar",
+        "qref:v0:62579efc:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/ext/zipfs.jar",
+        "qref:v0:bfc0be5c:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/resources.jar",
+        "qref:v0:5be8d0d6:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/rt.jar",
+        "qref:v0:7ca64879:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/jsse.jar",
+        "qref:v0:ea704461:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/jce.jar",
+        "qref:v0:bafdf2a8:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/charsets.jar",
+        "qref:v0:f23c6264:/usr/lib/jvm/temurin-8-jdk-amd64/jre/lib/jfr.jar",
+        "qref:v0:412d852c:/home/runner/work/Ammonite/Ammonite/out/mill-launcher/0.11.12.jar"
+    ],
+    "valueHash": 2102388143,
+    "inputsHash": 1851397952
+}
