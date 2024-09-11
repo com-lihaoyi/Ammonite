@@ -181,7 +181,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     def ivyDeps = super.ivyDeps() ++ Agg(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
   }
-  def allIvyDeps = T { transitiveIvyDeps() ++ scalaLibraryIvyDeps() }
+  def allBoundIvyDeps = T { transitiveIvyDeps() ++ scalaLibraryIvyDeps().map(bindDependency()) }
   def sources = T.sources {
     val sv = scalaVersion()
     val extraDir =
@@ -237,11 +237,11 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5
   }
   def externalSources = T {
-    resolveDeps(allIvyDeps, sources = true)()
+    resolveDeps(allBoundIvyDeps, sources = true)()
   }
-  def repositories = super.repositories ++ Seq(
+  def repositoriesTask = T.task {super.repositoriesTask() ++ Seq(
     mvn"https://scala-ci.typesafe.com/artifactory/scala-integration"
-  )
+  ) }
   override implicit def crossSbtModuleResolver: mill.define.Cross.Resolver[CrossModuleBase] =
     new mill.define.Cross.Resolver[CrossModuleBase] {
       def resolve[V <: CrossModuleBase](c: Cross[V]): V = {
@@ -253,14 +253,14 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
           }
           .flatMap(prefix =>
             c.items
-              .map(_._2)
+              .map(_.module.value)
               .find(_.crossScalaVersion.split('.').startsWith(prefix))
           )
           .collectFirst { case x => x }
           .getOrElse {
             throw new Exception(
               s"Unable to find compatible cross version between $crossScalaVersion and " +
-                c.items.map(_._2.crossScalaVersion).mkString(",")
+                c.items.map(_.module.value.crossScalaVersion).mkString(",")
             )
           }
 
@@ -297,11 +297,11 @@ trait AmmModule extends AmmInternalModule with PublishModule {
 trait AmmDependenciesResourceFileModule extends JavaModule {
   def dependencyResourceFileName: String
   def dependencyFileResources = T {
-    val deps0 = T.task { compileIvyDeps() ++ transitiveIvyDeps() }()
+    val deps0 = T.task { compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps() }()
     val (_, res) = mill.modules.Jvm.resolveDependenciesMetadata(
       repositoriesTask(),
-      deps0.map(resolveCoursierDependency().apply(_)),
-      deps0.filter(_.force).map(resolveCoursierDependency().apply(_)),
+      deps0.map(_.dep),
+      deps0.filter(_.force).map(_.dep),
       mapDependencies = Some(mapDependencies())
     )
 
@@ -316,8 +316,8 @@ trait AmmDependenciesResourceFileModule extends JavaModule {
   }
 }
 
-object terminal extends Cross[TerminalModule](binCrossScalaVersions: _*)
-class TerminalModule(val crossScalaVersion: String) extends AmmModule {
+object terminal extends Cross[TerminalModule](binCrossScalaVersions)
+trait TerminalModule extends AmmModule {
   def ivyDeps = T {
     super.ivyDeps() ++ Agg(
       Deps.fansi,
@@ -329,9 +329,9 @@ class TerminalModule(val crossScalaVersion: String) extends AmmModule {
   }
 }
 
-object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
-  object util extends Cross[UtilModule](binCrossScalaVersions: _*)
-  class UtilModule(val crossScalaVersion: String) extends AmmModule {
+object amm extends Cross[MainModule](fullCrossScalaVersions) {
+  object util extends Cross[UtilModule](binCrossScalaVersions)
+  trait UtilModule extends AmmModule {
     def moduleDeps = Seq()
     def ivyDeps = T {
       super.ivyDeps() ++ Agg(
@@ -346,8 +346,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
       (if (isScala3(crossScalaVersion)) Agg.empty[Dep] else Agg(Deps.scalaReflect(scalaVersion())))
   }
 
-  object runtime extends Cross[RuntimeModule](fullCrossScalaVersions: _*)
-  class RuntimeModule(val crossScalaVersion: String) extends AmmModule {
+  object runtime extends Cross[RuntimeModule](fullCrossScalaVersions)
+  trait RuntimeModule extends AmmModule {
     def moduleDeps = Seq(amm.util(), interp.api(), amm.repl.api())
     def isCrossFullScalaVersion = true
     def ivyDeps = super.ivyDeps() ++ Agg(
@@ -359,9 +359,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
     )
   }
 
-  object compiler extends Cross[CompilerModule](fullCrossScalaVersions: _*) {
-    object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions: _*)
-    class CompilerInterfaceModule(val crossScalaVersion: String) extends AmmModule {
+  object compiler extends Cross[CompilerModule](fullCrossScalaVersions) {
+    object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions)
+    trait CompilerInterfaceModule extends AmmModule {
       def isCrossFullScalaVersion = true
       def moduleDeps = Seq(amm.util())
       def exposedClassPath = T {
@@ -372,7 +372,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
       }
     }
   }
-  class CompilerModule(val crossScalaVersion: String) extends AmmModule {
+  trait CompilerModule extends AmmModule {
     def supports3 = true
     def moduleDeps = Seq(amm.compiler.interface(), amm.util(), amm.repl.api())
     def isCrossFullScalaVersion = true
@@ -405,9 +405,9 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
     object test extends AmmTests
   }
 
-  object interp extends Cross[InterpModule](fullCrossScalaVersions: _*) {
-    object api extends Cross[InterpApiModule](fullCrossScalaVersions: _*)
-    class InterpApiModule(val crossScalaVersion: String) extends AmmModule
+  object interp extends Cross[InterpModule](fullCrossScalaVersions) {
+    object api extends Cross[InterpApiModule](fullCrossScalaVersions)
+    trait InterpApiModule extends AmmModule
         with AmmDependenciesResourceFileModule {
       def moduleDeps = Seq(amm.compiler.interface(), amm.util())
       def isCrossFullScalaVersion = true
@@ -440,7 +440,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
         super.generatedSources() ++ Seq(constantsSourceDir())
     }
   }
-  class InterpModule(val crossScalaVersion: String) extends AmmModule {
+  trait InterpModule extends AmmModule {
     def moduleDeps = Seq(amm.util(), amm.runtime(), amm.compiler.interface())
     def isCrossFullScalaVersion = true
     def ivyDeps = super.ivyDeps() ++ Agg(
@@ -467,10 +467,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
 //    )
 //  }
 
-  object repl extends Cross[ReplModule](fullCrossScalaVersions: _*) {
+  object repl extends Cross[ReplModule](fullCrossScalaVersions) {
 
-    object api extends Cross[ReplApiModule](fullCrossScalaVersions: _*)
-    class ReplApiModule(val crossScalaVersion: String) extends AmmModule
+    object api extends Cross[ReplApiModule](fullCrossScalaVersions)
+    trait ReplApiModule extends AmmModule
         with AmmDependenciesResourceFileModule {
       def isCrossFullScalaVersion = true
       def dependencyResourceFileName = "amm-dependencies.txt"
@@ -496,7 +496,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
     }
 
   }
-  class ReplModule(val crossScalaVersion: String) extends AmmModule {
+  trait ReplModule extends AmmModule {
     def isCrossFullScalaVersion = true
     def moduleDeps = Seq(
       amm.util(),
@@ -525,19 +525,19 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
           amm.repl.api().exposedClassPath() ++
             amm.compiler().exposedClassPath() ++
             Seq(compile().classes) ++
-            resolveDeps(T.task { compileIvyDeps() ++ transitiveIvyDeps() })()
+            resolveDeps(T.task { compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps() })()
         )
       }
 
-      def localClasspath = T {
-        super.localClasspath() ++ Agg(thinWhitelist())
+      def runClasspath = T {
+        super.runClasspath() ++ Agg(thinWhitelist())
       }
 
       def resources = T.sources {
         (super.resources() ++
           ReplModule.this.sources() ++
           ReplModule.this.externalSources() ++
-          resolveDeps(ivyDeps, sources = true)()).distinct
+          resolveDeps(T.task{ ivyDeps().map(bindDependency())}, sources = true)()).distinct
       }
       def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
         Deps.scalazCore
@@ -546,7 +546,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions: _*) {
   }
 }
 
-class MainModule(val crossScalaVersion: String) extends AmmModule {
+trait MainModule extends AmmModule {
 
   def isCrossFullScalaVersion = true
 
@@ -594,7 +594,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule {
     )
   }
   def localClasspath = T {
-    super.localClasspath() ++ Agg(thinWhitelist())
+    Seq(thinWhitelist()) ++ super.localClasspath()
   }
 
   def launcher = {
@@ -642,16 +642,13 @@ class MainModule(val crossScalaVersion: String) extends AmmModule {
         amm.repl.api().exposedClassPath() ++
           amm.compiler().exposedClassPath() ++
           Seq(amm.repl().test.compile().classes, compile().classes) ++
-          resolveDeps(T.task { compileIvyDeps() ++ transitiveIvyDeps() })()
+          resolveDeps(T.task { compileIvyDeps().map(bindDependency()) ++ transitiveIvyDeps() })()
       )
-    }
-
-    def localClasspath = T {
-      super.localClasspath() ++ Agg(thinWhitelist())
     }
 
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
+      Seq(thinWhitelist()) ++
       super.runClasspath() ++
         terminal().sources() ++
         amm.util().sources() ++
@@ -662,6 +659,7 @@ class MainModule(val crossScalaVersion: String) extends AmmModule {
         amm.repl().sources() ++
         sources() ++
         externalSources()
+
 
   }
 }
@@ -690,8 +688,8 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
   PathRef(ctx.dest)
 }
 
-object integration extends Cross[IntegrationModule](fullCrossScalaVersions: _*)
-class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule {
+object integration extends Cross[IntegrationModule](fullCrossScalaVersions)
+trait IntegrationModule extends AmmInternalModule {
   def moduleDeps = Seq(amm())
   def ivyDeps = T {
     super.ivyDeps() ++ (
@@ -714,8 +712,8 @@ class IntegrationModule(val crossScalaVersion: String) extends AmmInternalModule
   }
 }
 
-object sshd extends Cross[SshdModule](fullCrossScalaVersions: _*)
-class SshdModule(val crossScalaVersion: String) extends AmmModule {
+object sshd extends Cross[SshdModule](fullCrossScalaVersions)
+trait SshdModule extends AmmModule {
   def moduleDeps = Seq(amm())
   def isCrossFullScalaVersion = true
   def ivyDeps = super.ivyDeps() ++ Agg(
@@ -737,18 +735,18 @@ class SshdModule(val crossScalaVersion: String) extends AmmModule {
  * Selects all cross module instances, that match the given predicate.
  * In Mill 0.11, this can be hopefully replaced with a simple filter on the `crossValue`.
  */
-def selectCrossPrefix[T <: Module, V](
+def selectCrossPrefix[T <: mill.Cross.Module[_], V](
     crossModule: Cross[T],
     predicate: String => Boolean
 )(accessor: T => V): Seq[V] =
   crossModule.items.collect {
-    case (List(key: String), mod) if predicate(key) => accessor(mod)
+    case item if predicate(item.crossSegments.last) => accessor(item.module.value)
   }
     .tap { mods =>
       if (mods.isEmpty) sys.error(s"No matching cross-instances found in ${crossModule}")
     }
 
-def unitTest(scalaVersion: String = ""): Command[Seq[(String, Seq[TestRunner.Result])]] = {
+def unitTest(scalaVersion: String = ""): Command[Seq[(String, Seq[mill.testrunner.TestResult])]] = {
   val binPred = (v: String) =>
     v.startsWith(scalaVersion.split("[.\\-]").take(if (v.startsWith("2")) 2 else 1).mkString("."))
   val pred = (_: String).startsWith(scalaVersion)
@@ -782,7 +780,7 @@ def generateConstantsFile(
     oldCurlUrls: Seq[(String, String)] = Nil,
     oldUnstableCurlUrls: Seq[(String, String)] = Nil,
     returnDirectory: Boolean = true
-)(implicit ctx: mill.util.Ctx.Dest) = {
+)(implicit ctx: mill.api.Ctx.Dest) = {
   val versionTxt = s"""
     package ammonite
     object Constants{
@@ -810,7 +808,7 @@ def generateConstantsFile(
 }
 
 def generateDependenciesFile(fileName: String, deps: Seq[coursier.Dependency])(implicit
-    ctx: mill.util.Ctx.Dest
+    ctx: mill.api.Ctx.Dest
 ) = {
 
   val dir = ctx.dest / "extra-resources"
