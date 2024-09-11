@@ -29,14 +29,14 @@ jobs:
           - java-version: 17
             command: 'amm.repl[2.13.{4,9,14}].__.test'
           - java-version: 21
-            command: 'amm.repl[{3.3.0,3.3.3,3.4.2}].__.test'
+            command: 'amm.repl[{3.3.3,3.4.2}].__.test'
 
           - java-version: 11
             command: 'amm[2.12.{9,14,19}].__.test'
           - java-version: 17
             command: 'amm[2.13.{4,9,14}].__.test'
           - java-version: 21
-            command: 'amm[{3.3.0,3.3.3,3.4.2}].__.test'
+            command: 'amm[{3.3.3,3.4.2}].__.test'
 
     runs-on: ubuntu-latest
     steps:
@@ -57,7 +57,7 @@ jobs:
           - java-version: 17
             scala-version: '2.13.{4,9,14}'
           - java-version: 21
-            scala-version: '{3.3.0,3.3.3,3.4.2}'
+            scala-version: '{3.3.3,3.4.2}'
 
     runs-on: ubuntu-latest
     steps:
