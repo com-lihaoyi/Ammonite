@@ -24,7 +24,7 @@ jobs:
           - java-version: 21
             scala-version: 2.12.18
           - java-version: 21
-            scala-version: 2.12.19
+            scala-version: 2.12.20
           - java-version: 21
             scala-version: 2.13.11
           - java-version: 21
@@ -57,7 +57,7 @@ jobs:
           - java-version: 21
             scala-version: 2.12.18
           - java-version: 21
-            scala-version: 2.12.19
+            scala-version: 2.12.20
           - java-version: 21
             scala-version: 2.13.11
           - java-version: 21
@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala-version: [ 2.12.19, 2.13.14, 3.3.3, 3.4.2 ]
+        scala-version: [ 2.12.20, 2.13.14, 3.3.3, 3.4.2 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
