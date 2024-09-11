@@ -30,7 +30,7 @@ jobs:
             command: 'amm[2.12.19].__.test'
 
           - java-version: 17
-            command: 'terminal[2.13.].__.test'
+            command: 'terminal[2.13].__.test'
           - java-version: 17
             command: 'amm.repl[2.13.14].__.test'
           - java-version: 17
