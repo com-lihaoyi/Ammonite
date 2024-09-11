@@ -529,8 +529,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         )
       }
 
-      def localClasspath = T {
-        super.localClasspath() ++ Agg(thinWhitelist())
+      def runClasspath = T {
+        super.runClasspath() ++ Agg(thinWhitelist())
       }
 
       def resources = T.sources {
@@ -575,7 +575,8 @@ trait MainModule extends AmmModule {
       amm.interp().sources() ++
       amm.repl().sources() ++
       sources() ++
-      externalSources()
+      externalSources() ++
+      Agg(thinWhitelist())
 
   def prependShellScript = T {
     mill.modules.Jvm.launcherUniversalScript(
@@ -592,9 +593,6 @@ trait MainModule extends AmmModule {
       amm.repl.api().exposedClassPath() ++
         amm.compiler().exposedClassPath()
     )
-  }
-  def localClasspath = T {
-    super.localClasspath() ++ Agg(thinWhitelist())
   }
 
   def launcher = {
@@ -646,10 +644,6 @@ trait MainModule extends AmmModule {
       )
     }
 
-    def localClasspath = T {
-      super.localClasspath() ++ Agg(thinWhitelist())
-    }
-
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
       super.runClasspath() ++
@@ -661,7 +655,8 @@ trait MainModule extends AmmModule {
         amm.interp().sources() ++
         amm.repl().sources() ++
         sources() ++
-        externalSources()
+        externalSources() ++
+        Agg(thinWhitelist())
 
   }
 }
