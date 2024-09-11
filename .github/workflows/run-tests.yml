@@ -68,7 +68,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
-      - run: ./mill -i -k -j4 'integration[${{ matrix.scala-version }}].__.test'
+      - run: ./mill -i -k 'integration[${{ matrix.scala-version }}].__.test'
 
   site:
     runs-on: ubuntu-latest

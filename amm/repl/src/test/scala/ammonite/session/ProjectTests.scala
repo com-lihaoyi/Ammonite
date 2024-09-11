@@ -184,8 +184,11 @@ object ProjectTests extends TestSuite {
     }
 
     test("finagle") {
+      val s = new java.net.ServerSocket(0);
+      val port = s.getLocalPort
+      s.close()
       // Prevent regressions when wildcard-importing things called `macro` or `_`
-      check.session("""
+      check.session(s"""
         @ import $ivy.`com.twitter::finagle-http:21.4.0 compat`
 
         @ import com.twitter.finagle._, com.twitter.util._
@@ -203,9 +206,9 @@ object ProjectTests extends TestSuite {
         @   }
         @ }
 
-        @ val server = Http.serve(":8080", service)
+        @ val server = Http.serve(":$port", service)
 
-        @ val client: Service[http.Request, http.Response] = Http.client.newService(":8080")
+        @ val client: Service[http.Request, http.Response] = Http.client.newService(":$port")
 
         @ val request = http.Request(http.Method.Get, "/")
 
