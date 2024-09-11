@@ -1,6 +1,4 @@
-#!/usr/bin/env amm
 
-@main
 def apply(
     uploadedFile: os.Path,
     tagName: String,
