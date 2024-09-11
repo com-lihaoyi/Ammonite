@@ -36,7 +36,7 @@ jobs:
           - java-version: 17
             command: 'amm[2.13.{4,9,14}].__.test'
           - java-version: 21
-            command: 'amm[{3.3.0,3,3,3,3.4.2}].__.test'
+            command: 'amm[{3.3.0,3.3.3,3.4.2}].__.test'
 
     runs-on: ubuntu-latest
     steps:
