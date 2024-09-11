@@ -189,7 +189,7 @@ object ProjectTests extends TestSuite {
       s.close()
       // Prevent regressions when wildcard-importing things called `macro` or `_`
       check.session(s"""
-        @ import $ivy.`com.twitter::finagle-http:21.4.0 compat`
+        @ import $$ivy.`com.twitter::finagle-http:21.4.0 compat`
 
         @ import com.twitter.finagle._, com.twitter.util._
 
