@@ -55,7 +55,7 @@ val commitsSinceTaggedVersion = latestTaggedVersion match{
 //  if (_) println("Java 21+: Skip building of modules requiring incompatible Scala versions")
 //}
 
-val scala2_12Versions = 9.to(19)
+val scala2_12Versions = 9.to(20)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.${v}")
 val scala2_13Versions = 2.to(14)
@@ -64,14 +64,20 @@ val scala2_13Versions = 2.to(14)
 val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
 //  .dropWhile(v => isJava21 && v == "3.3.0")
 val scala34Versions = Seq("3.4.2")
+val scala35Versions = Seq("3.5.0")
 
 val scala2Versions = scala2_12Versions ++ scala2_13Versions
-val scala3Versions = scala33Versions ++ scala34Versions
+val scala3Versions = scala33Versions ++ scala34Versions ++ scala35Versions
 
 val binCrossScalaVersions =
   Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
-val assemblyCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last, scala34Versions.last)
+val assemblyCrossScalaVersions = Seq(
+  scala2_12Versions.last,
+  scala2_13Versions.last,
+  scala33Versions.last,
+  scala34Versions.last,
+  scala35Versions.last,
+)
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || sv.startsWith("2.13.")
 }
@@ -98,7 +104,7 @@ val fastparseVersion = "3.1.1"
 val scalametaVersion = "4.9.7"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.12"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.13"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.78.1"
   val cask = ivy"com.lihaoyi::cask:0.9.1"
@@ -229,7 +235,9 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.13-or-3"))
       else Nil
     val extraDir5 =
-      if (sv.startsWith("3.4"))
+      if (sv.startsWith("3.5"))
+        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.5.0+"))
+      else if (sv.startsWith("3.4"))
         if (sv.stripPrefix("3.4.").toInt < 2)
           sys.error("Scala 3.4.0 and 3.4.1 are incompatible with Ammonite")
         else
