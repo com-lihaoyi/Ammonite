@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  release:
+    if: github.repository == 'com-lihaoyi/Ammonite'
+    uses: ./.github/workflows/publish-artifacts.yml
+    secrets: inherit
+
+  publishDocs:
+    if: github.repository == 'com-lihaoyi/Ammonite'
+    uses: ./.github/workflows/publish-docs.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+
+  publishExecutable:
+    if: github.repository == 'com-lihaoyi/Ammonite'
+    uses: ./.github/workflows/publish-executable.yml
+    secrets:
+      AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}

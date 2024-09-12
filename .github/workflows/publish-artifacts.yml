@@ -1,9 +1,5 @@
-name: Release
+name: Publish Artifacts
 on:
-  #  push:
-  #    branches:
-  #      - main
-  #      - 2.x
   workflow_call:
     secrets:
       SONATYPE_PGP_SECRET:
