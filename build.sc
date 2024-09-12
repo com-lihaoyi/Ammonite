@@ -120,10 +120,10 @@ object Deps {
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.55"
-  val mainargs = ivy"com.lihaoyi::mainargs:0.5.4"
-  val osLib = ivy"com.lihaoyi::os-lib:0.10.6"
+  val mainargs = ivy"com.lihaoyi::mainargs:0.7.4"
+  val osLib = ivy"com.lihaoyi::os-lib:0.10.7"
   val pprint = ivy"com.lihaoyi::pprint:0.9.0"
-  val requests = ivy"com.lihaoyi::requests:0.8.3"
+  val requests = ivy"com.lihaoyi::requests:0.9.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.18.0"
   val scalaCollectionCompat = ivy"org.scala-lang.modules::scala-collection-compat:2.12.0"
   def scalaCompiler(scalaVersion: String) = ivy"org.scala-lang:scala-compiler:${scalaVersion}"
@@ -140,17 +140,13 @@ object Deps {
   val semanticDbScalac = ivy"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = ivy"com.chuusai::shapeless:2.3.3"
   val slf4jNop = ivy"org.slf4j:slf4j-nop:1.7.36"
-  val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.2"
+  val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.3-M1"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
   val typename = ivy"org.tpolecat::typename:1.1.0"
-  def upickle(sv: String) = {
-    val ver =
-      if (sv.startsWith("3.2.")) "3.1.0"
-      else "3.1.3"
-    ivy"com.lihaoyi::upickle:$ver"
-  }
-  val utest = ivy"com.lihaoyi::utest:0.8.3"
+  val upickle = ivy"com.lihaoyi::upickle:4.0.1"
+
+  val utest = ivy"com.lihaoyi::utest:0.8.4"
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
@@ -366,7 +362,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
     def isCrossFullScalaVersion = true
     def ivyDeps = super.ivyDeps() ++ Agg(
       Deps.classPathUtil,
-      Deps.upickle(crossScalaVersion),
+      Deps.upickle,
       Deps.requests,
       Deps.mainargs,
       Deps.coursierDependencyInterface
