@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     env:
-      SONATYPE_DEPLOY_USER: ${{ secrets.SONATYPE_DEPLOY_USER }}
-      SONATYPE_DEPLOY_PASSWORD: ${{ secrets.SONATYPE_DEPLOY_PASSWORD }}
+      SONATYPE_DEPLOY_USER: ${{ secrets.SONATYPE_USER }}
+      SONATYPE_DEPLOY_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       SONATYPE_PGP_SECRET: ${{ secrets.SONATYPE_PGP_PRIVATE_KEY }}
       SONATYPE_PGP_PASSWORD: ${{ secrets.SONATYPE_PGP_PRIVATE_KEY_PASSWORD }}
       LANG: "en_US.UTF-8"
