@@ -34,7 +34,7 @@ object AmmCompletion extends AmmCompletionExtras {
   )(using Context): (Int, List[Completion]) = {
     val mode = Completion.completionMode(path, pos)
     val prefix = Completion.completionPrefix(path, pos)
-    val completer = new DeepCompleter(mode, pos, path)
+    val completer = new DeepCompleter(mode, prefix, pos, path)
 
     val hasBackTick = prefix.headOption.contains('`')
 
@@ -69,9 +69,10 @@ object AmmCompletion extends AmmCompletionExtras {
 
   class DeepCompleter(
     mode: Completion.Mode,
+    prefix: String,
     pos: SourcePosition,
     path: List[Tree],
-  ) extends Completion.Completer(mode, pos, path, _ => true):
+  ) extends Completion.Completer(mode, pos, path, _.startsWith(prefix)):
     private def blacklisted(s: Symbol)(using Context) = {
       val blacklist = Set(
         "scala.Predef.any2stringadd.+",
