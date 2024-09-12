@@ -5,9 +5,8 @@ import dotty.tools.dotc.ast.untpd
 import dotty.tools.dotc.core.Contexts._
 import dotty.tools.dotc.core.Denotations.SingleDenotation
 import dotty.tools.dotc.core.Flags._
-import dotty.tools.dotc.core.Names.{Name, termName}
+import dotty.tools.dotc.core.Names.Name
 import dotty.tools.dotc.core.Symbols.{Symbol, defn}
-import dotty.tools.dotc.core.TypeError
 import dotty.tools.dotc.interactive.{Completion, Interactive}
 import dotty.tools.dotc.util.SourcePosition
 
@@ -35,7 +34,7 @@ object AmmCompletion extends AmmCompletionExtras {
   )(using Context): (Int, List[Completion]) = {
     val mode = Completion.completionMode(path, pos)
     val prefix = Completion.completionPrefix(path, pos)
-    val completer = new DeepCompleter(mode, prefix, pos)
+    val completer = new DeepCompleter(mode, pos, path)
 
     val hasBackTick = prefix.headOption.contains('`')
 
@@ -70,9 +69,9 @@ object AmmCompletion extends AmmCompletionExtras {
 
   class DeepCompleter(
     mode: Completion.Mode,
-    prefix: String,
-    pos: SourcePosition
-  ) extends Completion.Completer(mode, prefix, pos):
+    pos: SourcePosition,
+    path: List[Tree],
+  ) extends Completion.Completer(mode, pos, path, _ => true):
     private def blacklisted(s: Symbol)(using Context) = {
       val blacklist = Set(
         "scala.Predef.any2stringadd.+",
@@ -129,7 +128,6 @@ object AmmCompletion extends AmmCompletionExtras {
       val syms = for {
         member <- allMembers(defn.RootClass).map(_.symbol).filter(!blacklisted(_)).toList
         sym <- rec(member)
-        if sym.name.toString.startsWith(prefix)
       } yield sym
 
       syms.map(sym => (sym.fullName, List(sym: SingleDenotation))).toMap
