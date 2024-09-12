@@ -96,23 +96,3 @@ jobs:
           java-version: 8
           distribution: temurin
       - run: ./mill -i -k -j4 '__.compile'
-
-  release:
-    if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
-    needs: [ test, itest, site, compileAll ]
-    uses: ./.github/workflows/release.yml
-    secrets: inherit
-
-  publishDocs:
-    if: github.repository == 'com-lihaoyi/Ammonite' && github.ref == 'refs/heads/main'
-    needs: [ test, itest, site ]
-    uses: ./.github/workflows/publishDocs.yml
-    secrets:
-      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-
-  publishExecutable:
-    if: github.repository == 'com-lihaoyi/Ammonite' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/2.x')
-    needs: [ test, itest, site ]
-    uses: ./.github/workflows/publishExecutable.yml
-    secrets:
-      AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
