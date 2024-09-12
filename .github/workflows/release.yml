@@ -23,10 +23,10 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     env:
-      SONATYPE_PGP_SECRET: ${{ secrets.SONATYPE_PGP_SECRET }}
       SONATYPE_DEPLOY_USER: ${{ secrets.SONATYPE_DEPLOY_USER }}
       SONATYPE_DEPLOY_PASSWORD: ${{ secrets.SONATYPE_DEPLOY_PASSWORD }}
-      SONATYPE_PGP_PASSWORD: ${{ secrets.SONATYPE_PGP_PASSWORD }}
+      SONATYPE_PGP_SECRET: ${{ secrets.$SONATYPE_PGP_PRIVATE_KEY }}
+      SONATYPE_PGP_PASSWORD: ${{ secrets.$SONATYPE_PGP_PRIVATE_KEY_PASSWORD }}
       LANG: "en_US.UTF-8"
       LC_MESSAGES: "en_US.UTF-8"
       LC_ALL: "en_US.UTF-8"
@@ -38,5 +38,5 @@ jobs:
         with:
           java-version: '8'
           distribution: temurin
-      - run: test -z "$SONATYPE_PGP_SECRET" || echo "$SONATYPE_PGP_SECRET" | base64 --decode | gpg --import --no-tty --batch --yes
+      - run: test -z "$SONATYPE_PGP_PRIVATE_KEY" || echo "$SONATYPE_PGP_PRIVATE_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
       - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts --shard ${{ matrix.shard }} --divisionCount 6
