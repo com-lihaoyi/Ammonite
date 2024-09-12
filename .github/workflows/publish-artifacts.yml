@@ -1,18 +1,13 @@
-name: Publish Artifacts
+name: Release
+
 on:
-  workflow_call:
-    secrets:
-      SONATYPE_PGP_SECRET:
-        required: true
-      SONATYPE_DEPLOY_USER:
-        required: true
-      SONATYPE_DEPLOY_PASSWORD:
-        required: true
-      SONATYPE_PGP_PASSWORD:
-        required: true
+  push:
+    tags:
+      - '**'
+  workflow_dispatch:
 
 jobs:
-  release:
+  publish-maven:
     strategy:
       matrix:
         shard: [ 1, 2, 3, 4, 5, 6]
@@ -36,3 +31,35 @@ jobs:
           distribution: temurin
       - run: test -z "$SONATYPE_PGP_PRIVATE_KEY" || echo "$SONATYPE_PGP_PRIVATE_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
       - run: GPG_TTY=$(tty) ./mill -i publishSonatype __.publishArtifacts --shard ${{ matrix.shard }} --divisionCount 6
+
+  publish-docs:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: temurin
+      - name: publish docs
+        shell: 'script -q -e -c "bash {0}"'
+        run: echo "Hello World" && ./mill -i publishDocs
+        env:
+          TERM: xterm-256color
+
+  publish-executable:
+    runs-on: ubuntu-latest
+    env:
+      AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: temurin
+      - run: ./mill -i publishExecutable
