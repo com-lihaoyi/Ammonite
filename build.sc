@@ -61,20 +61,17 @@ val scala2_12Versions = 9.to(20)
 val scala2_13Versions = 2.to(14)
 //  .dropWhile(v => isJava21 && v < 11)
   .map(v => s"2.13.${v}")
-val scala33Versions = Seq("3.3.0", "3.3.1", "3.3.2", "3.3.3")
-//  .dropWhile(v => isJava21 && v == "3.3.0")
 val scala34Versions = Seq("3.4.2")
 val scala35Versions = Seq("3.5.0")
 
 val scala2Versions = scala2_12Versions ++ scala2_13Versions
-val scala3Versions = scala33Versions ++ scala34Versions ++ scala35Versions
+val scala3Versions = scala34Versions ++ scala35Versions
 
 val binCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
+  Seq(scala2_12Versions.last, scala2_13Versions.last)
 val assemblyCrossScalaVersions = Seq(
   scala2_12Versions.last,
   scala2_13Versions.last,
-  scala33Versions.last,
   scala34Versions.last,
   scala35Versions.last,
 )
