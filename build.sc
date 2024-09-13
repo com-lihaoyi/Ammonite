@@ -117,7 +117,7 @@ object Deps {
   val jlineReader = ivy"org.jline:jline-reader:3.14.1"
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.55"
-  val mainargs = ivy"com.lihaoyi::mainargs:0.7.4"
+  val mainargs = ivy"com.lihaoyi::mainargs:0.7.5"
   val osLib = ivy"com.lihaoyi::os-lib:0.10.7"
   val pprint = ivy"com.lihaoyi::pprint:0.9.0"
   val requests = ivy"com.lihaoyi::requests:0.9.0"
