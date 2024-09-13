@@ -22,21 +22,21 @@ jobs:
             command: 'terminal.__.test'
 
           - java-version: 11
-            command: 'sshd[{2.12.20,2.13.14,3.3.3,3.4.2,3.5.0}].__.test'
+            command: 'sshd[{2.12.20,2.13.14,3.4.2,3.5.0}].__.test'
 
           - java-version: 11
             command: 'amm.repl[2.12.{9,14,20}].__.test'
           - java-version: 17
             command: 'amm.repl[2.13.{4,9,14}].__.test'
           - java-version: 21
-            command: 'amm.repl[{3.3.3,3.4.2,3.5.0}].__.test'
+            command: 'amm.repl[{3.4.2,3.5.0}].__.test'
 
           - java-version: 11
             command: 'amm[2.12.{9,14,20}].__.test'
           - java-version: 17
             command: 'amm[2.13.{4,9,14}].__.test'
           - java-version: 21
-            command: 'amm[{3.3.3,3.4.2,3.5.0}].__.test'
+            command: 'amm[{3.4.2,3.5.0}].__.test'
 
     runs-on: ubuntu-latest
     steps:
@@ -45,7 +45,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
-      - run: ./mill -i -k -j4 "${{ matrix.command }}"
+      - run: ./mill -i -j1 -k "${{ matrix.command }}"
 
   itest:
     strategy:
@@ -57,7 +57,7 @@ jobs:
           - java-version: 17
             scala-version: '2.13.{4,9,14}'
           - java-version: 21
-            scala-version: '{3.3.3,3.4.2,3.5.0}'
+            scala-version: '{3.4.2,3.5.0}'
 
     runs-on: ubuntu-latest
     steps:
@@ -68,7 +68,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
-      - run: ./mill -i -k 'integration[${{ matrix.scala-version }}].__.test'
+      - run: ./mill -i -j1 -k 'integration[${{ matrix.scala-version }}].__.test'
 
   site:
     runs-on: ubuntu-latest
