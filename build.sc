@@ -68,7 +68,7 @@ val scala2Versions = scala2_12Versions ++ scala2_13Versions
 val scala3Versions = scala34Versions ++ scala35Versions
 
 val binCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last)
+  Seq(scala2_12Versions.last, scala2_13Versions.last, scala34Versions.last)
 val assemblyCrossScalaVersions = Seq(
   scala2_12Versions.last,
   scala2_13Versions.last,
