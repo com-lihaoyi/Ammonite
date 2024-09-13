@@ -45,7 +45,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
-      - run: ./mill -i -k -j4 "${{ matrix.command }}"
+      - run: ./mill -i -j1 -k "${{ matrix.command }}"
 
   itest:
     strategy:
@@ -68,7 +68,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
-      - run: ./mill -i -k 'integration[${{ matrix.scala-version }}].__.test'
+      - run: ./mill -i -j1 -k 'integration[${{ matrix.scala-version }}].__.test'
 
   site:
     runs-on: ubuntu-latest
