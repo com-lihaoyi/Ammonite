@@ -58,7 +58,7 @@ val commitsSinceTaggedVersion = latestTaggedVersion match{
 val scala2_12Versions = 9.to(20)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.${v}")
-val scala2_13Versions = 2.to(14)
+val scala2_13Versions = 2.to(15)
 //  .dropWhile(v => isJava21 && v < 11)
   .map(v => s"2.13.${v}")
 // TODO: We can't have 3.4.0 & 3.4.1 until we solve https://github.com/com-lihaoyi/Ammonite/issues/1395
