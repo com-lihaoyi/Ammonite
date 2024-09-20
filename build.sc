@@ -63,7 +63,7 @@ val scala2_13Versions = 2.to(14)
   .map(v => s"2.13.${v}")
 // TODO: We can't have 3.4.0 & 3.4.1 until we solve https://github.com/com-lihaoyi/Ammonite/issues/1395
 val scala34Versions = Seq("3.4.2", "3.4.3")
-val scala35Versions = Seq("3.5.0")
+val scala35Versions = Seq("3.5.0", "3.5.1")
 
 val scala2Versions = scala2_12Versions ++ scala2_13Versions
 val scala3Versions = scala34Versions ++ scala35Versions
