@@ -1007,48 +1007,6 @@ def partition(
 
 }
 
-def publishSonatype(
-    publishArtifacts: mill.main.Tasks[PublishModule.PublishData],
-    shard: Int,
-    divisionCount: Int
-) =
-  T.command {
-
-    val x: Seq[(Seq[(os.Path, String)], Artifact)] = {
-      mill.define.Target.sequence(partition(publishArtifacts, shard, divisionCount))().map {
-        case PublishModule.PublishData(a, s) => (s.map { case (p, f) => (p.path, f) }, a)
-      }
-    }
-    if (isPublishableCommit)
-      new SonatypePublisher(
-        uri = "https://oss.sonatype.org/service/local",
-        snapshotUri = "https://oss.sonatype.org/content/repositories/snapshots",
-        credentials = sys.env("SONATYPE_DEPLOY_USER") + ":" + sys.env("SONATYPE_DEPLOY_PASSWORD"),
-        signed = true,
-        gpgArgs = Seq(
-          "--passphrase",
-          sys.env("SONATYPE_PGP_PASSWORD"),
-          "--no-tty",
-          "--pinentry-mode",
-          "loopback",
-          "--batch",
-          "--yes",
-          "-a",
-          "-b"
-        ),
-        readTimeout = 600000,
-        connectTimeout = 600000,
-        log = T.ctx().log,
-        workspace = T.workspace,
-        env = T.env,
-        awaitTimeout = 600000,
-        stagingRelease = true
-      ).publishAll(
-        true,
-        x: _*
-      )
-  }
-
 /**
  * Somethime, the Mill publish command fails although the Sonatype publishing went through.
  * This command checks, whether all artifacts are publshed.
