@@ -33,15 +33,17 @@ val isPublishableCommit =
       publishBranches.exists(suffix => x.endsWith(s"/${suffix}"))
     )
 
-val latestTaggedVersion = try{
-  os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
-}catch{case e: os.SubprocessException =>
-  "dev"
-}
+val latestTaggedVersion =
+  try {
+    os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
+  } catch {
+    case e: os.SubprocessException =>
+      "dev"
+  }
 
 val gitHead = os.proc("git", "rev-parse", "HEAD").call().out.trim
 
-val commitsSinceTaggedVersion = latestTaggedVersion match{
+val commitsSinceTaggedVersion = latestTaggedVersion match {
   case "dev" => 0
   case latest =>
     os.proc("git", "rev-list", gitHead, "--not", latest, "--count")
@@ -74,7 +76,7 @@ val assemblyCrossScalaVersions = Seq(
   scala2_12Versions.last,
   scala2_13Versions.last,
   scala34Versions.last,
-  scala35Versions.last,
+  scala35Versions.last
 )
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || sv.startsWith("2.13.")
@@ -102,7 +104,7 @@ val fastparseVersion = "3.1.1"
 val scalametaVersion = "4.9.7"
 
 object Deps {
-  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.14"
+  val acyclic = ivy"com.lihaoyi:::acyclic:0.3.15"
   val bsp4j = ivy"ch.epfl.scala:bsp4j:${bspVersion}"
   val bcprovJdk15on = ivy"org.bouncycastle:bcprov-jdk18on:1.78.1"
   val cask = ivy"com.lihaoyi::cask:0.9.1"
@@ -247,9 +249,11 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   def externalSources = T {
     resolveDeps(allBoundIvyDeps, sources = true)()
   }
-  def repositoriesTask = T.task {super.repositoriesTask() ++ Seq(
-    mvn"https://scala-ci.typesafe.com/artifactory/scala-integration"
-  ) }
+  def repositoriesTask = T.task {
+    super.repositoriesTask() ++ Seq(
+      mvn"https://scala-ci.typesafe.com/artifactory/scala-integration"
+    )
+  }
   override implicit def crossSbtModuleResolver: mill.define.Cross.Resolver[CrossModuleBase] =
     new mill.define.Cross.Resolver[CrossModuleBase] {
       def resolve[V <: CrossModuleBase](c: Cross[V]): V = {
@@ -545,7 +549,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         (super.resources() ++
           ReplModule.this.sources() ++
           ReplModule.this.externalSources() ++
-          resolveDeps(T.task{ ivyDeps().map(bindDependency())}, sources = true)()).distinct
+          resolveDeps(T.task { ivyDeps().map(bindDependency()) }, sources = true)()).distinct
       }
       def ivyDeps = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
         Deps.scalazCore
@@ -657,7 +661,7 @@ trait MainModule extends AmmModule {
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
     def runClasspath =
       Seq(thinWhitelist()) ++
-      super.runClasspath() ++
+        super.runClasspath() ++
         terminal().sources() ++
         amm.util().sources() ++
         amm.runtime().sources() ++
@@ -667,7 +671,6 @@ trait MainModule extends AmmModule {
         amm.repl().sources() ++
         sources() ++
         externalSources()
-
 
   }
 }
