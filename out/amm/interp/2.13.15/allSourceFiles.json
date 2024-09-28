@@ -1,0 +1,21 @@
+{
+    "value": [
+        "ref:v0:9ed45de5:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/Watchable.scala",
+        "ref:v0:26f40857:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/IvyThing.scala",
+        "ref:v0:7244124f:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/PredefInitialization.scala",
+        "ref:v0:21fa7707:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/Interpreter.scala",
+        "ref:v0:d04fac03:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/Script.scala",
+        "ref:v0:1dbe51f9:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/SingleScriptCompiler.scala",
+        "ref:v0:4b4cffd6:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompiler.scala",
+        "ref:v0:2ed92172:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/AmmoniteBuildServer.scala",
+        "ref:v0:c423e5f1:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/Diagnostic.scala",
+        "ref:v0:42fbf8c9:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/DummyBuildServerImplems.scala",
+        "ref:v0:d3497ff1:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptProcessor.scala",
+        "ref:v0:f12c873c:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCache.scala",
+        "ref:v0:86041997:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/SemanticdbProcessor.scala",
+        "ref:v0:889fca8a:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompileResult.scala",
+        "ref:v0:8e233fbd:/home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/DependencyLoader.scala"
+    ],
+    "valueHash": -1419293150,
+    "inputsHash": -705132688
+}
