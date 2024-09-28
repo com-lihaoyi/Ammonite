@@ -20,7 +20,7 @@ object LineNumberTests extends TestSuite {
 
     val sv = ammonite.compiler.CompilerBuilder.scalaVersion
     val isScala2 = sv.startsWith("2.")
-    val isPre3_4 = sv.take(4) <= "3.3."
+    val isPre3_3_4 = sv < "3.3.4"
 
     test("sourcecode") {
       if (isScala2) {
@@ -133,7 +133,7 @@ object LineNumberTests extends TestSuite {
             s"""$path:14: not found: value printnl
                |val res_0 = printnl("OK")
                |            ^""".stripMargin
-          else if (isPre3_4) {
+          else if (isPre3_3_4) {
             val sp = " "
             s"""-- [E006] Not Found Error: $path:1:12$sp
                |1 |val res_0 = printnl("OK")
@@ -162,7 +162,7 @@ object LineNumberTests extends TestSuite {
             s"""$path:30: not found: value prinntl
                |val res = prinntl("Ammonite")
                |          ^""".stripMargin
-          else if (isPre3_4) {
+          else if (isPre3_3_4) {
             val sp = " "
             s"""-- [E006] Not Found Error: $path:3:10$sp
                |3 |val res = prinntl("Ammonite")
