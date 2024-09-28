@@ -64,17 +64,19 @@ val scala2_13Versions = 2.to(15)
 //  .dropWhile(v => isJava21 && v < 11)
   .map(v => s"2.13.${v}")
 // TODO: We can't have 3.4.0 & 3.4.1 until we solve https://github.com/com-lihaoyi/Ammonite/issues/1395
+val scala33Versions = Seq("3.3.4")
 val scala34Versions = Seq("3.4.2", "3.4.3")
 val scala35Versions = Seq("3.5.0", "3.5.1")
 
 val scala2Versions = scala2_12Versions ++ scala2_13Versions
-val scala3Versions = scala34Versions ++ scala35Versions
+val scala3Versions = scala33Versions ++ scala34Versions ++ scala35Versions
 
 val binCrossScalaVersions =
-  Seq(scala2_12Versions.last, scala2_13Versions.last, scala34Versions.last)
+  Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
 val assemblyCrossScalaVersions = Seq(
   scala2_12Versions.last,
   scala2_13Versions.last,
+  scala33Versions.last,
   scala34Versions.last,
   scala35Versions.last
 )
@@ -144,7 +146,7 @@ object Deps {
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
   val typename = ivy"org.tpolecat::typename:1.1.0"
-  val upickle = ivy"com.lihaoyi::upickle:4.0.1"
+  val upickle = ivy"com.lihaoyi::upickle:4.0.2"
 
   val utest = ivy"com.lihaoyi::utest:0.8.4"
 }
