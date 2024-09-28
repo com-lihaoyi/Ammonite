@@ -71,7 +71,7 @@ object AmmCompletion extends AmmCompletionExtras {
     mode: Completion.Mode,
     prefix: String,
     pos: SourcePosition
-  ) extends Completion.Completer(mode, prefix, pos):
+  ) extends Completion.Completer(mode, pos, Nil, n => n.startsWith(prefix)):
     private def blacklisted(s: Symbol)(using Context) = {
       val blacklist = Set(
         "scala.Predef.any2stringadd.+",
