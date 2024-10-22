@@ -123,7 +123,7 @@ object Deps {
   val jlineTerminal = ivy"org.jline:jline-terminal:3.14.1"
   val jsch = ivy"com.jcraft:jsch:0.1.55"
   val mainargs = ivy"com.lihaoyi::mainargs:0.7.5"
-  val osLib = ivy"com.lihaoyi::os-lib:0.11.2"
+  val osLib = ivy"com.lihaoyi::os-lib:0.11.3"
   val pprint = ivy"com.lihaoyi::pprint:0.9.0"
   val requests = ivy"com.lihaoyi::requests:0.9.0"
   val scalacheck = ivy"org.scalacheck::scalacheck:1.18.0"
