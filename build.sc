@@ -911,6 +911,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
         "sbt",
         "readme/run"
       ).call(
+        cwd = T.workspace,
         env = Map(
           "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
           "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
@@ -971,6 +972,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
       "sbt",
       "readme/run"
     ).call(
+      cwd = T.workspace,
       env = Map(
         "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
         "CONSTANTS_FILE" -> constantsFile.toString
