@@ -190,6 +190,8 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   trait AmmTests extends super.Tests with TestModule.Utest {
     def ivyDeps = super.ivyDeps() ++ Agg(Deps.utest)
     def forkArgs = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
+    def testForkGrouping = discoveredTestClasses().grouped(1).toSeq
+    def testSandboxWorkingDir = false
   }
   def allBoundIvyDeps = T { transitiveIvyDeps() ++ scalaLibraryIvyDeps().map(bindDependency()) }
   def sources = T.sources {
@@ -909,6 +911,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
         "sbt",
         "readme/run"
       ).call(
+        cwd = T.workspace,
         env = Map(
           "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
           "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
@@ -969,6 +972,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
       "sbt",
       "readme/run"
     ).call(
+      cwd = T.workspace,
       env = Map(
         "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
         "CONSTANTS_FILE" -> constantsFile.toString
