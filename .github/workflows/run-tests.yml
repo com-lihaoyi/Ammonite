@@ -57,7 +57,7 @@ jobs:
           - java-version: 17
             scala-version: '2.13.{4,9,15}'
           - java-version: 21
-            scala-version: '{3.3.4,3.4.3,3.5.1}'
+            scala-version: '{3.3.4,3.4.3,3.5.2}'
 
     runs-on: ubuntu-latest
     steps:
