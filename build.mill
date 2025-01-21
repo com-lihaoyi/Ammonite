@@ -889,7 +889,7 @@ def publishExecutable() = {
       )
       upload(
         uploadedFile = os.temp(
-          os.read(os.pwd / "amm-template.sh")
+          os.read(Task.workspace / "amm-template.sh")
             .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
             .replace("DEFAULT_SCALA_VERSION=", s"DEFAULT_SCALA_VERSION=$scalaBinaryVersion")
         ),
