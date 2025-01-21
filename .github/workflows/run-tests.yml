@@ -22,21 +22,21 @@ jobs:
             command: 'terminal.__.test'
 
           - java-version: 11
-            command: 'sshd[{2.12.20,2.13.15,3.3.4,3.4.3,3.5.1}].__.test'
+            command: 'sshd[{2.12.20,2.13.16,3.3.4,3.4.3,3.5.1,3.6.2}].__.test'
 
           - java-version: 11
             command: 'amm.repl[2.12.{9,14,20}].__.test'
           - java-version: 17
-            command: 'amm.repl[2.13.{4,9,15}].__.test'
+            command: 'amm.repl[2.13.{4,9,16}].__.test'
           - java-version: 21
-            command: 'amm.repl[{3.3.4,3.4.3,3.5.1}].__.test'
+            command: 'amm.repl[{3.3.4,3.4.3,3.5.1,3.6.2}].__.test'
 
           - java-version: 11
             command: 'amm[2.12.{9,14,20}].__.test'
           - java-version: 17
-            command: 'amm[2.13.{4,9,15}].__.test'
+            command: 'amm[2.13.{4,9,16}].__.test'
           - java-version: 21
-            command: 'amm[{3.3.4,3.4.3,3.5.1}].__.test'
+            command: 'amm[{3.3.4,3.4.3,3.5.1,3.6.2}].__.test'
 
     runs-on: ubuntu-latest
     steps:
