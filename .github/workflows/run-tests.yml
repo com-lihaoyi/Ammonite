@@ -70,6 +70,8 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: temurin
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
       - run: ./mill -i -j1 -k 'integration[${{ matrix.scala-version }}].__.test'
 
   site:
