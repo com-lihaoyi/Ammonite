@@ -241,7 +241,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
       else Nil
     val extraDir5 =
       if (sv.startsWith("3.6"))
-        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.6.3+"))
+        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.6.2+"))
       else if (sv.startsWith("3.5"))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.5.0+"))
       else if (sv.startsWith("3.4"))
@@ -255,8 +255,11 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.3.1"))
       else Nil
     val extraDir6 =
-      if (sv.startsWith("3") && !sv.startsWith("3.6"))
-        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.5.0+"))
+      if (sv.startsWith("3"))
+        if (sv.startsWith("3.6.") && sv.stripPrefix("3.6.").toInt >= 3)
+          Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.6.3+"))
+        else
+          Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.6.2"))
       else Nil
 
     super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
