@@ -985,7 +985,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
       println("Skip deployment")
     } else {
       println("Deploying ...")
-      os.proc("ci/deploy_master_docs.sh").call()
+      os.proc("ci/deploy_master_docs.sh").call(cwd = Task.workspace)
     }
     ()
   }
