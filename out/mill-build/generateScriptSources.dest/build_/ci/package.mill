@@ -1,0 +1,20 @@
+package build_.ci
+import _root_.{build_ => $file}
+import build_.{package_ => build}
+object MillMiscSubFolderInfo
+extends mill.main.SubfolderModule.Info(
+  os.Path("/home/runner/work/Ammonite/Ammonite/ci"),
+  _root_.scala.Seq("ci")
+)
+import MillMiscSubFolderInfo._
+
+object package_ extends package_{
+  
+  
+}
+abstract class package_ extends _root_.mill.main.SubfolderModule  {
+//MILL_ORIGINAL_FILE_PATH=/home/runner/work/Ammonite/Ammonite/ci/package.mill
+//MILL_USER_CODE_START_MARKER
+
+
+}
