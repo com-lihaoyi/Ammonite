@@ -70,7 +70,7 @@ val scala2_13Versions = 2.to(16)
 val scala33Versions = Seq("3.3.4")
 val scala34Versions = Seq("3.4.2", "3.4.3")
 val scala35Versions = Seq("3.5.0", "3.5.1")
-val scala36Versions = Seq("3.6.2")
+val scala36Versions = Seq("3.6.2", "3.6.3")
 
 val scala2Versions = scala2_12Versions ++ scala2_13Versions
 val scala3Versions = scala33Versions ++ scala34Versions ++ scala35Versions ++ scala36Versions
