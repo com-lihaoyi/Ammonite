@@ -240,9 +240,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-2.13-or-3"))
       else Nil
     val extraDir5 =
-      if (sv.startsWith("3.6"))
-        Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.6.2+"))
-      else if (sv.startsWith("3.5"))
+      if (sv.startsWith("3.5") || sv.startsWith("3.6"))
         Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.5.0+"))
       else if (sv.startsWith("3.4"))
         if (sv.stripPrefix("3.4.").toInt < 2)
