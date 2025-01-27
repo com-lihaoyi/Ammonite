@@ -20,15 +20,15 @@ import java.util.Arrays
 
 /** This object provides functions for syntax highlighting in the REPL */
 class SyntaxHighlighting(
-  noAttrs: fansi.Attrs,
-  commentAttrs: fansi.Attrs,
-  keywordAttrs: fansi.Attrs,
-  valDefAttrs: fansi.Attrs,
-  literalAttrs: fansi.Attrs,
-  typeAttrs: fansi.Attrs,
-  annotationAttrs: fansi.Attrs,
-  notImplementedAttrs: fansi.Attrs
-) {
+                          noAttrs: fansi.Attrs,
+                          commentAttrs: fansi.Attrs,
+                          keywordAttrs: fansi.Attrs,
+                          valDefAttrs: fansi.Attrs,
+                          literalAttrs: fansi.Attrs,
+                          typeAttrs: fansi.Attrs,
+                          annotationAttrs: fansi.Attrs,
+                          notImplementedAttrs: fansi.Attrs
+                        ) {
 
   def highlight(in: String)(using Context): String = {
     def freshCtx = ctx.fresh.setReporter(Reporter.NoReporter)
@@ -78,8 +78,10 @@ class SyntaxHighlighting(
         }
       }
 
-      for (comment <- scanner.comments)
-        highlightPosition(comment.span, commentAttrs)
+      for {
+        comment <- scanner.comments
+        span = comment.span
+      } highlightPosition(span, commentAttrs)
 
       object TreeHighlighter extends untpd.UntypedTreeTraverser {
         import untpd._

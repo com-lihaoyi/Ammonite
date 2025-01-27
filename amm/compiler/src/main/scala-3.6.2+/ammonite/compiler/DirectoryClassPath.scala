@@ -8,6 +8,7 @@ import classpath.FileUtils._
 case class DirectoryClassPath(dir: JFile)
     extends classpath.JFileDirectoryLookup[classpath.BinaryFileEntry]
     with classpath.NoSourcePaths {
+
   def findClassFile(className: String): Option[AbstractFile] = {
     val relativePath = classpath.FileUtils.dirPath(className)
     val classFile = new JFile(dir, relativePath + ".class")
@@ -21,7 +22,7 @@ case class DirectoryClassPath(dir: JFile)
   protected def createFileEntry(file: AbstractFile): classpath.BinaryFileEntry =
     classpath.BinaryFileEntry(file)
   protected def isMatchingFile(f: JFile): Boolean =
-    f.isTasty || f.isBestEffortTasty || (f.isClass && !f.hasSiblingTasty)
+    f.isClass
 
   private[dotty] def classes(inPackage: classpath.PackageName): Seq[classpath.BinaryFileEntry] =
     files(inPackage)

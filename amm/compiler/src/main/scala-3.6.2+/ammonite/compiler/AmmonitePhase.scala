@@ -128,7 +128,7 @@ class AmmonitePhase(
         if !isMask(t)
         // getOrElse just in case...
         isType <- importableIsTypes.getOrElse(name.name.decode.toString, Nil)
-        case Ident(rename) <- Option(renameTree)
+        rename <- Option(renameTree).collect{ case Ident(r) => r }
       } yield ((isType, rename.decode.toString), name.name.decode.toString)
 
       renamings.toMap

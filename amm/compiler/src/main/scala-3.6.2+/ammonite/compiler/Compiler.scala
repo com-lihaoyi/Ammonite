@@ -23,7 +23,7 @@ import dotc.ast.Positioned
 import dotc.classpath
 import dotc.config.{CompilerCommand, JavaPlatform}
 import dotc.core.Contexts._
-import dotc.core.{CompilationUnitInfo, Flags, MacroClassLoader, Mode}
+import dotc.core.{Flags, MacroClassLoader, Mode}
 import dotc.core.Comments.{ContextDoc, ContextDocstrings}
 import dotc.core.Phases.{Phase, unfusedPhases}
 import dotc.core.Symbols.{defn, Symbol}
@@ -155,7 +155,7 @@ class Compiler(
       override protected def frontendPhases: List[List[Phase]] =
         CompilerHelper.frontEndPhases ++
         List(
-          // List(new semanticdb.ExtractSemanticDB),
+          List(new semanticdb.ExtractSemanticDB.ExtractSemanticInfo),
           List(new AmmonitePhase(userCodeNestingLevel, userCodeNestingLevel == 2)),
           List(new PostTyper)
         )
@@ -223,7 +223,7 @@ class Compiler(
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =
-      new CompilationUnit(ctx.source, CompilationUnitInfo(ctx.source.file)):
+      new CompilationUnit(ctx.source, null):
         // as done in
         // https://github.com/lampepfl/dotty/blob/3.0.0-M3/
         //   compiler/src/dotty/tools/repl/ReplCompillationUnit.scala/#L8
@@ -340,7 +340,7 @@ class Compiler(
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =
-      new CompilationUnit(ctx.source, CompilationUnitInfo(ctx.source.file)):
+      new CompilationUnit(ctx.source, null):
         override def isSuspendable: Boolean = false
     ctx
       .run
@@ -445,7 +445,7 @@ class Compiler(
         "java.lang.Object.finalize"
       )
 
-      blacklist(s.showFullName) ||
+      blacklist(s.fullName.toString) ||
       s.isOneOf(Flags.GivenOrImplicit) ||
       // Cache objects, which you should probably never need to
       // access directly, and apart from that have annoyingly long names

@@ -274,40 +274,40 @@ class Preprocessor(
     val errors = reParsed.collect{case (Left(e), _) => e }.flatten
     if (errors.length != 0) Left(errors.mkString(System.lineSeparator()))
     else {
-      val allDecls = for {
-        case ((Right(trees), code), i) <- reParsed.zipWithIndex if trees.nonEmpty
-      } yield {
-        // Suffix the name of the result variable with the index of
-        // the tree if there is more than one statement in this command
-        val suffix = if (reParsed.length > 1) "_" + i else ""
-        def handleTree(t: untpd.Tree) = {
-          // println(s"handleTree($t)")
-          val it = decls.iterator.flatMap(_.apply(code, "res" + resultIndex + suffix, t))
-          if (it.hasNext)
-            it.next()
-          else {
-            sys.error(s"Don't know how to handle ${t.getClass}: $t")
-          }
-        }
-        trees match {
-          case Seq(tree) => handleTree(tree)
+      val allDecls = 
+        reParsed.zipWithIndex.collect{
+          case ((Right(trees), code), i) if trees.nonEmpty =>
+            // Suffix the name of the result variable with the index of
+            // the tree if there is more than one statement in this command
+            val suffix = if (reParsed.length > 1) "_" + i else ""
+            def handleTree(t: untpd.Tree) = {
+              // println(s"handleTree($t)")
+              val it = decls.iterator.flatMap(_.apply(code, "res" + resultIndex + suffix, t))
+              if (it.hasNext)
+                it.next()
+              else {
+                sys.error(s"Don't know how to handle ${t.getClass}: $t")
+              }
+            }
+            trees match {
+              case Seq(tree) => handleTree(tree)
 
-          // This handles the multi-import case `import a.b, c.d`
-          case trees if trees.forall(_.isInstanceOf[untpd.Import]) => handleTree(trees(0))
+              // This handles the multi-import case `import a.b, c.d`
+              case trees if trees.forall(_.isInstanceOf[untpd.Import]) => handleTree(trees(0))
 
-          // AFAIK this can only happen for pattern-matching multi-assignment,
-          // which for some reason parse into a list of statements. In such a
-          // scenario, aggregate all their printers, but only output the code once
-          case trees =>
-            val printers = for {
-              tree <- trees
-              if tree.isInstanceOf[untpd.ValDef]
-              Expanded(_, printers) = handleTree(tree)
-              printer <- printers
-            } yield printer
+              // AFAIK this can only happen for pattern-matching multi-assignment,
+              // which for some reason parse into a list of statements. In such a
+              // scenario, aggregate all their printers, but only output the code once
+              case trees =>
+                val printers = for {
+                  tree <- trees
+                  if tree.isInstanceOf[untpd.ValDef]
+                  Expanded(_, printers) = handleTree(tree)
+                  printer <- printers
+                } yield printer
 
-            Expanded(code, printers)
-        }
+                Expanded(code, printers)
+            }
       }
 
       val expanded = allDecls match{

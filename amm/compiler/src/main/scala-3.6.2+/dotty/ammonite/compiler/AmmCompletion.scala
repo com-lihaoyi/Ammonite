@@ -12,27 +12,6 @@ import dotty.tools.dotc.interactive.{Completion, Interactive}
 import dotty.tools.dotc.util.SourcePosition
 
 object AmmCompletion extends AmmCompletionExtras {
-  val blacklist = Set(
-    "scala.Predef.any2stringadd.+",
-    "scala.Any.##",
-    "java.lang.Object.##",
-    "scala.<byname>",
-    "scala.<empty>",
-    "scala.<repeated>",
-    "scala.<repeated...>",
-    "scala.Predef.StringFormat.formatted",
-    "scala.Predef.Ensuring.ensuring",
-    "scala.Predef.ArrowAssoc.->",
-    "scala.Predef.ArrowAssoc.→",
-    "java.lang.Object.synchronized",
-    "java.lang.Object.ne",
-    "java.lang.Object.eq",
-    "java.lang.Object.wait",
-    "java.lang.Object.notifyAll",
-    "java.lang.Object.notify",
-    "java.lang.Object.clone",
-    "java.lang.Object.finalize"
-  )
 
   def completions(
     pos: SourcePosition,
@@ -40,11 +19,9 @@ object AmmCompletion extends AmmCompletionExtras {
     enableDeep: Boolean
   )(using Context): (Int, List[Completion]) = {
     val path = Interactive.pathTo(ctx.compilationUnit.tpdTree, pos.span)
-    val untpdPath = Interactive.resolveTypedOrUntypedPath(path, pos)
     computeCompletions(
       pos,
       path,
-      untpdPath,
       dependencyCompleteOpt,
       enableDeep
     )(using Interactive.contextOfPath(path).withPhase(Phases.typerPhase))
@@ -53,23 +30,19 @@ object AmmCompletion extends AmmCompletionExtras {
   def computeCompletions(
     pos: SourcePosition,
     path: List[Tree],
-    untpdPath: List[untpd.Tree],
     dependencyCompleteOpt: Option[String => (Int, Seq[String])],
     enableDeep: Boolean
   )(using Context): (Int, List[Completion]) = {
     val mode = Completion.completionMode(path, pos)
     val prefix = Completion.completionPrefix(path, pos)
-    val matches: Name => Boolean = _.startsWith(prefix)
-    val completer = new DeepCompleter(mode, pos, untpdPath, matches)
+    val completer = new DeepCompleter(mode, prefix, pos, path)
 
     val hasBackTick = prefix.headOption.contains('`')
 
     var extra = List.empty[Completion]
 
     val completions = path match {
-      case Select(qual, _) :: _                              =>
-        completer.selectionCompletions(qual)
-          .filter((_, mbrs) => !mbrs.exists(mbr => blacklist(mbr.symbol.fullName.decode.toString)))
+      case Select(qual, _) :: _                              => completer.selectionCompletions(qual)
       case Import(Ident(name), _) :: _
         if name.decode.toString == "$ivy" && dependencyCompleteOpt.nonEmpty =>
         val complete = dependencyCompleteOpt.get
@@ -97,11 +70,33 @@ object AmmCompletion extends AmmCompletionExtras {
 
   class DeepCompleter(
     mode: Completion.Mode,
+    prefix: String,
     pos: SourcePosition,
-    untpdPath: List[untpd.Tree],
-    matches: Name => Boolean
-  ) extends Completion.Completer(mode, pos, untpdPath, matches):
+    path: List[Tree],
+  ) extends Completion.Completer(mode, pos, path, _.startsWith(prefix)):
     private def blacklisted(s: Symbol)(using Context) = {
+      val blacklist = Set(
+        "scala.Predef.any2stringadd.+",
+        "scala.Any.##",
+        "java.lang.Object.##",
+        "scala.<byname>",
+        "scala.<empty>",
+        "scala.<repeated>",
+        "scala.<repeated...>",
+        "scala.Predef.StringFormat.formatted",
+        "scala.Predef.Ensuring.ensuring",
+        "scala.Predef.ArrowAssoc.->",
+        "scala.Predef.ArrowAssoc.→",
+        "java.lang.Object.synchronized",
+        "java.lang.Object.ne",
+        "java.lang.Object.eq",
+        "java.lang.Object.wait",
+        "java.lang.Object.notifyAll",
+        "java.lang.Object.notify",
+        "java.lang.Object.clone",
+        "java.lang.Object.finalize"
+      )
+
       blacklist(s.showFullName) ||
       s.isOneOf(GivenOrImplicit) ||
       // Cache objects, which you should probably never need to
@@ -135,7 +130,6 @@ object AmmCompletion extends AmmCompletionExtras {
       val syms = for {
         member <- allMembers(defn.RootClass).map(_.symbol).filter(!blacklisted(_)).toList
         sym <- rec(member)
-        if matches(sym.name)
       } yield sym
 
       syms.map(sym => (sym.fullName, List(sym: SingleDenotation))).toMap
