@@ -1,0 +1,22 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.16/compile.dest/zinc",
+            "classes": "ref:v0:dece50e5:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.16/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.16/compile.dest/zinc",
+            "classes": "ref:v0:01bdde98:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.16/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.16/compile.dest/zinc",
+            "classes": "ref:v0:865301ca:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.16/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.16/compile.dest/zinc",
+            "classes": "ref:v0:64536fdf:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.16/compile.dest/classes"
+        }
+    ],
+    "valueHash": -742755992,
+    "inputsHash": -1604504603
+}

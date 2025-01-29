@@ -1,0 +1,10 @@
+{
+    "value": [
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/util/compile-resources",
+        "ref:v0:dece50e5:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.16/compile.dest/classes",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources",
+        "ref:v0:01bdde98:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.16/compile.dest/classes"
+    ],
+    "valueHash": -1741363191,
+    "inputsHash": -1878556338
+}

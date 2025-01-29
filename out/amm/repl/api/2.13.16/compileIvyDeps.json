@@ -1,0 +1,8 @@
+{
+    "value": [
+        "com.lihaoyi:::acyclic:0.3.16",
+        "org.scala-lang:scala-reflect:2.13.16"
+    ],
+    "valueHash": -1023436684,
+    "inputsHash": -1838287160
+}

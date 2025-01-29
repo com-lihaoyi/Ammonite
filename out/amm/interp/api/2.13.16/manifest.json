@@ -1,0 +1,19 @@
+{
+    "value": {
+        "main": {
+            "Licenses": "MIT (MIT License)",
+            "URL": "https://github.com/com-lihaoyi/Ammonite",
+            "Manifest-Version": "1.0",
+            "Implementation-Version": "3.0.0-16-5b8ba21c",
+            "Description": "ammonite-interp-api",
+            "Implementation-Vendor": "com.lihaoyi",
+            "Implementation-Title": "ammonite-interp-api",
+            "Scala-Version": "2.13.16",
+            "Created-By": "Mill 0.12.0",
+            "Tool": "Mill-0.12.0"
+        },
+        "groups": {}
+    },
+    "valueHash": -2091898984,
+    "inputsHash": 1992586637
+}

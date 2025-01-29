@@ -1,0 +1,10 @@
+{
+    "value": [
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/resources",
+        "ref:v0:c1214948:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.16/dependencyFileResources.dest/extra-resources",
+        "ref:v0:865301ca:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.16/compile.dest/classes"
+    ],
+    "valueHash": -1016684776,
+    "inputsHash": 1664719970
+}

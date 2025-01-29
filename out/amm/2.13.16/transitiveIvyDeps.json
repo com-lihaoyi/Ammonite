@@ -1,0 +1,31 @@
+{
+    "value": [
+        "org.scala-lang:scala-library:2.13.16",
+        "com.lihaoyi:fansi_2.13:0.5.0",
+        "com.lihaoyi:sourcecode_2.13:0.4.3-M1",
+        "com.lihaoyi:os-lib_2.13:0.11.2",
+        "org.tpolecat:typename_2.13:1.1.0",
+        "org.scala-lang.modules:scala-collection-compat_2.13:2.12.0",
+        "com.lihaoyi:pprint_2.13:0.9.0",
+        "io.get-coursier:class-path-util_2.13:0.1.4",
+        "com.lihaoyi:upickle_2.13:4.0.2",
+        "com.lihaoyi:requests_2.13:0.9.0",
+        "com.lihaoyi:mainargs_2.13:0.7.5",
+        "io.get-coursier:dependency-interface_2.13:0.2.3",
+        "io.get-coursier:interface:1.0.19",
+        "com.lihaoyi:geny_2.13:1.1.1",
+        "ch.epfl.scala:bsp4j:2.1.0-M5",
+        "com.lihaoyi:fastparse_2.13:3.1.1",
+        "org.scalameta:common_2.13:4.9.7",
+        "org.jline:jline-terminal:3.14.1",
+        "org.jline:jline-terminal-jna:3.14.1",
+        "org.jline:jline-reader:3.14.1",
+        "org.scala-lang.modules:scala-xml_2.13:2.0.1",
+        "org.scala-lang:scala-compiler:2.13.16",
+        "com.lihaoyi:scalaparse_2.13:3.1.1",
+        "org.javassist:javassist:3.21.0-GA",
+        "com.github.javaparser:javaparser-core:3.2.12"
+    ],
+    "valueHash": 1719003006,
+    "inputsHash": 1639460076
+}

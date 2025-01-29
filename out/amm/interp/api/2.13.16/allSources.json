@@ -1,0 +1,15 @@
+{
+    "value": [
+        "ref:v0:64abb700:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/java",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala-2.13.16",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala-2.13",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala-2",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala-2.12.10-2.13.1+",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala-2.13.12+",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala-2.13-or-3",
+        "ref:v0:3151d664:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.16/constantsSourceDir.dest/src"
+    ],
+    "valueHash": 1890445648,
+    "inputsHash": 145416324
+}

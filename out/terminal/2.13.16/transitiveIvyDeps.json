@@ -1,0 +1,9 @@
+{
+    "value": [
+        "com.lihaoyi:fansi_2.13:0.5.0",
+        "com.lihaoyi:sourcecode_2.13:0.4.3-M1",
+        "org.scala-lang:scala-library:2.13.16"
+    ],
+    "valueHash": -1026723975,
+    "inputsHash": -622086197
+}
