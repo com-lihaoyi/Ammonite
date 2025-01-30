@@ -30,12 +30,6 @@ val isMasterCommit =
   sys.env.get("GITHUB_REPOSITORY") == Some(s"${ghOrg}/${ghRepo}") &&
     sys.env.get("GITHUB_REF").exists(x => x.endsWith(s"/${masterBranch}"))
 
-val isPublishableCommit =
-  sys.env.get("GITHUB_REPOSITORY") == Some(s"${ghOrg}/${ghRepo}") &&
-    sys.env.get("GITHUB_REF").exists(x =>
-      publishBranches.exists(suffix => x.endsWith(s"/${suffix}"))
-    )
-
 val latestTaggedVersion =
   try {
     os.proc("git", "describe", "--abbrev=0", "--tags").call().out.trim
@@ -860,55 +854,49 @@ def generateDependenciesFile(fileName: String, deps: Seq[coursier.Dependency])(i
   dir
 }
 
-def publishExecutable() = {
-  if (!isPublishableCommit) T.command {
-    println("MISC COMMIT: generating executable but not publishing")
-    T.sequence(latestAssemblies)()
+def publishExecutable() = T.command {
+  val latestAssemblyJars = T.sequence(latestAssemblies)()
+
+  println("MASTER COMMIT: Creating a release")
+  if (!unstable) {
+    requests.post(
+      s"https://api.github.com/repos/${ghOrg}/${ghRepo}/releases",
+      data = ujson.write(
+        ujson.Obj(
+          "tag_name" -> buildVersion,
+          "name" -> buildVersion,
+          "body" -> s"${homePage}/#${buildVersion}"
+        )
+      ),
+      headers = Seq("Authorization" -> s"token ${sys.env("AMMONITE_BOT_AUTH_TOKEN")}")
+    )
   }
-  else T.command {
-    val latestAssemblyJars = T.sequence(latestAssemblies)()
 
-    println("MASTER COMMIT: Creating a release")
-    if (!unstable) {
-      requests.post(
-        s"https://api.github.com/repos/${ghOrg}/${ghRepo}/releases",
-        data = ujson.write(
-          ujson.Obj(
-            "tag_name" -> buildVersion,
-            "name" -> buildVersion,
-            "body" -> s"${homePage}/#${buildVersion}"
-          )
-        ),
-        headers = Seq("Authorization" -> s"token ${sys.env("AMMONITE_BOT_AUTH_TOKEN")}")
-      )
-    }
+  for ((version, jar) <- assemblyCrossScalaVersions.zip(latestAssemblyJars)) {
+    println("MASTER COMMIT: Publishing Executable for Scala " + version)
+    // Prepare executable
 
-    for ((version, jar) <- assemblyCrossScalaVersions.zip(latestAssemblyJars)) {
-      println("MASTER COMMIT: Publishing Executable for Scala " + version)
-      // Prepare executable
-
-      val scalaBinaryVersion = version.take(version.lastIndexOf("."))
-      upload(
-        uploadedFile = jar.path,
-        tagName = latestTaggedVersion,
-        uploadName = s"$scalaBinaryVersion-$buildVersion",
-        authKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
-        ghOrg = ghOrg,
-        ghRepo = ghRepo
-      )
-      upload(
-        uploadedFile = os.temp(
-          os.read(Task.workspace / "amm-template.sh")
-            .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
-            .replace("DEFAULT_SCALA_VERSION=", s"DEFAULT_SCALA_VERSION=$scalaBinaryVersion")
-        ),
-        tagName = latestTaggedVersion,
-        uploadName = s"$scalaBinaryVersion-$buildVersion-bootstrap",
-        authKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
-        ghOrg = ghOrg,
-        ghRepo = ghRepo
-      )
-    }
+    val scalaBinaryVersion = version.take(version.lastIndexOf("."))
+    upload(
+      uploadedFile = jar.path,
+      tagName = latestTaggedVersion,
+      uploadName = s"$scalaBinaryVersion-$buildVersion",
+      authKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
+      ghOrg = ghOrg,
+      ghRepo = ghRepo
+    )
+    upload(
+      uploadedFile = os.temp(
+        os.read(Task.workspace / "amm-template.sh")
+          .replace("DEFAULT_AMM_VERSION=", s"DEFAULT_AMM_VERSION=$latestTaggedVersion")
+          .replace("DEFAULT_SCALA_VERSION=", s"DEFAULT_SCALA_VERSION=$scalaBinaryVersion")
+      ),
+      tagName = latestTaggedVersion,
+      uploadName = s"$scalaBinaryVersion-$buildVersion-bootstrap",
+      authKey = sys.env("AMMONITE_BOT_AUTH_TOKEN"),
+      ghOrg = ghOrg,
+      ghRepo = ghRepo
+    )
   }
 }
 
@@ -916,28 +904,7 @@ def publishDocs(skipDeploy: Boolean = false): Command[Unit] = {
   val ammoniteAssembly = amm(scala2_13Versions.last).assembly
   // Disable doc auto-publishing for now, as the recent modularization means we
   // need to make significant changes to the readme and that'll time.
-  if (!isMasterCommit) T.command {
-    println("MISC COMMIT: Building readme for verification")
-    try {
-      os.proc(
-        "sbt",
-        "readme/run"
-      ).call(
-        cwd = T.workspace,
-        env = Map(
-          "AMMONITE_ASSEMBLY" -> ammoniteAssembly().path.toString,
-          "CONSTANTS_FILE" -> generateConstantsFile(returnDirectory = false).toString
-        )
-      )
-    } catch {
-      case e =>
-        println(e)
-        e.printStackTrace()
-        throw e
-    }
-    ()
-  }
-  else T.command {
+  T.command {
     println("MASTER COMMIT: Updating version and publishing to Github Pages")
 
     if (!skipDeploy) {
