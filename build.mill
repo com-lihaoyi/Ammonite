@@ -54,7 +54,7 @@ val commitsSinceTaggedVersion = latestTaggedVersion match {
 //  if (_) println("Java 21+: Skip building of modules requiring incompatible Scala versions")
 //}
 
-val scala2_12Versions = 10.to(20)
+val scala2_12Versions = 15.to(20)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.${v}")
 val scala2_13Versions = 2.to(16)
@@ -195,30 +195,15 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   def allBoundIvyDeps = T { transitiveIvyDeps() ++ scalaLibraryIvyDeps().map(bindDependency()) }
   def sources = T.sources {
     val sv = scalaVersion()
-    val extraDir =
-      if (sv.startsWith("2.12.")) {
-        val patch = sv.stripPrefix("2.12.").takeWhile(_.isDigit).toInt
-        val dirNames1 = if (patch <= 12) Seq("scala-2.12.0_12") else Nil
-        val dirNames = Seq("scala-2.12.9+") ++ dirNames1
-        dirNames.map(dirName => PathRef(millSourcePath / "src" / "main" / dirName))
-      } else
-        Nil
 
     val extraDir3 =
-      if (isScala2()) {
+      if (sv.startsWith("2.13.")) {
+        val patch = sv.stripPrefix("2.13.").toInt
         val dir =
-          if (
-            sv.startsWith("2.13.") && sv.stripPrefix("2.13.").toInt >= 1 && sv.stripPrefix(
-              "2.13."
-            ).toInt <= 11
-          )
+          if (patch <= 11)
             millSourcePath / "src" / "main" / "scala-2.13.1-2.13.11"
-          else if (sv.startsWith("2.13.") && sv.stripPrefix("2.13.").toInt >= 12)
-            millSourcePath / "src" / "main" / "scala-2.13.12+"
-          else if (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").toInt >= 13)
-            millSourcePath / "src" / "main" / "scala-2.12.13+"
           else
-            millSourcePath / "src" / "main" / "scala-not-2.12.13+-2.13.1+"
+            millSourcePath / "src" / "main" / "scala-2.13.12+"
         Seq(PathRef(dir))
       } else Nil
     val extraDir4 =
@@ -246,7 +231,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
           Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.6.2"))
       else Nil
 
-    super.sources() ++ extraDir ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
+    super.sources() ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
   }
   def externalSources = T {
     resolveDeps(allBoundIvyDeps, sources = true)()
