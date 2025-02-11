@@ -1,3 +1,4 @@
+package build.ci
 
 def apply(
     uploadedFile: os.Path,
