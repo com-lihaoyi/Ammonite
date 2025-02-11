@@ -54,7 +54,7 @@ val commitsSinceTaggedVersion = latestTaggedVersion match {
 //  if (_) println("Java 21+: Skip building of modules requiring incompatible Scala versions")
 //}
 
-val scala2_12Versions = 9.to(20)
+val scala2_12Versions = 10.to(20)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.${v}")
 val scala2_13Versions = 2.to(16)
@@ -204,13 +204,6 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
       } else
         Nil
 
-    val extraDir2 =
-      if (isScala2())
-        Seq(PathRef(
-          if (isScala2_12_10OrLater(sv)) millSourcePath / "src" / "main" / "scala-2.12.10-2.13.1+"
-          else millSourcePath / "src" / "main" / "scala-not-2.12.10-2.13.1+"
-        ))
-      else Nil
     val extraDir3 =
       if (isScala2()) {
         val dir =
@@ -253,7 +246,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
           Seq(PathRef(millSourcePath / "src" / "main" / "scala-3.0.0-3.6.2"))
       else Nil
 
-    super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
+    super.sources() ++ extraDir ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6
   }
   def externalSources = T {
     resolveDeps(allBoundIvyDeps, sources = true)()
