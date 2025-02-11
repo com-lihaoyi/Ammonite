@@ -117,18 +117,6 @@
     those later.
 
   @p
-    For a video overview of the project and it's motivation, check out this talk:
-
-  @iframe(
-    src := "https://player.vimeo.com/video/148552858",
-    width := 800,
-    height := 600,
-    attr("frameborder") := 0,
-    attr("webkitallowfullscreen") := 1,
-    attr("mozallowfullscreen") := 1,
-    attr("allowfullscreen") := 1
-  )
-  @p
     If you are already working in Scala,
     you no longer have to drop down to Python or Bash for your scripting needs:
     you can use @sect.ref{Scala Scripts} for your scripting needs, and avoid

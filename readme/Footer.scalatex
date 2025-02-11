@@ -127,6 +127,10 @@
 
 
   @sect{Changelog}
+    @sect{3.0.1}
+      @ul
+        @li
+          Support for Scala 2.13.16, 3.3.4, 3.3.5
     @sect{3.0.0}
       @ul
         @li
