@@ -1,0 +1,104 @@
+name: Run Tests
+on:
+  push:
+    branches:
+      - main
+      - 2.x
+  pull_request:
+
+# cancel older runs of a pull request;
+# this will not cancel anything for normal git pushes
+concurrency:
+  group: cancel-old-pr-runs-${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - java-version: 11
+            command: 'terminal.__.test'
+
+          - java-version: 11
+            command: 'sshd[{2.12.20,2.13.16,3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
+
+          - java-version: 11
+            command: 'amm.repl[2.12.{9,14,20}].__.test'
+          - java-version: 17
+            command: 'amm.repl[2.13.{4,9,16}].__.test'
+          - java-version: 21
+            command: 'amm.repl[{3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
+
+          - java-version: 11
+            command: 'amm[2.12.{9,14,20}].__.test'
+          - java-version: 17
+            command: 'amm[2.13.{4,9,16}].__.test'
+          - java-version: 21
+            command: 'amm[{3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+      - run: ./mill -i -j1 -k "${{ matrix.command }}"
+
+  itest:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - java-version: 11
+            scala-version: '2.12.{9,14,20}'
+          - java-version: 17
+            scala-version: '2.13.{4,9,15}'
+          - java-version: 21
+            scala-version: '{3.3.5,3.4.3,3.5.2,3.6.3}'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+      - run: ./mill -i -j1 -k 'integration[${{ matrix.scala-version }}].__.test'
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: temurin
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+      - run: echo "Hello World" && ./mill -i publishDocs --skipDeploy true
+        shell: 'script -q -e -c "bash {0}"'
+        env:
+          TERM: xterm-256color
+
+  compileAll:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: temurin
+      - run: ./mill -i -k -j4 '__.compile'

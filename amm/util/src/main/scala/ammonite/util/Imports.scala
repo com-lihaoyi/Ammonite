@@ -56,7 +56,7 @@ case class ImportData(
 )
 
 object ImportData {
-  sealed case class ImportType(name: String)
+  case class ImportType(name: String)
   val Type = ImportType("Type")
   val Term = ImportType("Term")
   val TermType = ImportType("TermType")

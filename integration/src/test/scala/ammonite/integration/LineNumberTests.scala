@@ -27,7 +27,7 @@ object LineNumberTests extends TestSuite {
             """compilationErrorInSecondBlock.sc:14: not found: value printnl
               |val res_0 = printnl("OK")
               |            ^""".stripMargin
-          else if (scalaVersion.dropWhile(_ != '.') < ".4")
+          else if (scalaVersion < "3.3.4")
             s"""-- [E006] Not Found Error: ${replStandaloneResources / path}:1:12$sp
                |1 |val res_0 = printnl("OK")
                |  |            ^^^^^^^

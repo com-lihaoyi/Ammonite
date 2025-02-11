@@ -320,8 +320,8 @@ object Pressy {
     }
 
     def complete(snippetIndex: Int, previousImports: String, snippet: String) = {
-      val prefix = previousImports + newLine + "object AutocompleteWrapper{" + newLine
-      val suffix = newLine + "}"
+      val prefix = previousImports + newLine + "object AutocompleteWrapper{def main(args: Array[String])={" + newLine
+      val suffix = newLine + "()" + newLine + "}" + "}"
       val allCode = prefix + snippet + suffix
       val index = snippetIndex + prefix.length
 

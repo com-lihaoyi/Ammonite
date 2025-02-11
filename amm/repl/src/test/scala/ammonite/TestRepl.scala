@@ -105,6 +105,64 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
         throw e
     }
 
+  lazy val fullReplApi: FullReplAPI.Internal = new FullReplAPI.Internal {
+    def pprinter = replApi.pprinter
+    def colors = replApi.colors
+    def replArgs: IndexedSeq[Bind[_]] = replApi.replArgs0
+
+    override def print[T: TPrint](
+                                   value: => T,
+                                   ident: String,
+                                   custom: Option[String]
+                                 )(implicit
+                                   tcolors: TPrintColors,
+                                   classTagT: ClassTag[T]
+                                 ): Iterator[String] =
+      if (classTagT == scala.reflect.classTag[ammonite.Nope])
+        Iterator()
+      else
+        super.print(value, ident, custom)
+  }
+
+  lazy val replApi: ReplApiImpl = new ReplApiImpl {
+    def replArgs0 = Vector.empty[Bind[_]]
+    def printer = printer0
+
+    def sess = sess0
+    val prompt = Ref("@")
+    val frontEnd = Ref[FrontEnd](null)
+    def lastException: Throwable = null
+    def fullHistory = storage.fullHistory()
+    def history = new History(Vector())
+    val colors = Ref(Colors.BlackWhite)
+    def newCompiler() = interp.compilerManager.init(force = true)
+    def fullImports = interp.predefImports ++ imports
+    def imports = frames().head.imports
+    def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
+    def width = 80
+    def height = 80
+
+    object load extends ReplLoad with (String => Unit) {
+
+      def apply(line: String) = {
+        interp.processExec(line, currentLine, () => currentLine += 1) match {
+          case Res.Failure(s) => throw new CompilationError(s)
+          case Res.Exception(t, s) => throw t
+          case _ =>
+        }
+      }
+
+      def exec(file: os.Path): Unit = {
+        interp.watch(file)
+        apply(normalizeNewlines(os.read(file)))
+      }
+    }
+
+    override protected[this] def internal0: FullReplAPI.Internal = fullReplApi
+
+    def _compilerManager = interp.compilerManager
+  }
+
   val extraBridges = Seq(
     (
       "ammonite.TestReplBridge",
@@ -116,62 +174,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
     (
       "ammonite.repl.ReplBridge",
       "repl",
-      new ReplApiImpl { replApi =>
-        def replArgs0 = Vector.empty[Bind[_]]
-        def printer = printer0
-
-        def sess = sess0
-        val prompt = Ref("@")
-        val frontEnd = Ref[FrontEnd](null)
-        def lastException: Throwable = null
-        def fullHistory = storage.fullHistory()
-        def history = new History(Vector())
-        val colors = Ref(Colors.BlackWhite)
-        def newCompiler() = interp.compilerManager.init(force = true)
-        def fullImports = interp.predefImports ++ imports
-        def imports = frames().head.imports
-        def usedEarlierDefinitions = frames().head.usedEarlierDefinitions
-        def width = 80
-        def height = 80
-
-        object load extends ReplLoad with (String => Unit) {
-
-          def apply(line: String) = {
-            interp.processExec(line, currentLine, () => currentLine += 1) match {
-              case Res.Failure(s) => throw new CompilationError(s)
-              case Res.Exception(t, s) => throw t
-              case _ =>
-            }
-          }
-
-          def exec(file: os.Path): Unit = {
-            interp.watch(file)
-            apply(normalizeNewlines(os.read(file)))
-          }
-        }
-
-        override protected[this] def internal0: FullReplAPI.Internal =
-          new FullReplAPI.Internal {
-            def pprinter = replApi.pprinter
-            def colors = replApi.colors
-            def replArgs: IndexedSeq[Bind[_]] = replArgs0
-
-            override def print[T: TPrint](
-                value: => T,
-                ident: String,
-                custom: Option[String]
-            )(implicit
-                tcolors: TPrintColors,
-                classTagT: ClassTag[T]
-            ): Iterator[String] =
-              if (classTagT == scala.reflect.classTag[ammonite.Nope])
-                Iterator()
-              else
-                super.print(value, ident, custom)(TPrint.implicitly[T], tcolors, classTagT)
-          }
-
-        def _compilerManager = interp.compilerManager
-      }
+      replApi
     ),
     (
       "ammonite.repl.api.FrontEndBridge",
