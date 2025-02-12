@@ -7,5 +7,3 @@ trait FrontEndAPI {
 }
 
 object FrontEndBridge extends APIHolder[FrontEndAPI]
-
-

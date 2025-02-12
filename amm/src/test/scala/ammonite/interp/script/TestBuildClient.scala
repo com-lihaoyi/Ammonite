@@ -20,8 +20,8 @@ class TestBuildClient extends BuildClient {
   private val didChangeNotifications0 = new ConcurrentLinkedQueue[BuildTargetEvent]
 
   def diagnostics(
-    targetId: BuildTargetIdentifier,
-    document: TextDocumentIdentifier
+      targetId: BuildTargetIdentifier,
+      document: TextDocumentIdentifier
   ): Option[Seq[BDiagnostic]] =
     Option(diagnostics0.get((targetId, document)))
 

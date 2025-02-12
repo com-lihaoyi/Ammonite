@@ -1,6 +1,5 @@
 package ammonite.unit
 
-
 import utest._
 import ammonite.compiler.tools.source.load
 import ammonite.TestUtils
@@ -8,12 +7,11 @@ import ammonite.util.Util
 import ammonite.util.Util.Location
 
 import java.io.InputStream
-object SourceTests extends TestSuite{
+object SourceTests extends TestSuite {
   val tests = if (TestUtils.scala2) scala2Tests else scala3Tests
-  def scala2Tests = Tests{
+  def scala2Tests = Tests {
 
     def check(loaded: Location, expectedFileName: String, expected: String, slop: Int = 10) = {
-
 
       val loadedFileName = loaded.fileName
       assert(loadedFileName == expectedFileName)
@@ -27,16 +25,15 @@ object SourceTests extends TestSuite{
       assert(nearby.contains(expected))
     }
 
-
-    test("objectInfo"){
-      test("thirdPartyJava"){
+    test("objectInfo") {
+      test("thirdPartyJava") {
         check(
           load(new javassist.ClassPool()),
           "ClassPool.java",
           "public class ClassPool"
         )
       }
-      test("thirdPartyScala"){
+      test("thirdPartyScala") {
 //        Not published for 2.10
 //        check(
 //          load(shapeless.::),
@@ -49,12 +46,12 @@ object SourceTests extends TestSuite{
 //          "class TokensReader"
 //        )
       }
-      test("stdLibScala"){
-        test("direct"){
+      test("stdLibScala") {
+        test("direct") {
           val is2_13_3_orLower = {
             val ver = scala.util.Properties.versionNumberString
             !ver.startsWith("2.13.") ||
-              scala.util.Try(ver.stripPrefix("2.13.").toInt).toOption.exists(_ <= 3)
+            scala.util.Try(ver.stripPrefix("2.13.").toInt).toOption.exists(_ <= 3)
           }
           check(
             load(Nil),
@@ -63,7 +60,7 @@ object SourceTests extends TestSuite{
             else "val Nil = scala.collection.immutable.Nil"
           )
         }
-        test("runtimeTyped"){
+        test("runtimeTyped") {
           val empty: Seq[Int] = Seq()
           val nonEmpty: Seq[Int] = Seq(1)
           check(
@@ -80,8 +77,8 @@ object SourceTests extends TestSuite{
       }
 
     }
-    test("objectMemberInfo"){
-      test("thirdPartyJava"){
+    test("objectMemberInfo") {
+      test("thirdPartyJava") {
         val pool = new javassist.ClassPool()
         check(
           load(pool.find _),
@@ -95,7 +92,7 @@ object SourceTests extends TestSuite{
           "public URL find(String classname)"
         )
       }
-      test("void"){
+      test("void") {
         check(
           load(Predef.println()),
           "Predef.scala",
@@ -103,7 +100,7 @@ object SourceTests extends TestSuite{
         )
       }
 
-      test("overloaded"){
+      test("overloaded") {
         val pool = new javassist.ClassPool()
         check(
           load(pool.makeClass(_: InputStream)),
@@ -121,7 +118,7 @@ object SourceTests extends TestSuite{
           "public CtClass makeClass(ClassFile classfile, boolean ifNotFrozen)"
         )
       }
-      test("implementedBySubclass"){
+      test("implementedBySubclass") {
         val opt: Option[Int] = Option(1)
         check(
           load(opt.get),

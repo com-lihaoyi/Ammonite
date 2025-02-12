@@ -4,7 +4,7 @@ import ammonite.compiler.CompilerBuilder.scalaVersion
 import ammonite.compiler.Parsers
 import utest._
 
-object HighlightTests extends TestSuite{
+object HighlightTests extends TestSuite {
 
   def testHighlight(buffer: Vector[Char]) = Parsers.defaultHighlight(
     buffer,
@@ -30,12 +30,11 @@ object HighlightTests extends TestSuite{
   val isScala3_01 = scalaVersion.startsWith("3.0.") || scalaVersion.startsWith("3.1.")
   val tests = Tests {
     println("HighlightTests")
-    test("highlighting"){
-      test("fuzz"){
-
+    test("highlighting") {
+      test("fuzz") {
 
         val paths = os.walk(os.pwd).filter(_.ext == "scala")
-        for(path <- paths){
+        for (path <- paths) {
           val code = os.read(path)
           val out = Parsers.defaultHighlight(
             code.toVector,
@@ -51,37 +50,40 @@ object HighlightTests extends TestSuite{
           val outLength = out.length
           val codeLength = code.length
 
-          assert{identity(path); outLength == codeLength}
-          assert{identity(path); out == code}
+          assert { identity(path); outLength == codeLength }
+          assert { identity(path); out == code }
         }
         paths.length
       }
-      test("comment")- check("//a", "<B|//a>")
-      test("type")- {
+      test("comment") - check("//a", "<B|//a>")
+      test("type") - {
         val expected =
           if (isScala2) "x: <G|y>.<Y|type>"
           else "x: <G|y.type>"
         check("x: y.type", expected)
       }
-      test("literal")- check("1", "<G|1>")
-      test("expressions")- check("val (x, y) = 1 + 2 + 3", "<Y|val> (x, y) = <G|1> + <G|2> + <G|3>")
-      test("interpolation")- check(
+      test("literal") - check("1", "<G|1>")
+      test("expressions") - check(
+        "val (x, y) = 1 + 2 + 3",
+        "<Y|val> (x, y) = <G|1> + <G|2> + <G|3>"
+      )
+      test("interpolation") - check(
         """(s"hello ${world + 1}")""",
         """(<G|s"hello >${world + <G|1>}<G|">)"""
       )
-      test("runOff")- {
+      test("runOff") - {
         val expected =
           if (isScala2) """(<G|1> + <G|"Hello...>"""
           else """(<G|1> + "Hello...""" // Dotty highlighter doesn't color open strings
         check("""(1 + "Hello...""", expected)
       }
-      test("underscore")- {
+      test("underscore") - {
         val expected =
           if (isScala2) """<Y|val> <Y|_> = <G|1>"""
           else """<Y|val> _ = <G|1>"""
         check("""val _ = 1""", expected)
       }
-      test("nonTrivial")- {
+      test("nonTrivial") - {
         val underscore =
           if (isScala2) "<Y|_>"
           else "_"
@@ -113,7 +115,7 @@ object HighlightTests extends TestSuite{
               } finally Thread.currentThread().setContextClassLoader(oldClassloader)
             } yield out
         """,
-        s"""<Y|def> processLine(stmts: ${stringColl("Seq")},
+          s"""<Y|def> processLine(stmts: ${stringColl("Seq")},
                             saveHistory: (<G|String> => <G|Unit>, <G|String>) => <G|Unit>,
                             printer: ${stringColl("Iterator")} => <G|Unit>) = <Y|for>{
               $underscore <- Catching { <Y|case> Ex(x@$underscore0) =>

@@ -6,10 +6,8 @@ import dotty.tools.io.{AbstractFile, PlainFile, ClassPath, ClassRepresentation, 
 import classpath.FileUtils._
 
 case class DirectoryClassPath(dir: JFile)
-    extends classpath.JFileDirectoryLookup[classpath.ClassFileEntryImpl]
+    extends classpath.JFileDirectoryLookup[classpath.BinaryFileEntry]
     with classpath.NoSourcePaths {
-  override def findClass(className: String): Option[ClassRepresentation] =
-    findClassFile(className) map classpath.ClassFileEntryImpl
 
   def findClassFile(className: String): Option[AbstractFile] = {
     val relativePath = classpath.FileUtils.dirPath(className)
@@ -18,15 +16,14 @@ case class DirectoryClassPath(dir: JFile)
       val wrappedClassFile = new dotty.tools.io.File(classFile.toPath)
       val abstractClassFile = new PlainFile(wrappedClassFile)
       Some(abstractClassFile)
-    }
-    else None
+    } else None
   }
 
-  protected def createFileEntry(file: AbstractFile): classpath.ClassFileEntryImpl =
-    classpath.ClassFileEntryImpl(file)
+  protected def createFileEntry(file: AbstractFile): classpath.BinaryFileEntry =
+    classpath.BinaryFileEntry(file)
   protected def isMatchingFile(f: JFile): Boolean =
     f.isClass
 
-  private[dotty] def classes(inPackage: classpath.PackageName): Seq[classpath.ClassFileEntry] =
+  private[dotty] def classes(inPackage: classpath.PackageName): Seq[classpath.BinaryFileEntry] =
     files(inPackage)
 }

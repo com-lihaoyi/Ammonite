@@ -10,12 +10,12 @@ import scala.meta.internal.semanticdb._
 object SemanticdbProcessor {
 
   def postProcess(
-    module: Script,
-    wd: Option[os.Path],
-    adjust: Int => (Int, Int) => Option[(Int, Int)],
-    target: os.Path,
-    originalSource: os.RelPath,
-    destSource: os.RelPath
+      module: Script,
+      wd: Option[os.Path],
+      adjust: Int => (Int, Int) => Option[(Int, Int)],
+      target: os.Path,
+      originalSource: os.RelPath,
+      destSource: os.RelPath
   ): Unit = {
     val semanticDbDir = target / "META-INF" / "semanticdb"
     val orig = semanticDbDir /
@@ -31,12 +31,11 @@ object SemanticdbProcessor {
         for {
           (startLine, startChar) <- adjust0(range.startLine, range.startCharacter)
           (endLine, endChar) <- adjust0(range.endLine, range.endCharacter)
-        }
-          yield range
-            .withStartLine(startLine)
-            .withStartCharacter(startChar)
-            .withEndLine(endLine)
-            .withEndCharacter(endChar)
+        } yield range
+          .withStartLine(startLine)
+          .withStartCharacter(startChar)
+          .withEndLine(endLine)
+          .withEndCharacter(endChar)
     }
 
     def updateTrees(trees: Seq[Tree]): Option[Seq[Tree]] =

@@ -5,29 +5,29 @@ import ammonite.util.Util
 import utest._
 
 /**
-  * Make sure that if we run Scala scripts using the Ammonite executable, and
-  * they, fail with "expected" failure modes, don't show useless stack traces
-  * and just show what the user did wrong
+ * Make sure that if we run Scala scripts using the Ammonite executable, and
+ * they, fail with "expected" failure modes, don't show useless stack traces
+ * and just show what the user did wrong
  */
-object ErrorTruncationTests extends TestSuite{
+object ErrorTruncationTests extends TestSuite {
 
   def checkErrorMessage(file: os.RelPath, expected: String): Unit = {
     val e = fansi.Str(
       Util.normalizeNewlines(
-        intercept[os.SubprocessException]{ exec(file) }
+        intercept[os.SubprocessException] { exec(file) }
           .result
           .err
           .text()
       )
     ).plainText
-    //This string gets included on windows due to environment variable set additionally
+    // This string gets included on windows due to environment variable set additionally
 
     assert(TestUtils.containsLines(fansi.Str(e).plainText, expected))
   }
   val tests = Tests {
     println("ErrorTruncationTests")
     test("compileError") {
-      val path = os.rel/"errorTruncation"/"compileError.sc"
+      val path = os.rel / "errorTruncation" / "compileError.sc"
       val sp = " "
       checkErrorMessage(
         file = path,
@@ -69,10 +69,10 @@ object ErrorTruncationTests extends TestSuite{
       )
     }
 
-    test("parseError"){
-      if(!Util.windowsPlatform){
+    test("parseError") {
+      if (!Util.windowsPlatform) {
         checkErrorMessage(
-          file = os.rel/"errorTruncation"/"parseError.sc",
+          file = os.rel / "errorTruncation" / "parseError.sc",
           expected = Util.normalizeNewlines(
             if (isScala2)
               """parseError.sc:1:1 expected end-of-input
@@ -93,7 +93,7 @@ object ErrorTruncationTests extends TestSuite{
       "ammonite.$file.integration.src.test.resources.ammonite.integration.errorTruncation"
 
     test("runtimeError") - checkErrorMessage(
-      file = os.rel/"errorTruncation"/"runtimeError.sc",
+      file = os.rel / "errorTruncation" / "runtimeError.sc",
       expected = Util.normalizeNewlines(
         if (scalaVersion.startsWith("2.12"))
           s"""java.lang.ArithmeticException: / by zero

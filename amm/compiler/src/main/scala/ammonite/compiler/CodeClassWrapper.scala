@@ -6,7 +6,7 @@ import ammonite.util.Util.{CodeSource, newLine, normalizeNewlines}
 
 import scala.language.postfixOps
 
-object CodeClassWrapper extends CodeWrapper{
+object CodeClassWrapper extends CodeWrapper {
   /*
    * The goal of this code wrapper is that the user code:
    * - should be in a class rather than a singleton,
@@ -29,12 +29,12 @@ object CodeClassWrapper extends CodeWrapper{
   private val tq = "\"\"\""
   override val wrapperPath: Seq[Name] = Seq(Name("instance"))
   def apply(
-    code: String,
-    source: CodeSource,
-    imports: Imports,
-    printCode: String,
-    indexedWrapperName: Name,
-    extraCode: String
+      code: String,
+      source: CodeSource,
+      imports: Imports,
+      printCode: String,
+      indexedWrapperName: Name,
+      extraCode: String
   ) = {
     import source.pkgName
     val isObjDef = Parsers.isObjDef(code)
@@ -51,8 +51,7 @@ object ${indexedWrapperName.backticked}{
   def $$main() = instance.$$main()
 
   object Helper extends _root_.java.io.Serializable {
-"""
-      )
+""")
 
       val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
   override def toString = "${indexedWrapperName.encoded}";
@@ -113,7 +112,7 @@ object ${indexedWrapperName.backticked}{
             "_root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions.iterator.toSet"
       }
 
-        val top = normalizeNewlines(s"""
+      val top = normalizeNewlines(s"""
 package ${pkgName.head.encoded}
 package ${Util.encodeScalaSourcePath(pkgName.tail)}
 
@@ -132,8 +131,7 @@ override def toString = $q${indexedWrapperName.encoded}$q
 $requiredVals
 $reworkedImports
 
-final class Helper extends _root_.java.io.Serializable{\n"""
-    )
+final class Helper extends _root_.java.io.Serializable{\n""")
 
       val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
 

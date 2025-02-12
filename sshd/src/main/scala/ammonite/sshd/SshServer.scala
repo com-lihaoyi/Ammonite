@@ -66,8 +66,8 @@ object SshServer {
   // this is a user-safe options.
   // Server should have stable key
   // to not violate the user under threat of MITM attack
-  private def fallbackHostkeyFilePath(options:SshServerConfig) =
-    options.ammoniteHome/"cache"/"ssh"/"hostkeys"
+  private def fallbackHostkeyFilePath(options: SshServerConfig) =
+    options.ammoniteHome / "cache" / "ssh" / "hostkeys"
 
   def touch(file: os.Path): os.Path = {
     if (!os.exists(file)) {

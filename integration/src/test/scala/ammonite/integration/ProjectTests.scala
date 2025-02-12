@@ -14,15 +14,15 @@ import utest._
  * and configuration logic inside, which the unit tests don't cover since
  * they call the REPL programmatically
  */
-object ProjectTests extends TestSuite{
+object ProjectTests extends TestSuite {
 
   val tests = Tests {
     println("Running ProjectTest")
 
-    test("playframework"){
+    test("playframework") {
       if (!Util.windowsPlatform) {
-        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec(os.rel/"basic"/"PlayFramework.sc")
+        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")) {
+          val evaled = exec(os.rel / "basic" / "PlayFramework.sc")
           assert(evaled.out.text().contains("Hello bar"))
         }
       }
@@ -39,12 +39,12 @@ object ProjectTests extends TestSuite{
 //      }
 //    }
 
-    test("spark2"){
+    test("spark2") {
       // Note that this script screws up if you try to run it within SBT! It has to
       // be run as an integration test, or via `sbt amm/test:assembly && amm/target/amm`
       if (!Util.windowsPlatform) {
-        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")){
-          val evaled = exec(os.rel / "basic"/"Spark2.sc")
+        if (scalaVersion.startsWith("2.11.") && javaVersion.startsWith("1.8.")) {
+          val evaled = exec(os.rel / "basic" / "Spark2.sc")
           assert(evaled.out.text().contains("fake db write"))
         }
       }

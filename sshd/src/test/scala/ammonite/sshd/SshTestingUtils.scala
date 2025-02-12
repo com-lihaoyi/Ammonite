@@ -38,15 +38,13 @@ object SshTestingUtils {
 
   def genNonMatchingCredsPair = genCredsPair.suchThat(pair => pair._1 != pair._2)
 
-
-  def withTmpDirectory[T](block: os.Path => T):T = {
+  def withTmpDirectory[T](block: os.Path => T): T = {
     lazy val tmpDir = os.temp.dir()
     try block(tmpDir)
     finally os.remove.all(tmpDir)
   }
 
-  def testSshServer(user: (String, String), shell: ShellSession.Server)
-                   (implicit dir: os.Path) = {
+  def testSshServer(user: (String, String), shell: ShellSession.Server)(implicit dir: os.Path) = {
     def config = SshServerConfig(
       "localhost",
       port = 0,
@@ -60,9 +58,10 @@ object SshTestingUtils {
     SshServer(config, shell)
   }
 
-  def withTestSshServer[T](user: (String, String), testShell: () => Any = () => ???)
-                          (test: SshServerImpl => T)
-                          (implicit dir: os.Path): T = {
+  def withTestSshServer[T](
+      user: (String, String),
+      testShell: () => Any = () => ???
+  )(test: SshServerImpl => T)(implicit dir: os.Path): T = {
     val server = testSshServer(user, (_, _) => testShell.apply())
     server.start()
     try {
@@ -108,9 +107,8 @@ object SshTestingUtils {
     override def getPassphrase: String = ???
   }
 
-
   /* helper class for imitating user working with ssh shell session channel */
-  class Shell private(shell: Channel) {
+  class Shell private (shell: Channel) {
     def this(sshClient: Session) = this(sshClient.openChannel("shell"))
 
     val input = {
@@ -165,7 +163,7 @@ object SshTestingUtils {
       def currentTime = System.currentTimeMillis()
       val startTime = currentTime
       def elapsedTime = (currentTime - startTime).millis
-      @tailrec def awaitImpl():Unit = if (elapsedTime < duration) {
+      @tailrec def awaitImpl(): Unit = if (elapsedTime < duration) {
         if (isConnected) {
           Thread.sleep(100)
           awaitImpl()

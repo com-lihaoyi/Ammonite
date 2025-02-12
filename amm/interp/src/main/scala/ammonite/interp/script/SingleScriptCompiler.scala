@@ -15,20 +15,20 @@ import scala.collection.mutable
  * discarded right after having called `apply` or `writeSources`.
  */
 class SingleScriptCompiler(
-  compilerBuilder: CompilerBuilder,
-  initialClassLoader: ClassLoader,
-  storage: Storage,
-  printer: Printer,
-  initialImports: Imports,
-  classPathWhitelist: Set[Seq[String]],
-  codeWrapper: CodeWrapper,
-  wd: Option[os.Path],
-  generateSemanticDbs: Boolean,
-  settings: Seq[String],
-  module: Script,
-  dependencies: Script.ResolvedDependencies,
-  moduleTarget: Option[os.Path],
-  moduleSources: Option[os.Path]
+    compilerBuilder: CompilerBuilder,
+    initialClassLoader: ClassLoader,
+    storage: Storage,
+    printer: Printer,
+    initialImports: Imports,
+    classPathWhitelist: Set[Seq[String]],
+    codeWrapper: CodeWrapper,
+    wd: Option[os.Path],
+    generateSemanticDbs: Boolean,
+    settings: Seq[String],
+    module: Script,
+    dependencies: Script.ResolvedDependencies,
+    moduleTarget: Option[os.Path],
+    moduleSources: Option[os.Path]
 ) {
 
   private var messages = new mutable.ListBuffer[Diagnostic]
@@ -90,7 +90,6 @@ class SingleScriptCompiler(
 
   private val offsetToPosSc = PositionOffsetConversion.offsetToPos(module.code)
 
-
   private def clearByteCodeDir(): Unit =
     // remove only files from the target directory, not directories
     // (removing directories can confuse BSP clients with file watchers)
@@ -124,7 +123,7 @@ class SingleScriptCompiler(
     }
 
   private def updateSemanticDbs(
-    blocksOffsetAndCode: Vector[(Int, String)]
+      blocksOffsetAndCode: Vector[(Int, String)]
   ): Unit = {
 
     def adjust(blockIdx: Int): (Int, Int) => Option[(Int, Int)] =
@@ -159,7 +158,7 @@ class SingleScriptCompiler(
           .pkgName
           .map(_.raw)
           .toVector :+
-        s"${name.raw}.scala"
+          s"${name.raw}.scala"
       )
       val destRelPath = os.SubPath(segments0.toVector)
 
@@ -167,11 +166,10 @@ class SingleScriptCompiler(
     }
   }
 
-
   private def compileBlock(
-    scriptImports: Imports,
-    block: Script.Block,
-    blockIdx: Int
+      scriptImports: Imports,
+      block: Script.Block,
+      blockIdx: Int
   ): Res[(Imports, Int, String, Compiler.Output)] = {
 
     val indexedWrapperName = Interpreter.indexWrapperName(

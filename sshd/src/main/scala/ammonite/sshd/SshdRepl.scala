@@ -1,6 +1,5 @@
 package ammonite.sshd
 
-
 import java.io.{InputStream, OutputStream, PrintStream}
 
 import ammonite.Main
@@ -20,12 +19,14 @@ import ammonite.util.{Bind, Colors}
  *                 an argument named "session" containing the SSHD session will be added
  * @param classLoader classloader for ammonite to use
  */
-class SshdRepl(sshConfig: SshServerConfig,
-               predef: String = "",
-               defaultPredef: Boolean = true,
-               wd: os.Path = os.pwd,
-               replArgs: Seq[Bind[_]] = Nil,
-               classLoader: ClassLoader = SshdRepl.getClass.getClassLoader) {
+class SshdRepl(
+    sshConfig: SshServerConfig,
+    predef: String = "",
+    defaultPredef: Boolean = true,
+    wd: os.Path = os.pwd,
+    replArgs: Seq[Bind[_]] = Nil,
+    classLoader: ClassLoader = SshdRepl.getClass.getClassLoader
+) {
   private lazy val sshd = SshServer(
     sshConfig,
     shellServer = SshdRepl.runRepl(
@@ -44,16 +45,16 @@ class SshdRepl(sshConfig: SshServerConfig,
   def stopImmediately(): Unit = sshd.stop(true)
 }
 
-
 object SshdRepl {
   // Actually runs a repl inside of session serving a remote user shell.
-  private def runRepl(homePath: os.Path,
-                      predefCode: String,
-                      defaultPredef: Boolean,
-                      wd: os.Path,
-                      replArgs: Seq[Bind[_]],
-                      replServerClassLoader: ClassLoader)
-                     (in: InputStream, out: OutputStream): Unit = {
+  private def runRepl(
+      homePath: os.Path,
+      predefCode: String,
+      defaultPredef: Boolean,
+      wd: os.Path,
+      replArgs: Seq[Bind[_]],
+      replServerClassLoader: ClassLoader
+  )(in: InputStream, out: OutputStream): Unit = {
     // since sshd server has it's own customised environment,
     // where things like System.out will output to the
     // server's console, we need to prepare individual environment
@@ -67,11 +68,13 @@ object SshdRepl {
           defaultPredef = defaultPredef,
           storageBackend = new Storage.Folder(homePath),
           wd = wd,
-          inputStream = in, outputStream = out, errorStream = out,
+          inputStream = in,
+          outputStream = out,
+          errorStream = out,
           verboseOutput = false,
           remoteLogging = false,
           colors = Colors.Default
-        ).run(replArgs:_*)
+        ).run(replArgs: _*)
       } catch {
         case any: Throwable =>
           val sshClientOutput = new PrintStream(out)

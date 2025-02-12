@@ -4,8 +4,8 @@ import ammonite.compiler.CodeClassWrapper
 import ammonite.util.{Evaluated, Res}
 
 /**
-  * Wraps several [[TestRepl]], and runs its tests against all of them.
-  */
+ * Wraps several [[TestRepl]], and runs its tests against all of them.
+ */
 class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
@@ -34,6 +34,9 @@ class DualTestRepl { dual =>
     else scalaVersion.takeWhile(_ != '.')
   def scala2 = scalaVersion.startsWith("2.")
   def scala2_12 = scalaVersion.startsWith("2.12.")
+  def scala3_5_1OrHigher =
+    (scalaVersion.startsWith("3.5.") && scalaVersion.split("\\.")(2).toInt >= 1) ||
+      scalaVersion.split("\\.")(1).toInt >= 6
 
   def interps = repls.map(_.interp)
 
@@ -46,8 +49,7 @@ class DualTestRepl { dual =>
     }
   def result(input: String, expected: Res[Evaluated]): Unit =
     repls.foreach(_.result(input, expected))
-  def fail(input: String,
-           failureCheck: String => Boolean = _ => true): Unit =
+  def fail(input: String, failureCheck: String => Boolean = _ => true): Unit =
     repls.foreach(_.fail(input, failureCheck))
 
   def notFound(name: String): String =

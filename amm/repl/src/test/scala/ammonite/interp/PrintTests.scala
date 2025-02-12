@@ -4,12 +4,12 @@ import ammonite.DualTestRepl
 import ammonite.util.Util.newLine
 import utest._
 
-object PrintTests extends TestSuite{
-  val tests = Tests{
+object PrintTests extends TestSuite {
+  val tests = Tests {
     println("PrintTests")
     val check = new DualTestRepl()
 
-    test("simple"){
+    test("simple") {
       for (repl <- check.repls) {
         val t @ (ev, out, res, warn, err, inf) = repl.run("val n = 2", 0)
         val expectedRes = "n: Int = 2"
@@ -20,7 +20,7 @@ object PrintTests extends TestSuite{
       }
     }
 
-    test("out"){
+    test("out") {
       for (repl <- check.repls) {
         val t @ (ev, out, res, warn, err, inf) = repl.run("show(List(1, 2, 3))", 0)
         val expectedOut = "List(1, 2, 3)" + newLine
@@ -31,7 +31,7 @@ object PrintTests extends TestSuite{
       }
     }
 
-    test("both"){
+    test("both") {
       for (repl <- check.repls) {
         val t @ (ev, out, res, warn, err, inf) = repl.run("show(List(1, 2, 3)); val n = 3", 0)
         val expectedOut = "List(1, 2, 3)" + newLine

@@ -3,10 +3,7 @@ package ammonite.compiler
 import java.net.URL
 import java.nio.file.Path
 
-import ammonite.compiler.iface.{
-  Compiler => ICompiler,
-  CompilerBuilder => ICompilerBuilder
-}
+import ammonite.compiler.iface.{Compiler => ICompiler, CompilerBuilder => ICompilerBuilder}
 import ammonite.util.Frame
 
 import scala.collection.mutable
@@ -14,20 +11,19 @@ import scala.reflect.internal.util.{NoPosition, Position}
 import scala.reflect.io.VirtualDirectory
 import scala.tools.nsc.Settings
 
-
 case class CompilerBuilder(
-  outputDir: Option[Path] = None
+    outputDir: Option[Path] = None
 ) extends ICompilerBuilder {
   def create(
-    initialClassPath: Seq[URL],
-    classPath: Seq[URL],
-    dynamicClassPath: Seq[(String, Array[Byte])],
-    evalClassLoader: ClassLoader,
-    pluginClassLoader: ClassLoader,
-    reporter: Option[ICompilerBuilder.Message => Unit],
-    settings: Seq[String],
-    classPathWhiteList: Set[Seq[String]],
-    lineNumberModifier: Boolean
+      initialClassPath: Seq[URL],
+      classPath: Seq[URL],
+      dynamicClassPath: Seq[(String, Array[Byte])],
+      evalClassLoader: ClassLoader,
+      pluginClassLoader: ClassLoader,
+      reporter: Option[ICompilerBuilder.Message => Unit],
+      settings: Seq[String],
+      classPathWhiteList: Set[Seq[String]],
+      lineNumberModifier: Boolean
   ): ICompiler = {
 
     val vd = new VirtualDirectory("(memory)", None)
@@ -76,12 +72,12 @@ case class CompilerBuilder(
   }
 
   def newManager(
-    rtCacheDir: Option[Path],
-    headFrame: => Frame,
-    dependencyCompleter: => Option[String => (Int, Seq[String])],
-    whiteList: Set[Seq[String]],
-    initialClassLoader: ClassLoader,
-    settings: Seq[String]
+      rtCacheDir: Option[Path],
+      headFrame: => Frame,
+      dependencyCompleter: => Option[String => (Int, Seq[String])],
+      whiteList: Set[Seq[String]],
+      initialClassLoader: ClassLoader,
+      settings: Seq[String]
   ): CompilerLifecycleManager =
     new CompilerLifecycleManager(
       rtCacheDir,

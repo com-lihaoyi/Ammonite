@@ -3,17 +3,19 @@ package ammonite.integration
 import ammonite.integration.TestUtils._
 import utest._
 
-object ProjectTests213 extends TestSuite{
+object ProjectTests213 extends TestSuite {
 
   val tests = Tests {
     println("Running ProjectTest213")
 
-    test("httpApi"){
+    test("httpApi") {
       def addPostTest() = jsonplaceholder.withServer { url =>
         val res = execWithEnv(
           Seq("JSONPLACEHOLDER" -> url),
           os.rel / 'basic / "HttpApi.sc",
-          "addPost", "title", "some text"
+          "addPost",
+          "title",
+          "some text"
         )
         assert(res.out.trim.contains("101"))
       }
@@ -21,7 +23,8 @@ object ProjectTests213 extends TestSuite{
         val res = execWithEnv(
           Seq("JSONPLACEHOLDER" -> url),
           os.rel / 'basic / "HttpApi.sc",
-          "comments", "40"
+          "comments",
+          "40"
         )
         assert(res.out.trim.contains("totam vel saepe aut"))
         assert(res.out.trim.contains("aperiam et omnis totam"))

@@ -1,6 +1,5 @@
 package ammonite.sshd
 
-
 import ammonite.main.Defaults
 import org.apache.sshd.server.auth.password.PasswordAuthenticator
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
@@ -11,15 +10,18 @@ import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
  * @param ammoniteHome path that ammonite repl sessions will be using as their home directory
  * @param hostKeyFile path to the place where to store server's identity key
  */
-case class SshServerConfig(address: String,
-                           port: Int,
-                           ammoniteHome: os.Path = Defaults.ammoniteHome,
-                           hostKeyFile: Option[os.Path] = None,
-                           passwordAuthenticator: Option[PasswordAuthenticator] = None,
-                           publicKeyAuthenticator: Option[PublickeyAuthenticator] = None
+case class SshServerConfig(
+    address: String,
+    port: Int,
+    ammoniteHome: os.Path = Defaults.ammoniteHome,
+    hostKeyFile: Option[os.Path] = None,
+    passwordAuthenticator: Option[PasswordAuthenticator] = None,
+    publicKeyAuthenticator: Option[PublickeyAuthenticator] = None
 ) {
-  require(passwordAuthenticator.orElse(publicKeyAuthenticator).isDefined,
-    "you must provide at least one authenticator")
+  require(
+    passwordAuthenticator.orElse(publicKeyAuthenticator).isDefined,
+    "you must provide at least one authenticator"
+  )
   override def toString =
     s"(port = $port," +
       s"home = '$ammoniteHome', hostKeyFile = $hostKeyFile," +

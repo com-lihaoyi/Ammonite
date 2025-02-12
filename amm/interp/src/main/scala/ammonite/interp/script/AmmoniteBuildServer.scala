@@ -22,13 +22,13 @@ import scala.util.{Failure, Success}
 import scala.util.control.NonFatal
 
 class AmmoniteBuildServer(
-  compilerBuilder: CompilerBuilder,
-  parser: Parser,
-  codeWrapper: CodeWrapper,
-  initialScripts: Seq[os.Path] = Nil,
-  initialImports: Imports = AmmoniteBuildServer.defaultImports,
-  defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
-  importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
+    compilerBuilder: CompilerBuilder,
+    parser: Parser,
+    codeWrapper: CodeWrapper,
+    initialScripts: Seq[os.Path] = Nil,
+    initialImports: Imports = AmmoniteBuildServer.defaultImports,
+    defaultRepositories: Seq[Repository] = Repository.defaults().asScala.toList,
+    importHooks: Map[Seq[String], ImportHook] = ImportHook.defaults
 ) extends BuildServer with ScalaBuildServer with DummyBuildServerImplems {
 
   import AmmoniteBuildServer._
@@ -37,8 +37,12 @@ class AmmoniteBuildServer(
   private val printer = {
     val printStream = new PrintStream(System.out)
     Printer(
-      printStream, new PrintStream(System.err), printStream,
-      println, println, println
+      printStream,
+      new PrintStream(System.err),
+      printStream,
+      println,
+      println,
+      println
     )
   }
 
@@ -48,7 +52,6 @@ class AmmoniteBuildServer(
     alreadyLoadedDependencies(),
     verboseOutput = false
   )
-
 
   private val initialClassLoader =
     if (isolatedApi)
@@ -76,7 +79,7 @@ class AmmoniteBuildServer(
         root,
         importHooks
       )
-  }
+    }
   private lazy val compiler =
     withRoot { root =>
       new ScriptCompiler(
@@ -209,7 +212,7 @@ class AmmoniteBuildServer(
           catch {
             case NonFatal(e) =>
               System.err.println(s"Caught $e")
-              // FIXME Log this
+            // FIXME Log this
           }
         }
       } yield scriptBuildTarget(script, path)
@@ -228,8 +231,8 @@ class AmmoniteBuildServer(
     }
 
   private def scriptDependencySources(
-    script: Script,
-    target: BuildTargetIdentifier
+      script: Script,
+      target: BuildTargetIdentifier
   ): DependencySourcesItem = {
     val extra = initialClassPath.filter(_.toASCIIString.endsWith("-sources.jar")) // meh
     val jars = proc.jarDependencies(script) match {
@@ -245,7 +248,7 @@ class AmmoniteBuildServer(
   }
 
   def buildTargetDependencySources(
-    params: DependencySourcesParams
+      params: DependencySourcesParams
   ): CompletableFuture[DependencySourcesResult] =
     on(resolutionEc) {
       val items = for {
@@ -256,7 +259,7 @@ class AmmoniteBuildServer(
     }
 
   def buildTargetInverseSources(
-    params: InverseSourcesParams
+      params: InverseSourcesParams
   ): CompletableFuture[InverseSourcesResult] =
     nonBlocking {
       val uri = params.getTextDocument.getUri
@@ -268,10 +271,10 @@ class AmmoniteBuildServer(
     }
 
   private def sendDiagnostics(
-    client: BuildClient,
-    mod0: Script,
-    target: BuildTargetIdentifier,
-    diagnostics: Seq[Diagnostic]
+      client: BuildClient,
+      mod0: Script,
+      target: BuildTargetIdentifier,
+      diagnostics: Seq[Diagnostic]
   ): Unit = {
 
     def bspDiagnostic(diagnostic: Diagnostic): BDiagnostic = {
@@ -323,11 +326,11 @@ class AmmoniteBuildServer(
   }
 
   private def finishCompiling(
-    taskId: TaskId,
-    path: String,
-    target: BuildTargetIdentifier,
-    success: Boolean,
-    diagnostics: Iterable[Diagnostic]
+      taskId: TaskId,
+      path: String,
+      target: BuildTargetIdentifier,
+      success: Boolean,
+      diagnostics: Iterable[Diagnostic]
   ): Unit =
     for (client <- clientOpt) {
 
@@ -351,8 +354,8 @@ class AmmoniteBuildServer(
     }
 
   private def compileScript(
-    script: Script,
-    dependencies: Script.ResolvedDependencies
+      script: Script,
+      dependencies: Script.ResolvedDependencies
   ): ScriptCompileResult = {
 
     def actualDiagnostics(result: ScriptCompileResult) =
@@ -410,8 +413,8 @@ class AmmoniteBuildServer(
     }
 
   private def scriptScalacOptions(
-    script: Script,
-    target: BuildTargetIdentifier
+      script: Script,
+      target: BuildTargetIdentifier
   ): ScalacOptionsItem = {
     val extra = initialClassPath.filter(!_.toASCIIString.endsWith("-sources.jar")) // meh
     val scriptDependenciesTargets = proc.dependencies(script) match {
@@ -442,7 +445,7 @@ class AmmoniteBuildServer(
   }
 
   def buildTargetScalacOptions(
-    params: ScalacOptionsParams
+      params: ScalacOptionsParams
   ): CompletableFuture[ScalacOptionsResult] =
     on(resolutionEc) {
       val items = for {
@@ -510,9 +513,9 @@ object AmmoniteBuildServer {
   }
 
   private def alreadyLoadedDependencies(
-    resourceName: String =
-      if (isolatedApi) "amm-interp-api-dependencies.txt"
-      else "amm-dependencies.txt"
+      resourceName: String =
+        if (isolatedApi) "amm-interp-api-dependencies.txt"
+        else "amm-dependencies.txt"
   ): Seq[Dependency] = {
 
     var is: InputStream = null
@@ -525,12 +528,14 @@ object AmmoniteBuildServer {
         .mkString
         .split('\n')
         .filter(_.nonEmpty)
-        .map(l => l.split(':') match {
-          case Array(org, name, ver) =>
-            Dependency.of(org, name, ver)
-          case other =>
-            throw new Exception(s"Cannot parse line '$other' from resource $resourceName")
-        })
+        .map(l =>
+          l.split(':') match {
+            case Array(org, name, ver) =>
+              Dependency.of(org, name, ver)
+            case other =>
+              throw new Exception(s"Cannot parse line '$other' from resource $resourceName")
+          }
+        )
     } finally {
       if (is != null)
         is.close()
@@ -547,7 +552,7 @@ object AmmoniteBuildServer {
         .toSet
 
   private def naiveJavaFutureToScalaFuture[T](
-    f: java.util.concurrent.Future[T]
+      f: java.util.concurrent.Future[T]
   ): Future[T] = {
     val p = Promise[T]()
     val t = new Thread {
@@ -564,9 +569,9 @@ object AmmoniteBuildServer {
   }
 
   def start(
-    server: AmmoniteBuildServer,
-    input: InputStream = System.in,
-    output: OutputStream = System.out
+      server: AmmoniteBuildServer,
+      input: InputStream = System.in,
+      output: OutputStream = System.out
   ): (Launcher[BuildClient], Future[Unit]) = {
     val ec = Executors.newFixedThreadPool(4, threadFactory("ammonite-bsp-jsonrpc"))
     val launcher = new Launcher.Builder[BuildClient]()

@@ -1,6 +1,5 @@
 package ammonite.terminal
 
-
 /**
  * The core logic around a terminal; it defines the base `filters` API
  * through which anything (including basic cursor-navigation and typing)
@@ -11,12 +10,8 @@ package ammonite.terminal
  */
 object Terminal {
 
-
-
   type Action = (Vector[Char], Int) => (Vector[Char], Int)
   type MsgAction = (Vector[Char], Int) => (Vector[Char], Int, String)
-
-
 
   /**
    * Blockingly reads a line from the given input stream and returns it.
@@ -30,12 +25,13 @@ object Terminal {
    *                         cursor, without actually changing the logical
    *                         values inside them.
    */
-  def readLine(prompt: Prompt,
-               reader: java.io.Reader,
-               writer: java.io.Writer,
-               filters: Filter,
-               displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = LineReader.noTransform)
-               : Option[String] = {
+  def readLine(
+      prompt: Prompt,
+      reader: java.io.Reader,
+      writer: java.io.Writer,
+      filters: Filter,
+      displayTransform: (Vector[Char], Int) => (fansi.Str, Int) = LineReader.noTransform
+  ): Option[String] = {
     TTY.withSttyOverride(TTY.readLineStty()) {
       new LineReader(ConsoleDim.width(), prompt, reader, writer, filters, displayTransform)
         .readChar(TermState(LazyList.continually(reader.read()), Vector.empty, 0, ""), 0)

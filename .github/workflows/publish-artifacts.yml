@@ -1,0 +1,65 @@
+name: Publish Artifacts
+
+on:
+  push:
+    tags:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  publish-maven:
+
+    runs-on: ubuntu-latest
+    env:
+      MILL_SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      MILL_SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+      MILL_PGP_SECRET_BASE64: ${{ secrets.SONATYPE_PGP_PRIVATE_KEY }}
+      MILL_PGP_PASSPHRASE: ${{ secrets.SONATYPE_PGP_PRIVATE_KEY_PASSWORD }}
+      LANG: "en_US.UTF-8"
+      LC_MESSAGES: "en_US.UTF-8"
+      LC_ALL: "en_US.UTF-8"
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 11
+      - name: Publish to Maven Central
+        run: ./mill -i mill.scalalib.PublishModule/
+
+  publish-docs:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: temurin
+
+      - name: Setup sbt launcher
+        uses: sbt/setup-sbt@v1
+
+      - name: publish docs
+        shell: 'script -q -e -c "bash {0}"'
+        run: echo "Hello World" && ./mill -i publishDocs
+        env:
+          TERM: xterm-256color
+
+  publish-executable:
+    runs-on: ubuntu-latest
+    env:
+      AMMONITE_BOT_AUTH_TOKEN: ${{ secrets.AMMONITE_BOT_AUTH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: temurin
+      - run: ./mill -i publishExecutable

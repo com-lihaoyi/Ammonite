@@ -5,10 +5,12 @@ import ch.epfl.scala.bsp4j._
 import scala.collection.JavaConverters._
 
 private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuildServer {
-  override def buildTargetDependencyModules(dmp: DependencyModulesParams): CompletableFuture[DependencyModulesResult] =
+  override def buildTargetDependencyModules(dmp: DependencyModulesParams)
+      : CompletableFuture[DependencyModulesResult] =
     CompletableFuture.completedFuture(new DependencyModulesResult(List.empty.asJava))
 
-  override def buildTargetOutputPaths(opp: OutputPathsParams): CompletableFuture[OutputPathsResult] =
+  override def buildTargetOutputPaths(opp: OutputPathsParams)
+      : CompletableFuture[OutputPathsResult] =
     CompletableFuture.completedFuture(new OutputPathsResult(List.empty.asJava))
 
   override def buildTargetResources(params: ResourcesParams): CompletableFuture[ResourcesResult] = {
@@ -32,7 +34,7 @@ private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuil
   }
 
   override def buildTargetScalaMainClasses(
-    params: ScalaMainClassesParams
+      params: ScalaMainClassesParams
   ): CompletableFuture[ScalaMainClassesResult] = {
     val items = params.getTargets.asScala.map { target =>
       new ScalaMainClassesItem(target, List.empty[ScalaMainClass].asJava)
@@ -42,7 +44,7 @@ private[script] trait DummyBuildServerImplems extends BuildServer with ScalaBuil
   }
 
   override def buildTargetScalaTestClasses(
-    params: ScalaTestClassesParams
+      params: ScalaTestClassesParams
   ): CompletableFuture[ScalaTestClassesResult] = {
     val items = params.getTargets.asScala.map { target =>
       new ScalaTestClassesItem(target, List.empty[String].asJava)

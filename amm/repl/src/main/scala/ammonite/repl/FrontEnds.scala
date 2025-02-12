@@ -15,14 +15,13 @@ import ammonite.util.{Catching, Colors, Res}
 import ammonite.repl.api.FrontEnd
 import org.jline.reader.impl.DefaultParser
 
-
 object FrontEnds {
   class JLineUnix(codeParser: IParser) extends JLineTerm(codeParser)
   class JLineWindows(codeParser: IParser) extends JLineTerm(codeParser)
   class JLineTerm(codeParser: IParser) extends FrontEnd {
 
     private val term = TerminalBuilder.builder().build()
-    
+
     private val readerBuilder = LineReaderBuilder.builder().terminal(term)
     private val ammHighlighter = new AmmHighlighter(codeParser)
     private val ammCompleter = new AmmCompleter(ammHighlighter)
@@ -39,14 +38,16 @@ object FrontEnds {
     def width = term.getWidth
     def height = term.getHeight
 
-    def action(jInput: InputStream,
-               jReader: java.io.Reader,
-               jOutput: OutputStream,
-               prompt: String,
-               colors: Colors,
-               compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-               historyValues: IndexedSeq[String],
-               addHistory: String => Unit) = {
+    def action(
+        jInput: InputStream,
+        jReader: java.io.Reader,
+        jOutput: OutputStream,
+        prompt: String,
+        colors: Colors,
+        compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
+        historyValues: IndexedSeq[String],
+        addHistory: String => Unit
+    ) = {
 
       ammCompleter.compilerComplete = compilerComplete
       ammParser.addHistory = addHistory
@@ -88,14 +89,16 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
   // completion varies from action to action
   var compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]) =
     (x, y) => (0, Seq.empty, Seq.empty)
-  
+
   // used when making a candidate
-  private val leftDelimiters  = Set('.')
+  private val leftDelimiters = Set('.')
   private val rightDelimiters = Set('.', '(', '{', '[')
 
-  override def complete(reader: LineReader,
-                        line: ParsedLine,
-                        candidates: java.util.List[Candidate]): Unit = {
+  override def complete(
+      reader: LineReader,
+      line: ParsedLine,
+      candidates: java.util.List[Candidate]
+  ): Unit = {
     val (completionBase, completions, sigs) = compilerComplete(
       line.cursor(),
       line.line()
@@ -103,7 +106,7 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
     // display method signature(s)
     if (sigs.nonEmpty) {
       reader.getTerminal.writer.println()
-      sigs.foreach{ sig =>
+      sigs.foreach { sig =>
         val sigHighlighted = highlighter.highlight(reader, sig).toAnsi
         reader.getTerminal.writer.println(sigHighlighted)
       }
@@ -120,7 +123,7 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
 
   /** Makes a full-word candidate based on autocomplete candidate */
   private def makeCandidate(word: String, wordCursor: Int, candidate: String): String = {
-    val leftFromCursor  = word.substring(0, wordCursor)
+    val leftFromCursor = word.substring(0, wordCursor)
     val rightFromCursor = word.substring(wordCursor)
     val left = leftFromCursor.reverse.dropWhile(c => !leftDelimiters.contains(c)).reverse
     val right = rightFromCursor.dropWhile(c => !rightDelimiters.contains(c))
@@ -129,11 +132,14 @@ class AmmCompleter(highlighter: Highlighter) extends Completer {
 }
 
 class AmmParser(codeParser: IParser) extends Parser {
-  class AmmoniteParsedLine(line: String, words: java.util.List[String],
-                            wordIndex: Int, wordCursor: Int, cursor: Int,
-                            val stmts: Seq[String] = Seq.empty // needed for interpreter
-                          )
-    extends defaultParser.ArgumentList(line, words, wordIndex, wordCursor, cursor)
+  class AmmoniteParsedLine(
+      line: String,
+      words: java.util.List[String],
+      wordIndex: Int,
+      wordCursor: Int,
+      cursor: Int,
+      val stmts: Seq[String] = Seq.empty // needed for interpreter
+  ) extends defaultParser.ArgumentList(line, words, wordIndex, wordCursor, cursor)
 
   var addHistory: String => Unit = x => ()
 

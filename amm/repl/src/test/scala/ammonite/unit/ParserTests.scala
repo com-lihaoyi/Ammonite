@@ -3,11 +3,11 @@ package ammonite.unit
 import ammonite.util.Util
 import utest._
 
-object ParserTests extends TestSuite{
+object ParserTests extends TestSuite {
 
   val tests = Tests {
     println("ParserTests")
-    test("shebang"){
+    test("shebang") {
       def check(original: String, expected: String) = {
         val skipped = ammonite.interp.Interpreter.skipSheBangLine(
           ammonite.util.Util.normalizeNewlines(original)
@@ -66,7 +66,7 @@ object ParserTests extends TestSuite{
     //
     // Not nearly comprehensive, but hopefully if someone really borks this
     // somewhat-subtle logic around the parsers, one of these will catch it
-    test("endOfCommandDetection"){
+    test("endOfCommandDetection") {
       def assertResult(x: String, pred: Option[Either[String, _]] => Boolean) = {
         val res = ammonite.compiler.Parsers.split(x)
         assert(pred(res))
@@ -76,7 +76,7 @@ object ParserTests extends TestSuite{
       def assertInvalid(x: String) =
         assertResult(x, res => res.isDefined && res.get.isLeft)
 
-      test("endOfCommand"){
+      test("endOfCommand") {
         test - assertComplete("{}")
         test - assertComplete("foo.bar")
         test - assertComplete("foo.bar // line comment")
@@ -86,7 +86,9 @@ object ParserTests extends TestSuite{
           // I hope that one not passing doesn't have unintended consequences…
           // Once we can use coursier/interface#256 here, use it to compare versions
           // if (coursierapi.Version.compare("3.1.3", sv) <= 0)
-          if (sv.startsWith("2.") || sv.startsWith("3.0.") || (sv.startsWith("3.1.") && sv != "3.1.3"))
+          if (
+            sv.startsWith("2.") || sv.startsWith("3.0.") || (sv.startsWith("3.1.") && sv != "3.1.3")
+          )
             assertComplete("va va") // postfix
           else "Disabled"
         }
@@ -105,7 +107,7 @@ object ParserTests extends TestSuite{
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0).sum
         """)
       }
-      test("notEndOfCommand"){
+      test("notEndOfCommand") {
 
         test - assertIncomplete("{")
         test - assertIncomplete("foo.bar /* incomplete block comment")
@@ -115,9 +117,9 @@ object ParserTests extends TestSuite{
         test - assertIncomplete("""
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0
         """)
-        
+
       }
-      test("commandIsBroken"){
+      test("commandIsBroken") {
         test - assertInvalid("}")
         test - assertInvalid("{val val ")
         test - assertInvalid("val val ")
@@ -132,8 +134,8 @@ object ParserTests extends TestSuite{
           val r <- (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0
         """)
       }
-      test("examples"){
-        test("small"){
+      test("examples") {
+        test("small") {
           val input = Util.normalizeNewlines(
             """ for {
                  a <- List(1);
@@ -141,7 +143,7 @@ object ParserTests extends TestSuite{
               } yield (1, 2)"""
           )
           val lines = Predef.augmentString(input).lines.toVector
-          for(i <- 1 until lines.length) {
+          for (i <- 1 until lines.length) {
             val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
             // All others are incomplete
@@ -149,7 +151,7 @@ object ParserTests extends TestSuite{
             else assertIncomplete(prefix)
           }
         }
-        test("medium"){
+        test("medium") {
           val input = Util.normalizeNewlines(
             """ val ls = for(y <- 1900 to 2000; m <- 1 to 12) yield {
                   if(m == 2)
@@ -159,7 +161,7 @@ object ParserTests extends TestSuite{
                 } """
           )
           val lines = Predef.augmentString(input).lines.toVector
-          for(i <- 1 until lines.length) {
+          for (i <- 1 until lines.length) {
             val prefix = lines.take(i).mkString(Util.newLine)
             // Only the entire input, which is the last prefix, is complete.
             // All others are incomplete
@@ -167,7 +169,7 @@ object ParserTests extends TestSuite{
             else assertIncomplete(prefix)
           }
         }
-        test("big"){
+        test("big") {
           val input = Util.normalizeNewlines(
             """import play.core.server._, play.api.routing.sird._, play.api.mvc._ // 0
                import scalaj.http._                                               // 1
@@ -201,7 +203,7 @@ object ParserTests extends TestSuite{
           // is a valid, complete input. Every other line *should* be incomplete,
           // and no prefix in this example should be invalid
           val completeLines = Set(0, 1, 20, 25)
-          for(i <- 0 until lines.length) {
+          for (i <- 0 until lines.length) {
 
             val prefix = lines.take(i + 1).mkString(Util.newLine)
             if (completeLines(i)) assertComplete(prefix)

@@ -8,17 +8,15 @@ import sourcecode.Compat._
 import scala.annotation.tailrec
 import scala.language.experimental.macros
 
-object source{
-
+object source {
 
   def load(f: => Any): Location = macro loadMacro
 
-  def loadMacro(c: Context)
-               (f: c.Expr[Any]): c.Expr[Location] = {
+  def loadMacro(c: Context)(f: c.Expr[Any]): c.Expr[Location] = {
 
     import c.universe._
 
-    val res = breakUp(c)(f) match{
+    val res = breakUp(c)(f) match {
       case None =>
         q"${prefix(c)}.failLoudly(${prefix(c)}.loadObjectInfo($f))"
       case Some((classThingy, symbolName, lhs, returnClass, argClasses)) =>
@@ -35,24 +33,22 @@ object source{
         """
     }
 
-
     c.Expr[Location](res)
   }
 
-  def apply(f: => Any)
-           (implicit colors: CodeColors): Unit = macro applyDefaultPPrinterMacro
+  def apply(f: => Any)(implicit colors: CodeColors): Unit = macro applyDefaultPPrinterMacro
 
-  def apply(f: => Any, pprinter: pprint.PPrinter)
-           (implicit colors: CodeColors): Unit = macro applyMacro
+  def apply(f: => Any, pprinter: pprint.PPrinter)(implicit colors: CodeColors): Unit =
+    macro applyMacro
 
-  def apply(f: => Any, command: Int => Strings)
-            (implicit colors: CodeColors): Unit = macro applyCustomizeCommandDefaultPPrinterMacro
-  def apply(f: => Any, command: Int => Strings, pprinter: pprint.PPrinter)
-            (implicit colors: CodeColors): Unit = macro applyCustomizeCommandMacro
+  def apply(f: => Any, command: Int => Strings)(implicit colors: CodeColors): Unit =
+    macro applyCustomizeCommandDefaultPPrinterMacro
+  def apply(f: => Any, command: Int => Strings, pprinter: pprint.PPrinter)(implicit
+      colors: CodeColors
+  ): Unit = macro applyCustomizeCommandMacro
 
-  def applyDefaultPPrinterMacro(c: Context)
-                (f: c.Expr[Any])
-                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+  def applyDefaultPPrinterMacro(c: Context)(f: c.Expr[Any])(colors: c.Expr[CodeColors])
+      : c.Expr[Unit] = {
     import c.universe._
     val defaultPPrinter = c.Expr[pprint.PPrinter](
       q"${prefix(c)}.defaultPPrinter"
@@ -60,9 +56,10 @@ object source{
     applyMacro(c)(f, defaultPPrinter)(colors)
   }
 
-  def applyMacro(c: Context)
-                (f: c.Expr[Any], pprinter: c.Expr[pprint.PPrinter])
-                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+  def applyMacro(c: Context)(
+      f: c.Expr[Any],
+      pprinter: c.Expr[pprint.PPrinter]
+  )(colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     val defaultBrowseExpr = c.Expr[Int => Strings](
       q"${prefix(c)}.browseSourceCommand"
@@ -71,21 +68,24 @@ object source{
     applyCustomizeCommandMacro(c)(f, defaultBrowseExpr, pprinter)(colors)
   }
 
-  def applyCustomizeCommandDefaultPPrinterMacro(c: Context)
-                                (f: c.Expr[Any], command: c.Expr[Int => Strings])
-                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+  def applyCustomizeCommandDefaultPPrinterMacro(c: Context)(
+      f: c.Expr[Any],
+      command: c.Expr[Int => Strings]
+  )(colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     val defaultPPrinter = c.Expr[pprint.PPrinter](
       q"${prefix(c)}.defaultPPrinter"
     )
     applyCustomizeCommandMacro(c)(f, command, defaultPPrinter)(colors)
   }
-  def applyCustomizeCommandMacro(c: Context)
-                                (f: c.Expr[Any], command: c.Expr[Int => Strings], pprinter: c.Expr[pprint.PPrinter])
-                  (colors: c.Expr[CodeColors]): c.Expr[Unit] = {
+  def applyCustomizeCommandMacro(c: Context)(
+      f: c.Expr[Any],
+      command: c.Expr[Int => Strings],
+      pprinter: c.Expr[pprint.PPrinter]
+  )(colors: c.Expr[CodeColors]): c.Expr[Unit] = {
     import c.universe._
     c.Expr[Unit](
-      breakUp(c)(f) match{
+      breakUp(c)(f) match {
         case Some((classThingy, symbolName, lhs, returnClass, argClasses)) =>
           q"""
           ${prefix(c)}.browseObjectMember(
@@ -108,11 +108,12 @@ object source{
     import c.universe._
     q"ammonite.compiler.tools.SourceRuntime"
   }
+
   /**
-    * Attempts to up an expression, into either a LHS + methodcall + rhs. We
-    * then look for the source of the method. If it can't be split, we look for
-    * the source of the class of the entire expression
-    */
+   * Attempts to up an expression, into either a LHS + methodcall + rhs. We
+   * then look for the source of the method. If it can't be split, we look for
+   * the source of the class of the entire expression
+   */
   def breakUp(c: Context)(f: c.Expr[Any]) = {
     import c.universe._
     // Break up the expression into it's constituent parts
@@ -125,8 +126,7 @@ object source{
     // We keep the block wrapper to re-apply to the final expression later, because
     // sometimes (e.g. in the case of `new javassist.ClassPool().find _`) the LHS of
     // the last expr in the block ends up depending on the earlier statements
-    @tailrec def rec(wrapper: Tree => Tree, x: Tree)
-                    : Option[(Tree, Symbol, Tree => Tree)] = {
+    @tailrec def rec(wrapper: Tree => Tree, x: Tree): Option[(Tree, Symbol, Tree => Tree)] = {
       x match {
         case Select(qualifier, selector) =>
           if (selector.toString == "<init>") None
@@ -142,19 +142,19 @@ object source{
       }
     }
 
-    for((lhs, symbol, wrapper) <- rec(identity(_), f.tree)) yield {
+    for ((lhs, symbol, wrapper) <- rec(identity(_), f.tree)) yield {
 
       val method = symbol.asMethod
 
       val argClasses =
-        for(arg <- method.paramss.flatten)
-        yield q"classOf[${arg.typeSignature.erasure}]"
+        for (arg <- method.paramss.flatten)
+          yield q"classOf[${arg.typeSignature.erasure}]"
 
       val staticJavaLhsClass = lhs.symbol != null && lhs.symbol.isStatic && lhs.symbol.isJava
 
       val ownerCls = symbol.owner.asClass
 
-      val paramedOwnerCls = ownerCls.typeParams.length match{
+      val paramedOwnerCls = ownerCls.typeParams.length match {
         case 0 => ownerCls.thisPrefix.widen
         case n =>
           import compat._

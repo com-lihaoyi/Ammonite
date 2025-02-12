@@ -14,8 +14,10 @@ trait Frame {
 }
 
 object Frame {
+
   /** A hook that can be called every time JARs are added to the class path */
   trait Hook {
+
     /** Called when new JARs are added to the class path */
     def addClasspath(additional: Seq[java.net.URL]): Unit
   }

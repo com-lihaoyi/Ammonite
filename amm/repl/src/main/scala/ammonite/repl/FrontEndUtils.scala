@@ -2,6 +2,7 @@ package ammonite.repl
 import scala.annotation.tailrec
 
 import ammonite.util.Util.newLine
+
 /**
  * Created by haoyi on 8/29/15.
  */
@@ -20,25 +21,23 @@ object FrontEndUtils {
 
     val grouped =
       snippets.toList
-              .grouped(math.ceil(snippets.length * 1.0 / columns).toInt)
-              .toList
+        .grouped(math.ceil(snippets.length * 1.0 / columns).toInt)
+        .toList
 
-    ammonite.util.Util.transpose(grouped).iterator.flatMap{
-      case first :+ last => first.map(
-        x => x ++ " " * (width / columns - x.length)
-      ) :+ last :+ fansi.Str(newLine)
+    ammonite.util.Util.transpose(grouped).iterator.flatMap {
+      case first :+ last =>
+        first.map(x => x ++ " " * (width / columns - x.length)) :+ last :+ fansi.Str(newLine)
     }.map(_.render)
   }
 
   @tailrec def findPrefix(strings: Seq[String], i: Int = 0): String = {
     if (strings.count(_.length > i) == 0) strings(0).take(i)
-    else if(strings.collect{ case x if x.length > i => x(i)}.distinct.length > 1)
+    else if (strings.collect { case x if x.length > i => x(i) }.distinct.length > 1)
       strings(0).take(i)
     else findPrefix(strings, i + 1)
   }
 
-  def printCompletions(completions: Seq[String],
-                       details: Seq[String]): List[String] = {
+  def printCompletions(completions: Seq[String], details: Seq[String]): List[String] = {
 
     val prelude =
       if (details.length != 0 || completions.length != 0) List(newLine)
@@ -47,7 +46,6 @@ object FrontEndUtils {
     val detailsText =
       if (details.length == 0) Nil
       else FrontEndUtils.tabulate(details.map(fansi.Str(_)), FrontEndUtils.width)
-
 
     val completionText =
       if (completions.length == 0) Nil

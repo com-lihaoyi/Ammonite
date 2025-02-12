@@ -6,14 +6,14 @@ import utest._
 
 import scala.collection.{immutable => imm}
 
-object ImportTests extends TestSuite{
+object ImportTests extends TestSuite {
 
-  val tests = Tests{
+  val tests = Tests {
     println("ImportTests")
     val check = new DualTestRepl()
 
-    test("basic"){
-      test("hello"){
+    test("basic") {
+      test("hello") {
         check.session("""
           @ import math.abs
           import math.abs
@@ -27,7 +27,7 @@ object ImportTests extends TestSuite{
 
       }
 
-      test("java"){
+      test("java") {
         check.session("""
           @ import Thread._
           import Thread._
@@ -45,7 +45,7 @@ object ImportTests extends TestSuite{
           res4: Boolean = true
         """)
       }
-      test("multi"){
+      test("multi") {
         check.session("""
           @ import math._, Thread._
           import math._, Thread._
@@ -58,7 +58,7 @@ object ImportTests extends TestSuite{
         """)
       }
 
-      test("renaming"){
+      test("renaming") {
         check.session(s"""
           @ import math.{abs => sba}
 
@@ -86,8 +86,8 @@ object ImportTests extends TestSuite{
         """)
       }
     }
-    test("shadowing"){
-      test("sameName"){
+    test("shadowing") {
+      test("sameName") {
         check.session("""
           @ val abs = 'a'
           abs: Char = 'a'
@@ -120,8 +120,8 @@ object ImportTests extends TestSuite{
           res9: Int = 4
         """)
       }
-      test("shadowPrefix"){
-        test{
+      test("shadowPrefix") {
+        test {
           // fixed in 2.11 and 2.12
           check.session(raw"""
             @ object importing_issue {
@@ -163,7 +163,7 @@ object ImportTests extends TestSuite{
 
       }
 
-      test("typeTermSeparation"){
+      test("typeTermSeparation") {
         // Make sure that you can have a term and a type of the same name
         // coming from different places and they don't stomp over each other
         // (#199) and both are accessible.
@@ -181,7 +181,7 @@ object ImportTests extends TestSuite{
           res3: $aliasedType = 2
         """)
 
-        test{
+        test {
           val aliasedType =
             if (check.scala2) "Order" else "Seq"
           check.session(s"""
@@ -232,7 +232,7 @@ object ImportTests extends TestSuite{
           error: Compilation Failed
         """)
         // Prefix things properly in Scala-2.10 where the type printer is dumb
-        test("paulp"){
+        test("paulp") {
 
           if (!check.scala2) "disabled in Scala 3"
           else check.session(s"""
@@ -305,7 +305,7 @@ object ImportTests extends TestSuite{
           @ Paulp
           """)
         }
-        test("paulpTypeRegression"){
+        test("paulpTypeRegression") {
           if (!check.scala2) "disabled in Scala 3"
           else check.session(s"""
           @ type Paulp = Int
@@ -318,7 +318,7 @@ object ImportTests extends TestSuite{
         }
       }
     }
-    test("collapsing"){
+    test("collapsing") {
       check.session("""
         @ object Foo{ val bar = 1 }
 
@@ -330,7 +330,7 @@ object ImportTests extends TestSuite{
         res3: Int = 1
       """)
     }
-    test("shapelessBugMinimized"){
+    test("shapelessBugMinimized") {
       check.session("""
         @ object f{ case class Foo()}
 
@@ -341,7 +341,7 @@ object ImportTests extends TestSuite{
         @ Foo
       """)
     }
-    test("shapelessBugFull"){
+    test("shapelessBugFull") {
       if (check.scala2) check.session("""
         @ import $ivy.`com.chuusai::shapeless:2.3.7`, shapeless.::
 

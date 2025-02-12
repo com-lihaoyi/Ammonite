@@ -17,31 +17,39 @@ object DefaultPreprocessor {
     }
 }
 
-class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
-                          markGeneratedSections: Boolean = false) extends Preprocessor{
+class DefaultPreprocessor(
+    parse: => String => Either[String, Seq[G#Tree]],
+    markGeneratedSections: Boolean = false
+) extends Preprocessor {
 
   import DefaultPreprocessor._
 
-  def transform(stmts: Seq[String],
-                resultIndex: String,
-                leadingSpaces: String,
-                codeSource: CodeSource,
-                indexedWrapperName: Name,
-                imports: Imports,
-                printerTemplate: String => String,
-                extraCode: String,
-                skipEmpty: Boolean,
-                markScript: Boolean,
-                codeWrapper: CodeWrapper) = {
+  def transform(
+      stmts: Seq[String],
+      resultIndex: String,
+      leadingSpaces: String,
+      codeSource: CodeSource,
+      indexedWrapperName: Name,
+      imports: Imports,
+      printerTemplate: String => String,
+      extraCode: String,
+      skipEmpty: Boolean,
+      markScript: Boolean,
+      codeWrapper: CodeWrapper
+  ) = {
     // All code Ammonite compiles must be rooted in some package within
     // the `ammonite` top-level package
     assert(codeSource.pkgName.head == Name("ammonite"))
-    for{
+    for {
       Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
       (wrappedCode, importsLength, userCodeNestingLevel) = codeWrapper.wrapCode(
-        codeSource, indexedWrapperName, leadingSpaces + code,
+        codeSource,
+        indexedWrapperName,
+        leadingSpaces + code,
         printerTemplate(printer.mkString(", ")),
-        imports, extraCode, markScript
+        imports,
+        extraCode,
+        markScript
       )
     } yield Preprocessor.Output(wrappedCode, importsLength, userCodeNestingLevel)
   }
@@ -73,13 +81,12 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
 
   def pprint(ident: String) = pprintSignature(ident, None)
 
-
   /**
    * Processors for declarations which all have the same shape
    */
   def DefProc(definitionLabel: String)(cond: PartialFunction[G#Tree, G#Name]) =
     (code: String, name: String, tree: G#Tree) =>
-      cond.lift(tree).map{ name =>
+      cond.lift(tree).map { name =>
         val printer =
           if (isPrivate(tree)) Nil
           else Seq(definedStr(definitionLabel, Name.backtickWrap(name.decoded)))
@@ -89,16 +96,16 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
         )
       }
 
-  val ObjectDef = DefProc("object"){case m: G#ModuleDef => m.name}
-  val ClassDef = DefProc("class"){ case m: G#ClassDef if !m.mods.isTrait => m.name }
-  val TraitDef =  DefProc("trait"){ case m: G#ClassDef if m.mods.isTrait => m.name }
-  val DefDef = DefProc("function"){ case m: G#DefDef => m.name }
-  val TypeDef = DefProc("type"){ case m: G#TypeDef => m.name }
+  val ObjectDef = DefProc("object") { case m: G#ModuleDef => m.name }
+  val ClassDef = DefProc("class") { case m: G#ClassDef if !m.mods.isTrait => m.name }
+  val TraitDef = DefProc("trait") { case m: G#ClassDef if m.mods.isTrait => m.name }
+  val DefDef = DefProc("function") { case m: G#DefDef => m.name }
+  val TypeDef = DefProc("type") { case m: G#TypeDef => m.name }
 
   val PatVarDef = Processor { case (name, code, t: G#ValDef) =>
     Expanded(
-      //Only wrap rhs in function if it is not a function
-      //Wrapping functions causes type inference errors.
+      // Only wrap rhs in function if it is not a function
+      // Wrapping functions causes type inference errors.
       code,
       // Try to leave out all synthetics; we don't actually have proper
       // synthetic flags right now, because we're dumb-parsing it and not putting
@@ -109,7 +116,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
     )
   }
 
-  val Import = Processor{
+  val Import = Processor {
     case (name, code, tree: G#Import) =>
       val body = fastparse.parse(code, Parsers.ImportFinder(_)) match {
         case s: fastparse.Parsed.Success[String] =>
@@ -118,8 +125,10 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
           val Array(keyword, body) = code.split(" ", 2)
           body
       }
-      Expanded(code, Seq(
-        s"""
+      Expanded(
+        code,
+        Seq(
+          s"""
         _root_.ammonite
               .repl
               .ReplBridge
@@ -127,11 +136,12 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
               .Internal
               .printImport(${fastparse.internal.Util.literalize(body)})
         """
-      ))
+        )
+      )
   }
 
-  val Expr = Processor{
-    //Expressions are lifted to anon function applications so they will be JITed
+  val Expr = Processor {
+    // Expressions are lifted to anon function applications so they will be JITed
     case (name, code, tree) =>
       val expandedCode =
         if (markGeneratedSections)
@@ -145,13 +155,22 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
   }
 
   val decls = Seq[(String, String, G#Tree) => Option[Expanded]](
-    ObjectDef, ClassDef, TraitDef, DefDef, TypeDef, PatVarDef, Import, Expr
+    ObjectDef,
+    ClassDef,
+    TraitDef,
+    DefDef,
+    TypeDef,
+    PatVarDef,
+    Import,
+    Expr
   )
 
-  def expandStatements(stmts: Seq[String],
-                       wrapperIndex: String,
-                       skipEmpty: Boolean): Res[Expanded] = {
-    stmts match{
+  def expandStatements(
+      stmts: Seq[String],
+      wrapperIndex: String,
+      skipEmpty: Boolean
+  ): Res[Expanded] = {
+    stmts match {
       // In the REPL, we do not process empty inputs at all, to avoid
       // unnecessarily incrementing the command counter
       //
@@ -166,7 +185,7 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
 
   def complete(code: String, resultIndex: String, postSplit: Seq[String]) = {
     val reParsed = postSplit.map(p => (parse(p), p))
-    val errors = reParsed.collect{case (Left(e), _) => e }
+    val errors = reParsed.collect { case (Left(e), _) => e }
     if (errors.length != 0) Res.Failure(errors.mkString(newLine))
     else {
       val allDecls = for {
@@ -199,8 +218,8 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
         }
       }
 
-      allDecls match{
-        case Seq(first, rest@_*) =>
+      allDecls match {
+        case Seq(first, rest @ _*) =>
           val allDeclsWithComments = Expanded(first.code, first.printer) +: rest
           Res(
             allDeclsWithComments.reduceOption { (a, b) =>
@@ -220,4 +239,3 @@ class DefaultPreprocessor(parse: => String => Either[String, Seq[G#Tree]],
     }
   }
 }
-

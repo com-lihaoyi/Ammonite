@@ -6,10 +6,10 @@ import ammonite.runtime.ImportHook
 import ammonite.util.Name
 
 final case class Script(
-  code: String,
-  codeSource: CodeSource,
-  blocks: Seq[Script.Block],
-  processorDiagnostics: Seq[Diagnostic]
+    code: String,
+    codeSource: CodeSource,
+    blocks: Seq[Script.Block],
+    processorDiagnostics: Seq[Diagnostic]
 ) {
 
   lazy val dependencyImports: Imports = {
@@ -40,19 +40,19 @@ final case class Script(
 object Script {
 
   final case class Import(
-    code: Either[String, os.Path],
-    isExec: Boolean,
-    codeSource: CodeSource,
-    hookImports: Imports
+      code: Either[String, os.Path],
+      isExec: Boolean,
+      codeSource: CodeSource,
+      hookImports: Imports
   )
 
   final case class Dependencies(
-    scriptDependencies: Seq[Script.Import] = Nil,
-    dependencies: Seq[coursierapi.Dependency] = Nil,
-    jarDependencies: Seq[os.Path] = Nil,
-    pluginDependencies: Seq[coursierapi.Dependency] = Nil,
-    jarPluginDependencies: Seq[os.Path] = Nil,
-    extraRepositories: Seq[coursierapi.Repository] = Nil
+      scriptDependencies: Seq[Script.Import] = Nil,
+      dependencies: Seq[coursierapi.Dependency] = Nil,
+      jarDependencies: Seq[os.Path] = Nil,
+      pluginDependencies: Seq[coursierapi.Dependency] = Nil,
+      jarPluginDependencies: Seq[os.Path] = Nil,
+      extraRepositories: Seq[coursierapi.Repository] = Nil
   ) {
     def +(other: Dependencies): Dependencies =
       Dependencies(
@@ -75,7 +75,7 @@ object Script {
   }
 
   final case class Options(
-    extraScalacOptions: Seq[String] = Nil
+      extraScalacOptions: Seq[String] = Nil
   ) {
     def +(other: Options): Options =
       Options(
@@ -88,16 +88,16 @@ object Script {
   }
 
   final case class Block(
-    startIdx: Int,
-    leadingSpaces: String,
-    statements: Seq[String],
-    imports: Seq[ImportHook.Result]
+      startIdx: Int,
+      leadingSpaces: String,
+      statements: Seq[String],
+      imports: Seq[ImportHook.Result]
   )
 
   final case class ResolvedDependencies(
-    jars: Seq[os.Path],
-    pluginJars: Seq[os.Path],
-    byteCode: Seq[(String, Array[Byte])]
+      jars: Seq[os.Path],
+      pluginJars: Seq[os.Path],
+      byteCode: Seq[(String, Array[Byte])]
   )
 
   private def dependencies(hookRes: ImportHook.Result): Dependencies =

@@ -8,16 +8,23 @@ import ammonite.runtime.Storage
 import ammonite.util.Res
 import utest._
 
-object ScriptTests extends TestSuite{
-  val tests = Tests{
+object ScriptTests extends TestSuite {
+  val tests = Tests {
     println("ScriptTests")
     val check = new TestRepl()
 
     val printedScriptPath = """pwd/"amm"/"src"/"test"/"resources"/"scripts""""
 
-    test("exec"){
-      test("compilationBlocks"){
-        test("loadIvy") - retry(3){ // ivy or maven central seems to be flaky =/ =/ =/
+//    println("+LHY")
+//    println(
+//      os.read.lines(os.resource / "ammonite-api-whitelist.txt")
+//        .filter(_.contains("ammonite"))
+//        .mkString("\n")
+//    )
+//    println("-LHY")
+    test("exec") {
+      test("compilationBlocks") {
+        test("loadIvy") - retry(3) { // ivy or maven central seems to be flaky =/ =/ =/
           check.session(s"""
             @ import os._
 
@@ -27,8 +34,8 @@ object ScriptTests extends TestSuite{
             r: String = "<a href=\\"www.google.com\\">omg</a>"
 
             """)
-          }
-        test("preserveImports"){
+        }
+        test("preserveImports") {
           check.session(s"""
             @ import os._
 
@@ -38,7 +45,7 @@ object ScriptTests extends TestSuite{
             r: Left[String, Nothing] = ${Print.Left(value = "\"asd\"")}
             """)
         }
-        test("annotation"){
+        test("annotation") {
           check.session(s"""
             @ import os._
 
@@ -48,7 +55,7 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        test("syntax"){
+        test("syntax") {
           check.session(s"""
             @ import os._
 
@@ -58,7 +65,7 @@ object ScriptTests extends TestSuite{
             r: Int = 24
             """)
         }
-        test("limitImports"){
+        test("limitImports") {
           check.session(s"""
             @ import os._
 
@@ -69,25 +76,25 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      test("failures"){
-        test("syntaxError"){
+      test("failures") {
+        test("syntaxError") {
           val errorChunk =
             if (check.scala2)
               """
-   |            @ val r = res
-   |            error: not found: value res
-   |            val r = res
-   |                    ^
-   |            Compilation Failed
-   |          """.stripMargin
+                |            @ val r = res
+                |            error: not found: value res
+                |            val r = res
+                |                    ^
+                |            Compilation Failed
+                |          """.stripMargin
             else
               """
-   |            @ val r = res
-   |            error: val r = res
-   |                    ^^^
-   |                    Not found: res
-   |            Compilation Failed
-   |          """.stripMargin
+                |            @ val r = res
+                |            error: val r = res
+                |                    ^^^
+                |                    Not found: res
+                |            Compilation Failed
+                |          """.stripMargin
           check.session(s"""
             @ import os._
 
@@ -97,24 +104,24 @@ object ScriptTests extends TestSuite{
             $errorChunk
             """)
         }
-        test("compilationError"){
+        test("compilationError") {
           val errorChunk =
             if (check.scala2)
               """
-   |            @ val r = res
-   |            error: not found: value res
-   |            val r = res
-   |                    ^
-   |            Compilation Failed
-   |          """.stripMargin
+                |            @ val r = res
+                |            error: not found: value res
+                |            val r = res
+                |                    ^
+                |            Compilation Failed
+                |          """.stripMargin
             else
               """
-   |            @ val r = res
-   |            error: val r = res
-   |                    ^^^
-   |                    Not found: res
-   |            Compilation Failed
-   |          """.stripMargin
+                |            @ val r = res
+                |            error: val r = res
+                |                    ^^^
+                |                    Not found: res
+                |            Compilation Failed
+                |          """.stripMargin
           check.session(s"""
             @  import os._
 
@@ -124,33 +131,32 @@ object ScriptTests extends TestSuite{
             $errorChunk
             """)
         }
-        test("nofile"){
+        test("nofile") {
           check.session(s"""
             @ import os._
 
             @ repl.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
-            """
-          )
+            """)
         }
-        test("multiBlockError"){
+        test("multiBlockError") {
           val errorChunk =
             if (check.scala2)
               """
-    |            @ val r2 = res2
-    |            error: not found: value res2
-    |            val r2 = res2
-    |                     ^
-    |            Compilation Failed
-    |          """.stripMargin
+                |            @ val r2 = res2
+                |            error: not found: value res2
+                |            val r2 = res2
+                |                     ^
+                |            Compilation Failed
+                |          """.stripMargin
             else
               """
-    |            @ val r2 = res2
-    |            error: val r2 = res2
-    |                    ^^^^
-    |                    Not found: res2
-    |            Compilation Failed
-    |          """.stripMargin
+                |            @ val r2 = res2
+                |            error: val r2 = res2
+                |                    ^^^^
+                |                    Not found: res2
+                |            Compilation Failed
+                |          """.stripMargin
           check.session(s"""
             @ import os._
 
@@ -161,7 +167,7 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      test("nestedScripts"){
+      test("nestedScripts") {
         check.session(s"""
           @ import os._
 
@@ -174,8 +180,8 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
-      test("sheBang"){
-        test("singleLine"){
+      test("sheBang") {
+        test("singleLine") {
           check.session(s"""
             @  import os._
 
@@ -185,7 +191,7 @@ object ScriptTests extends TestSuite{
             r: Int = 42
             """)
         }
-        test("multiLine"){
+        test("multiLine") {
           check.session(
             s"""
             @  import os._
@@ -194,15 +200,16 @@ object ScriptTests extends TestSuite{
 
             @ val r = res
             r: Int = 42
-            """)
+            """
+          )
         }
       }
 
     }
 
-    test("module"){
-      test("compilationBlocks"){
-        test("loadIvy"){
+    test("module") {
+      test("compilationBlocks") {
+        test("loadIvy") {
           check.session(s"""
             @ import os._
 
@@ -212,7 +219,7 @@ object ScriptTests extends TestSuite{
             r: String = "<a href=\\"www.google.com\\">omg</a>"
            """)
         }
-        test("preserveImports"){
+        test("preserveImports") {
           check.session(s"""
             @ import os._
 
@@ -223,7 +230,7 @@ object ScriptTests extends TestSuite{
             """)
 
         }
-        test("annotation"){
+        test("annotation") {
 
           check.session(s"""
           @ import os._
@@ -234,8 +241,8 @@ object ScriptTests extends TestSuite{
           r: Int = 24
           """)
         }
-        test("syntax"){
-            check.session(s"""
+        test("syntax") {
+          check.session(s"""
               @ import os._
 
               @ interp.load.module($printedScriptPath/"BlockSepSyntax.sc")
@@ -244,7 +251,7 @@ object ScriptTests extends TestSuite{
               r: Int = 24
             """)
         }
-        test("limitImports"){
+        test("limitImports") {
           check.session(s"""
             @ import os._
 
@@ -255,8 +262,8 @@ object ScriptTests extends TestSuite{
             """)
         }
       }
-      test("failures"){
-        test("syntaxError"){
+      test("failures") {
+        test("syntaxError") {
           val errorChunk =
             if (check.scala2)
               """
@@ -283,7 +290,7 @@ object ScriptTests extends TestSuite{
             $errorChunk
             """)
         }
-        test("compilationError"){
+        test("compilationError") {
           val errorChunk =
             if (check.scala2)
               """
@@ -309,16 +316,15 @@ object ScriptTests extends TestSuite{
 
             $errorChunk""")
         }
-        test("nofile"){
+        test("nofile") {
           check.session(s"""
             @ import os._
 
             @ repl.load.exec($printedScriptPath/"notHere")
             error: java.nio.file.NoSuchFileException
-            """
-          )
+            """)
         }
-        test("scriptWithoutExtension"){
+        test("scriptWithoutExtension") {
           val storage = new Storage.Folder(os.temp.dir(prefix = "ammonite-tester"))
           val interp2 = createTestInterp(
             storage,
@@ -326,11 +332,11 @@ object ScriptTests extends TestSuite{
           )
 
           val Res.Failure(msg) =
-            Scripts.runScript(os.pwd, os.pwd/"scriptWithoutExtension", interp2)
+            Scripts.runScript(os.pwd, os.pwd / "scriptWithoutExtension", interp2)
 
           assert(msg.contains("Script file not found"))
         }
-        test("multiBlockError"){
+        test("multiBlockError") {
           val errorCheck =
             if (check.scala2)
               """
@@ -356,7 +362,7 @@ object ScriptTests extends TestSuite{
           """ + errorCheck)
         }
       }
-      test("encapsulation"){
+      test("encapsulation") {
         check.session(s"""
             @ import os._
 
@@ -364,10 +370,9 @@ object ScriptTests extends TestSuite{
 
             @ interp.load.module($printedScriptPath/"Encapsulation.sc")
             error: ${check.notFound("asd")}
-            """
-        )
+            """)
       }
-      test("nestedScripts"){
+      test("nestedScripts") {
         check.session(s"""
           @ import os._
 
@@ -380,7 +385,7 @@ object ScriptTests extends TestSuite{
           b: Int = 1
           """)
       }
-      test("noUnWrapping"){
+      test("noUnWrapping") {
         if (check.scala2) check.session(s"""
           @ import os._
 
@@ -394,8 +399,8 @@ object ScriptTests extends TestSuite{
         """) else "Disabled in Scala 3"
         // not sure why, in Scala 3, the parser slurps the first '{'…
       }
-      test("resolverWithinScript"){
-        test("pass"){
+      test("resolverWithinScript") {
+        test("pass") {
           if (scala2_11) check.session(s"""
             @ import os._
 
@@ -404,7 +409,7 @@ object ScriptTests extends TestSuite{
 
           """)
         }
-        test("fail"){
+        test("fail") {
           if (scala2_11) check.session(s"""
             @ import os._
 
@@ -413,14 +418,14 @@ object ScriptTests extends TestSuite{
           """)
         }
       }
-      test("resolverStatic"){
-          check.session(s"""
+      test("resolverStatic") {
+        check.session(s"""
             @ import os._
 
             @ interp.load.module($printedScriptPath/"ResolversStatic.sc")
           """)
       }
-      test("loadIvyAdvanced"){
+      test("loadIvyAdvanced") {
         check.session(s"""
         @ import os._
 

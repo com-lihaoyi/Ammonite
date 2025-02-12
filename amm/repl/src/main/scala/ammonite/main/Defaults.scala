@@ -8,8 +8,8 @@ import coursierapi.Dependency
 import scala.io.Codec
 
 /**
-  * Constants used in the default configuration for the Ammonite REPL
-  */
+ * Constants used in the default configuration for the Ammonite REPL
+ */
 object Defaults extends DefaultsScalaVersionSpecific {
 
   val welcomeBanner = {
@@ -23,7 +23,7 @@ object Defaults extends DefaultsScalaVersionSpecific {
   def ammoniteHome = os.Path(System.getProperty("user.home")) / ".ammonite"
 
   def alreadyLoadedDependencies(
-    resourceName: String = "amm-dependencies.txt"
+      resourceName: String = "amm-dependencies.txt"
   ): Seq[Dependency] = {
 
     var is: InputStream = null
@@ -36,12 +36,14 @@ object Defaults extends DefaultsScalaVersionSpecific {
         .mkString
         .split('\n')
         .filter(_.nonEmpty)
-        .map(l => l.split(':') match {
-          case Array(org, name, ver) =>
-            Dependency.of(org, name, ver)
-          case other =>
-            throw new Exception(s"Cannot parse line '$other' from resource $resourceName")
-        })
+        .map(l =>
+          l.split(':') match {
+            case Array(org, name, ver) =>
+              Dependency.of(org, name, ver)
+            case other =>
+              throw new Exception(s"Cannot parse line '$other' from resource $resourceName")
+          }
+        )
     } finally {
       if (is != null)
         is.close()

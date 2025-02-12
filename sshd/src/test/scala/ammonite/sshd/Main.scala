@@ -10,9 +10,10 @@ import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 object Main {
-  def main(args:Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     val config = SshServerConfig(
-      "localhost", 2222,
+      "localhost",
+      2222,
       passwordAuthenticator = None,
       publicKeyAuthenticator = Some(publicKeyChecker)
     )
@@ -20,7 +21,7 @@ object Main {
 
     ammoniteServer.start()
     println(s"Ammonite server started. $helpMessage." +
-            s"To connect use ssh [${currentUserName}@]<host> -p${config.port}")
+      s"To connect use ssh [${currentUserName}@]<host> -p${config.port}")
     exitAwaitLoop()
     ammoniteServer.stop()
 
@@ -31,10 +32,10 @@ object Main {
     def authenticate(username: String, key: PublicKey, session: ServerSession): Boolean = {
       val keys = AuthorizedKeysAuthenticator.readDefaultAuthorizedKeys()
       username == currentUserName &&
-        keys.asScala
-          .exists { entry =>
-            KeyUtils.compareKeys(entry.resolvePublicKey(PublicKeyEntryResolver.IGNORING), key)
-          }
+      keys.asScala
+        .exists { entry =>
+          KeyUtils.compareKeys(entry.resolvePublicKey(PublicKeyEntryResolver.IGNORING), key)
+        }
     }
   }
 

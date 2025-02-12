@@ -1,7 +1,7 @@
 package ammonite.testcode
 
 package paulp1 {
-  class Paulp{
+  class Paulp {
     override def toString = "paulp1.Paulp1"
   }
 }
@@ -12,13 +12,11 @@ package paulp2 {
   }
 }
 
-
 package paulp3 {
   object Paulp {
     override def toString = "paulp3.Paulp-object"
   }
-  class Paulp{
+  class Paulp {
     override def toString = "paulp3.Paulp-class"
   }
 }
-

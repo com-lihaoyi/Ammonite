@@ -26,7 +26,7 @@ object PositionOffsetConversion {
 
     def isAtEndOfLine(idx: Int) = charAtIsEOL(idx) {
       case CR | LF => true
-      case _       => false
+      case _ => false
     }
 
     val buf = new mutable.ArrayBuffer[Int]
@@ -114,18 +114,19 @@ object PositionOffsetConversion {
   private val firstLineWrapperPrefix = "/*<script>*/"
 
   def scalaPosToScPos(
-    scCode: String,
-    startLineInSc: Int,
-    startPosInSc: Int,
-    scalaCode: String,
-    startOffsetInScala: Int
+      scCode: String,
+      startLineInSc: Int,
+      startPosInSc: Int,
+      scalaCode: String,
+      startOffsetInScala: Int
   ): (Int, Int) => Option[(Int, Int)] = {
     val lineStartIndicesScala = lineStartIndices(scalaCode)
     val offsetToPosScala = offsetToPos(scalaCode)
     val generatedCodeIndicesScala =
       sections(
         scalaCode,
-        "/*<amm>*/", "/*</amm>*/"
+        "/*<amm>*/",
+        "/*</amm>*/"
       ).toVector
     val startPosInScala = offsetToPosScala(startOffsetInScala)
 

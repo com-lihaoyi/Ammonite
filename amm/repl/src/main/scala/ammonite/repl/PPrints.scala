@@ -5,7 +5,7 @@ import ammonite.runtime.tools.GrepResult
 import ammonite.util.Util
 import pprint.Renderer
 
-object PPrints{
+object PPrints {
   def replPPrintHandlers(width: => Int): PartialFunction[Any, pprint.Tree] = {
 //    case x: os.Path => PPrints.pathRepr(x)
 //    case x: os.RelPath => PPrints.relPathRepr(x)
@@ -14,13 +14,12 @@ object PPrints{
     case t: scala.xml.Elem => pprint.Tree.Lazy(_ => Iterator(t.toString))
   }
 
-
   def reprSection(s: String, cfg: pprint.Tree.Ctx): fansi.Str = {
     val validIdentifier = "([a-zA-Z_][a-zA-Z_0-9]+)".r
 
-    if (validIdentifier.findFirstIn(s) == Some(s)){
+    if (validIdentifier.findFirstIn(s) == Some(s)) {
       cfg.literalColor('\'' + s)
-    }else{
+    } else {
       cfg.literalColor(pprint.Util.literalize(s))
     }
   }
@@ -36,4 +35,3 @@ object PPrints{
   )
 
 }
-

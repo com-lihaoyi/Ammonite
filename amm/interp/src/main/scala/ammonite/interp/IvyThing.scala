@@ -7,11 +7,10 @@ import coursierapi.{Cache, Dependency, Fetch, Logger, Repository}
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-
-object IvyThing{
+object IvyThing {
   def completer(
-    repositories: Seq[Repository],
-    verbose: Boolean
+      repositories: Seq[Repository],
+      verbose: Boolean
   ): String => (Int, Seq[String]) = {
     val cache = Cache.create()
       .withLogger(if (verbose) Logger.progressBars() else Logger.nop)
@@ -27,11 +26,13 @@ object IvyThing{
         .complete()
       (res.getFrom, res.getCompletions.asScala.toVector)
   }
-  def resolveArtifact(repositories: Seq[Repository],
-                      dependencies: Seq[Dependency],
-                      verbose: Boolean,
-                      output: PrintStream,
-                      hooks: Seq[Fetch => Fetch]) = synchronized {
+  def resolveArtifact(
+      repositories: Seq[Repository],
+      dependencies: Seq[Dependency],
+      verbose: Boolean,
+      output: PrintStream,
+      hooks: Seq[Fetch => Fetch]
+  ) = synchronized {
     val fetch = Fetch.create()
       .addDependencies(dependencies: _*)
       .withRepositories(repositories: _*)
@@ -51,8 +52,8 @@ object IvyThing{
         def noChangingArtifact = res.getArtifacts.asScala.forall(!_.getKey.isChanging)
         def noVersionInterval = dependencies.map(_.getVersion).forall { v =>
           !v.startsWith("latest.") &&
-            !v.exists(Set('[', ']', '(', ')')) &&
-            !v.endsWith("+")
+          !v.exists(Set('[', ']', '(', ')')) &&
+          !v.endsWith("+")
         }
         val files = res.getFiles.asScala.toList
         Right((!customParams && noChangingArtifact && noVersionInterval, files))
@@ -62,4 +63,3 @@ object IvyThing{
   val defaultRepositories = Repository.defaults().asScala.toList
 
 }
-
