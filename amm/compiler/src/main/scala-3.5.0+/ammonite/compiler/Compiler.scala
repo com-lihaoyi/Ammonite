@@ -223,7 +223,7 @@ class Compiler(
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =
-      new CompilationUnit(ctx.source):
+      new CompilationUnit(ctx.source, null):
         // as done in
         // https://github.com/lampepfl/dotty/blob/3.0.0-M3/
         //   compiler/src/dotty/tools/repl/ReplCompillationUnit.scala/#L8
@@ -340,7 +340,7 @@ class Compiler(
     implicit val ctx: Context = run.runContext.withSource(sourceFile)
 
     val unit =
-      new CompilationUnit(ctx.source):
+      new CompilationUnit(ctx.source, null):
         override def isSuspendable: Boolean = false
     ctx
       .run

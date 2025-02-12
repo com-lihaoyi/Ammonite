@@ -1,6 +1,5 @@
-#!/usr/bin/env amm
+package build.ci
 
-@main
 def apply(
     uploadedFile: os.Path,
     tagName: String,

@@ -15,6 +15,13 @@ object ScriptTests extends TestSuite {
 
     val printedScriptPath = """pwd/"amm"/"src"/"test"/"resources"/"scripts""""
 
+//    println("+LHY")
+//    println(
+//      os.read.lines(os.resource / "ammonite-api-whitelist.txt")
+//        .filter(_.contains("ammonite"))
+//        .mkString("\n")
+//    )
+//    println("-LHY")
     test("exec") {
       test("compilationBlocks") {
         test("loadIvy") - retry(3) { // ivy or maven central seems to be flaky =/ =/ =/
