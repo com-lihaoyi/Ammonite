@@ -196,6 +196,8 @@ object BuiltinTests extends TestSuite {
       } else {
         val configCompiler = if (check.scala2)
           """@ interp.configureCompiler(_.settings.language.tryToSet(List("dynamics")))"""
+        else if (check.scala3_5_1OrHigher)
+          """@ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, ctx.settings.language.choices.toList.flatten.asInstanceOf[List[dotty.tools.dotc.config.Settings.Setting.ChoiceWithHelp[String]]].filter(_.name == "dynamics")))"""
         else
           """@ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, List("dynamics")))"""
         check.session(s"""
