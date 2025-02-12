@@ -5,9 +5,9 @@ import dotty.tools.dotc.ast.untpd
 import dotty.tools.dotc.core.Contexts._
 import dotty.tools.dotc.core.Denotations.SingleDenotation
 import dotty.tools.dotc.core.Flags._
-import dotty.tools.dotc.core.Names.{Name, termName}
+import dotty.tools.dotc.core.Names.Name
+import dotty.tools.dotc.core.Phases
 import dotty.tools.dotc.core.Symbols.{Symbol, defn}
-import dotty.tools.dotc.core.TypeError
 import dotty.tools.dotc.interactive.{Completion, Interactive}
 import dotty.tools.dotc.util.SourcePosition
 
@@ -24,7 +24,7 @@ object AmmCompletion extends AmmCompletionExtras {
       path,
       dependencyCompleteOpt,
       enableDeep
-    )(using Interactive.contextOfPath(path))
+    )(using Interactive.contextOfPath(path).withPhase(Phases.typerPhase))
   }
 
   def computeCompletions(
