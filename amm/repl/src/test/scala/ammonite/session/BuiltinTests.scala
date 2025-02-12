@@ -139,17 +139,20 @@ object BuiltinTests extends TestSuite {
       // not sure why that one doesn't pass in 2.13
       // even disabling the noimports and imports settings instead of setting noimports to false
       // doesn't seem to reinstate imports
-      def sv = scala.util.Properties.versionNumberString
       // In 2.12.13, I would have expected things like
       //   interp.configureCompiler(_.settings.Wconf.tryToSet(List("any:wv", "cat=unchecked:ws")))
       // to re-instate the expected warning below, to no avail :|
-      if (TestUtils.scala2_12 && sv.stripPrefix("2.12.").toInt <= 12) check.session(s"""
+      // if 2.12.19 > fails re add condition: scala.util.Properties.versionNumberString.stripPrefix("2.12.").toInt <= 19
+      if (TestUtils.scala2_12) {
+        check.session(s"""
         @ // Disabling default Scala imports
 
         @ List(1, 2, 3) + "lol"
         res0: String = "List(1, 2, 3)lol"
 
         @ interp.configureCompiler(_.settings.noimports.value = true)
+
+        @ // interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.YnoImports, true)) // Dotty
 
         @ List(1, 2, 3) + "lol" // predef imports disappear
         error: not found: value List
@@ -190,6 +193,49 @@ object BuiltinTests extends TestSuite {
         @ repl.compiler.settings.nowarnings.value
         res10: Boolean = false
       """)
+      } else {
+        val configCompiler = if (check.scala2)
+          """@ interp.configureCompiler(_.settings.language.tryToSet(List("dynamics")))"""
+        else if (check.scala3_5_1OrHigher)
+          """@ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, ctx.settings.language.choices.toList.flatten.asInstanceOf[List[dotty.tools.dotc.config.Settings.Setting.ChoiceWithHelp[String]]].filter(_.name == "dynamics")))"""
+        else
+          """@ interp.preConfigureCompiler(ctx => ctx.setSetting(ctx.settings.language, List("dynamics")))"""
+        check.session(s"""
+          @ object X extends Dynamic
+          error: extension of type scala.Dynamic needs to be enabled
+
+          $configCompiler
+
+          @ object X extends Dynamic
+          defined object X
+        """)
+      }
+    }
+    test("scalacOptions") {
+      if (check.scala2)
+        check.session("""
+          @ val scalacOptions = List("-Yno-imports")
+
+          @ repl.compiler.settings.noimports.value
+          res1: Boolean = false
+
+          @ interp.preConfigureCompiler(_.processArguments(scalacOptions, true))
+
+          @ repl.compiler.settings.noimports.value
+          res3: scala.Boolean = true
+        """)
+      else
+        check.session("""
+          @ val scalacOptions = List("-explain")
+
+          @ repl.initialContext.settings.explain.value(using repl.initialContext)
+          res1: Boolean = false
+
+          @ interp.preConfigureCompiler(ctx => ctx.setSettings(ctx.settings.processArguments(scalacOptions, true, ctx.settingsState).sstate))
+
+          @ repl.initialContext.settings.explain.value(using repl.initialContext)
+          res3: Boolean = true
+        """)
     }
     test("infoLogging") {
       if (check.scala2)

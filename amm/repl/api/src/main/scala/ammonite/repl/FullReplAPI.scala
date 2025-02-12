@@ -11,7 +11,7 @@ import scala.reflect.classTag
 
 trait FullReplAPI extends ReplAPI with FullReplAPIScalaVersionSpecific { replApi =>
 
-  protected val colors: Ref[Colors]
+  protected[ammonite] val colors: Ref[Colors]
 
   def help =
     """Welcome to the Ammonite Scala REPL! Enter a Scala expression and it will be evaluated.
@@ -23,7 +23,7 @@ trait FullReplAPI extends ReplAPI with FullReplAPIScalaVersionSpecific { replApi
       |description of how to use the REPL, check out https://ammonite.io
     """.stripMargin.trim
 
-  protected[this] def replArgs0: IndexedSeq[Bind[_]]
+  protected[ammonite] def replArgs0: IndexedSeq[Bind[_]]
   protected[this] def internal0: FullReplAPI.Internal =
     new FullReplAPI.Internal {
       def pprinter = replApi.pprinter

@@ -20,6 +20,7 @@ object LineNumberTests extends TestSuite {
 
     val sv = ammonite.compiler.CompilerBuilder.scalaVersion
     val isScala2 = sv.startsWith("2.")
+    val isPre3_3_4 = sv < "3.3.4"
 
     test("sourcecode") {
       if (isScala2) {
@@ -132,12 +133,21 @@ object LineNumberTests extends TestSuite {
             s"""$path:14: not found: value printnl
                |val res_0 = printnl("OK")
                |            ^""".stripMargin
-          else {
+          else if (isPre3_3_4) {
             val sp = " "
             s"""-- [E006] Not Found Error: $path:1:12$sp
                |1 |val res_0 = printnl("OK")
                |  |            ^^^^^^^
                |  |            Not found: printnl""".stripMargin
+          }
+          else {
+            val sp = " "
+            s"""-- [E006] Not Found Error: $path:1:12$sp
+               |1 |val res_0 = printnl("OK")
+               |  |            ^^^^^^^
+               |  |    Not found: printnl - did you mean print? or perhaps printf or println?
+               |  |
+               |  | longer explanation available when compiling with `-explain`""".stripMargin
           }
         )
       )
@@ -152,12 +162,21 @@ object LineNumberTests extends TestSuite {
             s"""$path:30: not found: value prinntl
                |val res = prinntl("Ammonite")
                |          ^""".stripMargin
-          else {
+          else if (isPre3_3_4) {
             val sp = " "
             s"""-- [E006] Not Found Error: $path:3:10$sp
                |3 |val res = prinntl("Ammonite")
                |  |          ^^^^^^^
                |  |          Not found: prinntl""".stripMargin
+          }
+          else {
+            val sp = " "
+            s"""-- [E006] Not Found Error: $path:3:10$sp
+               |3 |val res = prinntl("Ammonite")
+               |  |          ^^^^^^^
+               |  |    Not found: prinntl - did you mean print? or perhaps printf or println?
+               |  |
+               |  | longer explanation available when compiling with `-explain`""".stripMargin
           }
         )
       )
