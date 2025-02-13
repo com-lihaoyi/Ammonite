@@ -14,7 +14,11 @@ if [ -z "$SCALA_VERSION" ] ; then
   SCALA_VERSION=$DEFAULT_SCALA_VERSION
 fi
 
-AMM_DOWNLOAD_PATH="$HOME/.ammonite/download"
+if [ "x${XDG_CACHE_HOME}" != "x" ] ; then
+  AMM_DOWNLOAD_PATH="${XDG_CACHE_HOME}/ammonite/download"
+else
+  AMM_DOWNLOAD_PATH="${HOME}/.cache/ammonite/download"
+fi
 AMM_EXEC_PATH="${AMM_DOWNLOAD_PATH}/${AMM_VERSION}_$SCALA_VERSION"
 
 if [ ! -x "$AMM_EXEC_PATH" ] ; then
