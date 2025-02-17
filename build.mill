@@ -102,7 +102,7 @@ val (buildVersion, unstable) = scala.util.Try(
 
 val bspVersion = "2.1.1"
 val fastparseVersion = "3.1.1"
-val scalametaVersion = "4.9.9"
+val scalametaVersion = "4.10.0"
 
 object Deps {
   val acyclic = ivy"com.lihaoyi:::acyclic:0.3.16"
@@ -144,9 +144,8 @@ object Deps {
   val sourcecode = ivy"com.lihaoyi::sourcecode:0.4.3-M5"
   val sshdCore = ivy"org.apache.sshd:sshd-core:1.2.0"
   val scalametaCommon = ivy"org.scalameta::common:$scalametaVersion"
-  val scalametaSemantidbShared = ivy"org.scalameta:::semanticdb-shared:$scalametaVersion"
-  def scalametaSemantidbShared213(scala213Version: String) =
-    ivy"org.scalameta:semanticdb-shared_$scala213Version:$scalametaVersion"
+  val scalametaSemantidbShared = ivy"org.scalameta::semanticdb-shared:$scalametaVersion"
+  val scalametaSemantidbShared213 = ivy"org.scalameta:semanticdb-shared_2.13:$scalametaVersion"
   val typename = ivy"org.tpolecat::typename:1.1.0"
   val upickle = ivy"com.lihaoyi::upickle:4.1.0"
 
@@ -476,27 +475,16 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         Agg(
           Deps.sourcecode,
           Deps.scalaCollectionCompat,
-          Deps.scalametaSemantidbShared213("2.13.16")
+          Deps.scalametaSemantidbShared213
             // we remove transitive _2.13 dependencies from Scala 3 and
             // then we add it back with _3
             .exclude("com.lihaoyi" -> "sourcecode_2.13")
             .exclude("org.scala-lang.modules" -> "scala-collection-compat_2.13")
         )
-      else {
-        import coursier.core.Version
-        val sv = scalaVersion()
-        val useCommonScalaVersions0 =
-          (sv.startsWith("2.12.") && Version(sv) <= Version("2.12.15")) ||
-          (sv.startsWith("2.13.") && Version(sv) <= Version("2.13.10"))
-        if (useCommonScalaVersions0)
-          Agg(
-            Deps.scalametaCommon
-          )
-        else
-          Agg(
-            Deps.scalametaSemantidbShared
-          )
-      }
+      else
+        Agg(
+          Deps.scalametaSemantidbShared
+        )
     }
   }
 
