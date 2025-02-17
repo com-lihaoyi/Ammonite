@@ -531,10 +531,10 @@ object AmmoniteBuildServerTests extends TestSuite {
           val events = runner.client.taskEvents()
           val messages = events.collect {
             case TestBuildClient.TaskEvent.Start(params)
-                if params.getDataKind == TaskDataKind.COMPILE_TASK =>
+                if params.getDataKind == TaskStartDataKind.COMPILE_TASK =>
               params.getMessage
             case TestBuildClient.TaskEvent.Finish(params)
-                if params.getDataKind == TaskDataKind.COMPILE_REPORT =>
+                if params.getDataKind == TaskFinishDataKind.COMPILE_REPORT =>
               params.getMessage
           }
           val expectedMessages = Seq(

@@ -125,7 +125,7 @@ class AmmoniteBuildServer(
     Executors.newFixedThreadPool(1, threadFactory("ammonite-bsp-compile"))
   )
 
-  override def onConnectWithClient(client: BuildClient): Unit = {
+  def onConnectWithClient(client: BuildClient): Unit = {
     clientOpt = Some(client)
   }
 
@@ -190,7 +190,13 @@ class AmmoniteBuildServer(
       List.empty[String].asJava,
       List("scala").asJava,
       directDeps.map(buildTargetIdentifier).asJava,
-      new BuildTargetCapabilities(true, false, false)
+      {
+        val capabilities = new BuildTargetCapabilities
+        capabilities.setCanCompile(true)
+        capabilities.setCanTest(false)
+        capabilities.setCanRun(false)
+        capabilities
+      }
     )
     target.setBaseDirectory(path.toNIO.toAbsolutePath.getParent.toUri.toASCIIString)
     target.setDisplayName(path.last)
@@ -318,7 +324,7 @@ class AmmoniteBuildServer(
       val startParams = new TaskStartParams(taskId)
       startParams.setEventTime(System.currentTimeMillis())
       startParams.setMessage(s"Compiling $path")
-      startParams.setDataKind(TaskDataKind.COMPILE_TASK)
+      startParams.setDataKind(TaskStartDataKind.COMPILE_TASK)
       startParams.setData(new CompileTask(target))
       client.onBuildTaskStart(startParams)
     }
@@ -348,7 +354,7 @@ class AmmoniteBuildServer(
       )
       finishParams.setEventTime(System.currentTimeMillis())
       finishParams.setMessage(if (success) s"Compiled $path" else s"Error compiling $path")
-      finishParams.setDataKind(TaskDataKind.COMPILE_REPORT)
+      finishParams.setDataKind(TaskFinishDataKind.COMPILE_REPORT)
       finishParams.setData(new CompileReport(target, errorCount, warningCount))
       clientOpt.foreach(_.onBuildTaskFinish(finishParams))
     }
@@ -458,7 +464,7 @@ class AmmoniteBuildServer(
   def buildTargetCleanCache(params: CleanCacheParams): CompletableFuture[CleanCacheResult] =
     on(compileEc) {
       compiler.clearCache()
-      new CleanCacheResult("", true)
+      new CleanCacheResult(true)
     }
 
   private val shutdownPromise = Promise[Unit]()
