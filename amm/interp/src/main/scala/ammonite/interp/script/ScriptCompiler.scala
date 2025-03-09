@@ -31,7 +31,7 @@ final class ScriptCompiler(
   def compile(
       module: Script,
       processor: ScriptProcessor,
-      doCompile: (Script, Script.ResolvedDependencies) => ScriptCompileResult = compile(_, _)
+      doCompile: (Script, Script.ResolvedDependencies) => ScriptCompileResult = compile
   ): (
       Map[Script, Seq[Diagnostic]],
       Either[String, Seq[AmmCompiler.Output]]

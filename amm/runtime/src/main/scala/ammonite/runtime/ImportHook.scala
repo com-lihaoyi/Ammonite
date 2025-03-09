@@ -196,9 +196,8 @@ object ImportHook {
         DependencyParser.parse(coords).map { dep =>
           val scalaVersion =
             if (
-              (dottyCompat || dep.userParams.get(
-                "compat"
-              ).nonEmpty) && !interp.scalaVersion.startsWith("2.")
+              (dottyCompat || dep.userParams.exists(_._1 == "compat")) &&
+              !interp.scalaVersion.startsWith("2.")
             )
               // When dotty compatibility is enabled, pull Scala 2.13 dependencies rather than Scala 3 ones.
               // versionNumberString gives us the right 2.13 version for the current Scala 3 version.
