@@ -148,7 +148,7 @@ object Deps {
   val typename = ivy"org.tpolecat::typename:1.1.0"
   val upickle = ivy"com.lihaoyi::upickle:4.1.0"
 
-  val utest = ivy"com.lihaoyi::utest:0.8.5"
+  val utest = ivy"com.lihaoyi::utest:0.8.9"
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
