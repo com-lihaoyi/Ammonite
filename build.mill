@@ -146,7 +146,7 @@ object Deps {
   val scalametaSemantidbShared = ivy"org.scalameta::semanticdb-shared:$scalametaVersion"
   val scalametaSemantidbShared213 = ivy"org.scalameta:semanticdb-shared_2.13:$scalametaVersion"
   val typename = ivy"org.tpolecat::typename:1.1.0"
-  val upickle = ivy"com.lihaoyi::upickle:4.1.0"
+  val upickle = ivy"com.lihaoyi::upickle:4.3.2"
 
   val utest = ivy"com.lihaoyi::utest:0.8.5"
 }
