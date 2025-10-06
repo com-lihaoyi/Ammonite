@@ -262,7 +262,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   }
   def repositoriesTask = T.task {
     super.repositoriesTask() ++ Seq(
-      mvn"https://scala-ci.typesafe.com/artifactory/scala-integration"
+      coursier.maven.MavenRepository("https://scala-ci.typesafe.com/artifactory/scala-integration")
     )
   }
   override implicit def crossSbtModuleResolver: mill.define.Cross.Resolver[CrossModuleBase] =
@@ -303,7 +303,7 @@ trait AmmModule extends AmmInternalModule with PublishModule {
     )
   )
 
-  def transitiveJars: T[Agg[PathRef]] = T {
+  def transitiveJars: T[Seq[PathRef]] = T {
     mill.define.Target.traverse(this +: moduleDeps)(m =>
       T.task { m.jar() }
     )()
