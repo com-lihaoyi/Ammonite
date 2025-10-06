@@ -41,6 +41,13 @@ abstract class Preprocessor {
 
 object Preprocessor {
 
+  /**
+    *
+    *
+    * @param code
+    * @param prefixCharLength
+    * @param userCodeNestingLevel if 0, assume code isn't generated / wrapped by Ammonite
+    */
   case class Output(
       code: String,
       prefixCharLength: Int,

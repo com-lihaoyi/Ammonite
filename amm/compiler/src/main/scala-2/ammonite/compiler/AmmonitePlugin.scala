@@ -106,7 +106,7 @@ object AmmonitePlugin {
     }
 
     userCodeNestingLevel match {
-      case 1 =>
+      case 0 | 1 =>
       /*
        * We don't try to determine what previous commands are actually used here.
        * userCodeNestingLevel == 1 likely corresponds to the default object-based
