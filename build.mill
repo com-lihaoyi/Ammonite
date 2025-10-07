@@ -152,26 +152,26 @@ object Deps {
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   // We need it to be a Boolean, not T[Boolean]
   def isCrossFullScalaVersion: Boolean = false
-  override def crossFullScalaVersion: T[Boolean] = T { isCrossFullScalaVersion }
-  override def skipBloop: Boolean = {
+  def crossFullScalaVersion: T[Boolean] = T { isCrossFullScalaVersion }
+  def skipBloop: Boolean = {
     val versions =
       if (isCrossFullScalaVersion) assemblyCrossScalaVersions else binCrossScalaVersions
     // no need to expose the modules for old Scala versions support in Bloop / Metals
     !versions.contains(crossScalaVersion)
   }
-  override def artifactName: T[String] = T {
+  def artifactName: T[String] = T {
     "ammonite-" + millOuterCtx.segments.parts.mkString("-").stripPrefix("amm-")
   }
   def isScala2: T[Boolean] = T { scalaVersion().startsWith("2.") }
-  override def scalacOptions: T[Seq[String]] = T {
+  def scalacOptions: T[Seq[String]] = T {
     if (isScala2()) Seq("-P:acyclic:force")
     else Nil
   }
-  override def compileIvyDeps: T[Agg[Dep]] = T {
+  def compileIvyDeps: T[Agg[Dep]] = T {
     if (isScala2()) Agg(Deps.acyclic)
     else Agg[Dep]()
   }
-  override def scalacPluginIvyDeps: T[Agg[Dep]] = T {
+  def scalacPluginIvyDeps: T[Agg[Dep]] = T {
     if (isScala2()) Agg(Deps.acyclic)
     else Agg[Dep]()
   }
@@ -186,14 +186,14 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     )
   }
   trait AmmTests extends super.CrossSbtTests with TestModule.Utest {
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(Deps.utest)
-    override def forkArgs: T[Seq[String]] = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
-    override def testForkGrouping: T[Seq[Seq[String]]] = discoveredTestClasses().grouped(1).toSeq
-    override def testSandboxWorkingDir: T[Boolean] = false
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(Deps.utest)
+    def forkArgs: T[Seq[String]] = Seq("-Xmx2g", "-Dfile.encoding=UTF8")
+    def testForkGrouping: T[Seq[Seq[String]]] = discoveredTestClasses().grouped(1).toSeq
+    def testSandboxWorkingDir: T[Boolean] = false
   }
   def allBoundIvyDeps: T[Agg[BoundDep]] =
     T { (allIvyDeps() ++ scalaLibraryIvyDeps()).map(bindDependency()) }
-  override def sources: T[Seq[PathRef]] = Task.Sources {
+  def sources: T[Seq[PathRef]] = Task.Sources {
     val sv = scalaVersion()
     val extraDir =
       if (sv.startsWith("2.12.")) {
@@ -259,7 +259,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   def externalSources: T[Agg[PathRef]] = T {
     resolveDeps(allBoundIvyDeps, sources = true, artifactTypes = None)()
   }
-  override def repositoriesTask = Task.Anon {
+  def repositoriesTask = Task.Anon {
     super.repositoriesTask() ++ Seq(
       coursier.maven.MavenRepository("https://scala-ci.typesafe.com/artifactory/scala-integration")
     )
@@ -290,8 +290,8 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
     }
 }
 trait AmmModule extends AmmInternalModule with PublishModule {
-  override def publishVersion: T[String] = buildVersion
-  override def pomSettings = PomSettings(
+  def publishVersion: T[String] = buildVersion
+  def pomSettings = PomSettings(
     description = artifactName(),
     organization = "com.lihaoyi",
     url = s"https://github.com/${ghOrg}/${ghRepo}",
@@ -337,29 +337,29 @@ trait AmmDependenciesResourceFileModule extends JavaModule {
     }
   }
 
-  override def resources: T[Seq[PathRef]] = T.sources {
+  def resources: T[Seq[PathRef]] = T.sources {
     super.resources() ++ dependencyFileResources()
   }
 }
 
 object terminal extends Cross[TerminalModule](binCrossScalaVersions)
 trait TerminalModule extends AmmModule {
-  override def ivyDeps: T[Agg[Dep]] = T {
+  def ivyDeps: T[Agg[Dep]] = T {
     super.ivyDeps() ++ Agg(
       Deps.fansi,
       Deps.sourcecode
     )
   }
   object test extends AmmTests {
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(Deps.sourcecode)
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(Deps.sourcecode)
   }
 }
 
 object amm extends Cross[MainModule](fullCrossScalaVersions) {
   object util extends Cross[UtilModule](binCrossScalaVersions)
   trait UtilModule extends AmmModule {
-    override def moduleDeps: Seq[PublishModule] = Seq()
-    override def ivyDeps: T[Agg[Dep]] = T {
+    def moduleDeps: Seq[PublishModule] = Seq()
+    def ivyDeps: T[Agg[Dep]] = T {
       super.ivyDeps() ++ Agg(
         Deps.osLib,
         Deps.typename,
@@ -368,15 +368,15 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         Deps.pprint
       )
     }
-    override def compileIvyDeps: T[Agg[Dep]] = super.compileIvyDeps() ++
+    def compileIvyDeps: T[Agg[Dep]] = super.compileIvyDeps() ++
       (if (isScala3(crossScalaVersion)) Agg.empty[Dep] else Agg(Deps.scalaReflect(scalaVersion())))
   }
 
   object runtime extends Cross[RuntimeModule](fullCrossScalaVersions)
   trait RuntimeModule extends AmmModule {
-    override def moduleDeps: Seq[PublishModule] = Seq(amm.util(), interp.api(), amm.repl.api())
-    override def isCrossFullScalaVersion = true
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+    def moduleDeps: Seq[PublishModule] = Seq(amm.util(), interp.api(), amm.repl.api())
+    def isCrossFullScalaVersion = true
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
       Deps.classPathUtil,
       Deps.upickle,
       Deps.requests,
@@ -388,8 +388,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
   object compiler extends Cross[CompilerModule](fullCrossScalaVersions) {
     object interface extends Cross[CompilerInterfaceModule](fullCrossScalaVersions)
     trait CompilerInterfaceModule extends AmmModule {
-      override def isCrossFullScalaVersion = true
-      override def moduleDeps: Seq[PublishModule] = Seq(amm.util())
+      def isCrossFullScalaVersion = true
+      def moduleDeps: Seq[PublishModule] = Seq(amm.util())
       def exposedClassPath: T[Seq[PathRef]] = T {
         runClasspath() ++
           externalSources() ++
@@ -400,10 +400,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
   }
   trait CompilerModule extends AmmModule {
     def supports3 = true
-    override def moduleDeps: Seq[PublishModule] =
+    def moduleDeps: Seq[PublishModule] =
       Seq(amm.compiler.interface(), amm.util(), amm.repl.api())
-    override def isCrossFullScalaVersion = true
-    override def ivyDeps: T[Agg[Dep]] = T {
+    def isCrossFullScalaVersion = true
+    def ivyDeps: T[Agg[Dep]] = T {
       val scalaSpecificDeps =
         if (isScala2())
           Agg(
@@ -436,10 +436,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
     object api extends Cross[InterpApiModule](fullCrossScalaVersions)
     trait InterpApiModule extends AmmModule
         with AmmDependenciesResourceFileModule {
-      override def moduleDeps: Seq[PublishModule] = Seq(amm.compiler.interface(), amm.util())
-      override def isCrossFullScalaVersion = true
-      override def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
-      override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+      def moduleDeps: Seq[PublishModule] = Seq(amm.compiler.interface(), amm.util())
+      def isCrossFullScalaVersion = true
+      def dependencyResourceFileName = "amm-interp-api-dependencies.txt"
+      def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
         Deps.coursierInterface
       )
       override def docJar: T[PathRef] = if (isScala3(crossScalaVersion)) T {
@@ -468,10 +468,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
     }
   }
   trait InterpModule extends AmmModule {
-    override def moduleDeps: Seq[PublishModule] =
+    def moduleDeps: Seq[PublishModule] =
       Seq(amm.util(), amm.runtime(), amm.compiler.interface())
-    override def isCrossFullScalaVersion = true
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+    def isCrossFullScalaVersion = true
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
       Deps.bsp4j,
       Deps.fastparse
     ) ++ {
@@ -504,10 +504,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
     object api extends Cross[ReplApiModule](fullCrossScalaVersions)
     trait ReplApiModule extends AmmModule
         with AmmDependenciesResourceFileModule {
-      override def isCrossFullScalaVersion = true
-      override def dependencyResourceFileName = "amm-dependencies.txt"
-      override def moduleDeps: Seq[PublishModule] = Seq(amm.util(), interp.api())
-      override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+      def isCrossFullScalaVersion = true
+      def dependencyResourceFileName = "amm-dependencies.txt"
+      def moduleDeps: Seq[PublishModule] = Seq(amm.util(), interp.api())
+      def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
         Deps.mainargs,
         Deps.geny
       )
@@ -517,7 +517,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
                                                                      scalaVersion()
                                                                    )))
 
-      override def generatedSources: T[Seq[PathRef]] = T {
+      def generatedSources: T[Seq[PathRef]] = T {
         Seq(PathRef(generateConstantsFile(buildVersion, bspVersion = bspVersion)))
       }
 
@@ -531,29 +531,29 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
 
   }
   trait ReplModule extends AmmModule {
-    override def isCrossFullScalaVersion = true
-    override def moduleDeps: Seq[PublishModule] = Seq(
+    def isCrossFullScalaVersion = true
+    def moduleDeps: Seq[PublishModule] = Seq(
       amm.util(),
       amm.runtime(),
       amm.interp(),
       terminal(),
       amm.compiler.interface()
     )
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
       Deps.jlineTerminal,
       Deps.jlineJna,
       Deps.jlineReader,
       Deps.scalaXml(scalaVersion())
     )
-    override def compileIvyDeps: T[Agg[Dep]] =
+    def compileIvyDeps: T[Agg[Dep]] =
       super.compileIvyDeps() ++ (if (isScala3(crossScalaVersion)) Agg.empty[Dep]
                                  else Agg(Deps.scalaReflect(scalaVersion())))
 
     object test extends AmmTests with AmmDependenciesResourceFileModule {
       def crossScalaVersion: String = ReplModule.this.crossScalaVersion
-      override def scalaVersion: T[String] = ReplModule.this.scalaVersion
-      override def dependencyResourceFileName = "amm-test-dependencies.txt"
-      override def moduleDeps: Seq[JavaModule] = super.moduleDeps ++ Seq(amm.compiler())
+      def scalaVersion: T[String] = ReplModule.this.scalaVersion
+      def dependencyResourceFileName = "amm-test-dependencies.txt"
+      def moduleDeps: Seq[JavaModule] = super.moduleDeps ++ Seq(amm.compiler())
 
       def thinWhitelist: T[PathRef] = T {
         generateApiWhitelist(
@@ -566,11 +566,11 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         )
       }
 
-      override def runClasspath: T[Seq[PathRef]] = T {
+      def runClasspath: T[Seq[PathRef]] = T {
         super.runClasspath() ++ Agg(thinWhitelist())
       }
 
-      override def resources: T[Seq[PathRef]] = Task.Sources {
+      def resources: T[Seq[PathRef]] = Task.Sources {
         (super.resources() ++
           ReplModule.this.sources() ++
           ReplModule.this.externalSources() ++
@@ -580,7 +580,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
             artifactTypes = None
           )()).distinct
       }
-      override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
+      def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ amm.compiler().ivyDeps() ++ Agg(
         Deps.scalazCore
       )
     }
@@ -588,10 +588,10 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
 }
 
 trait MainModule extends AmmModule {
-  override def isCrossFullScalaVersion = true
-  override def mainClass: T[Option[String]] = Some("ammonite.AmmoniteMain")
-  override def artifactName = "ammonite"
-  override def moduleDeps: Seq[PublishModule] = Seq(
+  def isCrossFullScalaVersion = true
+  def mainClass: T[Option[String]] = Some("ammonite.AmmoniteMain")
+  def artifactName = "ammonite"
+  def moduleDeps: Seq[PublishModule] = Seq(
     terminal(),
     amm.util(),
     amm.runtime(),
@@ -602,7 +602,7 @@ trait MainModule extends AmmModule {
     amm.compiler()
   )
 
-  override def runClasspath: T[Seq[PathRef]] =
+  def runClasspath: T[Seq[PathRef]] =
     super.runClasspath() ++
       terminal().sources() ++
       amm.util().sources() ++
@@ -614,7 +614,7 @@ trait MainModule extends AmmModule {
       sources() ++
       externalSources()
 
-  override def prependShellScript: T[String] = T {
+  def prependShellScript: T[String] = T {
     mill.util.Jvm.launcherUniversalScript(
       mainClass().get,
       Agg("$0"),
@@ -630,11 +630,11 @@ trait MainModule extends AmmModule {
         amm.compiler().exposedClassPath()
     )
   }
-  override def localClasspath: T[Seq[PathRef]] = T {
+  def localClasspath: T[Seq[PathRef]] = T {
     Seq(thinWhitelist()) ++ super.localClasspath()
   }
 
-  override def launcher: T[PathRef] = {
+  def launcher: T[PathRef] = {
     val isWindows = scala.util.Properties.isWin
     if (isWindows)
       T {
@@ -669,9 +669,9 @@ trait MainModule extends AmmModule {
   }
 
   object test extends AmmTests {
-    override def moduleDeps: Seq[JavaModule] =
+    def moduleDeps: Seq[JavaModule] =
       super.moduleDeps ++ Seq(amm.compiler().test, amm.repl().test)
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
       Deps.scalaJava8Compat
     )
 
@@ -685,7 +685,7 @@ trait MainModule extends AmmModule {
     }
 
     // Need to duplicate this from MainModule due to Mill not properly propagating it through
-    override def runClasspath: T[Seq[PathRef]] =
+    def runClasspath: T[Seq[PathRef]] =
       Seq(thinWhitelist()) ++
         super.runClasspath() ++
         terminal().sources() ++
@@ -727,8 +727,8 @@ def generateApiWhitelist(replApiCp: Seq[PathRef])(implicit ctx: mill.api.Ctx.Des
 
 object integration extends Cross[IntegrationModule](fullCrossScalaVersions)
 trait IntegrationModule extends AmmInternalModule {
-  override def moduleDeps: Seq[JavaModule] = Seq(amm())
-  override def ivyDeps: T[Agg[Dep]] = T {
+  def moduleDeps: Seq[JavaModule] = Seq(amm())
+  def ivyDeps: T[Agg[Dep]] = T {
     super.ivyDeps() ++ (
       if (scalaVersion().startsWith("2.13."))
         Agg(Deps.cask)
@@ -743,7 +743,7 @@ trait IntegrationModule extends AmmInternalModule {
       else
         amm().assembly().path.toString
     }
-    override def forkEnv: T[Map[String, String]] = super.forkEnv() ++ Seq(
+    def forkEnv: T[Map[String, String]] = super.forkEnv() ++ Seq(
       "AMMONITE_ASSEMBLY" -> testLauncher()
     )
   }
@@ -751,15 +751,15 @@ trait IntegrationModule extends AmmInternalModule {
 
 object sshd extends Cross[SshdModule](fullCrossScalaVersions)
 trait SshdModule extends AmmModule {
-  override def moduleDeps: Seq[PublishModule] = Seq(amm())
-  override def isCrossFullScalaVersion = true
-  override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+  def moduleDeps: Seq[PublishModule] = Seq(amm())
+  def isCrossFullScalaVersion = true
+  def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
     // sshd-core 1.3.0 requires java8
     Deps.sshdCore,
     Deps.bcprovJdk15on
   )
   object test extends AmmTests {
-    override def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
+    def ivyDeps: T[Agg[Dep]] = super.ivyDeps() ++ Agg(
       // slf4j-nop makes sshd server use logger that writes into the void
       Deps.slf4jNop,
       Deps.jsch,
