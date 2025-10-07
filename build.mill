@@ -4,7 +4,6 @@ import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 import $ivy.`io.get-coursier::coursier-launcher:2.1.0-RC1`
 import $file.ci.upload
 import $packages._
-import coursier.MavenRepository
 
 // imports
 import java.util.concurrent.atomic.AtomicInteger
@@ -262,7 +261,7 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
   }
   override def repositoriesTask = Task.Anon {
     super.repositoriesTask() ++ Seq(
-      MavenRepository("https://scala-ci.typesafe.com/artifactory/scala-integration")
+      coursier.maven.MavenRepository("https://scala-ci.typesafe.com/artifactory/scala-integration")
     )
   }
   override implicit def crossSbtModuleResolver: mill.define.Cross.Resolver[CrossModuleBase] =
@@ -303,7 +302,7 @@ trait AmmModule extends AmmInternalModule with PublishModule {
     )
   )
 
-  override def transitiveJars: T[Seq[PathRef]] = T {
+  def transitiveJars: T[Seq[PathRef]] = T {
     mill.define.Target.traverse(this +: moduleDeps)(m =>
       Task.Anon { m.jar() }
     )()
@@ -415,7 +414,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         else
           Agg[Dep](
             mvn"org.scala-lang::scala3-compiler:${scalaVersion()}",
-            mvn"org.ow2.asm:asm:9.7.1"
+            mvn"org.ow2.asm:asm:9.9"
           )
       super.ivyDeps() ++ scalaSpecificDeps ++ Agg(
         Deps.javassist,
