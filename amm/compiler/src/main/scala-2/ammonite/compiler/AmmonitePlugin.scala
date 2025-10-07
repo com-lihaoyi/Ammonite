@@ -63,8 +63,7 @@ class AmmonitePlugin(
               unit,
               output,
               usedEarlierDefinitions,
-              userCodeNestingLevel,
-              topWrapperLen
+              userCodeNestingLevel
             )
           }
         }
@@ -80,8 +79,7 @@ object AmmonitePlugin {
       unit: g.CompilationUnit,
       output: Seq[ImportData] => Unit,
       usedEarlierDefinitions: Seq[String] => Unit,
-      userCodeNestingLevel: => Int,
-      topWrapperLen: => Int
+      userCodeNestingLevel: => Int
   ) = {
 
     count += 1
