@@ -6,7 +6,7 @@
 #   - env-variable `MILL_VERSION`
 #   - local file `.mill-version`
 #   - local file `.config/mill-version`
-#   - `mill-version` from YAML frontmatter of current buildfile
+#   - `mill-version` from YAML fronmatter of current buildfile
 #   - if accessible, find the latest stable version available on Maven Central (https://repo1.maven.org/maven2)
 #   - env-variable `DEFAULT_MILL_VERSION`
 #
@@ -23,7 +23,7 @@
 # into a cache location (~/.cache/mill/download).
 #
 # Mill Project URL: https://github.com/com-lihaoyi/mill
-# Script Version: 1.0.5
+# Script Version: 1.0.0-M1-21-7b6fae-DIRTY892b63e8
 #
 # If you want to improve this script, please also contribute your changes back!
 # This script was generated from: dist/scripts/src/mill.sh
@@ -32,8 +32,14 @@
 
 set -e
 
+if [ "$1" = "--setup-completions" ] ; then
+  # Need to preserve the first position of those listed options
+  MILL_FIRST_ARG=$1
+  shift
+fi
+
 if [ -z "${DEFAULT_MILL_VERSION}" ] ; then
-  DEFAULT_MILL_VERSION="0.12.0"
+  DEFAULT_MILL_VERSION="0.12.10"
 fi
 
 
@@ -73,19 +79,7 @@ if [ -z "${MILL_VERSION}" ] ; then
   elif [ -f ".config/mill-version" ] ; then
     MILL_VERSION="$(tr '\r' '\n' < .config/mill-version | head -n 1 2> /dev/null)"
   elif [ -n "${MILL_BUILD_SCRIPT}" ] ; then
-    # `s/.*://`:
-    #   This is a greedy match that removes everything from the beginning of the line up to (and including) the last
-    #   colon (:). This effectively isolates the value part of the declaration.
-    #
-    #  `s/#.*//`:
-    #    This removes any comments at the end of the line.
-    #
-    #  `s/['\"]//g`:
-    #    This removes all single and double quotes from the string, wherever they appear (g is for "global").
-    #
-    #  `s/^[[:space:]]*//; s/[[:space:]]*$//`:
-    #    These two expressions trim any leading or trailing whitespace ([[:space:]] matches spaces and tabs).
-    MILL_VERSION="$(grep -E "//\|.*mill-version" "${MILL_BUILD_SCRIPT}" | sed -E "s/.*://; s/#.*//; s/['\"]//g; s/^[[:space:]]*//; s/[[:space:]]*$//")"
+    MILL_VERSION="$(cat ${MILL_BUILD_SCRIPT} | grep '//[|]  *mill-version:  *' | sed 's;//|  *mill-version:  *;;')"
   fi
 fi
 
