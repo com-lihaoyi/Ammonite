@@ -187,8 +187,8 @@ class SyntaxError(val msg: String) extends RuntimeException
 class AmmHighlighter(codeParser: IParser) extends Highlighter {
 
   var colors: Colors = Colors.Default
-  def setErrorIndex(x$1: Int): Unit = ()
-  def setErrorPattern(x$1: java.util.regex.Pattern): Unit = ()
+  override def setErrorIndex(x$1: Int): Unit = ()
+  override def setErrorPattern(x$1: java.util.regex.Pattern): Unit = ()
   override def highlight(reader: LineReader, buffer: String): AttributedString = {
     val hl = codeParser.defaultHighlight(
       buffer.toVector,
