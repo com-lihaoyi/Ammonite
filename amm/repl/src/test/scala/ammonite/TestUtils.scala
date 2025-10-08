@@ -81,7 +81,7 @@ object TestUtils {
         case ("indent", value: String) => indent = value; Nil
         case (name, value) =>
           val repr =
-            if (scala2_12 || !scala2) s"$value"
+            if (scala2_12) s"$value"
             else s"$name = $value"
           Seq(repr)
       }
