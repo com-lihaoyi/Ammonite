@@ -105,7 +105,7 @@ val scalametaVersion = "4.13.10"
 object Deps {
   val acyclic = mvn"com.lihaoyi:::acyclic:0.3.19"
   val bsp4j = mvn"ch.epfl.scala:bsp4j:$bspVersion"
-  val bcprovJdk15on = mvn"org.bouncycastle:bcprov-jdk18on:1.80"
+  val bcprovJdk15on = mvn"org.bouncycastle:bcprov-jdk18on:1.82"
   val cask = mvn"com.lihaoyi::cask:0.10.2"
   val classPathUtil = mvn"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = mvn"io.get-coursier:interface:1.0.28"
