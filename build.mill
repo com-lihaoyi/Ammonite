@@ -124,7 +124,7 @@ object Deps {
   val pprint = mvn"com.lihaoyi::pprint:0.9.0"
   val requests = mvn"com.lihaoyi::requests:0.9.0"
   val scalacheck = mvn"org.scalacheck::scalacheck:1.18.1"
-  val scalaCollectionCompat = mvn"org.scala-lang.modules::scala-collection-compat:2.13.0"
+  val scalaCollectionCompat = mvn"org.scala-lang.modules::scala-collection-compat:2.14.0"
   def scalaCompiler(scalaVersion: String) = mvn"org.scala-lang:scala-compiler:$scalaVersion"
   val scalaJava8Compat = mvn"org.scala-lang.modules::scala-java8-compat:1.0.2"
   val scalaparse = mvn"com.lihaoyi::scalaparse:$fastparseVersion"
