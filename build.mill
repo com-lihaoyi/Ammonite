@@ -110,7 +110,7 @@ object Deps {
   val classPathUtil = mvn"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = mvn"io.get-coursier:interface:1.0.28"
   val coursierDependencyInterface = mvn"io.get-coursier::dependency-interface:0.3.2"
-  val fansi = mvn"com.lihaoyi::fansi:0.5.0"
+  val fansi = mvn"com.lihaoyi::fansi:0.5.1"
   val fastparse = mvn"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = mvn"com.lihaoyi::geny:1.1.1"
   val javaparserCore = mvn"com.github.javaparser:javaparser-core:3.2.12"
@@ -120,7 +120,7 @@ object Deps {
   val jlineTerminal = mvn"org.jline:jline-terminal:3.14.1"
   val jsch = mvn"com.jcraft:jsch:0.1.55"
   val mainargs = mvn"com.lihaoyi::mainargs:0.7.6"
-  val osLib = mvn"com.lihaoyi::os-lib:0.11.4"
+  val osLib = mvn"com.lihaoyi::os-lib:0.11.5"
   val pprint = mvn"com.lihaoyi::pprint:0.9.0"
   val requests = mvn"com.lihaoyi::requests:0.9.0"
   val scalacheck = mvn"org.scalacheck::scalacheck:1.18.1"
@@ -139,14 +139,14 @@ object Deps {
   val semanticDbScalac = mvn"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = mvn"com.chuusai::shapeless:2.3.3"
   val slf4jNop = mvn"org.slf4j:slf4j-nop:2.0.17"
-  val sourcecode = mvn"com.lihaoyi::sourcecode:0.4.3-M5"
+  val sourcecode = mvn"com.lihaoyi::sourcecode:0.4.4"
   val sshdCore = mvn"org.apache.sshd:sshd-core:1.2.0"
   val scalametaSemantidbShared = mvn"org.scalameta::semanticdb-shared:$scalametaVersion"
   val scalametaSemantidbShared213 = mvn"org.scalameta:semanticdb-shared_2.13:$scalametaVersion"
   val typename = mvn"org.tpolecat::typename:1.1.0"
-  val upickle = mvn"com.lihaoyi::upickle:4.1.0"
+  val upickle = mvn"com.lihaoyi::upickle:4.3.2"
 
-  val utest = mvn"com.lihaoyi::utest:0.8.5"
+  val utest = mvn"com.lihaoyi::utest:0.8.9"
 }
 
 trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
