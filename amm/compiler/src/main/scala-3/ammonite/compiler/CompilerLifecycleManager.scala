@@ -120,8 +120,12 @@ class CompilerLifecycleManager(
     // Enforce the invariant that every piece of code Ammonite ever compiles,
     // gets run within the `ammonite` package. It's further namespaced into
     // things like `ammonite.$file` or `ammonite.$sess`, but it has to be
-    // within `ammonite`
-    assert(processed.code.trim.startsWith("package ammonite"))
+    // within `ammonite`.
+    // We make an exception for raw sources, which have nesting level 0.
+    assert(
+      processed.userCodeNestingLevel == 0 ||
+      processed.code.trim.startsWith("package ammonite")
+    )
 
     init()
     val compiled = compiler.compile(

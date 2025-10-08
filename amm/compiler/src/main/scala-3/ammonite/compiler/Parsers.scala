@@ -60,8 +60,12 @@ class Parsers extends IParser {
     ignoreIncomplete: Boolean = true,
     fileName: String = "(console)"
   ): Option[Either[String, Seq[String]]] =
-    doSplit(code, ignoreIncomplete, fileName)
-      .map(_.map(_.map(_._2)))
+    if (code.startsWith("package "))
+      if (code.endsWith("\n\n")) Some(Right(Seq(code.stripSuffix("\n"))))
+      else None
+    else
+      doSplit(code, ignoreIncomplete, fileName)
+        .map(_.map(_.map(_._2)))
 
   private def doSplit(
     code: String,
