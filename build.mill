@@ -138,7 +138,7 @@ object Deps {
   val scalazCore = mvn"org.scalaz::scalaz-core:7.2.36"
   val semanticDbScalac = mvn"org.scalameta:::semanticdb-scalac:$scalametaVersion"
   val shapeless = mvn"com.chuusai::shapeless:2.3.3"
-  val slf4jNop = mvn"org.slf4j:slf4j-nop:2.0.16"
+  val slf4jNop = mvn"org.slf4j:slf4j-nop:2.0.17"
   val sourcecode = mvn"com.lihaoyi::sourcecode:0.4.4"
   val sshdCore = mvn"org.apache.sshd:sshd-core:1.2.0"
   val scalametaSemantidbShared = mvn"org.scalameta::semanticdb-shared:$scalametaVersion"
