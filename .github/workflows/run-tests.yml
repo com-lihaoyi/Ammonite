@@ -101,4 +101,4 @@ jobs:
         with:
           java-version: 11
           distribution: temurin
-      - run: ./mill -i -k -j4 '__.compile'
+      - run: ./mill -i -k -j1 '__.compile'
