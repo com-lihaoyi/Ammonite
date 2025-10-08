@@ -22,19 +22,19 @@ jobs:
             command: 'terminal.__.test'
 
           - java-version: 11
-            command: 'sshd[{2.12.20,2.13.16,3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
+            command: 'sshd[{2.12.20,2.13.17,3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
 
           - java-version: 11
             command: 'amm.repl[2.12.{9,14,20}].__.test'
           - java-version: 17
-            command: 'amm.repl[2.13.{4,9,16}].__.test'
+            command: 'amm.repl[2.13.{4,9,17}].__.test'
           - java-version: 21
             command: 'amm.repl[{3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
 
           - java-version: 11
             command: 'amm[2.12.{9,14,20}].__.test'
           - java-version: 17
-            command: 'amm[2.13.{4,9,16}].__.test'
+            command: 'amm[2.13.{4,9,17}].__.test'
           - java-version: 21
             command: 'amm[{3.3.5,3.4.3,3.5.2,3.6.3}].__.test'
 
@@ -82,7 +82,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v4
         with:
-          java-version: 8
+          java-version: 11
           distribution: temurin
       - name: Setup sbt launcher
         uses: sbt/setup-sbt@v1
@@ -99,6 +99,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: 8
+          java-version: 11
           distribution: temurin
-      - run: ./mill -i -k -j4 '__.compile'
+      - run: ./mill -i -k -j1 '__.compile'
