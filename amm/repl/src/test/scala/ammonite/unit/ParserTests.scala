@@ -106,6 +106,16 @@ object ParserTests extends TestSuite {
         test - assertComplete("""
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0).sum
         """)
+        test - assertComplete(
+          // raw source code ending with 2 empty lines: assumed to be complete
+          """package thing
+            |
+            |object Thing {
+            |  def message = "Hello"
+            |}
+            |
+            |""".stripMargin
+        )
       }
       test("notEndOfCommand") {
 
@@ -117,6 +127,15 @@ object ParserTests extends TestSuite {
         test - assertIncomplete("""
           val r = (1 until 1000).view.filter(n => n % 3 == 0 || n % 5 == 0
         """)
+        test - assertIncomplete(
+          // raw source code *not* ending with 2 empty lines: assumed not to be complete
+          """package thing
+            |
+            |object Thing {
+            |  def message = "Hello"
+            |}
+            |""".stripMargin
+        )
 
       }
       test("commandIsBroken") {

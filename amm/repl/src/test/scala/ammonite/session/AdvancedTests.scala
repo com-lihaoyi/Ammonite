@@ -320,7 +320,7 @@ object AdvancedTests extends TestSuite {
         check.session("""
           @ // Compiler plugins imported without `.$plugin` are not loaded
 
-          @ import $ivy.`org.typelevel:::kind-projector:0.13.3`
+          @ import $ivy.`org.typelevel:::kind-projector:0.13.4`
 
           @ trait TC0[F[_]]
           defined trait TC0
@@ -330,7 +330,7 @@ object AdvancedTests extends TestSuite {
 
           @ // You need to use `import $plugin.$ivy`
 
-          @ import $plugin.$ivy.`org.typelevel:::kind-projector:0.13.3`
+          @ import $plugin.$ivy.`org.typelevel:::kind-projector:0.13.4`
 
           @ trait TC[F[_]]
           defined trait TC
@@ -855,6 +855,51 @@ object AdvancedTests extends TestSuite {
           """
         )
       }
+    }
+
+    test("package input") {
+      check.session(
+        """
+          @ package thing
+          @
+          @ object Thing {
+          @   def message = "Hello"
+          @ }
+
+          @ val message = thing.Thing.message
+          message: String = "Hello"
+        """
+      )
+
+      if (scala2)
+        check.session(
+          """
+            @ package foo
+            @
+            @ object Foo {
+            @   def message = "Hello"
+            @   zz
+            @ }
+            error: source-2.scala:5: not found: value zz
+              zz
+              ^
+          """
+        )
+      else
+        check.session(
+          """
+            @ package foo
+            @
+            @ object Foo {
+            @   def message = "Hello"
+            @   zz
+            @ }
+            error: -- [E006] Not Found Error: source-2.scala:5:2 ----------------------------------
+            5 |  zz
+              ^^
+              Not found: zz
+          """
+        )
     }
   }
 }
