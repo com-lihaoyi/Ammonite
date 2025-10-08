@@ -231,7 +231,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
       val (cmdLines, resultLines) =
         Predef.augmentString(step).lines.toArray.map(_.drop(margin)).partition(_.startsWith("@"))
 
-      val commandText = cmdLines.map(_.stripPrefix("@ ")).toVector
+      val commandText = cmdLines.map(line => if (line == "@") "" else line.stripPrefix("@ ")).toVector
 
       println(cmdLines.mkString(Util.newLine))
       // Make sure all non-empty, non-complete command-line-fragments
@@ -365,30 +365,41 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
     warningBuffer.clear()
     errorBuffer.clear()
     infoBuffer.clear()
-    val splitted = ammonite.compiler.Parsers.split(input) match {
-      case None => sys.error(s"No result when splitting input '$input'")
-      case Some(Left(error)) => sys.error(s"Error when splitting input '$input': $error")
-      case Some(Right(stmts)) => stmts
-    }
-    val processed = interp.processLine(
-      input,
-      splitted,
-      index,
-      false,
-      () => currentLine += 1
-    )
-    processed match {
-      case Res.Failure(s) => printer0.error(s)
-      case Res.Exception(throwable, msg) =>
-        printer0.error(
-          Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
-        )
 
-      case _ =>
-    }
-    Repl.handleOutput(interp, processed)
+    val res =
+      if (input.startsWith("package "))
+        interp.processRawSource(input, s"source-$currentLine.scala").map { _ =>
+          currentLine += 1
+          Evaluated(Nil, Imports())
+        }
+      else {
+        val splitted = ammonite.compiler.Parsers.split(input) match {
+          case None => sys.error(s"No result when splitting input '$input'")
+          case Some(Left(error)) => sys.error(s"Error when splitting input '$input': $error")
+          case Some(Right(stmts)) => stmts
+        }
+        val processed = interp.processLine(
+          input,
+          splitted,
+          index,
+          false,
+          () => currentLine += 1
+        )
+        processed match {
+          case Res.Failure(s) => printer0.error(s)
+          case Res.Exception(throwable, msg) =>
+            printer0.error(
+              Repl.showException(throwable, fansi.Attrs.Empty, fansi.Attrs.Empty, fansi.Attrs.Empty)
+            )
+
+          case _ =>
+        }
+        Repl.handleOutput(interp, processed)
+        processed
+      }
+
     (
-      processed,
+      res,
       outString,
       resString,
       warningBuffer.mkString,
