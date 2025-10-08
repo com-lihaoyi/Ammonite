@@ -856,5 +856,50 @@ object AdvancedTests extends TestSuite {
         )
       }
     }
+
+    test("package input") {
+      check.session(
+        """
+          @ package thing
+          @
+          @ object Thing {
+          @   def message = "Hello"
+          @ }
+
+          @ val message = thing.Thing.message
+          message: String = "Hello"
+        """
+      )
+
+      if (scala2)
+        check.session(
+          """
+            @ package foo
+            @
+            @ object Foo {
+            @   def message = "Hello"
+            @   zz
+            @ }
+            error: source-2.scala:5: not found: value zz
+              zz
+              ^
+          """
+        )
+      else
+        check.session(
+          """
+            @ package foo
+            @
+            @ object Foo {
+            @   def message = "Hello"
+            @   zz
+            @ }
+            error: -- [E006] Not Found Error: source-2.scala:5:2 ----------------------------------
+            5 |  zz
+              ^^
+              Not found: zz
+          """
+        )
+    }
   }
 }

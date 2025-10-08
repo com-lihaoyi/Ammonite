@@ -78,7 +78,10 @@ object Parsers extends IParser {
       ignoreIncomplete: Boolean,
       fileName: String
   ): Option[Either[String, Seq[String]]] =
-    if (ignoreIncomplete) {
+    if (code.startsWith("package "))
+      if (code.endsWith("\n\n")) Some(Right(Seq(code.stripSuffix("\n"))))
+      else None
+    else if (ignoreIncomplete) {
       // We use `instrument` to detect when the parser has reached the end of the
       // input, any time during the parse. If it has done so, and failed, we
       // consider the input incomplete.

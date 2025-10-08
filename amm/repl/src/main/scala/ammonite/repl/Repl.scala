@@ -204,7 +204,15 @@ class Repl(
           history = history :+ code
         }
     )
-    out <- interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
+    out <- {
+      if (code.startsWith("package "))
+        interp.processRawSource(code, s"source-$currentLine.scala").map { _ =>
+          currentLine += 1
+          Evaluated(Nil, Imports())
+        }
+      else
+        interp.processLine(code, stmts, currentLine, false, () => currentLine += 1)
+    }
   } yield {
     printer.outStream.println()
     out

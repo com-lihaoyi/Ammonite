@@ -305,6 +305,27 @@ class Interpreter(
     } yield (res, Tag("", "", classPathWhitelist.hashCode().toString))
   }
 
+  def processRawSource(
+    code: String,
+    fileName: String
+  ): Res[Seq[(String, Array[Byte])]] = synchronized {
+    for {
+      _ <- Catching { case e: ThreadDeath => Evaluator.interrupted(e) }
+      output <- Res(
+        compilerManager.compileClass(
+          Preprocessor.Output(code, 0, 0),
+          printer,
+          fileName
+        ),
+        "Compilation Failed"
+      )
+      _ = {
+        for ((name, bytes) <- output.classFiles.sortBy(_._1) if name.endsWith(".class"))
+          headFrame.classloader.addClassFile(name.stripSuffix(".class").replace('/', '.'), bytes)
+      }
+    } yield output.classFiles
+  }
+
   def processSingleBlock(
       processed: Preprocessor.Output,
       codeSource0: CodeSource,
