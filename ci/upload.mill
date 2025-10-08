@@ -20,7 +20,7 @@ def apply(
     headers = Seq("Authorization" -> s"token $authKey")
   )
 
-  val parsed = ujson.read(body.text)
+  val parsed = ujson.read(body.text())
 
   println(body)
 
@@ -39,7 +39,7 @@ def apply(
     connectTimeout = 5000,
     readTimeout = 60000,
     data = os.read.bytes(uploadedFile)
-  ).text
+  ).text()
 
   println(res)
 
