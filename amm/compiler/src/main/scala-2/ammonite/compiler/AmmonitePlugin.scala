@@ -63,8 +63,7 @@ class AmmonitePlugin(
               unit,
               output,
               usedEarlierDefinitions,
-              userCodeNestingLevel,
-              topWrapperLen
+              userCodeNestingLevel
             )
           }
         }
@@ -80,8 +79,7 @@ object AmmonitePlugin {
       unit: g.CompilationUnit,
       output: Seq[ImportData] => Unit,
       usedEarlierDefinitions: Seq[String] => Unit,
-      userCodeNestingLevel: => Int,
-      topWrapperLen: => Int
+      userCodeNestingLevel: => Int
   ) = {
 
     count += 1
@@ -108,7 +106,7 @@ object AmmonitePlugin {
     }
 
     userCodeNestingLevel match {
-      case 1 =>
+      case 0 | 1 =>
       /*
        * We don't try to determine what previous commands are actually used here.
        * userCodeNestingLevel == 1 likely corresponds to the default object-based
