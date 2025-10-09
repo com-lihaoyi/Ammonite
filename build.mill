@@ -64,9 +64,11 @@ val scala33Versions = Seq("3.3.4", "3.3.5", "3.3.6", "3.3.7")
 val scala34Versions = Seq("3.4.2", "3.4.3")
 val scala35Versions = Seq("3.5.0", "3.5.1", "3.5.2")
 val scala36Versions = Seq("3.6.2", "3.6.3", "3.6.4")
+val scala37Versions = Seq("3.7.3")
 
 val scala2Versions = scala2_12Versions ++ scala2_13Versions
-val scala3Versions = scala33Versions ++ scala34Versions ++ scala35Versions ++ scala36Versions
+val scala3Versions = scala33Versions ++ scala34Versions ++ scala35Versions ++ scala36Versions ++
+  scala37Versions
 
 val binCrossScalaVersions =
   Seq(scala2_12Versions.last, scala2_13Versions.last, scala33Versions.last)
@@ -76,7 +78,8 @@ val assemblyCrossScalaVersions = Seq(
   scala33Versions.last,
   scala34Versions.last,
   scala35Versions.last,
-  scala36Versions.last
+  scala36Versions.last,
+  scala37Versions.last
 )
 def isScala2_12_10OrLater(sv: String): Boolean = {
   (sv.startsWith("2.12.") && sv.stripPrefix("2.12.").length > 1) || sv.startsWith("2.13.")
@@ -259,6 +262,8 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
         Seq(PathRef(moduleDir / "src" / "main" / "scala-3.6.0-3.6.2"))
       else if (Version(sv) >= Version("3.6.3") && Version(sv) < Version("3.7.0"))
         Seq(PathRef(moduleDir / "src" / "main" / "scala-3.6.3+"))
+      else if (Version(sv) >= Version("3.7.0"))
+        Seq(PathRef(moduleDir / "src" / "main" / "scala-3.7+"))
       else
         Nil
     val extraDir7 =
@@ -268,9 +273,14 @@ trait AmmInternalModule extends CrossSbtModule with Bloop.Module {
         Seq(PathRef(moduleDir / "src" / "main" / "scala-3.3.7+"))
       else
         Nil
+    val extraDir8 =
+      if (Version(sv) >= Version("3.5.0") && Version(sv) < Version("3.7.0"))
+        Seq(PathRef(moduleDir / "src" / "main" / "scala-3.5-3.6"))
+      else
+        Nil
 
     super.sources() ++ extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++
-      extraDir7
+      extraDir7 ++ extraDir8
   }
   def externalSources: T[Agg[PathRef]] = T {
     resolveDeps(allBoundIvyDeps, sources = true, artifactTypes = None)()
