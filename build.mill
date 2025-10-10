@@ -12,7 +12,6 @@ import mill.*
 import mill.api.{BuildCtx, Result}
 import mill.scalalib.*
 import mill.scalalib.publish.*
-import mill.scalalib.SonatypeCentralPublishModule
 import mill.javalib.api.JvmWorkerUtil.*
 import mill.javalib.testrunner.TestResult
 import coursier.version.Version
