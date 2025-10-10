@@ -12,6 +12,7 @@ import mill.*
 import mill.api.{BuildCtx, Result}
 import mill.scalalib.*
 import mill.scalalib.publish.*
+import mill.scalalib.SonatypeCentralPublishModule
 import mill.javalib.api.JvmWorkerUtil.*
 import mill.javalib.testrunner.TestResult
 import coursier.version.Version
@@ -325,7 +326,7 @@ trait AmmInternalModule extends CrossSbtModule {
       }
     }
 }
-trait AmmModule extends AmmInternalModule with PublishModule with CoursierModule {
+trait AmmModule extends AmmInternalModule with SonatypeCentralPublishModule with CoursierModule {
   def publishVersion: T[String] = buildVersion
   def pomSettings = PomSettings(
     description = artifactName(),
