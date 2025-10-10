@@ -1,7 +1,7 @@
 package ammonite
 
 import ammonite.compiler.CodeClassWrapper
-import ammonite.util.{Evaluated, Res}
+import ammonite.util.{Evaluated, Name, Res}
 
 /**
  * Wraps several [[TestRepl]], and runs its tests against all of them.
@@ -10,6 +10,7 @@ class DualTestRepl { dual =>
 
   def predef: (String, Option[os.Path]) = ("", None)
   def wrapperNamePrefix = Option.empty[String]
+  def pkgName = Option.empty[Seq[Name]]
 
   def warnings = true
 
@@ -18,12 +19,14 @@ class DualTestRepl { dual =>
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef
       override def wrapperNamePrefix = dual.wrapperNamePrefix
+      override def pkgName = dual.pkgName
       override def warnings = dual.warnings
     },
     new TestRepl(compilerBuilder) {
       override def predef = dual.predef
       override def codeWrapper = CodeClassWrapper
       override def wrapperNamePrefix = dual.wrapperNamePrefix
+      override def pkgName = dual.pkgName
       override def warnings = dual.warnings
     }
   )

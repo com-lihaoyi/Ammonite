@@ -30,6 +30,7 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
   def predef: (String, Option[os.Path]) = ("", None)
   def codeWrapper: CodeWrapper = DefaultCodeWrapper
   def wrapperNamePrefix = Option.empty[String]
+  def pkgName = Option.empty[Seq[Name]]
   def warnings = true
 
   val tempDir = os.Path(
@@ -80,7 +81,8 @@ class TestRepl(compilerBuilder: ICompilerBuilder = CompilerBuilder()) { self =>
     importHooks = ImportHook.defaults,
     classPathWhitelist = ammonite.repl.Repl.getClassPathWhitelist(thin = true),
     wrapperNamePrefix = wrapperNamePrefix.getOrElse(Interpreter.Parameters().wrapperNamePrefix),
-    warnings = warnings
+    warnings = warnings,
+    pkgName = pkgName.getOrElse(Interpreter.Parameters().pkgName)
   )
   val interp =
     try {
