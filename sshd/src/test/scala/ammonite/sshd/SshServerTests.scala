@@ -30,7 +30,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
             val (serverCreds, clientCreds) = credsPair
             withTestSshServer(serverCreds) { server =>
               val client = sshClient(clientCreds, server)
-              val exception = intercept[JSchException] {
+              val exception = assertThrows[JSchException] {
                 client.connect()
               }
               assert(!client.isConnected, exception.getMessage == "Auth fail")
@@ -83,7 +83,7 @@ object SshServerTests extends TestSuite with ScalaCheckSupport {
     assert(client.isConnected)
     Option(client.openChannel(channel)) match {
       case Some(shell) =>
-        intercept[JSchException](shell.connect(2000))
+        assertThrows[JSchException](shell.connect(2000))
         assert(!shell.isConnected)
       case None =>
     }

@@ -173,7 +173,7 @@ object BasicTests extends TestSuite {
       assert(!evaled2.err.text().contains("Compiling"))
     }
     test("testSilentRunningWithExceptions") {
-      val errorMsg = intercept[os.SubprocessException] {
+      val errorMsg = assertThrows[os.SubprocessException] {
         exec(os.rel / "basic" / "Failure.sc")
       }.result.err.text()
 
@@ -183,7 +183,7 @@ object BasicTests extends TestSuite {
       assert(errorMsg.contains(expected))
     }
     test("testSilentIvyExceptions") {
-      val errorMsg = intercept[os.SubprocessException] {
+      val errorMsg = assertThrows[os.SubprocessException] {
         exec(os.rel / "basic" / "wrongIvyCordinates.sc")
       }.result.err.text()
 
@@ -263,7 +263,7 @@ object BasicTests extends TestSuite {
         assert(out == ("Hello! foofoo ." + Util.newLine))
       }
       def specifyMainTest() = {
-        val evaled = intercept[os.SubprocessException](exec(os.rel / "basic" / "MultiMain.sc"))
+        val evaled = assertThrows[os.SubprocessException](exec(os.rel / "basic" / "MultiMain.sc"))
 
         val out = evaled.result.err.text()
         val expected = Util.normalizeNewlines(
