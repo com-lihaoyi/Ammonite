@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ch.epfl.scala:bsp4j:2.1.1",
+        "com.lihaoyi::fastparse:3.1.1",
+        "org.scalameta::semanticdb-shared:4.13.10"
+    ],
+    "valueHash": -268720977,
+    "inputsHash": 1376521610
+}

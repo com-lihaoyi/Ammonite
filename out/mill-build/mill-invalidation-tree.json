@@ -1,0 +1,85 @@
+{
+  "scalaVersion": {
+    "zincAuxiliaryClassFileExtensions": {},
+    "compile": {
+      "codeSignatures": {}
+    },
+    "scalaLibraryMvnDeps": {},
+    "scalaOrganization": {},
+    "enablePluginScalacOptions": {},
+    "scalacPluginClasspath": {},
+    "scalaCompilerClasspath": {}
+  },
+  "mandatoryMvnDeps": {},
+  "mill.javalib.JvmWorkerModule.repositories": {},
+  "cliImports": {
+    "runMvnDeps": {}
+  },
+  "zincReportCachedProblems": {},
+  "javacOptions": {},
+  "sources.super.javalib.JavaModule": {
+    "sources": {
+      "allSources": {}
+    }
+  },
+  "runClasspath.super.RunModule": {
+    "runClasspath": {
+      "millBuildRootModuleResult": {}
+    }
+  },
+  "jvmId": {
+    "javaHome": {}
+  },
+  "jvmIndexVersion": {},
+  "scalacOptions.super.scalalib.ScalaModule": {
+    "scalacOptions": {}
+  },
+  "repositories": {},
+  "millVersion": {},
+  "bomMvnDeps": {},
+  "platformSuffix": {},
+  "mandatoryJavacOptions": {},
+  "scriptSources": {
+    "allSourceFiles": {},
+    "parseBuildFiles": {
+      "generatedScriptSources": {
+        "generatedSources": {}
+      }
+    }
+  },
+  "mill.javalib.JvmWorkerModule.checkGradleModules": {
+    "mill.javalib.JvmWorkerModule.classpath": {}
+  },
+  "mill.javalib.CoursierConfigModule.coursierEnv": {},
+  "zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {},
+  "resources": {},
+  "depManagement": {},
+  "compileResources": {
+    "localCompileClasspath": {
+      "localClasspath": {}
+    }
+  },
+  "artifactTypes": {},
+  "scalacPluginMvnDeps": {},
+  "localRunClasspath.super.RunModule": {
+    "localRunClasspath": {}
+  },
+  "checkGradleModules": {},
+  "mandatoryScalacOptions": {
+    "allScalacOptions": {}
+  },
+  "compileMvnDeps": {
+    "resolvedRunMvnDeps": {},
+    "resolvedMvnDeps": {
+      "compileClasspath": {}
+    }
+  },
+  "zincIncrementalCompilation": {},
+  "upstreamCompileOutput": {},
+  "transitiveLocalClasspath": {},
+  "transitiveCoursierProjects": {},
+  "mill.javalib.JvmWorkerModule.zincLogDebug": {
+    "mill.javalib.JvmWorkerModule.internalWorker": {}
+  },
+  "unmanagedClasspath": {}
+}

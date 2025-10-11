@@ -1,0 +1,6 @@
+com.lihaoyi:acyclic_2.13.17:0.3.19
+com.lihaoyi:geny_2.13:1.1.1
+com.lihaoyi:mainargs_2.13:0.7.6
+org.scala-lang:scala-library:2.13.17
+org.scala-lang:scala-reflect:2.13.17
+org.scala-lang.modules:scala-collection-compat_2.13:2.12.0

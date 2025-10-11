@@ -1,0 +1,11 @@
+{
+    "value": [
+        "com.lihaoyi::os-lib:0.11.5",
+        "org.tpolecat::typename:1.1.0",
+        "org.scala-lang.modules::scala-collection-compat:2.14.0",
+        "com.lihaoyi::fansi:0.5.1",
+        "com.lihaoyi::pprint:0.9.0"
+    ],
+    "valueHash": -1749176060,
+    "inputsHash": -379264484
+}

@@ -1,0 +1,894 @@
+{
+  "publishDocs": {
+    "amm[2.13.17].assembly": {
+      "amm[2.13.17].localClasspath": {
+        "amm[2.13.17].localClasspath.super.mill.javalib.JavaModule": {
+          "amm[2.13.17].localCompileClasspath": {
+            "amm[2.13.17].compileResources": {},
+            "amm[2.13.17].unmanagedClasspath": {}
+          },
+          "amm[2.13.17].localRunClasspath": {
+            "amm[2.13.17].localRunClasspath.super.RunModule": {},
+            "amm[2.13.17].compile": {
+              "amm[2.13.17].allSourceFiles": {
+                "amm[2.13.17].allSources": {
+                  "amm[2.13.17].sources": {
+                    "amm[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                      "amm[2.13.17].versionSources": {},
+                      "amm[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                    },
+                    "amm[2.13.17].customSources": {}
+                  },
+                  "amm[2.13.17].generatedSources": {}
+                }
+              },
+              "amm[2.13.17].javaHome": {
+                "amm[2.13.17].jvmId": {},
+                "amm[2.13.17].jvmIndexVersion": {}
+              },
+              "amm[2.13.17].scalaCompilerClasspath": {},
+              "amm[2.13.17].zincAuxiliaryClassFileExtensions": {
+                "amm[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+              },
+              "amm[2.13.17].upstreamCompileOutput": {},
+              "amm[2.13.17].scalacPluginClasspath": {
+                "amm[2.13.17].scalacPluginMvnDeps": {}
+              },
+              "amm[2.13.17].javacOptions": {},
+              "amm[2.13.17].mandatoryJavacOptions": {},
+              "mill.javalib.JvmWorkerModule.internalWorker": {
+                "mill.javalib.JvmWorkerModule.repositories": {},
+                "mill.javalib.JvmWorkerModule.classpath": {},
+                "mill.javalib.JvmWorkerModule.zincLogDebug": {},
+                "mill.javalib.JvmWorkerModule.checkGradleModules": {}
+              },
+              "amm[2.13.17].compileClasspath": {
+                "amm[2.13.17].resolvedMvnDeps": {}
+              },
+              "amm[2.13.17].zincIncrementalCompilation": {},
+              "amm[2.13.17].zincReportCachedProblems": {},
+              "amm[2.13.17].allScalacOptions": {
+                "amm[2.13.17].enablePluginScalacOptions": {},
+                "amm[2.13.17].mandatoryScalacOptions": {},
+                "amm[2.13.17].scalacOptions": {}
+              }
+            },
+            "amm[2.13.17].resources": {}
+          }
+        },
+        "amm[2.13.17].thinWhitelist": {
+          "amm.compiler[2.13.17].exposedClassPath": {
+            "amm.compiler[2.13.17].externalSources": {
+              "amm.compiler[2.13.17].scalaOrganization": {},
+              "amm.compiler[2.13.17].checkGradleModules": {},
+              "amm.compiler[2.13.17].allBoundMvnDeps": {
+                "amm.compiler[2.13.17].scalaLibraryMvnDeps": {},
+                "amm.compiler[2.13.17].allMvnDeps": {}
+              }
+            },
+            "amm.compiler[2.13.17].transitiveJars": {
+              "amm.compiler.interface[2.13.17].jar": {
+                "amm.compiler.interface[2.13.17].manifest": {
+                  "amm.compiler.interface[2.13.17].manifest.super.scalalib.ScalaModule": {
+                    "amm.compiler.interface[2.13.17].manifest.super.javalib.AssemblyModule": {
+                      "amm.compiler.interface[2.13.17].manifest0": {
+                        "amm.compiler.interface[2.13.17].finalMainClassOpt": {
+                          "amm.compiler.interface[2.13.17].allLocalMainClasses": {},
+                          "amm.compiler.interface[2.13.17].mainClass": {}
+                        }
+                      }
+                    }
+                  },
+                  "amm.compiler.interface[2.13.17].pomSettings": {},
+                  "amm.compiler.interface[2.13.17].artifactName": {},
+                  "amm.compiler.interface[2.13.17].publishVersion": {}
+                }
+              },
+              "amm.compiler[2.13.17].jar": {
+                "amm.compiler[2.13.17].manifest": {
+                  "amm.compiler[2.13.17].publishVersion": {},
+                  "amm.compiler[2.13.17].artifactName": {},
+                  "amm.compiler[2.13.17].manifest.super.scalalib.ScalaModule": {
+                    "amm.compiler[2.13.17].manifest.super.javalib.AssemblyModule": {
+                      "amm.compiler[2.13.17].manifest0": {
+                        "amm.compiler[2.13.17].finalMainClassOpt": {
+                          "amm.compiler[2.13.17].allLocalMainClasses": {},
+                          "amm.compiler[2.13.17].mainClass": {}
+                        }
+                      }
+                    }
+                  },
+                  "amm.compiler[2.13.17].pomSettings": {}
+                }
+              }
+            },
+            "amm.compiler[2.13.17].transitiveSourceJars": {
+              "amm.compiler.interface[2.13.17].sourceJar": {
+                "amm.compiler.interface[2.13.17].allSources": {
+                  "amm.compiler.interface[2.13.17].sources": {
+                    "amm.compiler.interface[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                      "amm.compiler.interface[2.13.17].sources.super.mill.scalalib.SbtModule": {},
+                      "amm.compiler.interface[2.13.17].versionSources": {}
+                    },
+                    "amm.compiler.interface[2.13.17].customSources": {}
+                  },
+                  "amm.compiler.interface[2.13.17].generatedSources": {}
+                }
+              },
+              "amm.compiler[2.13.17].sourceJar": {
+                "amm.compiler[2.13.17].allSources": {
+                  "amm.compiler[2.13.17].generatedSources": {},
+                  "amm.compiler[2.13.17].sources": {
+                    "amm.compiler[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                      "amm.compiler[2.13.17].versionSources": {},
+                      "amm.compiler[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                    },
+                    "amm.compiler[2.13.17].customSources": {}
+                  }
+                }
+              }
+            },
+            "amm.compiler[2.13.17].runClasspath": {
+              "amm.compiler[2.13.17].transitiveLocalClasspath": {},
+              "amm.compiler[2.13.17].runClasspath.super.RunModule": {},
+              "amm.compiler[2.13.17].resolvedRunMvnDeps": {
+                "amm.compiler[2.13.17].artifactTypes": {}
+              }
+            }
+          },
+          "amm.repl.api[2.13.17].exposedClassPath": {
+            "amm.repl.api[2.13.17].transitiveSourceJars": {
+              "amm.repl.api[2.13.17].sourceJar": {
+                "amm.repl.api[2.13.17].allSources": {
+                  "amm.repl.api[2.13.17].sources": {
+                    "amm.repl.api[2.13.17].customSources": {},
+                    "amm.repl.api[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                      "amm.repl.api[2.13.17].versionSources": {},
+                      "amm.repl.api[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                    }
+                  },
+                  "amm.repl.api[2.13.17].generatedSources": {}
+                }
+              },
+              "amm.util[2.13.17].sourceJar": {
+                "amm.util[2.13.17].allSources": {
+                  "amm.util[2.13.17].generatedSources": {},
+                  "amm.util[2.13.17].sources": {
+                    "amm.util[2.13.17].customSources": {},
+                    "amm.util[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                      "amm.util[2.13.17].versionSources": {},
+                      "amm.util[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                    }
+                  }
+                }
+              },
+              "amm.interp.api[2.13.17].sourceJar": {
+                "amm.interp.api[2.13.17].allSources": {
+                  "amm.interp.api[2.13.17].generatedSources": {
+                    "amm.interp.api[2.13.17].constantsSourceDir": {},
+                    "amm.interp.api[2.13.17].generatedSources.super.mill.javalib.JavaModule": {}
+                  },
+                  "amm.interp.api[2.13.17].sources": {
+                    "amm.interp.api[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                      "amm.interp.api[2.13.17].sources.super.mill.scalalib.SbtModule": {},
+                      "amm.interp.api[2.13.17].versionSources": {}
+                    },
+                    "amm.interp.api[2.13.17].customSources": {}
+                  }
+                }
+              }
+            },
+            "amm.repl.api[2.13.17].transitiveJars": {
+              "amm.repl.api[2.13.17].jar": {
+                "amm.repl.api[2.13.17].manifest": {
+                  "amm.repl.api[2.13.17].publishVersion": {},
+                  "amm.repl.api[2.13.17].pomSettings": {},
+                  "amm.repl.api[2.13.17].manifest.super.scalalib.ScalaModule": {
+                    "amm.repl.api[2.13.17].manifest.super.javalib.AssemblyModule": {
+                      "amm.repl.api[2.13.17].manifest0": {
+                        "amm.repl.api[2.13.17].finalMainClassOpt": {
+                          "amm.repl.api[2.13.17].mainClass": {},
+                          "amm.repl.api[2.13.17].allLocalMainClasses": {}
+                        }
+                      }
+                    }
+                  },
+                  "amm.repl.api[2.13.17].artifactName": {}
+                }
+              },
+              "amm.interp.api[2.13.17].jar": {
+                "amm.interp.api[2.13.17].manifest": {
+                  "amm.interp.api[2.13.17].artifactName": {},
+                  "amm.interp.api[2.13.17].publishVersion": {},
+                  "amm.interp.api[2.13.17].pomSettings": {},
+                  "amm.interp.api[2.13.17].manifest.super.scalalib.ScalaModule": {
+                    "amm.interp.api[2.13.17].manifest.super.javalib.AssemblyModule": {
+                      "amm.interp.api[2.13.17].manifest0": {
+                        "amm.interp.api[2.13.17].finalMainClassOpt": {
+                          "amm.interp.api[2.13.17].allLocalMainClasses": {},
+                          "amm.interp.api[2.13.17].mainClass": {}
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "amm.util[2.13.17].jar": {
+                "amm.util[2.13.17].manifest": {
+                  "amm.util[2.13.17].publishVersion": {},
+                  "amm.util[2.13.17].pomSettings": {},
+                  "amm.util[2.13.17].artifactName": {},
+                  "amm.util[2.13.17].manifest.super.scalalib.ScalaModule": {
+                    "amm.util[2.13.17].manifest.super.javalib.AssemblyModule": {
+                      "amm.util[2.13.17].manifest0": {
+                        "amm.util[2.13.17].finalMainClassOpt": {
+                          "amm.util[2.13.17].mainClass": {},
+                          "amm.util[2.13.17].allLocalMainClasses": {}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "amm.repl.api[2.13.17].externalSources": {
+              "amm.repl.api[2.13.17].scalaOrganization": {},
+              "amm.repl.api[2.13.17].checkGradleModules": {},
+              "amm.repl.api[2.13.17].allBoundMvnDeps": {
+                "amm.repl.api[2.13.17].allMvnDeps": {},
+                "amm.repl.api[2.13.17].scalaLibraryMvnDeps": {}
+              }
+            },
+            "amm.repl.api[2.13.17].runClasspath": {
+              "amm.repl.api[2.13.17].resolvedRunMvnDeps": {
+                "amm.repl.api[2.13.17].artifactTypes": {}
+              },
+              "amm.repl.api[2.13.17].runClasspath.super.RunModule": {},
+              "amm.repl.api[2.13.17].transitiveLocalClasspath": {}
+            }
+          }
+        }
+      },
+      "amm[2.13.17].upstreamAssembly": {
+        "amm[2.13.17].upstreamLocalAssemblyClasspath": {
+          "amm[2.13.17].transitiveLocalClasspath": {
+            "amm.repl[2.13.17].localClasspath": {
+              "amm.repl[2.13.17].localRunClasspath": {
+                "amm.repl[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.repl[2.13.17].resources": {},
+                "amm.repl[2.13.17].compile": {
+                  "amm.repl[2.13.17].allSourceFiles": {
+                    "amm.repl[2.13.17].allSources": {
+                      "amm.repl[2.13.17].generatedSources": {},
+                      "amm.repl[2.13.17].sources": {
+                        "amm.repl[2.13.17].customSources": {},
+                        "amm.repl[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                          "amm.repl[2.13.17].sources.super.mill.scalalib.SbtModule": {},
+                          "amm.repl[2.13.17].versionSources": {}
+                        }
+                      }
+                    }
+                  },
+                  "amm.repl[2.13.17].scalacPluginClasspath": {
+                    "amm.repl[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.repl[2.13.17].javacOptions": {},
+                  "amm.repl[2.13.17].scalaCompilerClasspath": {
+                    "amm.repl[2.13.17].checkGradleModules": {}
+                  },
+                  "amm.repl[2.13.17].upstreamCompileOutput": {},
+                  "amm.repl[2.13.17].mandatoryJavacOptions": {},
+                  "amm.repl[2.13.17].allScalacOptions": {
+                    "amm.repl[2.13.17].scalacOptions": {},
+                    "amm.repl[2.13.17].enablePluginScalacOptions": {},
+                    "amm.repl[2.13.17].mandatoryScalacOptions": {}
+                  },
+                  "amm.repl[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.repl[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.repl[2.13.17].scalaOrganization": {},
+                  "amm.repl[2.13.17].zincReportCachedProblems": {},
+                  "amm.repl[2.13.17].javaHome": {
+                    "amm.repl[2.13.17].jvmIndexVersion": {},
+                    "amm.repl[2.13.17].jvmId": {}
+                  },
+                  "amm.repl[2.13.17].zincIncrementalCompilation": {},
+                  "amm.repl[2.13.17].compileClasspath": {
+                    "amm.repl[2.13.17].resolvedMvnDeps": {
+                      "amm.repl[2.13.17].artifactTypes": {}
+                    }
+                  }
+                }
+              },
+              "amm.repl[2.13.17].localCompileClasspath": {
+                "amm.repl[2.13.17].unmanagedClasspath": {},
+                "amm.repl[2.13.17].compileResources": {}
+              }
+            },
+            "amm.util[2.13.17].localClasspath": {
+              "amm.util[2.13.17].localRunClasspath": {
+                "amm.util[2.13.17].resources": {},
+                "amm.util[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.util[2.13.17].compile": {
+                  "amm.util[2.13.17].allScalacOptions": {
+                    "amm.util[2.13.17].scalacOptions": {},
+                    "amm.util[2.13.17].enablePluginScalacOptions": {},
+                    "amm.util[2.13.17].mandatoryScalacOptions": {}
+                  },
+                  "amm.util[2.13.17].upstreamCompileOutput": {},
+                  "amm.util[2.13.17].mandatoryJavacOptions": {},
+                  "amm.util[2.13.17].zincIncrementalCompilation": {},
+                  "amm.util[2.13.17].scalaCompilerClasspath": {
+                    "amm.util[2.13.17].checkGradleModules": {}
+                  },
+                  "amm.util[2.13.17].scalaOrganization": {},
+                  "amm.util[2.13.17].javacOptions": {},
+                  "amm.util[2.13.17].compileClasspath": {
+                    "amm.util[2.13.17].resolvedMvnDeps": {
+                      "amm.util[2.13.17].artifactTypes": {}
+                    }
+                  },
+                  "amm.util[2.13.17].scalacPluginClasspath": {
+                    "amm.util[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.util[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.util[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.util[2.13.17].javaHome": {
+                    "amm.util[2.13.17].jvmId": {},
+                    "amm.util[2.13.17].jvmIndexVersion": {}
+                  },
+                  "amm.util[2.13.17].allSourceFiles": {},
+                  "amm.util[2.13.17].zincReportCachedProblems": {}
+                }
+              },
+              "amm.util[2.13.17].localCompileClasspath": {
+                "amm.util[2.13.17].compileResources": {},
+                "amm.util[2.13.17].unmanagedClasspath": {}
+              }
+            },
+            "amm.repl.api[2.13.17].localClasspath": {
+              "amm.repl.api[2.13.17].localRunClasspath": {
+                "amm.repl.api[2.13.17].resources": {
+                  "amm.repl.api[2.13.17].resources.super.mill.javalib.MavenModule": {},
+                  "amm.repl.api[2.13.17].dependencyFileResources": {}
+                },
+                "amm.repl.api[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.repl.api[2.13.17].compile": {
+                  "amm.repl.api[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.repl.api[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.repl.api[2.13.17].allScalacOptions": {
+                    "amm.repl.api[2.13.17].enablePluginScalacOptions": {},
+                    "amm.repl.api[2.13.17].mandatoryScalacOptions": {},
+                    "amm.repl.api[2.13.17].scalacOptions": {}
+                  },
+                  "amm.repl.api[2.13.17].zincReportCachedProblems": {},
+                  "amm.repl.api[2.13.17].scalacPluginClasspath": {
+                    "amm.repl.api[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.repl.api[2.13.17].zincIncrementalCompilation": {},
+                  "amm.repl.api[2.13.17].mandatoryJavacOptions": {},
+                  "amm.repl.api[2.13.17].allSourceFiles": {},
+                  "amm.repl.api[2.13.17].compileClasspath": {
+                    "amm.repl.api[2.13.17].resolvedMvnDeps": {}
+                  },
+                  "amm.repl.api[2.13.17].javacOptions": {},
+                  "amm.repl.api[2.13.17].javaHome": {
+                    "amm.repl.api[2.13.17].jvmIndexVersion": {},
+                    "amm.repl.api[2.13.17].jvmId": {}
+                  },
+                  "amm.repl.api[2.13.17].upstreamCompileOutput": {},
+                  "amm.repl.api[2.13.17].scalaCompilerClasspath": {}
+                }
+              },
+              "amm.repl.api[2.13.17].localCompileClasspath": {
+                "amm.repl.api[2.13.17].unmanagedClasspath": {},
+                "amm.repl.api[2.13.17].compileResources": {}
+              }
+            },
+            "amm.compiler.interface[2.13.17].localClasspath": {
+              "amm.compiler.interface[2.13.17].localCompileClasspath": {
+                "amm.compiler.interface[2.13.17].compileResources": {},
+                "amm.compiler.interface[2.13.17].unmanagedClasspath": {}
+              },
+              "amm.compiler.interface[2.13.17].localRunClasspath": {
+                "amm.compiler.interface[2.13.17].compile": {
+                  "amm.compiler.interface[2.13.17].scalaCompilerClasspath": {
+                    "amm.compiler.interface[2.13.17].scalaLibraryMvnDeps": {},
+                    "amm.compiler.interface[2.13.17].checkGradleModules": {}
+                  },
+                  "amm.compiler.interface[2.13.17].allSourceFiles": {},
+                  "amm.compiler.interface[2.13.17].compileClasspath": {
+                    "amm.compiler.interface[2.13.17].resolvedMvnDeps": {
+                      "amm.compiler.interface[2.13.17].artifactTypes": {}
+                    }
+                  },
+                  "amm.compiler.interface[2.13.17].zincIncrementalCompilation": {},
+                  "amm.compiler.interface[2.13.17].mandatoryJavacOptions": {},
+                  "amm.compiler.interface[2.13.17].zincReportCachedProblems": {},
+                  "amm.compiler.interface[2.13.17].upstreamCompileOutput": {},
+                  "amm.compiler.interface[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.compiler.interface[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.compiler.interface[2.13.17].javaHome": {
+                    "amm.compiler.interface[2.13.17].jvmId": {},
+                    "amm.compiler.interface[2.13.17].jvmIndexVersion": {}
+                  },
+                  "amm.compiler.interface[2.13.17].scalacPluginClasspath": {
+                    "amm.compiler.interface[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.compiler.interface[2.13.17].allScalacOptions": {
+                    "amm.compiler.interface[2.13.17].scalacOptions": {},
+                    "amm.compiler.interface[2.13.17].enablePluginScalacOptions": {},
+                    "amm.compiler.interface[2.13.17].mandatoryScalacOptions": {}
+                  },
+                  "amm.compiler.interface[2.13.17].javacOptions": {},
+                  "amm.compiler.interface[2.13.17].scalaOrganization": {}
+                },
+                "amm.compiler.interface[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.compiler.interface[2.13.17].resources": {}
+              }
+            },
+            "amm.interp.api[2.13.17].localClasspath": {
+              "amm.interp.api[2.13.17].localRunClasspath": {
+                "amm.interp.api[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.interp.api[2.13.17].compile": {
+                  "amm.interp.api[2.13.17].javacOptions": {},
+                  "amm.interp.api[2.13.17].mandatoryJavacOptions": {},
+                  "amm.interp.api[2.13.17].scalacPluginClasspath": {
+                    "amm.interp.api[2.13.17].checkGradleModules": {},
+                    "amm.interp.api[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.interp.api[2.13.17].javaHome": {
+                    "amm.interp.api[2.13.17].jvmIndexVersion": {},
+                    "amm.interp.api[2.13.17].jvmId": {}
+                  },
+                  "amm.interp.api[2.13.17].scalaCompilerClasspath": {},
+                  "amm.interp.api[2.13.17].zincIncrementalCompilation": {},
+                  "amm.interp.api[2.13.17].compileClasspath": {
+                    "amm.interp.api[2.13.17].resolvedMvnDeps": {
+                      "amm.interp.api[2.13.17].artifactTypes": {}
+                    }
+                  },
+                  "amm.interp.api[2.13.17].zincReportCachedProblems": {},
+                  "amm.interp.api[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.interp.api[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.interp.api[2.13.17].upstreamCompileOutput": {},
+                  "amm.interp.api[2.13.17].allSourceFiles": {},
+                  "amm.interp.api[2.13.17].allScalacOptions": {
+                    "amm.interp.api[2.13.17].mandatoryScalacOptions": {},
+                    "amm.interp.api[2.13.17].scalacOptions": {},
+                    "amm.interp.api[2.13.17].enablePluginScalacOptions": {}
+                  },
+                  "amm.interp.api[2.13.17].scalaOrganization": {}
+                },
+                "amm.interp.api[2.13.17].resources": {
+                  "amm.interp.api[2.13.17].resources.super.mill.javalib.MavenModule": {},
+                  "amm.interp.api[2.13.17].dependencyFileResources": {
+                    "amm.interp.api[2.13.17].allMvnDeps": {}
+                  }
+                }
+              },
+              "amm.interp.api[2.13.17].localCompileClasspath": {
+                "amm.interp.api[2.13.17].compileResources": {},
+                "amm.interp.api[2.13.17].unmanagedClasspath": {}
+              }
+            },
+            "amm.interp[2.13.17].localClasspath": {
+              "amm.interp[2.13.17].localRunClasspath": {
+                "amm.interp[2.13.17].resources": {},
+                "amm.interp[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.interp[2.13.17].compile": {
+                  "amm.interp[2.13.17].scalaCompilerClasspath": {
+                    "amm.interp[2.13.17].checkGradleModules": {}
+                  },
+                  "amm.interp[2.13.17].zincIncrementalCompilation": {},
+                  "amm.interp[2.13.17].scalaOrganization": {},
+                  "amm.interp[2.13.17].zincReportCachedProblems": {},
+                  "amm.interp[2.13.17].allSourceFiles": {
+                    "amm.interp[2.13.17].allSources": {
+                      "amm.interp[2.13.17].sources": {
+                        "amm.interp[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                          "amm.interp[2.13.17].versionSources": {},
+                          "amm.interp[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                        },
+                        "amm.interp[2.13.17].customSources": {}
+                      },
+                      "amm.interp[2.13.17].generatedSources": {}
+                    }
+                  },
+                  "amm.interp[2.13.17].compileClasspath": {
+                    "amm.interp[2.13.17].resolvedMvnDeps": {
+                      "amm.interp[2.13.17].artifactTypes": {}
+                    }
+                  },
+                  "amm.interp[2.13.17].upstreamCompileOutput": {},
+                  "amm.interp[2.13.17].javacOptions": {},
+                  "amm.interp[2.13.17].scalacPluginClasspath": {
+                    "amm.interp[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.interp[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.interp[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.interp[2.13.17].mandatoryJavacOptions": {},
+                  "amm.interp[2.13.17].javaHome": {
+                    "amm.interp[2.13.17].jvmIndexVersion": {},
+                    "amm.interp[2.13.17].jvmId": {}
+                  },
+                  "amm.interp[2.13.17].allScalacOptions": {
+                    "amm.interp[2.13.17].enablePluginScalacOptions": {},
+                    "amm.interp[2.13.17].mandatoryScalacOptions": {},
+                    "amm.interp[2.13.17].scalacOptions": {}
+                  }
+                }
+              },
+              "amm.interp[2.13.17].localCompileClasspath": {
+                "amm.interp[2.13.17].unmanagedClasspath": {},
+                "amm.interp[2.13.17].compileResources": {}
+              }
+            },
+            "amm.runtime[2.13.17].localClasspath": {
+              "amm.runtime[2.13.17].localRunClasspath": {
+                "amm.runtime[2.13.17].compile": {
+                  "amm.runtime[2.13.17].javaHome": {
+                    "amm.runtime[2.13.17].jvmId": {},
+                    "amm.runtime[2.13.17].jvmIndexVersion": {}
+                  },
+                  "amm.runtime[2.13.17].javacOptions": {},
+                  "amm.runtime[2.13.17].mandatoryJavacOptions": {},
+                  "amm.runtime[2.13.17].allSourceFiles": {
+                    "amm.runtime[2.13.17].allSources": {
+                      "amm.runtime[2.13.17].generatedSources": {},
+                      "amm.runtime[2.13.17].sources": {
+                        "amm.runtime[2.13.17].customSources": {},
+                        "amm.runtime[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                          "amm.runtime[2.13.17].versionSources": {},
+                          "amm.runtime[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                        }
+                      }
+                    }
+                  },
+                  "amm.runtime[2.13.17].scalacPluginClasspath": {
+                    "amm.runtime[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.runtime[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.runtime[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.runtime[2.13.17].scalaOrganization": {},
+                  "amm.runtime[2.13.17].allScalacOptions": {
+                    "amm.runtime[2.13.17].enablePluginScalacOptions": {},
+                    "amm.runtime[2.13.17].mandatoryScalacOptions": {},
+                    "amm.runtime[2.13.17].scalacOptions": {}
+                  },
+                  "amm.runtime[2.13.17].zincIncrementalCompilation": {},
+                  "amm.runtime[2.13.17].upstreamCompileOutput": {},
+                  "amm.runtime[2.13.17].zincReportCachedProblems": {},
+                  "amm.runtime[2.13.17].scalaCompilerClasspath": {
+                    "amm.runtime[2.13.17].checkGradleModules": {}
+                  },
+                  "amm.runtime[2.13.17].compileClasspath": {
+                    "amm.runtime[2.13.17].resolvedMvnDeps": {
+                      "amm.runtime[2.13.17].artifactTypes": {}
+                    }
+                  }
+                },
+                "amm.runtime[2.13.17].resources": {},
+                "amm.runtime[2.13.17].localRunClasspath.super.RunModule": {}
+              },
+              "amm.runtime[2.13.17].localCompileClasspath": {
+                "amm.runtime[2.13.17].unmanagedClasspath": {},
+                "amm.runtime[2.13.17].compileResources": {}
+              }
+            },
+            "terminal[2.13.17].localClasspath": {
+              "terminal[2.13.17].localRunClasspath": {
+                "terminal[2.13.17].localRunClasspath.super.RunModule": {},
+                "terminal[2.13.17].compile": {
+                  "terminal[2.13.17].mandatoryJavacOptions": {},
+                  "terminal[2.13.17].zincIncrementalCompilation": {},
+                  "terminal[2.13.17].javaHome": {
+                    "terminal[2.13.17].jvmId": {},
+                    "terminal[2.13.17].jvmIndexVersion": {}
+                  },
+                  "terminal[2.13.17].scalaCompilerClasspath": {
+                    "terminal[2.13.17].checkGradleModules": {}
+                  },
+                  "terminal[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "terminal[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "terminal[2.13.17].compileClasspath": {
+                    "terminal[2.13.17].resolvedMvnDeps": {
+                      "terminal[2.13.17].artifactTypes": {}
+                    }
+                  },
+                  "terminal[2.13.17].scalacPluginClasspath": {
+                    "terminal[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "terminal[2.13.17].javacOptions": {},
+                  "terminal[2.13.17].upstreamCompileOutput": {},
+                  "terminal[2.13.17].allScalacOptions": {
+                    "terminal[2.13.17].mandatoryScalacOptions": {},
+                    "terminal[2.13.17].scalacOptions": {},
+                    "terminal[2.13.17].enablePluginScalacOptions": {}
+                  },
+                  "terminal[2.13.17].zincReportCachedProblems": {},
+                  "terminal[2.13.17].scalaOrganization": {},
+                  "terminal[2.13.17].allSourceFiles": {
+                    "terminal[2.13.17].allSources": {
+                      "terminal[2.13.17].sources": {
+                        "terminal[2.13.17].customSources": {},
+                        "terminal[2.13.17].sources.super.mill.scalalib.CrossSbtModule": {
+                          "terminal[2.13.17].versionSources": {},
+                          "terminal[2.13.17].sources.super.mill.scalalib.SbtModule": {}
+                        }
+                      },
+                      "terminal[2.13.17].generatedSources": {}
+                    }
+                  }
+                },
+                "terminal[2.13.17].resources": {}
+              },
+              "terminal[2.13.17].localCompileClasspath": {
+                "terminal[2.13.17].unmanagedClasspath": {},
+                "terminal[2.13.17].compileResources": {}
+              }
+            },
+            "amm.compiler[2.13.17].localClasspath": {
+              "amm.compiler[2.13.17].localCompileClasspath": {
+                "amm.compiler[2.13.17].unmanagedClasspath": {},
+                "amm.compiler[2.13.17].compileResources": {}
+              },
+              "amm.compiler[2.13.17].localRunClasspath": {
+                "amm.compiler[2.13.17].localRunClasspath.super.RunModule": {},
+                "amm.compiler[2.13.17].compile": {
+                  "amm.compiler[2.13.17].javaHome": {
+                    "amm.compiler[2.13.17].jvmIndexVersion": {},
+                    "amm.compiler[2.13.17].jvmId": {}
+                  },
+                  "amm.compiler[2.13.17].allScalacOptions": {
+                    "amm.compiler[2.13.17].enablePluginScalacOptions": {},
+                    "amm.compiler[2.13.17].mandatoryScalacOptions": {},
+                    "amm.compiler[2.13.17].scalacOptions": {}
+                  },
+                  "amm.compiler[2.13.17].upstreamCompileOutput": {},
+                  "amm.compiler[2.13.17].compileClasspath": {
+                    "amm.compiler[2.13.17].resolvedMvnDeps": {}
+                  },
+                  "amm.compiler[2.13.17].zincReportCachedProblems": {},
+                  "amm.compiler[2.13.17].scalaCompilerClasspath": {},
+                  "amm.compiler[2.13.17].zincAuxiliaryClassFileExtensions": {
+                    "amm.compiler[2.13.17].zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+                  },
+                  "amm.compiler[2.13.17].scalacPluginClasspath": {
+                    "amm.compiler[2.13.17].scalacPluginMvnDeps": {}
+                  },
+                  "amm.compiler[2.13.17].allSourceFiles": {},
+                  "amm.compiler[2.13.17].zincIncrementalCompilation": {},
+                  "amm.compiler[2.13.17].mandatoryJavacOptions": {},
+                  "amm.compiler[2.13.17].javacOptions": {}
+                },
+                "amm.compiler[2.13.17].resources": {}
+              }
+            }
+          }
+        },
+        "amm[2.13.17].resolvedIvyAssembly": {
+          "amm[2.13.17].upstreamIvyAssemblyClasspath": {
+            "amm[2.13.17].resolvedRunMvnDeps": {
+              "amm.repl[2.13.17].mvnDeps": {
+                "amm.repl[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm.util[2.13.17].repositories": {},
+              "amm.runtime[2.13.17].repositories": {},
+              "amm.interp.api[2.13.17].repositories": {},
+              "amm.repl.api[2.13.17].scalaVersion": {},
+              "terminal[2.13.17].scalaVersion": {},
+              "amm[2.13.17].runMvnDeps": {},
+              "amm.compiler[2.13.17].mvnDeps": {
+                "amm.compiler[2.13.17].isScala2": {},
+                "amm.compiler[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm.repl[2.13.17].platformSuffix": {},
+              "amm[2.13.17].mvnDeps": {},
+              "terminal[2.13.17].repositories": {},
+              "amm.repl.api[2.13.17].mvnDeps": {
+                "amm.repl.api[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm.runtime[2.13.17].mvnDeps": {
+                "amm.runtime[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm.interp.api[2.13.17].platformSuffix": {},
+              "amm.util[2.13.17].mvnDeps": {
+                "amm.util[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm[2.13.17].transitiveCoursierProjects": {
+                "amm.compiler[2.13.17].depManagement": {},
+                "amm.repl.api[2.13.17].compileMvnDeps": {
+                  "amm.repl.api[2.13.17].compileMvnDeps.super.build_.package_.AmmInternalModule": {
+                    "amm.repl.api[2.13.17].isScala2": {}
+                  }
+                },
+                "amm.runtime[2.13.17].runMvnDeps": {},
+                "amm.compiler[2.13.17].compileMvnDeps": {},
+                "amm.compiler.interface[2.13.17].platformSuffix": {},
+                "amm.compiler.interface[2.13.17].mvnDeps": {},
+                "amm.interp[2.13.17].compileMvnDeps": {
+                  "amm.interp[2.13.17].isScala2": {}
+                },
+                "amm.util[2.13.17].transitiveCoursierProjects": {},
+                "amm.repl[2.13.17].transitiveCoursierProjects": {},
+                "terminal[2.13.17].runMvnDeps": {},
+                "amm.repl.api[2.13.17].mandatoryMvnDeps": {
+                  "amm.repl.api[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {}
+                },
+                "amm.util[2.13.17].bomMvnDeps": {},
+                "terminal[2.13.17].transitiveCoursierProjects": {},
+                "amm.repl[2.13.17].depManagement": {},
+                "amm.util[2.13.17].mandatoryMvnDeps": {
+                  "amm.util[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {},
+                  "amm.util[2.13.17].scalaLibraryMvnDeps": {}
+                },
+                "amm.interp[2.13.17].runMvnDeps": {},
+                "amm.interp.api[2.13.17].bomMvnDeps": {},
+                "amm.interp.api[2.13.17].transitiveCoursierProjects": {},
+                "amm.runtime[2.13.17].compileMvnDeps": {
+                  "amm.runtime[2.13.17].isScala2": {}
+                },
+                "amm.interp[2.13.17].bomMvnDeps": {},
+                "amm.compiler[2.13.17].runMvnDeps": {},
+                "amm.repl.api[2.13.17].depManagement": {},
+                "terminal[2.13.17].compileMvnDeps": {
+                  "terminal[2.13.17].isScala2": {}
+                },
+                "amm.util[2.13.17].runMvnDeps": {},
+                "amm.runtime[2.13.17].bomMvnDeps": {},
+                "amm.interp.api[2.13.17].mandatoryMvnDeps": {
+                  "amm.interp.api[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {},
+                  "amm.interp.api[2.13.17].scalaLibraryMvnDeps": {}
+                },
+                "amm.interp[2.13.17].transitiveCoursierProjects": {
+                  "amm.compiler.interface[2.13.17].compileMvnDeps": {
+                    "amm.compiler.interface[2.13.17].isScala2": {}
+                  },
+                  "amm.compiler.interface[2.13.17].mandatoryMvnDeps": {
+                    "amm.compiler.interface[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {}
+                  },
+                  "amm.compiler.interface[2.13.17].runMvnDeps": {},
+                  "amm.compiler.interface[2.13.17].transitiveCoursierProjects": {},
+                  "amm.compiler.interface[2.13.17].bomMvnDeps": {},
+                  "amm.compiler.interface[2.13.17].depManagement": {}
+                },
+                "amm.compiler[2.13.17].bomMvnDeps": {},
+                "amm.compiler.interface[2.13.17].scalaVersion": {},
+                "amm.runtime[2.13.17].mandatoryMvnDeps": {
+                  "amm.runtime[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {},
+                  "amm.runtime[2.13.17].scalaLibraryMvnDeps": {}
+                },
+                "amm.repl[2.13.17].compileMvnDeps": {
+                  "amm.repl[2.13.17].compileMvnDeps.super.build_.package_.AmmInternalModule": {
+                    "amm.repl[2.13.17].isScala2": {}
+                  }
+                },
+                "amm.interp[2.13.17].depManagement": {},
+                "terminal[2.13.17].mandatoryMvnDeps": {
+                  "terminal[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {},
+                  "terminal[2.13.17].scalaLibraryMvnDeps": {}
+                },
+                "amm.runtime[2.13.17].depManagement": {},
+                "amm.compiler[2.13.17].transitiveCoursierProjects": {},
+                "amm.compiler[2.13.17].mandatoryMvnDeps": {
+                  "amm.compiler[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {}
+                },
+                "terminal[2.13.17].depManagement": {},
+                "amm.repl[2.13.17].runMvnDeps": {},
+                "amm.interp.api[2.13.17].runMvnDeps": {},
+                "amm.repl.api[2.13.17].bomMvnDeps": {},
+                "amm.repl[2.13.17].mandatoryMvnDeps": {
+                  "amm.repl[2.13.17].scalaLibraryMvnDeps": {},
+                  "amm.repl[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {}
+                },
+                "amm.repl.api[2.13.17].runMvnDeps": {},
+                "amm.interp[2.13.17].mandatoryMvnDeps": {
+                  "amm.interp[2.13.17].scalaLibraryMvnDeps": {},
+                  "amm.interp[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {}
+                },
+                "terminal[2.13.17].bomMvnDeps": {},
+                "amm.interp.api[2.13.17].depManagement": {},
+                "amm.repl.api[2.13.17].transitiveCoursierProjects": {},
+                "amm.util[2.13.17].depManagement": {},
+                "amm.runtime[2.13.17].transitiveCoursierProjects": {},
+                "amm.interp.api[2.13.17].compileMvnDeps": {
+                  "amm.interp.api[2.13.17].isScala2": {}
+                },
+                "amm.util[2.13.17].compileMvnDeps": {
+                  "amm.util[2.13.17].compileMvnDeps.super.build_.package_.AmmInternalModule": {
+                    "amm.util[2.13.17].isScala2": {}
+                  }
+                },
+                "amm.repl[2.13.17].bomMvnDeps": {}
+              },
+              "amm[2.13.17].depManagement": {},
+              "amm.util[2.13.17].platformSuffix": {},
+              "amm[2.13.17].bomMvnDeps": {},
+              "amm.repl[2.13.17].scalaVersion": {},
+              "amm.interp.api[2.13.17].mvnDeps": {
+                "amm.interp.api[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm.repl[2.13.17].repositories": {},
+              "amm[2.13.17].platformSuffix": {},
+              "amm.compiler[2.13.17].scalaVersion": {},
+              "amm.runtime[2.13.17].platformSuffix": {},
+              "amm.interp[2.13.17].mvnDeps": {
+                "amm.interp[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              },
+              "amm.interp[2.13.17].repositories": {},
+              "amm.compiler.interface[2.13.17].repositories": {},
+              "amm[2.13.17].scalaOrganization": {},
+              "amm.interp[2.13.17].scalaVersion": {},
+              "terminal[2.13.17].platformSuffix": {},
+              "amm[2.13.17].checkGradleModules": {},
+              "amm.interp[2.13.17].platformSuffix": {},
+              "amm[2.13.17].compileMvnDeps": {
+                "amm[2.13.17].isScala2": {}
+              },
+              "amm.repl.api[2.13.17].repositories": {},
+              "amm[2.13.17].mandatoryMvnDeps": {
+                "amm[2.13.17].scalaLibraryMvnDeps": {},
+                "amm[2.13.17].mandatoryMvnDeps.super.javalib.JavaModule": {}
+              },
+              "amm.compiler[2.13.17].repositories": {},
+              "amm.runtime[2.13.17].scalaVersion": {},
+              "amm.compiler[2.13.17].platformSuffix": {},
+              "amm.repl.api[2.13.17].platformSuffix": {},
+              "amm[2.13.17].repositories": {},
+              "amm.util[2.13.17].scalaVersion": {},
+              "amm[2.13.17].artifactTypes": {},
+              "amm.interp.api[2.13.17].scalaVersion": {},
+              "terminal[2.13.17].mvnDeps": {
+                "terminal[2.13.17].mvnDeps.super.mill.javalib.JavaModule": {}
+              }
+            }
+          }
+        }
+      },
+      "amm[2.13.17].prependShellScript": {
+        "amm[2.13.17].mainClass": {}
+      },
+      "mill.javalib.AssemblyModule.jarjarabramsWorker": {
+        "mill.javalib.AssemblyModule.jarjarabramsWorkerClassloader": {
+          "mill.javalib.AssemblyModule.jarjarabramsWorkerClasspath": {
+            "mill.javalib.AssemblyModule.checkGradleModules": {},
+            "mill.javalib.CoursierConfigModule.coursierEnv": {},
+            "mill.javalib.AssemblyModule.repositories": {}
+          }
+        }
+      },
+      "amm[2.13.17].manifest": {
+        "amm[2.13.17].manifest.super.scalalib.ScalaModule": {
+          "amm[2.13.17].manifest.super.javalib.AssemblyModule": {
+            "amm[2.13.17].manifest0": {
+              "amm[2.13.17].finalMainClassOpt": {
+                "amm[2.13.17].allLocalMainClasses": {
+                  "mill.javalib.classgraph.ClassgraphWorkerModule.classgraphWorker": {
+                    "mill.javalib.classgraph.ClassgraphWorkerModule.classgraphWorkerClassloader": {
+                      "mill.javalib.classgraph.ClassgraphWorkerModule.classgraphWorkerClasspath": {
+                        "mill.javalib.classgraph.ClassgraphWorkerModule.checkGradleModules": {},
+                        "mill.javalib.classgraph.ClassgraphWorkerModule.repositories": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "amm[2.13.17].scalaVersion": {}
+        },
+        "amm[2.13.17].artifactName": {},
+        "amm[2.13.17].pomSettings": {},
+        "amm[2.13.17].publishVersion": {}
+      }
+    }
+  }
+}

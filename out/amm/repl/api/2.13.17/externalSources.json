@@ -1,0 +1,10 @@
+{
+    "value": [
+        "qref:v1:bf895bdf:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6-sources.jar",
+        "qref:v1:1b49070c:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1-sources.jar",
+        "qref:v1:c983aa61:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17-sources.jar",
+        "qref:v1:7550c97b:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.12.0/scala-collection-compat_2.13-2.12.0-sources.jar"
+    ],
+    "valueHash": -984800625,
+    "inputsHash": -287254598
+}

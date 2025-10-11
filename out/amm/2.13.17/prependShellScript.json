@@ -1,0 +1,5 @@
+{
+    "value": "@ 2>/dev/null # 2>nul & echo off & goto BOF\r\n:\nif [ -z \"$JAVA_HOME\" ] ; then\n  JAVACMD=\"java\"\nelse\n  JAVACMD=\"$JAVA_HOME/bin/java\"\nfi\n\nexec \"$JAVACMD\" -Xmx500m -XX:+UseG1GC $JAVA_OPTS -cp \"$0\" ammonite.AmmoniteMain \"$@\"\n\nexit\n\r\n:BOF\r\nsetlocal\r\n@echo off\r\nsetlocal EnableDelayedExpansion\r\nset \"JAVACMD=java.exe\"\r\nif not \"%JAVA_HOME%\"==\"\" set \"JAVACMD=%JAVA_HOME%\\bin\\java.exe\"\r\n\r\n\"%JAVACMD%\" -Xmx500m -XX:+UseG1GC %JAVA_OPTS% -cp \"%~dpnx0\" ammonite.AmmoniteMain %*\r\n\r\nendlocal\r\n\r\nendlocal\r\nexit /B %errorlevel%\r\n",
+    "valueHash": 1791477153,
+    "inputsHash": 1427283757
+}

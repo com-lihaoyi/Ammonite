@@ -1,0 +1,10 @@
+{
+    "value": [
+        "ref:v0:5f99ae7a:/home/runner/work/Ammonite/Ammonite/out/amm/2.13.17/thinWhitelist.dest",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compile-resources",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/src/main/resources",
+        "ref:v0:99e53862:/home/runner/work/Ammonite/Ammonite/out/amm/2.13.17/compile.dest/classes"
+    ],
+    "valueHash": -1137682072,
+    "inputsHash": 472186211
+}

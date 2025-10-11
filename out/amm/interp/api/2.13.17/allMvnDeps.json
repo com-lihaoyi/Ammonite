@@ -1,0 +1,8 @@
+{
+    "value": [
+        "io.get-coursier:interface:1.0.28",
+        "org.scala-lang:scala-library:2.13.17"
+    ],
+    "valueHash": -336826863,
+    "inputsHash": 46959923
+}

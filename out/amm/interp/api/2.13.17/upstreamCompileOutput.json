@@ -1,0 +1,14 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:32bf4b84:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:1e588dc2:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes"
+        }
+    ],
+    "valueHash": -483725972,
+    "inputsHash": 871211391
+}

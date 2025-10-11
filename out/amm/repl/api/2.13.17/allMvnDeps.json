@@ -1,0 +1,9 @@
+{
+    "value": [
+        "com.lihaoyi::mainargs:0.7.6",
+        "com.lihaoyi::geny:1.1.1",
+        "org.scala-lang:scala-library:2.13.17"
+    ],
+    "valueHash": 1884496961,
+    "inputsHash": 1495909177
+}

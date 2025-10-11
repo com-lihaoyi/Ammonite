@@ -1,0 +1,12 @@
+{
+    "value": {
+        "wrapped": [
+            "ref:v0:2a404b5d:/home/runner/work/Ammonite/Ammonite/out/mill-build/generatedScriptSources.dest/wrapped"
+        ],
+        "support": [
+            "ref:v0:34480208:/home/runner/work/Ammonite/Ammonite/out/mill-build/generatedScriptSources.dest/support"
+        ]
+    },
+    "valueHash": 530526012,
+    "inputsHash": 1194179516
+}

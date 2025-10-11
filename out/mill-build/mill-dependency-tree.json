@@ -1,0 +1,86 @@
+{
+  "millBuildRootModuleResult": {
+    "codeSignatures": {},
+    "compile": {
+      "compileClasspath": {
+        "resolvedMvnDeps": {}
+      },
+      "allSourceFiles": {
+        "allSources": {
+          "sources": {
+            "sources.super.javalib.JavaModule": {}
+          },
+          "generatedSources": {}
+        },
+        "scriptSources": {}
+      },
+      "zincAuxiliaryClassFileExtensions": {
+        "zincAuxiliaryClassFileExtensions.super.javalib.JavaModule": {}
+      },
+      "scalaVersion": {},
+      "generatedScriptSources": {
+        "parseBuildFiles": {}
+      },
+      "zincReportCachedProblems": {},
+      "javacOptions": {},
+      "javaHome": {
+        "jvmId": {},
+        "jvmIndexVersion": {}
+      },
+      "mill.javalib.JvmWorkerModule.internalWorker": {
+        "mill.javalib.JvmWorkerModule.repositories": {},
+        "mill.javalib.JvmWorkerModule.classpath": {},
+        "mill.javalib.JvmWorkerModule.zincLogDebug": {},
+        "mill.javalib.JvmWorkerModule.checkGradleModules": {}
+      },
+      "zincIncrementalCompilation": {},
+      "upstreamCompileOutput": {},
+      "millVersion": {},
+      "scalaOrganization": {},
+      "allScalacOptions": {
+        "mandatoryScalacOptions": {},
+        "scalacOptions": {
+          "scalacOptions.super.scalalib.ScalaModule": {}
+        },
+        "enablePluginScalacOptions": {}
+      },
+      "mandatoryJavacOptions": {},
+      "scalacPluginClasspath": {
+        "scalacPluginMvnDeps": {}
+      },
+      "scalaCompilerClasspath": {
+        "scalaLibraryMvnDeps": {}
+      }
+    },
+    "runClasspath": {
+      "localClasspath": {
+        "localCompileClasspath": {
+          "compileResources": {},
+          "unmanagedClasspath": {}
+        },
+        "localRunClasspath": {
+          "resources": {},
+          "localRunClasspath.super.RunModule": {}
+        }
+      },
+      "transitiveLocalClasspath": {},
+      "resolvedRunMvnDeps": {
+        "mandatoryMvnDeps": {},
+        "mill.javalib.CoursierConfigModule.coursierEnv": {},
+        "depManagement": {},
+        "artifactTypes": {},
+        "checkGradleModules": {},
+        "compileMvnDeps": {},
+        "repositories": {},
+        "transitiveCoursierProjects": {},
+        "runMvnDeps": {
+          "cliImports": {}
+        },
+        "mvnDeps": {},
+        "bomMvnDeps": {},
+        "platformSuffix": {}
+      },
+      "runClasspath.super.RunModule": {}
+    }
+  }
+}

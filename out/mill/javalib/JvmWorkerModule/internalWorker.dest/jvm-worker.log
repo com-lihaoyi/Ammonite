@@ -1,0 +1,1416 @@
+[2025-10-11T11:07:47.292100|req#0] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Res.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/WhiteListClassLoader.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Classpath.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/PositionOffsetConversion.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Frame.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Imports.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Model.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/ReplClassLoader.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Position.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/scala/ammonite/util/Util.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/java/io/github/retronym/java9rtexport/Export.java,
+    /home/runner/work/Ammonite/Ammonite/amm/util/src/main/java/io/github/retronym/java9rtexport/Copy.java
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:07:47.291534|req#1] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/SpecialKeys.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/Protocol.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/Terminal.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/HistoryFilter.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/UndoFilter.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/ReadlineFilters.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/BasicFilters.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/filters/GUILikeFilters.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/ConsoleDim.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/Filter.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/LineReader.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/Utils.scala,
+    /home/runner/work/Ammonite/Ammonite/terminal/src/main/scala/ammonite/terminal/FilterTools.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.4/sourcecode_2.13-0.4.4.jar,
+    /home/runner/work/Ammonite/Ammonite/terminal/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:07:47.297428|req#0] Using local Zinc instance
+[2025-10-11T11:07:47.297428|req#1] Using local Zinc instance
+[2025-10-11T11:08:04.719776|req#1] Compilation took 17418ms
+[2025-10-11T11:08:06.294496|req#0] Compilation took 18993ms
+[2025-10-11T11:08:06.305301|req#2] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/CompilerBuilder.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/Compiler.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/Parser.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/CodeWrapper.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/CompilerLifecycleManager.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala/ammonite/compiler/iface/Preprocessor.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:06.305660|req#2] Using local Zinc instance
+[2025-10-11T11:08:07.004417|req#2] Compilation took 698ms
+[2025-10-11T11:08:07.023908|req#3] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/Stubs.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/AmmoniteExit.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/InterpAPI.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/APIHolder.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/src/main/scala/ammonite/interp/api/IvyConstructor.scala,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/constantsSourceDir.dest/src/Constants.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:07.024222|req#3] Using local Zinc instance
+[2025-10-11T11:08:07.427591|req#3] Compilation took 403ms
+[2025-10-11T11:08:07.443233|req#4] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1808938000[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/SessionChanged.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/FrontEnd.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/ReplAPI.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/api/FrontEndAPI.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/tools/Util.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/repl/FullReplAPI.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/runtime/tools/package.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala/ammonite/runtime/tools/Tools.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2/ammonite/repl/api/ReplAPIScalaVersionSpecific.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2/ammonite/repl/FullReplAPIScalaVersionSpecific.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/src/main/scala-2.13-or-3/ammonite/repl/api/History.scala,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/generatedSources.dest/src/Constants.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:07.443618|req#4] Using local Zinc instance
+[2025-10-11T11:08:08.527418|req#4] Compilation took 1083ms
+[2025-10-11T11:08:08.545328|req#5] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1808938000[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m2025886025[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala/ammonite/compiler/DefaultCodeWrapper.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala/ammonite/compiler/CodeClassWrapper.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala/ammonite/compiler/CompilerUtil.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.13/ammonite/compiler/CompilerCompatibility.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/scala/tools/nsc/CustomZipAndJarFileLookupFactory.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/CompilerBuilder.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Highlighter.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/DefaultPreprocessor.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Pressy.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/internal/CustomURLZipArchive.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Compiler.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/AmmonitePlugin.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/desugar.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/HighlightJava.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/SourceRuntime.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/tools/source.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/CompilerExtensions.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/CompilerLifecycleManager.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2/ammonite/compiler/Parsers.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.12.10-2.13.1+/scala/tools/nsc/AmmClassPath.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.12.10-2.13.1+/scala/tools/nsc/WhiteListClasspath.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/src/main/scala-2.13.12+/ammonite/compiler/MakeReporter.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.13/3.1.1/scalaparse_2.13-3.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.0.1/scala-xml_2.13-2.0.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/javaparser/javaparser-core/3.2.12/javaparser-core-3.2.12.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/3.1.1/fastparse_2.13-3.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:08.545809|req#5] Using local Zinc instance
+[2025-10-11T11:08:08.553899|req#6] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1808938000[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m2025886025[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/package.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Evaluator.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ClassLoaders.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Storage.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ImportHook.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/class-path-util_2.13/0.1.4/class-path-util_2.13-0.1.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.13/4.3.2/upickle_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/requests_2.13/0.9.0/requests_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency-interface_2.13/0.3.2/dependency-interface_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.13/4.3.2/ujson_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upack_2.13/4.3.2/upack_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-implicits_2.13/4.3.2/upickle-implicits_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency_2.13/0.3.2/dependency_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-core_2.13/4.3.2/upickle-core_2.13-4.3.2.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:08.554286|req#6] Using local Zinc instance
+[2025-10-11T11:08:12.766886|req#6] Compilation took 4212ms
+[2025-10-11T11:08:12.785005|req#7] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m2025886025[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1808938000[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m893120324[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/PredefInitialization.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/Watchable.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/DependencyLoader.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/Interpreter.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/IvyThing.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/SemanticdbProcessor.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompileResult.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptProcessor.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/SingleScriptCompiler.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/AmmoniteBuildServer.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/DummyBuildServerImplems.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCache.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/Diagnostic.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/Script.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/src/main/scala/ammonite/interp/script/ScriptCompiler.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/bsp4j/2.1.1/bsp4j-2.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/3.1.1/fastparse_2.13-3.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-shared_2.13/4.13.10/semanticdb-shared_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/class-path-util_2.13/0.1.4/class-path-util_2.13-0.1.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.13/4.3.2/upickle_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/requests_2.13/0.9.0/requests_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency-interface_2.13/0.3.2/dependency-interface_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/lsp4j/org.eclipse.lsp4j.generator/0.20.1/org.eclipse.lsp4j.generator-0.20.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/lsp4j/org.eclipse.lsp4j.jsonrpc/0.20.1/org.eclipse.lsp4j.jsonrpc-0.20.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.4/sourcecode_2.13-0.4.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.13/4.13.10/scalameta_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scalap/2.13.13/scalap-2.13.13.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.13/0.11.15/scalapb-runtime_2.13-0.11.15.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.13/4.3.2/ujson_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upack_2.13/4.3.2/upack_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-implicits_2.13/4.3.2/upickle-implicits_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency_2.13/0.3.2/dependency_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtend/org.eclipse.xtend.lib/2.28.0/org.eclipse.xtend.lib-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.13/4.13.10/parsers_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.13/0.11.15/lenses_2.13-0.11.15.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.6/protobuf-java-3.19.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-core_2.13/4.3.2/upickle-core_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtext/org.eclipse.xtext.xbase.lib/2.28.0/org.eclipse.xtext.xbase.lib-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtend/org.eclipse.xtend.lib.macro/2.28.0/org.eclipse.xtend.lib.macro-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.13/4.13.10/trees_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/guava/30.1-jre/guava-30.1-jre.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.13/4.13.10/common_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.13/4.13.10/io_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:12.785463|req#7] Using local Zinc instance
+[2025-10-11T11:08:16.944371|req#7] Compilation took 4158ms
+[2025-10-11T11:08:16.960769|req#8] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m2025886025[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1808938000[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m893120324[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1000827435[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1256870814[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/package.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/AmmoniteFrontEnd.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/Signaller.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEnds.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/ApiImpls.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/PPrints.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/FrontEndUtils.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/repl/Repl.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala/ammonite/main/Defaults.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/src/main/scala-2/ammonite/main/DefaultsScalaVersionSpecific.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-terminal/3.14.1/jline-terminal-3.14.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-terminal-jna/3.14.1/jline-terminal-jna-3.14.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-reader/3.14.1/jline-reader-3.14.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.0.1/scala-xml_2.13-2.0.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/class-path-util_2.13/0.1.4/class-path-util_2.13-0.1.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.13/4.3.2/upickle_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/requests_2.13/0.9.0/requests_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency-interface_2.13/0.3.2/dependency-interface_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/bsp4j/2.1.1/bsp4j-2.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/3.1.1/fastparse_2.13-3.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-shared_2.13/4.13.10/semanticdb-shared_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.4/sourcecode_2.13-0.4.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/5.3.1/jna-5.3.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.13/4.3.2/ujson_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upack_2.13/4.3.2/upack_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-implicits_2.13/4.3.2/upickle-implicits_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency_2.13/0.3.2/dependency_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/lsp4j/org.eclipse.lsp4j.generator/0.20.1/org.eclipse.lsp4j.generator-0.20.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/lsp4j/org.eclipse.lsp4j.jsonrpc/0.20.1/org.eclipse.lsp4j.jsonrpc-0.20.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.13/4.13.10/scalameta_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scalap/2.13.13/scalap-2.13.13.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.13/0.11.15/scalapb-runtime_2.13-0.11.15.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-core_2.13/4.3.2/upickle-core_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtend/org.eclipse.xtend.lib/2.28.0/org.eclipse.xtend.lib-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.13/4.13.10/parsers_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.13/0.11.15/lenses_2.13-0.11.15.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.6/protobuf-java-3.19.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtext/org.eclipse.xtext.xbase.lib/2.28.0/org.eclipse.xtext.xbase.lib-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtend/org.eclipse.xtend.lib.macro/2.28.0/org.eclipse.xtend.lib.macro-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.13/4.13.10/trees_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/guava/30.1-jre/guava-30.1-jre.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.13/4.13.10/common_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.13/4.13.10/io_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/terminal/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:16.961194|req#8] Using local Zinc instance
+[2025-10-11T11:08:18.865680|req#8] Compilation took 1904ms
+[2025-10-11T11:08:19.216515|req#5] Compilation took 10670ms
+[2025-10-11T11:08:19.236501|req#9] [33mZincCompileMixed[39m(
+  upstreamCompileOutput = [33mVector[39m(
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1256870814[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m851397508[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m2025886025[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m509119938[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1808938000[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m893120324[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-1000827435[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m-2037447620[39m,
+        revalidate = Never
+      )
+    ),
+    [33mCompilationResult[39m(
+      analysisFile = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.17/compile.dest/zinc,
+      classes = [33mPathRef[39m(
+        path = /home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.17/compile.dest/classes,
+        quick = [32mfalse[39m,
+        sig = [32m1526300664[39m,
+        revalidate = Never
+      )
+    )
+  ),
+  sources = [33mArraySeq[39m(
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/MainRunner.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/Main.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/AmmoniteMain.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/TrapExitSecurityManager.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/Config.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/package.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/Scripts.scala,
+    /home/runner/work/Ammonite/Ammonite/amm/src/main/scala/ammonite/main/ProxyFromEnv.scala
+  ),
+  compileClasspath = [33mList[39m(
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fansi_2.13/0.5.1/fansi_2.13-0.5.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.4/sourcecode_2.13-0.4.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-lib_2.13/0.11.5/os-lib_2.13-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/tpolecat/typename_2.13/1.1.0/typename_2.13-1.1.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-collection-compat_2.13/2.14.0/scala-collection-compat_2.13-2.14.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/pprint_2.13/0.9.0/pprint_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/class-path-util_2.13/0.1.4/class-path-util_2.13-0.1.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle_2.13/4.3.2/upickle_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/requests_2.13/0.9.0/requests_2.13-0.9.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/mainargs_2.13/0.7.6/mainargs_2.13-0.7.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency-interface_2.13/0.3.2/dependency-interface_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/interface/1.0.28/interface-1.0.28.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.1/geny_2.13-1.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/ch/epfl/scala/bsp4j/2.1.1/bsp4j-2.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/3.1.1/fastparse_2.13-3.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-shared_2.13/4.13.10/semanticdb-shared_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-terminal/3.14.1/jline-terminal-3.14.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-terminal-jna/3.14.1/jline-terminal-jna-3.14.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline-reader/3.14.1/jline-reader-3.14.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.0.1/scala-xml_2.13-2.0.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.13/3.1.1/scalaparse_2.13-3.1.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/javaparser/javaparser-core/3.2.12/javaparser-core-3.2.12.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/os-zip/0.11.5/os-zip-0.11.5.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/ujson_2.13/4.3.2/ujson_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upack_2.13/4.3.2/upack_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-implicits_2.13/4.3.2/upickle-implicits_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/get-coursier/dependency_2.13/0.3.2/dependency_2.13-0.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/lsp4j/org.eclipse.lsp4j.generator/0.20.1/org.eclipse.lsp4j.generator-0.20.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/lsp4j/org.eclipse.lsp4j.jsonrpc/0.20.1/org.eclipse.lsp4j.jsonrpc-0.20.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/scalameta_2.13/4.13.10/scalameta_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scalap/2.13.13/scalap-2.13.13.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/scalapb-runtime_2.13/0.11.15/scalapb-runtime_2.13-0.11.15.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/net/java/dev/jna/jna/5.3.1/jna-5.3.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/upickle-core_2.13/4.3.2/upickle-core_2.13-4.3.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtend/org.eclipse.xtend.lib/2.28.0/org.eclipse.xtend.lib-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/parsers_2.13/4.13.10/parsers_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/thesamet/scalapb/lenses_2.13/0.11.15/lenses_2.13-0.11.15.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/protobuf/protobuf-java/3.19.6/protobuf-java-3.19.6.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtext/org.eclipse.xtext.xbase.lib/2.28.0/org.eclipse.xtext.xbase.lib-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/eclipse/xtend/org.eclipse.xtend.lib.macro/2.28.0/org.eclipse.xtend.lib.macro-2.28.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/trees_2.13/4.13.10/trees_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/guava/30.1-jre/guava-30.1-jre.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/common_2.13/4.13.10/common_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/io_2.13/4.13.10/io_2.13-4.13.10.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/checkerframework/checker-qual/3.5.0/checker-qual-3.5.0.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.3.4/error_prone_annotations-2.3.4.jar,
+    /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar,
+    /home/runner/work/Ammonite/Ammonite/terminal/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/util/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/interface/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/api/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/runtime/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/interp/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/repl/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compiler/compile-resources,
+    /home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.17/compile.dest/classes,
+    /home/runner/work/Ammonite/Ammonite/amm/compile-resources
+  ),
+  javacOptions = [33mJavaCompilerOptions[39m([33mList[39m([32m"-source"[39m, [32m"1.8"[39m, [32m"-target"[39m, [32m"1.8"[39m)),
+  scalaVersion = [32m"2.13.17"[39m,
+  scalaOrganization = [32m"org.scala-lang"[39m,
+  scalacOptions = [33mList[39m(
+    [32m"-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar"[39m,
+    [32m"-P:acyclic:force"[39m
+  ),
+  compilerClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m130492794[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m-84992303[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar,
+      quick = [32mtrue[39m,
+      sig = [32m387231293[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar,
+      quick = [32mtrue[39m,
+      sig = [32m401293690[39m,
+      revalidate = Once
+    )
+  ),
+  scalacPluginClasspath = [33mList[39m(
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.17/0.3.19/acyclic_2.13.17-0.3.19.jar,
+      quick = [32mtrue[39m,
+      sig = [32m175321169[39m,
+      revalidate = Once
+    ),
+    [33mPathRef[39m(
+      path = /home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17.jar,
+      quick = [32mtrue[39m,
+      sig = [32m1347585619[39m,
+      revalidate = Once
+    )
+  ),
+  incrementalCompilation = [32mtrue[39m,
+  auxiliaryClassFileExtensions = [33mList[39m()
+)
+[2025-10-11T11:08:19.239159|req#9] Using local Zinc instance
+[2025-10-11T11:08:20.651449|req#9] Compilation took 1407ms

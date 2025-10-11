@@ -1,0 +1,4475 @@
+{
+    "value": [
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "amm-util-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "os-lib_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.11.5",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "os-lib_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.11.5",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.tpolecat"
+                            },
+                            "name": {
+                                "value": "typename_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "1.1.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.tpolecat"
+                            },
+                            "name": {
+                                "value": "typename_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "1.1.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang.modules"
+                            },
+                            "name": {
+                                "value": "scala-collection-compat_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.14.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang.modules"
+                            },
+                            "name": {
+                                "value": "scala-collection-compat_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.14.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "fansi_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.5.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "fansi_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.5.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "pprint_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.9.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "pprint_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.9.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-reflect"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        },
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "amm-runtime-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-interp-api-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-interp-api-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-repl-api-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-repl-api-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "io.get-coursier"
+                            },
+                            "name": {
+                                "value": "class-path-util_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.1.4",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "io.get-coursier"
+                            },
+                            "name": {
+                                "value": "class-path-util_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.1.4",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "upickle_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "4.3.2",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "upickle_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "4.3.2",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "requests_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.9.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "requests_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.9.0",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "mainargs_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.7.6",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "mainargs_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.7.6",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "io.get-coursier"
+                            },
+                            "name": {
+                                "value": "dependency-interface_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.2",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "io.get-coursier"
+                            },
+                            "name": {
+                                "value": "dependency-interface_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.2",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        },
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "amm-interp-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-runtime-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-runtime-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-compiler-interface-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-compiler-interface-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "ch.epfl.scala"
+                            },
+                            "name": {
+                                "value": "bsp4j"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.1.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "ch.epfl.scala"
+                            },
+                            "name": {
+                                "value": "bsp4j"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.1.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "fastparse_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "3.1.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "fastparse_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "3.1.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scalameta"
+                            },
+                            "name": {
+                                "value": "semanticdb-shared_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "4.13.10",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scalameta"
+                            },
+                            "name": {
+                                "value": "semanticdb-shared_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "4.13.10",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        },
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "terminal-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "fansi_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.5.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "fansi_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.5.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "sourcecode_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.4.4",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "sourcecode_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.4.4",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        },
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "amm-compiler-interface-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        },
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "amm-interp-api-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-compiler-interface-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-compiler-interface-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "io.get-coursier"
+                            },
+                            "name": {
+                                "value": "interface"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "1.0.28",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "io.get-coursier"
+                            },
+                            "name": {
+                                "value": "interface"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "1.0.28",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        },
+        {
+            "module": {
+                "organization": {
+                    "value": "mill-internal"
+                },
+                "name": {
+                    "value": "amm-repl-api-2.13.17"
+                },
+                "attributes": {}
+            },
+            "version0": "0+mill-internal",
+            "dependencies0": [
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-util-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-interp-api-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "mill-internal"
+                            },
+                            "name": {
+                                "value": "amm-interp-api-2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0+mill-internal",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-library"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "mainargs_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.7.6",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "mainargs_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.7.6",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "compile"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "geny_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "1.1.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "runtime"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "geny_2.13"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "1.1.1",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "runtime"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "com.lihaoyi"
+                            },
+                            "name": {
+                                "value": "acyclic_2.13.17"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "0.3.19",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ],
+                [
+                    {
+                        "$type": "Configuration",
+                        "configuration": {
+                            "value": "provided"
+                        }
+                    },
+                    {
+                        "module": {
+                            "organization": {
+                                "value": "org.scala-lang"
+                            },
+                            "name": {
+                                "value": "scala-reflect"
+                            },
+                            "attributes": {}
+                        },
+                        "versionConstraint": "2.13.17",
+                        "variantSelector": {
+                            "$type": "ConfigurationBased",
+                            "configuration": {
+                                "value": "compile"
+                            }
+                        },
+                        "minimizedExclusions": {
+                            "data": "ExcludeNone"
+                        },
+                        "publication": {
+                            "name": "",
+                            "type": {
+                                "value": ""
+                            },
+                            "ext": {
+                                "value": ""
+                            },
+                            "classifier": {
+                                "value": ""
+                            }
+                        },
+                        "optional": false,
+                        "transitive": true,
+                        "overrides": [],
+                        "boms": [],
+                        "bomDependencies": [],
+                        "overridesMap": [],
+                        "endorseStrictVersions": false
+                    }
+                ]
+            ],
+            "configurations": [
+                [
+                    {
+                        "value": "test"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "provided"
+                    },
+                    [
+                        {
+                            "value": "provided"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "compile"
+                    },
+                    []
+                ],
+                [
+                    {
+                        "value": "default"
+                    },
+                    [
+                        {
+                            "value": "runtime"
+                        }
+                    ]
+                ],
+                [
+                    {
+                        "value": "runtime"
+                    },
+                    [
+                        {
+                            "value": "compile"
+                        }
+                    ]
+                ]
+            ],
+            "parent0": null,
+            "dependencyManagement0": [],
+            "properties": [],
+            "profiles": [],
+            "versions": null,
+            "snapshotVersioning": null,
+            "packagingOpt": null,
+            "relocated": false,
+            "actualVersionOpt0": null,
+            "publications0": [],
+            "info": {
+                "description": "",
+                "homePage": "",
+                "developers": [],
+                "publication": null,
+                "scm": null,
+                "licenseInfo": []
+            },
+            "overrides": [],
+            "variants": {},
+            "variantPublications": {}
+        }
+    ],
+    "valueHash": 367673206,
+    "inputsHash": -911969970
+}

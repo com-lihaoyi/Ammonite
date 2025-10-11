@@ -1,0 +1,10 @@
+{
+    "value": [
+        "ref:v0:d1879e6d:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.17/jar.dest/out.jar",
+        "ref:v0:ddd79236:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/jar.dest/out.jar",
+        "ref:v0:57c429be:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/jar.dest/out.jar",
+        "ref:v0:e672d55c:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/jar.dest/out.jar"
+    ],
+    "valueHash": 675155700,
+    "inputsHash": -1427935064
+}

@@ -1,0 +1,20 @@
+{
+    "value": {
+        "main": {
+            "Licenses": "MIT (MIT License)",
+            "URL": "https://github.com/com-lihaoyi/Ammonite",
+            "Manifest-Version": "1.0",
+            "Implementation-Version": "3.0.3",
+            "Description": "ammonite",
+            "Implementation-Vendor": "com.lihaoyi",
+            "Implementation-Title": "ammonite",
+            "Scala-Version": "2.13.17",
+            "Main-Class": "ammonite.AmmoniteMain",
+            "Created-By": "Mill 1.0.6",
+            "Tool": "Mill-1.0.6"
+        },
+        "groups": {}
+    },
+    "valueHash": -710472372,
+    "inputsHash": 519714233
+}

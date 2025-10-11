@@ -1,0 +1,18 @@
+{
+    "value": [
+        "qref:v1:df68498d:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17-sources.jar",
+        "qref:v1:0eeb7c19:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/scalaparse_2.13/3.1.1/scalaparse_2.13-3.1.1-sources.jar",
+        "qref:v1:e75a2be1:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.13/2.0.1/scala-xml_2.13-2.0.1-sources.jar",
+        "qref:v1:44baeda9:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA-sources.jar",
+        "qref:v1:b6b71d6a:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/javaparser/javaparser-core/3.2.12/javaparser-core-3.2.12-sources.jar",
+        "qref:v1:c983aa61:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.17/scala-library-2.13.17-sources.jar",
+        "qref:v1:56ebc07f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.13.17/scala-reflect-2.13.17-sources.jar",
+        "qref:v1:f104a9c5:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16-sources.jar",
+        "qref:v1:986afb6f:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-sources.jar",
+        "qref:v1:c6c8ba4e:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/fastparse_2.13/3.1.1/fastparse_2.13-3.1.1-sources.jar",
+        "qref:v1:54d6279e:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/sourcecode_2.13/0.4.0/sourcecode_2.13-0.4.0-sources.jar",
+        "qref:v1:adbee315:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/geny_2.13/1.1.0/geny_2.13-1.1.0-sources.jar"
+    ],
+    "valueHash": 103505161,
+    "inputsHash": 1139912113
+}

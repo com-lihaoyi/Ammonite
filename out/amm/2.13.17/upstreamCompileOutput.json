@@ -1,0 +1,42 @@
+{
+    "value": [
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:b515ac62:/home/runner/work/Ammonite/Ammonite/out/terminal/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:32bf4b84:/home/runner/work/Ammonite/Ammonite/out/amm/util/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:78c09149:/home/runner/work/Ammonite/Ammonite/out/amm/repl/api/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:1e588dc2:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/interface/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:942dcbf0:/home/runner/work/Ammonite/Ammonite/out/amm/interp/api/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:353bef44:/home/runner/work/Ammonite/Ammonite/out/amm/runtime/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:c45895d5:/home/runner/work/Ammonite/Ammonite/out/amm/interp/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:868f043c:/home/runner/work/Ammonite/Ammonite/out/amm/repl/2.13.17/compile.dest/classes"
+        },
+        {
+            "analysisFile": "/home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.17/compile.dest/zinc",
+            "classes": "ref:v0:5af97ff8:/home/runner/work/Ammonite/Ammonite/out/amm/compiler/2.13.17/compile.dest/classes"
+        }
+    ],
+    "valueHash": -501469111,
+    "inputsHash": -547849854
+}

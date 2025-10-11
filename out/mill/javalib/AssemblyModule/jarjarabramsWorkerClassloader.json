@@ -1,0 +1,9 @@
+{
+    "value": {
+        "worker": "mill.javalib.AssemblyModule.jarjarabramsWorkerClassloader",
+        "toString": "mill.api.daemon.MillURLClassLoader@195dcc87",
+        "inputsHash": -1439254464
+    },
+    "valueHash": -1439254464,
+    "inputsHash": -1439254464
+}

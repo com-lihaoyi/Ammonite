@@ -1,0 +1,11 @@
+{
+    "value": [
+        "io.get-coursier::class-path-util:0.1.4",
+        "com.lihaoyi::upickle:4.3.2",
+        "com.lihaoyi::requests:0.9.0",
+        "com.lihaoyi::mainargs:0.7.6",
+        "io.get-coursier::dependency-interface:0.3.2"
+    ],
+    "valueHash": 1515939353,
+    "inputsHash": 1707453451
+}

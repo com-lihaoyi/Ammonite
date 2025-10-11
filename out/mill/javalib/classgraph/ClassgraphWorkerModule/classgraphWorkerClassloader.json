@@ -1,0 +1,9 @@
+{
+    "value": {
+        "worker": "mill.javalib.classgraph.ClassgraphWorkerModule.classgraphWorkerClassloader",
+        "toString": "mill.api.daemon.MillURLClassLoader@6bd5921a",
+        "inputsHash": -1354429674
+    },
+    "valueHash": -1354429674,
+    "inputsHash": -1354429674
+}
