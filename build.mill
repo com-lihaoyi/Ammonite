@@ -114,7 +114,7 @@ object Deps {
   val fansi = mvn"com.lihaoyi::fansi:0.5.1"
   val fastparse = mvn"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = mvn"com.lihaoyi::geny:1.1.1"
-  val javaparserCore = mvn"com.github.javaparser:javaparser-core:3.2.12"
+  val javaparserCore = mvn"com.github.javaparser:javaparser-core:3.27.1"
   val javassist = mvn"org.javassist:javassist:3.21.0-GA"
   val jlineJna = mvn"org.jline:jline-terminal-jna:3.14.1"
   val jlineReader = mvn"org.jline:jline-reader:3.14.1"
