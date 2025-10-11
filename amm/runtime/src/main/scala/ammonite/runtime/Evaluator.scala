@@ -27,6 +27,7 @@ trait Evaluator {
       printer: Printer,
       indexedWrapperName: Name,
       wrapperPath: Seq[Name],
+      pkgName: Seq[Name],
       silent: Boolean,
       contextClassLoader: ClassLoader
   ): Res[Evaluated]
@@ -114,11 +115,12 @@ object Evaluator {
         printer: Printer,
         indexedWrapperName: Name,
         wrapperPath: Seq[Name],
+        pkgName: Seq[Name],
         silent: Boolean,
         contextClassLoader: ClassLoader
     ) = {
       for {
-        cls <- loadClass("ammonite.$sess." + indexedWrapperName.backticked, classFiles)
+        cls <- loadClass(pkgName.map(_.backticked + ".").mkString + indexedWrapperName.backticked, classFiles)
         _ <- Catching { userCodeExceptionHandler }
       } yield {
         headFrame.usedEarlierDefinitions = usedEarlierDefinitions
@@ -132,7 +134,7 @@ object Evaluator {
 
         // "" Empty string as cache tag of repl code
         evaluationResult(
-          Seq(Name("ammonite"), Name("$sess"), indexedWrapperName),
+          pkgName ++ Seq(indexedWrapperName),
           wrapperPath,
           newImports
         )

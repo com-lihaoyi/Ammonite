@@ -6,7 +6,7 @@ rem This script determines the Mill version to use by trying these sources
 rem   - env-variable `MILL_VERSION`
 rem   - local file `.mill-version`
 rem   - local file `.config/mill-version`
-rem   - `mill-version` from YAML fronmatter of current buildfile
+rem   - `mill-version` from YAML frontmatter of current buildfile
 rem   - if accessible, find the latest stable version available on Maven Central (https://repo1.maven.org/maven2)
 rem   - env-variable `DEFAULT_MILL_VERSION`
 rem
@@ -23,7 +23,7 @@ rem this script downloads a binary file from Maven Central or Github Pages (this
 rem into a cache location (%USERPROFILE%\.mill\download).
 rem
 rem Mill Project URL: https://github.com/com-lihaoyi/mill
-rem Script Version: 1.0.0-M1-21-7b6fae-DIRTY892b63e8
+rem Script Version: 1.0.6
 rem
 rem If you want to improve this script, please also contribute your changes back!
 rem This script was generated from: dist/scripts/src/mill.bat
@@ -34,7 +34,7 @@ rem setlocal seems to be unavailable on Windows 95/98/ME
 rem but I don't think we need to support them in 2019
 setlocal enabledelayedexpansion
 
-if [!DEFAULT_MILL_VERSION!]==[] ( set "DEFAULT_MILL_VERSION=0.12.10" )
+if [!DEFAULT_MILL_VERSION!]==[] ( set "DEFAULT_MILL_VERSION=1.0.6" )
 
 if [!MILL_GITHUB_RELEASE_CDN!]==[] ( set "MILL_GITHUB_RELEASE_CDN=" )
 
@@ -66,9 +66,35 @@ if [!MILL_VERSION!]==[] (
       set /p MILL_VERSION=<.config\mill-version
     ) else (
       if not "%MILL_BUILD_SCRIPT%"=="" (
-        for /f "tokens=1-2*" %%a in ('findstr /C:"//| mill-version:" %MILL_BUILD_SCRIPT%') do (
-          set "MILL_VERSION=%%c"
+        rem Find the line and process it
+        for /f "tokens=*" %%a in ('findstr /R /C:"//\|.*mill-version" "%MILL_BUILD_SCRIPT%"') do (
+            set "line=%%a"
+
+            rem --- 1. Replicate sed 's/.*://' ---
+            rem This removes everything up to and including the first colon
+            set "line=!line:*:=!"
+
+            rem --- 2. Replicate sed 's/#.*//' ---
+            rem Split on '#' and keep the first part
+            for /f "tokens=1 delims=#" %%b in ("!line!") do (
+                set "line=%%b"
+            )
+
+            rem --- 3. Replicate sed 's/['"]//g' ---
+            rem Remove all quotes
+            set "line=!line:'=!"
+            set "line=!line:"=!"
+
+            rem --- 4. NEW: Replicate sed's trim/space removal ---
+            rem Remove all space characters from the result. This is more robust.
+            set "MILL_VERSION=!line: =!"
+
+            rem We found the version, so we can exit the loop
+            goto :version_found
         )
+
+        :version_found
+        rem no-op
       ) else (
         rem no-op
       )
@@ -76,7 +102,11 @@ if [!MILL_VERSION!]==[] (
   )
 )
 
-if [!MILL_VERSION!]==[] set MILL_VERSION=%DEFAULT_MILL_VERSION%
+if [!MILL_VERSION!]==[] (
+    echo No mill version specified. >&2
+    echo You should provide a version via a '//^| mill-version: ' comment or a '.mill-version' file. >&2
+    set MILL_VERSION=%DEFAULT_MILL_VERSION%
+)
 
 if [!MILL_DOWNLOAD_PATH!]==[] set MILL_DOWNLOAD_PATH=%USERPROFILE%\.mill\download
 

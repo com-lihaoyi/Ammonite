@@ -67,7 +67,7 @@ object ${indexedWrapperName.backticked}{
         val (l, reqVals0) = imports
           .value
           .map { data =>
-            val prefix = Seq(Name("_root_"), Name("ammonite"), Name("$sess"))
+            val prefix = Seq(Name("_root_")) ++ source.pkgName
             if (data.prefix.startsWith(prefix) && data.prefix.endsWith(wrapperPath)) {
               val name = data.prefix.drop(prefix.length).dropRight(wrapperPath.length).last
               (data.copy(prefix = Seq(name)), Seq(name -> data.prefix))
