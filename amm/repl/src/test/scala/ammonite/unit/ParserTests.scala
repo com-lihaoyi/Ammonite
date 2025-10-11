@@ -15,46 +15,54 @@ object ParserTests extends TestSuite {
         val normalizedExpected = ammonite.util.Util.normalizeNewlines(expected)
         assert(skipped == normalizedExpected)
       }
-      "env" - check(
-        """#! /usr/bin/env amm
-          |
-          |println("Hello") """.stripMargin,
-        """
-          |
-          |println("Hello") """.stripMargin
-      )
-      "hardcoded" - check(
-        """#! /Users/lihaoyi/Dropbox/Github/Ammonite/amm/target/amm
-          |
-          |println("Hello") """.stripMargin,
-        """
-          |
-          |println("Hello") """.stripMargin
-      )
-      "nix-shell" - check(
-        """#! /usr/bin/env nix-shell
-          |#! nix-shell -i amm -p ammonite-repl
-          |
-          |println("Hello") """.stripMargin,
-        """
-          |
-          |
-          |println("Hello") """.stripMargin
-      )
-      "nix-shell-endshebang" - check(
-        """#! /usr/bin/env nix-shell
-          |#! nix-shell -i amm -p ammonite-repl
-          |
-          |!#
-          |
-          |println("Hello") """.stripMargin,
-        """
-          |
-          |
-          |
-          |
-          |println("Hello") """.stripMargin
-      )
+      test("env") {
+        check(
+          """#! /usr/bin/env amm
+            |
+            |println("Hello") """.stripMargin,
+          """
+            |
+            |println("Hello") """.stripMargin
+        )
+      }
+      test("hardcoded") {
+        check(
+          """#! /Users/lihaoyi/Dropbox/Github/Ammonite/amm/target/amm
+            |
+            |println("Hello") """.stripMargin,
+          """
+            |
+            |println("Hello") """.stripMargin
+        )
+      }
+      test("nix-shell") {
+        check(
+          """#! /usr/bin/env nix-shell
+            |#! nix-shell -i amm -p ammonite-repl
+            |
+            |println("Hello") """.stripMargin,
+          """
+            |
+            |
+            |println("Hello") """.stripMargin
+        )
+      }
+      test("nix-shell-endshebang") {
+        check(
+          """#! /usr/bin/env nix-shell
+            |#! nix-shell -i amm -p ammonite-repl
+            |
+            |!#
+            |
+            |println("Hello") """.stripMargin,
+          """
+            |
+            |
+            |
+            |
+            |println("Hello") """.stripMargin
+        )
+      }
     }
 
     // Sanity check the logic that runs when you press ENTER in the REPL and
