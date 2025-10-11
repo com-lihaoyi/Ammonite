@@ -323,7 +323,7 @@ object ProjectTests extends TestSuite {
       )
     }
 
-    "no duplicate Ammonite JARs" - {
+    test("no duplicate Ammonite JARs") {
       check.session(
         """
         @ def scalaLibJarCount() = {

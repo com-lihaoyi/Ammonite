@@ -50,7 +50,7 @@ object AmmoniteBuildServerTests extends TestSuite {
 
   val tests = Tests {
 
-    "simple" - {
+    test("simple") {
       val runner = new BspScriptRunner(wd / "simple" / "script.sc")
 
       val expectedClassPath = List(
@@ -75,7 +75,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
-    "don't delete directories in target" - {
+    test("don't delete directories in target") {
       val runner = new BspScriptRunner(wd / "simple" / "script.sc")
 
       val expectedClassPath = List(
@@ -108,7 +108,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
-    "caching" - {
+    test("caching") {
       val runner = new BspScriptRunner(
         Seq("script", "lib").map(name => wd / "import-file" / s"$name.sc"): _*
       )
@@ -153,7 +153,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
-    "cache clean-up" - {
+    test("cache clean-up") {
 
       val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")
 
@@ -229,7 +229,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       f
     }
 
-    "router imports" - {
+    test("router imports") {
 
       val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")
 
@@ -293,7 +293,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       f
     }
 
-    "build changed notification" - {
+    test("build changed notification") {
 
       val tmpDir = os.temp.dir(prefix = "ammonite-bsp-tests-")
 
@@ -362,7 +362,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       f
     }
 
-    "dash in name" - {
+    test("dash in name") {
       val runner = new BspScriptRunner(wd / "dash-1" / "main-1.sc")
 
       for {
@@ -390,8 +390,8 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
-    "errored" - {
-      "compilation" - {
+    test("errored") {
+      test("compilation") {
         val runner = new BspScriptRunner(wd / "error" / "foo.sc")
 
         val expectedDiagnostics = List(
@@ -417,7 +417,7 @@ object AmmoniteBuildServerTests extends TestSuite {
         } yield ()
       }
 
-      "import file" - {
+      test("import file") {
         val runner = new BspScriptRunner(wd / "error" / "invalid-import-file.sc")
 
         val expectedDiagnostics = List(
@@ -440,7 +440,7 @@ object AmmoniteBuildServerTests extends TestSuite {
         } yield ()
       }
 
-      "import file and compilation" - {
+      test("import file and compilation") {
         val runner = new BspScriptRunner(wd / "error" / "error-and-invalid-import-file.sc")
 
         val expectedDiagnostics = List(
@@ -555,14 +555,14 @@ object AmmoniteBuildServerTests extends TestSuite {
 
       } yield ()
     }
-    "multi" - {
+    test("multi") {
       // Disabled in Scala 3  as the test involves Scala 2 macros.
       // TODO Re-enable once we switch to a Scala 3 version that has circe artifacts
       if (isScala2) multiTest()
       else "Temporarily disabled in Scala 3"
     }
 
-    "semanticdb" - {
+    test("semanticdb") {
       val scriptPath = os.RelPath("semdb/script.sc")
       val otherScriptPath = os.RelPath("semdb/other.sc")
       val runner = new BspScriptRunner(wd / scriptPath, wd / otherScriptPath)
@@ -674,7 +674,7 @@ object AmmoniteBuildServerTests extends TestSuite {
       } yield ()
     }
 
-    "single comment with no line feed" - {
+    test("single comment with no line feed") {
       val runner = new BspScriptRunner(wd / "comment" / "script.sc")
 
       for {
