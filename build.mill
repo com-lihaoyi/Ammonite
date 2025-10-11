@@ -325,7 +325,7 @@ trait AmmInternalModule extends CrossSbtModule {
       }
     }
 }
-trait AmmModule extends AmmInternalModule with PublishModule with CoursierModule {
+trait AmmModule extends AmmInternalModule with SonatypeCentralPublishModule with CoursierModule {
   def publishVersion: T[String] = buildVersion
   def pomSettings = PomSettings(
     description = artifactName(),
