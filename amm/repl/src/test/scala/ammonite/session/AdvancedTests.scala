@@ -2,7 +2,7 @@ package ammonite.session
 
 import ammonite.TestUtils._
 import ammonite.{DualTestRepl, TestRepl}
-import ammonite.util.Res
+import ammonite.util.{Name, Res}
 import utest._
 
 object AdvancedTests extends TestSuite {
@@ -783,6 +783,33 @@ object AdvancedTests extends TestSuite {
       )
     }
 
+    test("custom package name") {
+      val check = new DualTestRepl {
+        override def pkgName = Some(Seq(Name("ammonite"), Name("$thing")))
+      }
+      // Helper suffix stripped for class-based code wrapping
+      check.session(
+        """
+          @ val clsName = getClass.getName.stripPrefix("ammonite.$thing.").stripSuffix("Helper")
+          clsName: String = "cmd0$"
+        """
+      )
+    }
+
+    test("longer custom package name and custom wrapper") {
+      val check = new DualTestRepl {
+        override def pkgName = Some(Seq(Name("ammonite"), Name("foo"), Name("$other"), Name("$thing")))
+        override def wrapperNamePrefix = Some("cell")
+      }
+      // Helper suffix stripped for class-based code wrapping
+      check.session(
+        """
+          @ val clsName = getClass.getName.stripPrefix("ammonite.foo.$other.$thing.").stripSuffix("Helper")
+          clsName: String = "cell0$"
+        """
+      )
+    }
+
     test("warnings") {
 
       val checkWithoutWarnings = new DualTestRepl {
@@ -855,6 +882,51 @@ object AdvancedTests extends TestSuite {
           """
         )
       }
+    }
+
+    test("package input") {
+      check.session(
+        """
+          @ package thing
+          @
+          @ object Thing {
+          @   def message = "Hello"
+          @ }
+
+          @ val message = thing.Thing.message
+          message: String = "Hello"
+        """
+      )
+
+      if (scala2)
+        check.session(
+          """
+            @ package foo
+            @
+            @ object Foo {
+            @   def message = "Hello"
+            @   zz
+            @ }
+            error: source-2.scala:5: not found: value zz
+              zz
+              ^
+          """
+        )
+      else
+        check.session(
+          """
+            @ package foo
+            @
+            @ object Foo {
+            @   def message = "Hello"
+            @   zz
+            @ }
+            error: -- [E006] Not Found Error: source-2.scala:5:2 ----------------------------------
+            5 |  zz
+              ^^
+              Not found: zz
+          """
+        )
     }
   }
 }

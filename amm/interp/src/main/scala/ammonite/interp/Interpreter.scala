@@ -237,7 +237,7 @@ class Interpreter(
     val codeSource = CodeSource(
       wrapperName,
       Seq(),
-      Seq(Name("ammonite"), Name("$sess")),
+      parameters.pkgName,
       Some(wd / "(console)")
     )
     val (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
@@ -299,10 +299,32 @@ class Interpreter(
         printer,
         indexedWrapperName,
         replCodeWrapper.wrapperPath,
+        parameters.pkgName,
         silent,
         evalClassloader
       )
     } yield (res, Tag("", "", classPathWhitelist.hashCode().toString))
+  }
+
+  def processRawSource(
+    code: String,
+    fileName: String
+  ): Res[Seq[(String, Array[Byte])]] = synchronized {
+    for {
+      _ <- Catching { case e: ThreadDeath => Evaluator.interrupted(e) }
+      output <- Res(
+        compilerManager.compileClass(
+          Preprocessor.Output(code, 0, 0),
+          printer,
+          fileName
+        ),
+        "Compilation Failed"
+      )
+      _ = {
+        for ((name, bytes) <- output.classFiles.sortBy(_._1) if name.endsWith(".class"))
+          headFrame.classloader.addClassFile(name.stripSuffix(".class").replace('/', '.'), bytes)
+      }
+    } yield output.classFiles
   }
 
   def processSingleBlock(
@@ -435,7 +457,7 @@ class Interpreter(
           CodeSource(
             wrapperName,
             Seq(),
-            Seq(Name("ammonite"), Name("$sess")),
+            parameters.pkgName,
             Some(wd / "(console)")
           ),
           (processed, indexedWrapperName) =>
@@ -734,7 +756,8 @@ object Interpreter {
       alreadyLoadedDependencies: Seq[Dependency] = Nil,
       classPathWhitelist: Set[Seq[String]] = Set.empty,
       wrapperNamePrefix: String = "cmd",
-      warnings: Boolean = false
+      warnings: Boolean = false,
+      pkgName: Seq[Name] = Seq(Name("ammonite"), Name("$sess"))
   )
 
   val predefImports = Imports(
