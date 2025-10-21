@@ -161,7 +161,7 @@ trait AmmInternalModule extends CrossSbtModule {
     !versions.contains(crossScalaVersion)
   }
   def artifactName: T[String] = Task {
-    "ammonite-" + moduleSegments.parts.mkString("-").stripPrefix("amm-")
+    "ammonite-" + moduleSegments.parts.dropRight(1).mkString("-").stripPrefix("amm-")
   }
   def isScala2: T[Boolean] = Task { scalaVersion().startsWith("2.") }
   def scalacOptions: T[Seq[String]] = Task {
