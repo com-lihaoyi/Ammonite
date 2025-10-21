@@ -44,8 +44,7 @@ abstract class CodeWrapper {
 object CodeWrapper {
   def packageDirectives(pkgName: Seq[Name]): String = {
 
-    val packageDirectives0 = normalizeNewlines(s"""
-package ${pkgName.head.encoded}
+    val packageDirectives0 = normalizeNewlines(s"""package ${pkgName.head.encoded}
 """)
     val extraPackageDirectives =
       if (pkgName.tail.isEmpty) ""

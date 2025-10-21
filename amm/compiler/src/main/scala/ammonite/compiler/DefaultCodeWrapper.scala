@@ -14,7 +14,8 @@ object DefaultCodeWrapper extends CodeWrapper {
       indexedWrapperName: Name,
       extraCode: String
   ) = {
-    val top = CodeWrapper.packageDirectives(source.pkgName) + normalizeNewlines(s"""$imports
+    val top = CodeWrapper.packageDirectives(source.pkgName) + normalizeNewlines(s"""
+$imports
 
 object ${indexedWrapperName.backticked}{\n""")
     val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }
