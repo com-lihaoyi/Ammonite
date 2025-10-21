@@ -154,14 +154,8 @@ trait AmmInternalModule extends CrossSbtModule {
   // We need it to be a Boolean, not T[Boolean]
   def isCrossFullScalaVersion: Boolean = false
   def crossFullScalaVersion: T[Boolean] = Task { isCrossFullScalaVersion }
-  def skipBloop: Boolean = {
-    val versions =
-      if (isCrossFullScalaVersion) assemblyCrossScalaVersions else binCrossScalaVersions
-    // no need to expose the modules for old Scala versions support in Bloop / Metals
-    !versions.contains(crossScalaVersion)
-  }
   def artifactName: T[String] = Task {
-    "ammonite-" + moduleSegments.parts.mkString("-").stripPrefix("amm-")
+    "ammonite-" + moduleSegments.parts.dropRight(1).mkString("-").stripPrefix("amm-")
   }
   def isScala2: T[Boolean] = Task { scalaVersion().startsWith("2.") }
   def scalacOptions: T[Seq[String]] = Task {
@@ -281,13 +275,13 @@ trait AmmInternalModule extends CrossSbtModule {
 
     val extraDirs: Seq[os.Path] =
       extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++ extraDir7 ++ extraDir8
-    
+
     extraDirs
   }
 
   def customSources: T[Seq[PathRef]] = Task.Sources(customSourceDirs*)
 
-  def sources: T[Seq[PathRef]] = Task { 
+  def sources: T[Seq[PathRef]] = Task {
     (super.sources() ++ customSources()).distinctBy(_.path)
   }
   def externalSources: T[Seq[PathRef]] = Task {
