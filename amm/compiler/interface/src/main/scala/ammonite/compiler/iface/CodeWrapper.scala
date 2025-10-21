@@ -1,7 +1,7 @@
 package ammonite.compiler.iface
 
 import ammonite.util.{Imports, Name}
-import ammonite.util.Util.CodeSource
+import ammonite.util.Util.{CodeSource, encodeScalaSourcePath, normalizeNewlines}
 
 abstract class CodeWrapper {
   def wrapperPath: Seq[Name] = Nil
@@ -39,4 +39,20 @@ abstract class CodeWrapper {
     (topWrapper0 + code + bottomWrapper0, importsLen, userCodeNestingLevel)
   }
 
+}
+
+object CodeWrapper {
+  def packageDirectives(pkgName: Seq[Name]): String = {
+
+    val packageDirectives0 = normalizeNewlines(s"""
+package ${pkgName.head.encoded}
+""")
+    val extraPackageDirectives =
+      if (pkgName.tail.isEmpty) ""
+      else
+        normalizeNewlines(s"""package ${encodeScalaSourcePath(pkgName.tail)}
+""")
+
+    packageDirectives0 + extraPackageDirectives
+  }
 }

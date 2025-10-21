@@ -14,11 +14,7 @@ object DefaultCodeWrapper extends CodeWrapper {
       indexedWrapperName: Name,
       extraCode: String
   ) = {
-    import source.pkgName
-    val top = normalizeNewlines(s"""
-package ${pkgName.head.encoded}
-package ${Util.encodeScalaSourcePath(pkgName.tail)}
-$imports
+    val top = CodeWrapper.packageDirectives(source.pkgName) + normalizeNewlines(s"""$imports
 
 object ${indexedWrapperName.backticked}{\n""")
     val bottom = normalizeNewlines(s"""\ndef $$main() = { $printCode }

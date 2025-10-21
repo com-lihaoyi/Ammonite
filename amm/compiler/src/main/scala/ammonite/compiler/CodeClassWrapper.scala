@@ -40,10 +40,7 @@ object CodeClassWrapper extends CodeWrapper {
     val isObjDef = Parsers.isObjDef(code)
 
     if (isObjDef) {
-      val top = normalizeNewlines(s"""
-package ${pkgName.head.encoded}
-package ${Util.encodeScalaSourcePath(pkgName.tail)}
-
+      val top = CodeWrapper.packageDirectives(pkgName) + normalizeNewlines(s"""
 $imports
 
 object ${indexedWrapperName.backticked}{
@@ -112,10 +109,7 @@ object ${indexedWrapperName.backticked}{
             "_root_.ammonite.repl.ReplBridge.value.usedEarlierDefinitions.iterator.toSet"
       }
 
-      val top = normalizeNewlines(s"""
-package ${pkgName.head.encoded}
-package ${Util.encodeScalaSourcePath(pkgName.tail)}
-
+      val top = CodeWrapper.packageDirectives(pkgName) + normalizeNewlines(s"""
 object ${indexedWrapperName.backticked}{
   val wrapper = new ${indexedWrapperName.backticked}
   val instance = new wrapper.Helper

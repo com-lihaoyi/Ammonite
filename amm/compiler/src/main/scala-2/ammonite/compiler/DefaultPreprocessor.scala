@@ -37,9 +37,6 @@ class DefaultPreprocessor(
       markScript: Boolean,
       codeWrapper: CodeWrapper
   ) = {
-    // All code Ammonite compiles must be rooted in some package within
-    // the `ammonite` top-level package
-    assert(codeSource.pkgName.head == Name("ammonite"))
     for {
       Expanded(code, printer) <- expandStatements(stmts, resultIndex, skipEmpty)
       (wrappedCode, importsLength, userCodeNestingLevel) = codeWrapper.wrapCode(
