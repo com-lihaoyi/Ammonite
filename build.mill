@@ -275,13 +275,13 @@ trait AmmInternalModule extends CrossSbtModule {
 
     val extraDirs: Seq[os.Path] =
       extraDir ++ extraDir2 ++ extraDir3 ++ extraDir4 ++ extraDir5 ++ extraDir6 ++ extraDir7 ++ extraDir8
-    
+
     extraDirs
   }
 
   def customSources: T[Seq[PathRef]] = Task.Sources(customSourceDirs*)
 
-  def sources: T[Seq[PathRef]] = Task { 
+  def sources: T[Seq[PathRef]] = Task {
     (super.sources() ++ customSources()).distinctBy(_.path)
   }
   def externalSources: T[Seq[PathRef]] = Task {
