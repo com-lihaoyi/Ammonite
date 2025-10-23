@@ -101,7 +101,10 @@ object AmmonitePlugin {
       val nestingLevel = userCodeNestingLevel
       assert(nestingLevel >= 0)
       (0 until nestingLevel).foldLeft(unit.body.children.last.children)((res, _) =>
-        res.last.asInstanceOf[g.ImplDef].impl.body
+        res.last match {
+          case impl: g.ImplDef => impl.impl.body
+          case templ: g.Template => templ.body
+        }
       )
     }
 
@@ -139,7 +142,7 @@ object AmmonitePlugin {
          * `cmd2.this.cmd0.n`, and put `cmd0` in `uses`.
          */
         val wrapperSym = unit.body.children.last.children
-          .last.asInstanceOf[g.ImplDef].symbol
+          .last.symbol
         val uses0 = for {
           tree <- stats
           names <- tree.collect {
