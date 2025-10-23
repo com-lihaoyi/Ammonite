@@ -147,7 +147,7 @@ object Deps {
   val typename = mvn"org.tpolecat::typename:1.1.0"
   val upickle = mvn"com.lihaoyi::upickle:4.3.2"
 
-  val utest = mvn"com.lihaoyi::utest:0.8.9"
+  val utest = mvn"com.lihaoyi::utest:0.9.1"
 }
 
 trait AmmInternalModule extends CrossSbtModule {
