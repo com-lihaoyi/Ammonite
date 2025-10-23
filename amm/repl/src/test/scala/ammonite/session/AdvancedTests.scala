@@ -810,6 +810,32 @@ object AdvancedTests extends TestSuite {
       )
     }
 
+    test("custom package name not starting with ammonite") {
+      val check = new DualTestRepl {
+        override def pkgName = Some(Seq(Name("repl"), Name("$thing")))
+      }
+      // Helper suffix stripped for class-based code wrapping
+      check.session(
+        """
+          @ val clsName = getClass.getName.stripPrefix("repl.$thing.").stripSuffix("Helper")
+          clsName: String = "cmd0$"
+        """
+      )
+    }
+
+    test("one word custom package name") {
+      val check = new DualTestRepl {
+        override def pkgName = Some(Seq(Name("repl")))
+      }
+      // Helper suffix stripped for class-based code wrapping
+      check.session(
+        """
+          @ val clsName = getClass.getName.stripPrefix("repl.").stripSuffix("Helper")
+          clsName: String = "cmd0$"
+        """
+      )
+    }
+
     test("warnings") {
 
       val checkWithoutWarnings = new DualTestRepl {

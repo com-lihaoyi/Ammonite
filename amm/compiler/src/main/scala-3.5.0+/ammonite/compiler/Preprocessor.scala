@@ -58,10 +58,6 @@ class Preprocessor(
 
     // println(s"transformOrNull(${stmts.toSeq})")
 
-    // All code Ammonite compiles must be rooted in some package within
-    // the `ammonite` top-level package
-    assert(codeSource.pkgName.head == Name("ammonite"))
-
     expandStatements(stmts, resultIndex, skipEmpty).map {
       case Expanded(code, printer) =>
         val (wrappedCode, importsLength, userCodeNestingLevel) = wrapCode(
