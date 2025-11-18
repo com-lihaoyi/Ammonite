@@ -22,19 +22,19 @@ jobs:
             command: 'terminal.__.test'
 
           - java-version: 11
-            command: 'sshd[{2.12.20,2.13.17,3.3.7,3.4.3,3.5.2,3.6.4,3.7.3}].__.test'
+            command: 'sshd[{2.12.20,2.13.18,3.3.7,3.4.3,3.5.2,3.6.4,3.7.3}].__.test'
 
           - java-version: 11
             command: 'amm.repl[2.12.{9,14,20}].__.test'
           - java-version: 17
-            command: 'amm.repl[2.13.{4,9,17}].__.test'
+            command: 'amm.repl[2.13.{4,9,18}].__.test'
           - java-version: 21
             command: 'amm.repl[{3.3.7,3.4.3,3.5.2,3.6.4,3.7.3}].__.test'
 
           - java-version: 11
             command: 'amm[2.12.{9,14,20}].__.test'
           - java-version: 17
-            command: 'amm[2.13.{4,9,17}].__.test'
+            command: 'amm[2.13.{4,9,18}].__.test'
           - java-version: 21
             command: 'amm[{3.3.7,3.4.3,3.5.2,3.6.4,3.7.3}].__.test'
 
@@ -57,7 +57,7 @@ jobs:
           - java-version: 11
             scala-version: '2.12.{9,14,20}'
           - java-version: 17
-            scala-version: '2.13.{4,9,15}'
+            scala-version: '2.13.{4,9,15,18}'
           - java-version: 21
             scala-version: '{3.3.7,3.4.3,3.5.2,3.6.4,3.7.3}'
 
