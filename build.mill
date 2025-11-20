@@ -104,7 +104,7 @@ val fastparseVersion = "3.1.1"
 val scalametaVersion = "4.13.10"
 
 object Deps {
-  val acyclic = mvn"com.lihaoyi:::acyclic:0.3.19"
+  val acyclic = mvn"com.lihaoyi:::acyclic:0.3.20"
   val bsp4j = mvn"ch.epfl.scala:bsp4j:$bspVersion"
   val bcprovJdk15on = mvn"org.bouncycastle:bcprov-jdk18on:1.82"
   val cask = mvn"com.lihaoyi::cask:0.10.2"
