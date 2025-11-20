@@ -53,7 +53,7 @@ val commitsSinceTaggedVersion = latestTaggedVersion match {
 val scala2_12Versions = 9.to(20)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.$v")
-val scala2_13Versions = 3.to(17)
+val scala2_13Versions = 3.to(18)
 //  .dropWhile(v => isJava21 && v < 11)
   .map(v => s"2.13.$v")
 // TODO: We can't have 3.4.0 & 3.4.1 until we solve https://github.com/com-lihaoyi/Ammonite/issues/1395
@@ -104,7 +104,7 @@ val fastparseVersion = "3.1.1"
 val scalametaVersion = "4.13.10"
 
 object Deps {
-  val acyclic = mvn"com.lihaoyi:::acyclic:0.3.19"
+  val acyclic = mvn"com.lihaoyi:::acyclic:0.3.20"
   val bsp4j = mvn"ch.epfl.scala:bsp4j:$bspVersion"
   val bcprovJdk15on = mvn"org.bouncycastle:bcprov-jdk18on:1.82"
   val cask = mvn"com.lihaoyi::cask:0.10.2"
