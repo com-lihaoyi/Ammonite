@@ -1,1 +1,1 @@
-addSbtPlugin("com.lihaoyi" % "scalatex-sbt-plugin" % "0.3.11")
+addSbtPlugin("com.lihaoyi" % "scalatex-sbt-plugin" % "0.3.12")
