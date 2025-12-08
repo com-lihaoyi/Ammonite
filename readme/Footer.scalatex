@@ -127,6 +127,28 @@
 
 
   @sect{Changelog}
+    @sect{3.0.5}
+      @ul
+        @li
+          Support for Scala 2.13.18, 3.7.4
+    @sect{3.0.4}
+      @ul
+        @li
+          Lift the requirement that all Ammonite code must live under pkg 'ammonite'
+        @li
+          Fix wrong artifact names, accidentally introduced in 3.0.2
+    @sect{3.0.3}
+      @ul
+        @li
+          Support for Scala 2.13.17, 3.3.6, 3.3.7, 3.6.4, 3.7.3
+        @li
+          Allow compiling standard/raw sources starting with a package directive
+        @li
+          Update dependency os-lib to 0.11.5
+        @li
+          Update dependency sourcecode to 0.4.4
+        @li
+          Update dependency asm to 9.9 to support newer JVM versions
     @sect{3.0.2}
       @ul
         @li
