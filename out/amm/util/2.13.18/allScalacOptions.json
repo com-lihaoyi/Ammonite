@@ -1,0 +1,8 @@
+{
+    "value": [
+        "-Xplugin:/home/runner/.cache/coursier/v1/https/repo1.maven.org/maven2/com/lihaoyi/acyclic_2.13.18/0.3.20/acyclic_2.13.18-0.3.20.jar",
+        "-P:acyclic:force"
+    ],
+    "valueHash": -664654055,
+    "inputsHash": 2006387378
+}

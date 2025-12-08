@@ -1,0 +1,11 @@
+{
+    "value": [
+        "org.scala-lang:scala-compiler:2.13.18",
+        "com.lihaoyi::scalaparse:3.1.1",
+        "org.scala-lang.modules::scala-xml:2.0.1",
+        "org.javassist:javassist:3.21.0-GA",
+        "com.github.javaparser:javaparser-core:3.2.12"
+    ],
+    "valueHash": 1733556561,
+    "inputsHash": -464729888
+}

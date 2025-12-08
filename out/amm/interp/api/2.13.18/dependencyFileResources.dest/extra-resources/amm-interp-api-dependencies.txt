@@ -1,0 +1,4 @@
+com.lihaoyi:acyclic_2.13.18:0.3.20
+io.get-coursier:interface:1.0.28
+org.scala-lang:scala-library:2.13.18
+org.slf4j:slf4j-api:1.7.36

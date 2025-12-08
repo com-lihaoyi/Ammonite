@@ -1,0 +1,13 @@
+{
+    "value": {
+        "main": {
+            "Manifest-Version": "1.0",
+            "Created-By": "Mill 1.0.6",
+            "Tool": "Mill-1.0.6",
+            "Main-Class": "ammonite.AmmoniteMain"
+        },
+        "groups": {}
+    },
+    "valueHash": 1240457356,
+    "inputsHash": -1335508469
+}

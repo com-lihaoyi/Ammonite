@@ -1,0 +1,14 @@
+{
+    "value": [
+        "ref:v0:f32d3087:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/java",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala-2.13.18",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala-2.13",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala-2",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala-2.12.10-2.13.1+",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala-2.13.12+",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/compiler/interface/src/main/scala-2.13-or-3"
+    ],
+    "valueHash": -1729190656,
+    "inputsHash": -307955361
+}

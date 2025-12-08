@@ -1,0 +1,9 @@
+{
+    "value": [
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala-2.12.10-2.13.1+",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala-2.13.12+",
+        "ref:v0:c984eca8:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala-2.13-or-3"
+    ],
+    "valueHash": -1575722775,
+    "inputsHash": -1403429741
+}

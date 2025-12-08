@@ -1,0 +1,11 @@
+{
+    "value": [
+        "ref:v0:bf457867:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/package.scala",
+        "ref:v0:ad457693:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Evaluator.scala",
+        "ref:v0:d6661260:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ClassLoaders.scala",
+        "ref:v0:13285998:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/Storage.scala",
+        "ref:v0:4d7764fd:/home/runner/work/Ammonite/Ammonite/amm/runtime/src/main/scala/ammonite/runtime/ImportHook.scala"
+    ],
+    "valueHash": 1896302638,
+    "inputsHash": 1195007651
+}

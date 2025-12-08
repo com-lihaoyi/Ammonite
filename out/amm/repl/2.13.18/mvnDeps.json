@@ -1,0 +1,10 @@
+{
+    "value": [
+        "org.jline:jline-terminal:3.14.1",
+        "org.jline:jline-terminal-jna:3.14.1",
+        "org.jline:jline-reader:3.14.1",
+        "org.scala-lang.modules::scala-xml:2.0.1"
+    ],
+    "valueHash": 631381875,
+    "inputsHash": -1056620437
+}

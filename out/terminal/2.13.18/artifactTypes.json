@@ -1,0 +1,33 @@
+{
+    "value": [
+        {
+            "value": "eclipse-plugin"
+        },
+        {
+            "value": "maven-plugin"
+        },
+        {
+            "value": "bundle"
+        },
+        {
+            "value": "scala-jar"
+        },
+        {
+            "value": "klib"
+        },
+        {
+            "value": "hk2-jar"
+        },
+        {
+            "value": "orbit"
+        },
+        {
+            "value": "test-jar"
+        },
+        {
+            "value": "jar"
+        }
+    ],
+    "valueHash": -2079360105,
+    "inputsHash": -1865641010
+}
