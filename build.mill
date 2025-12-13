@@ -50,7 +50,7 @@ val commitsSinceTaggedVersion = latestTaggedVersion match {
 //  if (_) println("Java 21+: Skip building of modules requiring incompatible Scala versions")
 //}
 
-val scala2_12Versions = 9.to(20)
+val scala2_12Versions = 9.to(21)
 //  .dropWhile(v => isJava21 && v < 18)
   .map(v => s"2.12.$v")
 val scala2_13Versions = 3.to(18)
