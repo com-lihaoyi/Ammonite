@@ -162,7 +162,7 @@ class Repl(
     // running the user code directly. Could be made longer to better warm more
     // code paths, but then the fixed overhead gets larger so not really worth it
     val code = s"""val array = Seq.tabulate(10)(_*2).toArray.max"""
-    val stmts = parser.split(code).get.toOption.get
+    val stmts = parser.split(code, fileName = "warmup.sc").get.toOption.get
     interp.processLine(code, stmts, 9999999, silent = true, () => () /*donothing*/ )
   }
 
@@ -202,7 +202,8 @@ class Repl(
         if (code != "") {
           storage.fullHistory() = storage.fullHistory() :+ code
           history = history :+ code
-        }
+        },
+      fileName = s"${interp.parameters.wrapperNamePrefix}$currentLine.sc"
     )
     out <- {
       if (code.startsWith("package "))

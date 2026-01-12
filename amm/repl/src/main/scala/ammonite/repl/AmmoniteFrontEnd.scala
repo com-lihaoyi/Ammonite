@@ -25,13 +25,14 @@ case class AmmoniteFrontEnd(
       colors: Colors,
       compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
       history: IndexedSeq[String],
-      addHistory: String => Unit
+      addHistory: String => Unit,
+      fileName: String
   ) = {
-    readLine(reader, output, prompt, colors, compilerComplete, history) match {
+    readLine(reader, output, prompt, colors, compilerComplete, history, fileName) match {
       case None => Res.Exit(())
       case Some(code) =>
         addHistory(code)
-        parser.split(code, ignoreIncomplete = false).get match {
+        parser.split(code, ignoreIncomplete = false, fileName = fileName).get match {
           case Right(value) => Res.Success((code, value))
           case Left(error) => Res.Failure(error)
         }
@@ -46,7 +47,8 @@ case class AmmoniteFrontEnd(
       prompt: String,
       colors: Colors,
       compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
-      history: IndexedSeq[String]
+      history: IndexedSeq[String],
+      fileName: String
   ) = {
 
     val writer = new OutputStreamWriter(output)
@@ -104,7 +106,7 @@ case class AmmoniteFrontEnd(
     // Enter
     val multilineFilter = Filter.action(
       SpecialKeys.NewLine,
-      ti => parser.split(ti.ts.buffer.mkString).isEmpty
+      ti => parser.split(ti.ts.buffer.mkString, fileName = fileName).isEmpty
     ) {
       case TermState(rest, b, c, _) => BasicFilters.injectNewLine(b, c, rest)
     }

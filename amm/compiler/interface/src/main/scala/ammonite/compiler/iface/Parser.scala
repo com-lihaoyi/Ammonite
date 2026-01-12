@@ -8,7 +8,7 @@ abstract class Parser {
   def split(
       code: String,
       ignoreIncomplete: Boolean = true,
-      fileName: String = "(console)"
+      fileName: String
   ): Option[Either[String, Seq[String]]]
 
   final def parseImportHooks(

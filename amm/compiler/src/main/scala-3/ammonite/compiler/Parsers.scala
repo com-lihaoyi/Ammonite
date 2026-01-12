@@ -58,7 +58,7 @@ class Parsers extends IParser {
   def split(
     code: String,
     ignoreIncomplete: Boolean = true,
-    fileName: String = "(console)"
+    fileName: String
   ): Option[Either[String, Seq[String]]] =
     if (code.startsWith("package "))
       if (code.endsWith("\n\n")) Some(Right(Seq(code.stripSuffix("\n"))))

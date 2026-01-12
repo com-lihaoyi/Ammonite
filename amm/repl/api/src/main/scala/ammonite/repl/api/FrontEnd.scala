@@ -16,6 +16,7 @@ trait FrontEnd {
       colors: Colors,
       compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
       history: IndexedSeq[String],
-      addHistory: String => Unit
+      addHistory: String => Unit,
+      fileName: String
   ): Res[(String, Seq[String])]
 }
