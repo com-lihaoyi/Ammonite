@@ -955,13 +955,15 @@ object AdvancedTests extends TestSuite {
         )
     }
     test("position crash") {
-      if (scala2)
+      if (scala2) {
+        val endDelim = if (check.scalaVersion == "2.12.9") "'" else "`"
         check.session(
-          """
-            @ import java.io._; import java.util.Map; class Map
-            warning: imported `Map` is permanently hidden by definition of class Map in
-          """
+          s"""
+             @ import java.io._; import java.util.Map; class Map
+             warning: imported `Map$endDelim is permanently hidden by definition of class Map in
+           """
         )
+      }
       else
         // Scala 3 gives no warning for that code, and might not suffer from the bug
         // this prevents a regression from (see com-lihaoyi/Ammonite#1706)
