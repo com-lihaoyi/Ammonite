@@ -956,7 +956,9 @@ object AdvancedTests extends TestSuite {
     }
     test("position crash") {
       if (scala2) {
-        val endDelim = if (check.scalaVersion == "2.12.9") "'" else "`"
+        val useStandardQuote = check.scalaVersion.startsWith("2.12.") &&
+          coursier.version.Version(check.scalaVersion) <= coursier.version.Version("2.12.12")
+        val endDelim = if (useStandardQuote) "'" else "`"
         check.session(
           s"""
              @ import java.io._; import java.util.Map; class Map
