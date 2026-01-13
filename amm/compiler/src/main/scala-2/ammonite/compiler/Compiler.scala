@@ -8,7 +8,7 @@ import ammonite.util.{Classpath, ImportData, Imports, Printer}
 import ammonite.util.Util.newLine
 
 import scala.collection.mutable
-import scala.reflect.internal.util.Position
+import scala.reflect.internal.util.{Position, RangePosition}
 import scala.reflect.io
 import scala.reflect.io._
 import scala.tools.nsc
@@ -197,12 +197,19 @@ object Compiler {
       // classfiles causes scalac to get confused
       settings.termConflict.value = "object"
 
+      def fixPos(pos: Position): Position =
+        pos match {
+          case r: RangePosition if r.point > r.source.length && r.point - importsLen >= 0 && r.point - importsLen <= r.source.length =>
+            r.withPoint(r.point - importsLen)
+          case s => s
+        }
+
       val reporter = reporterOpt.getOrElse {
         import scala.reflect.internal.util.Position
         MakeReporter.makeReporter(
-          (pos, msg) => errorLogger(Position.formatMessage(pos, msg, false)),
-          (pos, msg) => warningLogger(Position.formatMessage(pos, msg, false)),
-          (pos, msg) => infoLogger(Position.formatMessage(pos, msg, false)),
+          (pos, msg) => errorLogger(Position.formatMessage(fixPos(pos), msg, false)),
+          (pos, msg) => warningLogger(Position.formatMessage(fixPos(pos), msg, false)),
+          (pos, msg) => infoLogger(Position.formatMessage(fixPos(pos), msg, false)),
           settings
         )
       }
