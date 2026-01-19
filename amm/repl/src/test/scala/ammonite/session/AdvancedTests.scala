@@ -377,7 +377,7 @@ object AdvancedTests extends TestSuite {
             else "2.1.1"
           s"""import $$plugin.$$ivy.`org.scalamacros:::paradise:$paradiseVersion`"""
         } else
-          "interp.configureCompiler(_.settings.YmacroAnnotations.value = true)"
+          "interp.preConfigureCompiler(_.YmacroAnnotations.value = true)"
 
       if (check.scala2)
         check.session(s"""
