@@ -139,7 +139,7 @@ case class Main(
           PredefInfo(Name("ArgsPredef"), argString, false, None)
         ),
         customPredefs = predefFileInfoOpt.toSeq ++ Seq(
-          PredefInfo(Name("CodePredef"), predefCode, false, Some(wd / "(console)"))
+          PredefInfo(Name("CodePredef"), predefCode, false, None)
         ),
         wd = wd,
         welcomeBanner = welcomeBanner,

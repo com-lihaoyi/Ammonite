@@ -46,11 +46,13 @@ object FrontEnds {
         colors: Colors,
         compilerComplete: (Int, String) => (Int, Seq[String], Seq[String]),
         historyValues: IndexedSeq[String],
-        addHistory: String => Unit
+        addHistory: String => Unit,
+        fileName: String
     ) = {
 
       ammCompleter.compilerComplete = compilerComplete
       ammParser.addHistory = addHistory
+      ammParser.fileName = fileName
       ammHighlighter.colors = colors
       historyValues.foreach(reader.getHistory.add)
 
@@ -143,6 +145,8 @@ class AmmParser(codeParser: IParser) extends Parser {
 
   var addHistory: String => Unit = x => ()
 
+  var fileName: String = ""
+
   val defaultParser = new org.jline.reader.impl.DefaultParser
 
   override def parse(line: String, cursor: Int, context: Parser.ParseContext): ParsedLine = {
@@ -152,7 +156,7 @@ class AmmParser(codeParser: IParser) extends Parser {
     val wordIndex = defParLine.wordIndex // index of the current word in the list of words
     val wordCursor = defParLine.wordCursor // cursor position within the current word
 
-    codeParser.split(line) match {
+    codeParser.split(line, fileName = fileName) match {
       case Some(Right(stmts)) =>
         addHistory(line)
         // if ENTER and not at the end of input -> newline

@@ -34,7 +34,7 @@ class Interpreter(
     val createFrame: () => Frame,
     replCodeWrapper: CodeWrapper,
     val scriptCodeWrapper: CodeWrapper,
-    parameters: Interpreter.Parameters = Interpreter.Parameters()
+    val parameters: Interpreter.Parameters = Interpreter.Parameters()
 ) extends ImportHook.InterpreterInterface { interp =>
 
   import parameters._
@@ -238,7 +238,7 @@ class Interpreter(
       wrapperName,
       Seq(),
       parameters.pkgName,
-      Some(wd / "(console)")
+      None
     )
     val (hookStmts, importTrees) = parser().parseImportHooks(codeSource, stmts)
 
@@ -251,7 +251,7 @@ class Interpreter(
         replCodeWrapper.wrapperPath
       )
 
-      processed <- compilerManager.preprocess("(console)").transform(
+      processed <- compilerManager.preprocess(wrapperName.encoded + ".sc").transform(
         hookStmts,
         currentLine.toString,
         "",
@@ -458,7 +458,7 @@ class Interpreter(
             wrapperName,
             Seq(),
             parameters.pkgName,
-            Some(wd / "(console)")
+            None
           ),
           (processed, indexedWrapperName) =>
             evaluateLine(processed, fileName, indexedWrapperName, false, incrementLine),
