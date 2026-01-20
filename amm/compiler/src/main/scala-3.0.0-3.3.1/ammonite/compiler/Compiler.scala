@@ -44,7 +44,6 @@ import dotty.tools.io.{
   VirtualFile,
   PlainFile
 }
-import dotty.tools.repl.CollectTopLevelImports
 
 class Compiler(
   dynamicClassPath: AbstractFile,
