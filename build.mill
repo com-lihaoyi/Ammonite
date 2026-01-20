@@ -427,13 +427,6 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
     trait CompilerInterfaceModule extends AmmModule {
       def isCrossFullScalaVersion = true
       def moduleDeps: Seq[PublishModule] = Seq(amm.util())
-      def docJar =
-        if (crossValue == "2.12.9" || crossValue == "2.12.10" || crossValue == "2.12.11")
-          Task {
-            PathRef(mill.util.Jvm.createJar(Task.dest / "empty.zip", Nil))
-          }
-        else
-          super.docJar
       def exposedClassPath: T[Seq[PathRef]] = Task {
         runClasspath() ++
           externalSources() ++
