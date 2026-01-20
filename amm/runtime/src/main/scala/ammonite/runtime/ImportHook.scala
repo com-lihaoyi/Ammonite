@@ -198,10 +198,16 @@ object ImportHook {
             if (
               (dottyCompat || dep.userParams.exists(_._1 == "compat")) &&
               !interp.scalaVersion.startsWith("2.")
-            )
-              // When dotty compatibility is enabled, pull Scala 2.13 dependencies rather than Scala 3 ones.
-              // versionNumberString gives us the right 2.13 version for the current Scala 3 version.
-              scala.util.Properties.versionNumberString
+            ) {
+              if (scala.util.Properties.versionNumberString.startsWith("2.13."))
+                // When dotty compatibility is enabled, pull Scala 2.13 dependencies rather than Scala 3 ones.
+                // versionNumberString gives us the right 2.13 version for the current Scala 3 version.
+                scala.util.Properties.versionNumberString
+              else
+                // For Scala 3.8.0 and later versions, scala.util.Properties.versionNumberString
+                // isn't the 2.13.x compatible Scala version any more
+                "2.13.6"
+            }
             else
               interp.scalaVersion
           val params = ScalaParameters(scalaVersion)
