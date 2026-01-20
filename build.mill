@@ -113,6 +113,7 @@ object Deps {
   val classPathUtil = mvn"io.get-coursier::class-path-util:0.1.4"
   val coursierInterface = mvn"io.get-coursier:interface:1.0.28"
   val coursierDependencyInterface = mvn"io.get-coursier::dependency-interface:0.3.2"
+  def coursierVersions(scalaVersion: String) = mvn"io.get-coursier::versions:0.5.1".withDottyCompat(scalaVersion)
   val fansi = mvn"com.lihaoyi::fansi:0.5.1"
   val fastparse = mvn"com.lihaoyi::fastparse:$fastparseVersion"
   val geny = mvn"com.lihaoyi::geny:1.1.1"
@@ -618,7 +619,8 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
           )(using CoursierModule.ResolvableBoundDep)).distinct
       }
       def mvnDeps: T[Seq[Dep]] = super.mvnDeps() ++ amm.compiler().mvnDeps() ++ Seq(
-        Deps.scalazCore
+        Deps.scalazCore,
+        Deps.coursierVersions(scalaVersion())
       )
     }
   }
