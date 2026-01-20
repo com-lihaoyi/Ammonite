@@ -354,6 +354,12 @@ trait AmmModule extends AmmInternalModule with SonatypeCentralPublishModule with
   }
 
   override def javacOptions: T[Seq[String]] = Seq("-source", "1.8", "-target", "1.8")
+
+  def docSources = Task {
+    val sv = scalaVersion()
+    if (Version(sv) <= Version("2.12.11")) Nil
+    else super.docSources()
+  }
 }
 trait AmmDependenciesResourceFileModule extends JavaModule {
   def dependencyResourceFileName: String
