@@ -954,6 +954,54 @@ object AdvancedTests extends TestSuite {
           """
         )
     }
+    test("eval package input") {
+      val tq = "\"\"\""
+      check.session(
+        s"""
+           @ repl.load(${tq}package thing
+           @
+           @ object Thing {
+           @   def message = "Hello"
+           @ }
+           @ $tq)
+
+           @ val message = thing.Thing.message
+           message: String = "Hello"
+         """
+      )
+
+      if (scala2)
+        check.session(
+          s"""
+             @ repl.load(${tq}package foo
+             @
+             @ object Foo {
+             @   def message = "Hello"
+             @   zz
+             @ }
+             @ $tq)
+             error: source-3.scala:5: not found: value zz
+               zz
+               ^
+           """
+        )
+      else
+        check.session(
+          s"""
+             @ repl.load(${tq}package foo
+             @
+             @ object Foo {
+             @   def message = "Hello"
+             @   zz
+             @ }
+             @ $tq)
+             error: -- [E006] Not Found Error: source-3.scala:5:2 ----------------------------------
+             5 |  zz
+               ^^
+               Not found: zz
+           """
+        )
+    }
     test("position crash") {
       if (scala2) {
         val useStandardQuote = check.scalaVersion.startsWith("2.12.") &&

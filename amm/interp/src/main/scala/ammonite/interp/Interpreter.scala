@@ -445,28 +445,35 @@ class Interpreter(
 
   def processExec(code: String, currentLine: Int, incrementLine: () => Unit): Res[Imports] =
     synchronized {
-      val wrapperName = Name(wrapperNamePrefix + currentLine)
-      val fileName = wrapperName.encoded + ".sc"
-      for {
-        blocks <- Res(parser().splitScript(Interpreter.skipSheBangLine(code), fileName))
+      val finalCode = Interpreter.skipSheBangLine(code)
 
-        metadata <- processAllScriptBlocks(
-          blocks.map(_ => None),
-          Res.Success(blocks),
-          predefImports ++ frameImports,
-          CodeSource(
-            wrapperName,
-            Seq(),
-            parameters.pkgName,
-            Some(wd / "(console)")
-          ),
-          (processed, indexedWrapperName) =>
-            evaluateLine(processed, fileName, indexedWrapperName, false, incrementLine),
-          autoImport = true,
-          ""
-        )
-      } yield {
-        metadata.blockInfo.last.finalImports
+      if (finalCode.startsWith("package "))
+        processRawSource(code, s"source-$currentLine.scala")
+          .map(_ => Imports())
+      else {
+        val wrapperName = Name(wrapperNamePrefix + currentLine)
+        val fileName = wrapperName.encoded + ".sc"
+        for {
+          blocks <- Res(parser().splitScript(finalCode, fileName))
+
+          metadata <- processAllScriptBlocks(
+            blocks.map(_ => None),
+            Res.Success(blocks),
+            predefImports ++ frameImports,
+            CodeSource(
+              wrapperName,
+              Seq(),
+              parameters.pkgName,
+              Some(wd / "(console)")
+            ),
+            (processed, indexedWrapperName) =>
+              evaluateLine(processed, fileName, indexedWrapperName, false, incrementLine),
+            autoImport = true,
+            ""
+          )
+        } yield {
+          metadata.blockInfo.last.finalImports
+        }
       }
     }
 
