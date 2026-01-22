@@ -22,21 +22,21 @@ jobs:
             command: 'terminal.__.test'
 
           - java-version: 17
-            command: 'sshd[{2.12.21,2.13.18,3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.0}].__.test'
+            command: 'sshd[{2.12.21,2.13.18,3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.1}].__.test'
 
           - java-version: 11
             command: 'amm.repl[2.12.{9,14,21}].__.test'
           - java-version: 17
             command: 'amm.repl[2.13.{4,9,18}].__.test'
           - java-version: 21
-            command: 'amm.repl[{3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.0}].__.test'
+            command: 'amm.repl[{3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.1}].__.test'
 
           - java-version: 11
             command: 'amm[2.12.{9,14,21}].__.test'
           - java-version: 17
             command: 'amm[2.13.{4,9,18}].__.test'
           - java-version: 21
-            command: 'amm[{3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.0}].__.test'
+            command: 'amm[{3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.1}].__.test'
 
     runs-on: ubuntu-latest
     steps:
@@ -59,7 +59,7 @@ jobs:
           - java-version: 17
             scala-version: '2.13.{4,9,15,18}'
           - java-version: 21
-            scala-version: '{3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.0}'
+            scala-version: '{3.3.7,3.4.3,3.5.2,3.6.4,3.7.4,3.8.1}'
 
     runs-on: ubuntu-latest
     steps:
