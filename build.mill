@@ -123,7 +123,7 @@ object Deps {
   val jlineReader = mvn"org.jline:jline-reader:3.14.1"
   val jlineTerminal = mvn"org.jline:jline-terminal:3.14.1"
   val jsch = mvn"com.jcraft:jsch:0.1.55"
-  val mainargs = mvn"com.lihaoyi::mainargs:0.7.6"
+  val mainargs = mvn"com.lihaoyi::mainargs:0.7.8"
   val osLib = mvn"com.lihaoyi::os-lib:0.11.5"
   val pprint = mvn"com.lihaoyi::pprint:0.9.0"
   val requests = mvn"com.lihaoyi::requests:0.9.0"
