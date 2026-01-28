@@ -457,7 +457,7 @@ object amm extends Cross[MainModule](fullCrossScalaVersions) {
         else
           Seq[Dep](
             mvn"org.scala-lang::scala3-compiler:${scalaVersion()}",
-            mvn"org.ow2.asm:asm:9.9"
+            mvn"org.ow2.asm:asm:9.9.1"
           )
       super.mvnDeps() ++ scalaSpecificDeps ++ Seq(
         Deps.javassist,
