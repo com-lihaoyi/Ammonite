@@ -124,7 +124,7 @@ object SourceTests212 extends TestSuite {
         // Some aliases the make our code shorter
         import scalaz.==>>
         implicit val scalazOrder: scalaz.Order[Int] = scalaz.Order.fromScalaOrdering(Ordering[Int])
-        implicit val scalazShow: scalaz.Show[Int] = scalaz.Show.show[Int](_.toString)
+        implicit val scalazShow: scalaz.Show[Int] = scalaz.Show.show[Int](n => scalaz.Cord(n.toString))
         type I = Int
         test("empty") - check(load(==>>.empty[I, I] _), "Map.scala", "final def empty")
         test("singleton") - check(load(==>>.singleton[I, I] _), "Map.scala", "final def singleton")
