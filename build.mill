@@ -125,7 +125,7 @@ object Deps {
   val jsch = mvn"com.jcraft:jsch:0.1.55"
   val mainargs = mvn"com.lihaoyi::mainargs:0.7.6"
   val osLib = mvn"com.lihaoyi::os-lib:0.11.5"
-  val pprint = mvn"com.lihaoyi::pprint:0.9.0"
+  val pprint = mvn"com.lihaoyi::pprint:0.9.6"
   val requests = mvn"com.lihaoyi::requests:0.9.0"
   val scalacheck = mvn"org.scalacheck::scalacheck:1.19.0"
   val scalaCollectionCompat = mvn"org.scala-lang.modules::scala-collection-compat:2.14.0"
