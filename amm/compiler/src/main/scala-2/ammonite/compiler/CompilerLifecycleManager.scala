@@ -85,7 +85,7 @@ class CompilerLifecycleManager(
       // we also make a *separate* copy to pass to the presentation compiler.
       // Otherwise activating autocomplete makes the presentation compiler mangle
       // the shared settings and makes the main compiler sad
-      val settings = Option(compiler).fold(new Settings)(_.compiler.settings.copy)
+      val settings = new Settings
       val (success, trailingSettings) =
         settings.processArguments(initialSettings.toList, processAll = true)
       if (!success)
